@@ -14,3 +14,6 @@ service terms are retained separately as
 [upstream reference material](/UPSTREAM_TERMS.md).
 
 CrowClaw visual identity is used as the theme inspiration for this derivative.
+
+The corresponding source for this deployed derivative is published at
+[CrowLoki/Crow-GodMod3](https://github.com/CrowLoki/Crow-GodMod3).
