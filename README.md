@@ -47,5 +47,5 @@ npm test
 ## Licence
 
 This modified derivative remains under the GNU Affero General Public License
-v3.0. See `public/ATTRIBUTION.md`, `public/LICENSE.txt`, and the unmodified
-upstream material under `vendor/godmod3/`.
+v3.0. See `LICENSE`, `public/ATTRIBUTION.md`, and the unmodified upstream
+material under `vendor/godmod3/`.
