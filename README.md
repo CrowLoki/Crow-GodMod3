@@ -8,6 +8,17 @@ CrowClaw visual identity.
 - Corresponding source:
   [CrowLoki/Crow-GodMod3](https://github.com/CrowLoki/Crow-GodMod3)
 
+## Project status
+
+This repository is an ongoing project.
+
+- **Phase 1:** establish the faithful standalone Crow-GodMod3 application,
+  preserve the upstream functionality, and apply the CrowClaw identity.
+- **Phase 2:** expand Crow-GodMod3 with additional features defined during the
+  next development phase.
+- **CrowClaw:** keep Crow-GodMod3 independently usable while making it available
+  as an optional CrowClaw plugin in a future phase.
+
 ## Provenance
 
 - The live site was mirrored with HTTrack and compared with its public source.
