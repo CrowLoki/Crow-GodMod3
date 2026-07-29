@@ -1,17 +1,20 @@
 # Crow-GodMod3
 
-A CrowClaw-inspired chat workbench that reinterprets the interaction shell of
-[G0DM0D3](https://godmod3.ai/) with CrowClaw branding, language, and visual
-identity.
+A faithful static derivative of
+[G0DM0D3](https://github.com/elder-plinius/G0DM0D3), rebranded with the
+CrowClaw visual identity.
 
-## Current scope
+## Provenance
 
-- Responsive chat workspace with desktop sidebar and mobile drawer
-- CrowClaw visual system and product artwork
-- Strategy selector, prompt starters, local conversation history, settings,
-  theme variants, state export, and deliberate local-history clearing
-- Honest provider setup state: no API key is stored or transmitted and no model
-  provider is wired in this interface build
+- The live site was mirrored with HTTrack and compared with its public source.
+- `vendor/godmod3/index.html` is the unmodified upstream snapshot from commit
+  `f6301765fb90eb7b336bdf365319cd2fe44b1187`.
+- `scripts/build-crow-static.mjs` applies the deterministic Crow-GodMod3 brand,
+  palette, privacy, and attribution layer.
+- The generated application is served directly at `/` from
+  `public/crow-godmod3.html`; there is no iframe or imitation shell.
+- Application telemetry is disabled. Provider requests still go to the
+  provider or local endpoint configured by the user.
 
 ## Development
 
@@ -23,6 +26,11 @@ npm run dev
 Build and test:
 
 ```powershell
-npm run build
-node --test tests/rendered-html.test.mjs
+npm test
 ```
+
+## Licence
+
+This modified derivative remains under the GNU Affero General Public License
+v3.0. See `public/ATTRIBUTION.md`, `public/LICENSE.txt`, and the unmodified
+upstream material under `vendor/godmod3/`.

@@ -1,19 +1,29 @@
 import assert from "node:assert/strict";
-import { access, readFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-async function render() {
+const publicEntry = new URL("../public/crow-godmod3.html", import.meta.url);
+
+async function render(path = "/?source=test") {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
   workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);
   const { default: worker } = await import(workerUrl.href);
+  const source = await readFile(publicEntry, "utf8");
 
   return worker.fetch(
-    new Request("http://localhost/", {
+    new Request(`http://localhost${path}`, {
       headers: { accept: "text/html" },
     }),
     {
       ASSETS: {
-        fetch: async () => new Response("Not found", { status: 404 }),
+        fetch: async (request) => {
+          const requestedUrl = new URL(request.url);
+          assert.equal(requestedUrl.pathname, "/crow-godmod3.html");
+          assert.equal(requestedUrl.search, "?source=test");
+          return new Response(source, {
+            headers: { "content-type": "text/html; charset=utf-8" },
+          });
+        },
       },
     },
     {
@@ -23,37 +33,35 @@ async function render() {
   );
 }
 
-test("server-renders the Crow-GodMod3 interface", async () => {
+test("serves the verified static clone directly at the root", async () => {
   const response = await render();
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
 
   const html = await response.text();
+  assert.ok(html.length > 500_000);
   assert.match(html, /<title>Crow-GodMod3<\/title>/i);
-  assert.match(html, /CROW—GODMOD3/);
-  assert.match(html, /Think with a/);
-  assert.match(html, /sharper edge\./);
-  assert.match(html, /No provider connected\./);
-  assert.doesNotMatch(html, /codex-preview|Your site is taking shape/i);
+  assert.match(html, />Crow-GodMod3</);
+  assert.match(html, /crowclaw-head\.webp/);
+  assert.match(html, /crowclaw-mark\.webp/);
+  assert.match(html, /ULTRAPLINIAN/);
+  assert.match(html, /PARSELTONGUE/);
+  assert.match(html, /OpenRouter/);
+  assert.match(html, /const APP_TELEMETRY_ENABLED = false;/);
+  assert.doesNotMatch(html, /<iframe\b/i);
 });
 
-test("removes the starter and retains the branded product source", async () => {
-  const [page, layout, packageJson] = await Promise.all([
-    readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
-    readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
-    readFile(new URL("../package.json", import.meta.url), "utf8"),
+test("contains no orange, amber, yellow, or gold visual colour tokens", async () => {
+  const html = await readFile(publicEntry, "utf8");
+  const forbidden =
+    /#(?:f59e0b|f97316|fbbf24|ff6600|ff7b00|ff9900|ffa500|ffaa00|ffb733|ffcc00|ffd700)\b|rgba\(\s*255\s*,\s*(?:102|123|153|165|170|204|215)\s*,|rgba\(\s*251\s*,\s*191\s*,\s*36|rgba\(\s*249\s*,\s*115\s*,\s*22|rgba\(\s*245\s*,\s*158\s*,\s*11/gi;
+  assert.doesNotMatch(html, forbidden);
+});
+
+test("packages the public source byte-for-byte", async () => {
+  const [source, packaged] = await Promise.all([
+    readFile(publicEntry),
+    readFile(new URL("../dist/client/crow-godmod3.html", import.meta.url)),
   ]);
-
-  assert.match(page, /MURMURATION/);
-  assert.match(page, /SHADOWSCRIPT/);
-  assert.match(page, /crowclaw-head\.webp/);
-  assert.match(layout, /title:\s*"Crow-GodMod3"/);
-  assert.doesNotMatch(packageJson, /react-loading-skeleton/);
-
-  await assert.rejects(
-    access(new URL("../app/_sites-preview/SkeletonPreview.tsx", import.meta.url)),
-  );
-  await assert.rejects(
-    access(new URL("../app/_sites-preview/preview.css", import.meta.url)),
-  );
+  assert.deepEqual(packaged, source);
 });

@@ -4,15 +4,15 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Crow-GodMod3",
   description:
-    "A CrowClaw-inspired multi-model chat workbench interface.",
+    "A CrowClaw-themed multi-model AI research interface.",
   applicationName: "Crow-GodMod3",
-  keywords: ["Crow-GodMod3", "CrowClaw", "AI workbench", "chat interface"],
+  keywords: ["Crow-GodMod3", "CrowClaw", "AI research", "multi-model chat"],
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#08080b",
+  themeColor: "#07050d",
 };
 
 export default function RootLayout({
