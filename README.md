@@ -4,6 +4,10 @@ A faithful static derivative of
 [G0DM0D3](https://github.com/elder-plinius/G0DM0D3), rebranded with the
 CrowClaw visual identity.
 
+- Live site: [crow-godmod3.vercel.app](https://crow-godmod3.vercel.app)
+- Corresponding source:
+  [CrowLoki/Crow-GodMod3](https://github.com/CrowLoki/Crow-GodMod3)
+
 ## Provenance
 
 - The live site was mirrored with HTTrack and compared with its public source.
