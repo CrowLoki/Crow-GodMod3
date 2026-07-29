@@ -31,6 +31,25 @@ This repository is an ongoing project.
 - Application telemetry is disabled. Provider requests still go to the
   provider or local endpoint configured by the user.
 
+## Crow Theme integration
+
+Crow-GodMod3 includes the complete approved Crow Brand System under
+[`brand-system/`](brand-system/):
+
+- Glitch Ascendant as the primary Crow-GodMod3 form
+- Core Architect as its compact form
+- Field Operator and Pet Companion for the wider approved mascot family
+- Crow Signal Display and Mono fonts
+- Crow Talon static and animated Windows pointers
+- signal marks, favicon and application icons
+- backgrounds, six product heroes and social artwork
+- shared CSS, JSON and TypeScript design tokens
+- brand, mascot, prompt, provenance and reproducible-build sources
+
+The build copies the pack into the deployed `/crow-theme/` catalogue and
+applies its product binding, typography, pointers, hero, icons, social preview
+and colour tokens to the application. The upstream snapshot remains unchanged.
+
 ## Development
 
 ```powershell
@@ -48,4 +67,5 @@ npm test
 
 This modified derivative remains under the GNU Affero General Public License
 v3.0. See `LICENSE`, `public/ATTRIBUTION.md`, and the unmodified upstream
-material under `vendor/godmod3/`.
+material under `vendor/godmod3/`. Original Crow Brand System assets are covered
+by the separate notice in [`brand-system/LICENSE.md`](brand-system/LICENSE.md).

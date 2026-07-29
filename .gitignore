@@ -44,3 +44,5 @@ next-env.d.ts
 /.wrangler/
 /outputs/
 /work/
+/public/crow-theme/
+/public/manifest.webmanifest

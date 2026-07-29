@@ -1,0 +1,1153 @@
+{
+  "id": "crow-brand-system",
+  "name": "Crow Brand System",
+  "version": "0.1.0",
+  "status": "internal-preview",
+  "generated_at": "2026-07-29T15:02:53.164611+00:00",
+  "approved_forms": [
+    "core-architect",
+    "field-operator",
+    "glitch-ascendant",
+    "pet-companion"
+  ],
+  "original_asset_families": [
+    "Crow Signal",
+    "Crow Talon"
+  ],
+  "products": [
+    "CrowClaw",
+    "Crow-GodMod3",
+    "CrowQuant",
+    "CrowNest",
+    "CrowMemory",
+    "CrowFlix"
+  ],
+  "files": [
+    {
+      "file": ".gitignore",
+      "kind": "project",
+      "bytes": 203,
+      "sha256": "c4155abd47083de95084e533b37d9462095754a2f4e0f0d4ef0ca47a8612d3a8"
+    },
+    {
+      "file": "AGENTS.md",
+      "kind": "project",
+      "bytes": 1819,
+      "sha256": "63d8cea58dc1ec51c0d25f171bab2f2ff6368b37c729bfc08cb6dc1159beb103"
+    },
+    {
+      "file": "assets/backgrounds/exports/void-grid-1920x1080.png",
+      "kind": "background",
+      "bytes": 2117035,
+      "sha256": "53eea5e6609be075c5980b4cc58c54a6a4546a0c31ee1e9142122d1d474dda14",
+      "width": 1920,
+      "height": 1080,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/backgrounds/exports/void-grid-2560x1440.png",
+      "kind": "background",
+      "bytes": 3180260,
+      "sha256": "1bd8b1a61c6a5637fd2fd5724221d0f35954c2cb9c2c541842e456a61381eb0b",
+      "width": 2560,
+      "height": 1440,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/backgrounds/exports/void-grid-3440x1440.png",
+      "kind": "background",
+      "bytes": 3265850,
+      "sha256": "fab716ce65311a80569c98854f596ceefafd62096076009a300898a0c18ca581",
+      "width": 3440,
+      "height": 1440,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/backgrounds/exports/void-grid-mobile-1440x2560.png",
+      "kind": "background",
+      "bytes": 1325594,
+      "sha256": "9d2ee0618a297dc96cbee388be938164ec903164584b48c7a144fa63fb5d418d",
+      "width": 1440,
+      "height": 2560,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/backgrounds/exports/void-grid-square-2048x2048.png",
+      "kind": "background",
+      "bytes": 2341968,
+      "sha256": "1f7f07cc27d96b22c6611ad9918ad3d765882679cc8905b8d40da7e917334582",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/backgrounds/void-grid-neutral.png",
+      "kind": "background",
+      "bytes": 1822304,
+      "sha256": "bd7f2acc2ac02afb33861bd5e01545801fd41753ea8f8f5ff3bee2a70d18088a",
+      "width": 1672,
+      "height": 941,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/icons/app/crow-signal-app-rounded-1024.png",
+      "kind": "icon",
+      "bytes": 1352750,
+      "sha256": "30725f9aa921822d2daf1a101a2fbb310463f6b64deefa7a8b3af52f18456e2e",
+      "width": 1024,
+      "height": 1024,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/icons/app/crow-signal-app-rounded-256.png",
+      "kind": "icon",
+      "bytes": 94339,
+      "sha256": "29b9f9afe84e51392503bdd18041dd1e2c314f65bcce735da1c1514fedc04bd7",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/icons/app/crow-signal-app-rounded-512.png",
+      "kind": "icon",
+      "bytes": 372106,
+      "sha256": "0779dcaf9f723e13e560b59a325de9dadbf8356d5807401f5c3437aee5bf0a42",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/icons/avatars/crow-signal-avatar-512.png",
+      "kind": "icon",
+      "bytes": 471123,
+      "sha256": "ce0a32d4a8fd410233548d2ee7f094399a07d326804281fba92ee6ab7cb3d5fe",
+      "width": 512,
+      "height": 512,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/icons/avatars/pet-companion-avatar-512.png",
+      "kind": "icon",
+      "bytes": 430444,
+      "sha256": "393b0dfd5cd86ce69b51a90dc784ac443e76ea358b44ff716ba0dee4ea0f9501",
+      "width": 512,
+      "height": 512,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/icons/contact-sheet.png",
+      "kind": "icon",
+      "bytes": 879645,
+      "sha256": "a688dff1772c1610fe79d3e67205aaa4281f607e69b3e61e7f43bdbc290d5317",
+      "width": 2400,
+      "height": 1760,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/icons/favicon.ico",
+      "kind": "icon",
+      "bytes": 369966,
+      "sha256": "0e2a991721cf2d1f05a7f2d68704656cff8bd574e1fa931b2a19c848f24d8f15",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "format": "ICO"
+    },
+    {
+      "file": "assets/icons/manifest.json",
+      "kind": "icon",
+      "bytes": 15682,
+      "sha256": "b9ce6c2077a1e55d982eef289f278f533754db3f3fc41437859192578db62ec4"
+    },
+    {
+      "file": "assets/icons/png/crow-signal-1024.png",
+      "kind": "icon",
+      "bytes": 1209436,
+      "sha256": "ee65879a2cecd02ef9bb1d386738ef391158c3791ec0c4638cc9d48bf337ea9c",
+      "width": 1024,
+      "height": 1024,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/icons/png/crow-signal-128.png",
+      "kind": "icon",
+      "bytes": 34542,
+      "sha256": "ff6bbdff613acc55f7f004171fa67215b6b49b618b02bf5d3a88d48c780e8f18",
+      "width": 128,
+      "height": 128,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/icons/png/crow-signal-16.png",
+      "kind": "icon",
+      "bytes": 705,
+      "sha256": "dac2f1f115473d8f63fa02ec848fb29b3c040d2a1b8a6fbde4ebb59720d36426",
+      "width": 16,
+      "height": 16,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/icons/png/crow-signal-180.png",
+      "kind": "icon",
+      "bytes": 66979,
+      "sha256": "75ade137a7af57043a7ce42b3cac8e63e9720dd5dada0fb47c4afe5ffb13467d",
+      "width": 180,
+      "height": 180,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/icons/png/crow-signal-192.png",
+      "kind": "icon",
+      "bytes": 75773,
+      "sha256": "705da099cde24a21c5ba471b5ac67af338cf9b6ca4a938901cf9f908f25caad3",
+      "width": 192,
+      "height": 192,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/icons/png/crow-signal-20.png",
+      "kind": "icon",
+      "bytes": 1033,
+      "sha256": "157731bbef2553c9c6e2131083a0b01b2e04a721fe68b8c59943fd5f04d27dc4",
+      "width": 20,
+      "height": 20,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/icons/png/crow-signal-24.png",
+      "kind": "icon",
+      "bytes": 1416,
+      "sha256": "8e0776e8bb5a8af341d84342f269970d8c30dce454be46905837355dd462f446",
+      "width": 24,
+      "height": 24,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/icons/png/crow-signal-256.png",
+      "kind": "icon",
+      "bytes": 103405,
+      "sha256": "dea4da2edead995b0ccb431ce9c2fd20777fe9e7d72896aead334a2e8cadaace",
+      "width": 256,
+      "height": 256,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/icons/png/crow-signal-32.png",
+      "kind": "icon",
+      "bytes": 2416,
+      "sha256": "2730f713c165441b106718f607b54a4caf5c68fad90adba722ab2c57f3b6a83b",
+      "width": 32,
+      "height": 32,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/icons/png/crow-signal-40.png",
+      "kind": "icon",
+      "bytes": 3765,
+      "sha256": "cffaaefea91f67d509c7cb109ef70ef7922eb7ffb2c84512edd8ace70c1220db",
+      "width": 40,
+      "height": 40,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/icons/png/crow-signal-48.png",
+      "kind": "icon",
+      "bytes": 5363,
+      "sha256": "36f4504b03589787790f66d8d899146f642a64c6ff780a4600fde03a84e73662",
+      "width": 48,
+      "height": 48,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/icons/png/crow-signal-512.png",
+      "kind": "icon",
+      "bytes": 319308,
+      "sha256": "830b53da8581ef50cec9d759cab8a5e282b5241140b27e0d395b27e8670e21cd",
+      "width": 512,
+      "height": 512,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/icons/png/crow-signal-64.png",
+      "kind": "icon",
+      "bytes": 9137,
+      "sha256": "9897e280a67383144d5b341b61b06e92ca009bdbfb84888c533e2a55c35c145e",
+      "width": 64,
+      "height": 64,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/icons/png/crow-signal-96.png",
+      "kind": "icon",
+      "bytes": 19806,
+      "sha256": "b6e269acf3fac811d99a17b711eb69d4d929881de4814fa274722ef5b87baf0b",
+      "width": 96,
+      "height": 96,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/marks/crow-signal-master.png",
+      "kind": "project",
+      "bytes": 1796036,
+      "sha256": "de3b381e21c29c1d87d69554daa474c9a4d11c146eaea44dd4c843d9b197f472",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/mascots/masters/core-architect.png",
+      "kind": "approved-mascot-master",
+      "bytes": 2170779,
+      "sha256": "7d368291269cf02b5c968245a0f29b63a6cb008f3fa741a8530630bb6fc6062d",
+      "width": 951,
+      "height": 1653,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/mascots/masters/field-operator.png",
+      "kind": "approved-mascot-master",
+      "bytes": 2750287,
+      "sha256": "ef682df20a92e22ce3c3c3623dd6e790856e7385bb917b931ed78784afbeb2ce",
+      "width": 1024,
+      "height": 1536,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/mascots/masters/glitch-ascendant.png",
+      "kind": "approved-mascot-master",
+      "bytes": 3236779,
+      "sha256": "a16ba71249f78001fb2e5b4ad48fc5573d41a7e63cdd3d2fef8a6ea227c9bcfd",
+      "width": 1024,
+      "height": 1536,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/mascots/masters/pet-companion.png",
+      "kind": "approved-mascot-master",
+      "bytes": 1971520,
+      "sha256": "644a121117370fcc01babbd4e30682a768a9e723e99ad2b3e40d404f0575d1c0",
+      "width": 1024,
+      "height": 1536,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/mascots/references/3eyedcrow-original.jpg",
+      "kind": "identity-reference",
+      "bytes": 512599,
+      "sha256": "817f319e50d8cb444ea5f5ecce69995a371ab188c2e8aca45646e86c637e37c9",
+      "width": 1024,
+      "height": 1021,
+      "mode": "RGB",
+      "format": "JPEG"
+    },
+    {
+      "file": "assets/mascots/references/core-architect-selected-reference.png",
+      "kind": "identity-reference",
+      "bytes": 2182547,
+      "sha256": "3415ed010d2141ab06a62a329df91764ce5e0f9ca6024793addb3bf1acf98ff4",
+      "width": 951,
+      "height": 1654,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/product-variants/crow-godmod3-hero.png",
+      "kind": "product-artwork",
+      "bytes": 2262636,
+      "sha256": "581194e8fd09ebbfbc30943e8636c97ebd362758c1ed0400b69ac219bb58fe8c",
+      "width": 1672,
+      "height": 941,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/product-variants/crowclaw-hero.png",
+      "kind": "product-artwork",
+      "bytes": 1932620,
+      "sha256": "643336b0e838b3f0bc630cee275890977d315946bad529028f8978654d9644d2",
+      "width": 1672,
+      "height": 941,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/product-variants/crowflix-hero.png",
+      "kind": "product-artwork",
+      "bytes": 2192412,
+      "sha256": "2366f71a0808b3c38de9d9edbeb65f325e7a0c105963889ddbbad53aba196864",
+      "width": 1672,
+      "height": 941,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/product-variants/crowmemory-hero.png",
+      "kind": "product-artwork",
+      "bytes": 2110505,
+      "sha256": "445e0756a04c86ed9c29404f726d89bfb3746fc7ffc5d995e47225cb51e1f256",
+      "width": 1672,
+      "height": 941,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/product-variants/crownest-hero.png",
+      "kind": "product-artwork",
+      "bytes": 1899295,
+      "sha256": "4cd90c1b03b80cdf247d24641d70da48926ac30b8f6036ddae8f016a28521dfc",
+      "width": 1672,
+      "height": 941,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/product-variants/crowquant-hero.png",
+      "kind": "product-artwork",
+      "bytes": 2225177,
+      "sha256": "053ede22d87eb92f1687015a8497d17ca7b45c58424cf1a86d8113ccb9a9e2f2",
+      "width": 1672,
+      "height": 941,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/product-variants/exports/crow-godmod3-1200x630.png",
+      "kind": "product-artwork",
+      "bytes": 1154027,
+      "sha256": "bc6480c6896f5ebce5346f0216eb6d4cedaa78c84b25372c4e1a09bf40691ff8",
+      "width": 1200,
+      "height": 630,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/product-variants/exports/crow-godmod3-1920x1080.png",
+      "kind": "product-artwork",
+      "bytes": 2725968,
+      "sha256": "a5bcb2488664a56384c50e57982164adf42510655d8f5e395c4f4b4d6e74fa58",
+      "width": 1920,
+      "height": 1080,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/product-variants/exports/crowclaw-1200x630.png",
+      "kind": "product-artwork",
+      "bytes": 968477,
+      "sha256": "984b22e2eda4640059ed979b5fb50c1a381a0fef4bedd98c5047871a4ed11e8d",
+      "width": 1200,
+      "height": 630,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/product-variants/exports/crowclaw-1920x1080.png",
+      "kind": "product-artwork",
+      "bytes": 2273666,
+      "sha256": "58c548c63074a3ef9fa50f47f0900c55842e59fd3d8a808717cdfcfaecaa5fc4",
+      "width": 1920,
+      "height": 1080,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/product-variants/exports/crowflix-1200x630.png",
+      "kind": "product-artwork",
+      "bytes": 1083165,
+      "sha256": "39067eacb2602bb9510db744c4604aef068f511d3f77d95bce6f740170f499ab",
+      "width": 1200,
+      "height": 630,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/product-variants/exports/crowflix-1920x1080.png",
+      "kind": "product-artwork",
+      "bytes": 2616720,
+      "sha256": "ace58830615200a94d1811b633e1e0d1b8c06cff41a40a9670d48b400c039826",
+      "width": 1920,
+      "height": 1080,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/product-variants/exports/crowmemory-1200x630.png",
+      "kind": "product-artwork",
+      "bytes": 1049901,
+      "sha256": "4d20a456d80d1a958045a39762113e23d0b2ba6410fe740e82f135f854044b73",
+      "width": 1200,
+      "height": 630,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/product-variants/exports/crowmemory-1920x1080.png",
+      "kind": "product-artwork",
+      "bytes": 2521615,
+      "sha256": "e262f51bf8d29f6ccf9401aea96ce4e14eed0efeb4b50b3b8a51fe67be2d4ef1",
+      "width": 1920,
+      "height": 1080,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/product-variants/exports/crownest-1200x630.png",
+      "kind": "product-artwork",
+      "bytes": 952773,
+      "sha256": "de7c796f9cccbfa21948a754a0a9b0d4ef76ab133055eb1a4de357bd6cfb23e0",
+      "width": 1200,
+      "height": 630,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/product-variants/exports/crownest-1920x1080.png",
+      "kind": "product-artwork",
+      "bytes": 2238367,
+      "sha256": "d05422b4c8a4bc3396ad38019bc31a4bf1649489c376a840272cda65b9e21f55",
+      "width": 1920,
+      "height": 1080,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/product-variants/exports/crowquant-1200x630.png",
+      "kind": "product-artwork",
+      "bytes": 1113746,
+      "sha256": "b4adae9bcb48c4a1aa08ed545d1579270dc090500804ef4f748f807bde0d5c92",
+      "width": 1200,
+      "height": 630,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/product-variants/exports/crowquant-1920x1080.png",
+      "kind": "product-artwork",
+      "bytes": 2688920,
+      "sha256": "07d2bfa5c1411a1f96579b7e7d28df5267dc4e59a0ca09c7cbeb25d755a23cdf",
+      "width": 1920,
+      "height": 1080,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/raster-manifest.json",
+      "kind": "project",
+      "bytes": 4427,
+      "sha256": "92ff121ed729a4a831e678ed00afcf6ce7214dba2002c648b71071f0b1d87c79"
+    },
+    {
+      "file": "assets/social/crow-family-banner.png",
+      "kind": "social",
+      "bytes": 1839555,
+      "sha256": "cd63d5a0c5993090e78eaea71fd9395e4af089b2d5386ec65ac4bd37b32a650b",
+      "width": 1774,
+      "height": 887,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/social/exports/crow-family-github-1280x640.png",
+      "kind": "social",
+      "bytes": 971319,
+      "sha256": "b7fb8261764007494fa6a6fb4c2098c7753fbee0fd1084b487249f7f23777279",
+      "width": 1280,
+      "height": 640,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/social/exports/crow-family-open-graph-1200x630.png",
+      "kind": "social",
+      "bytes": 916959,
+      "sha256": "1b331cd8f6f674c4d32b4d9189518fefd76a5ab8ae3a5df05324b6098753707e",
+      "width": 1200,
+      "height": 630,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/social/exports/crow-family-post-1080x1080.png",
+      "kind": "social",
+      "bytes": 1568140,
+      "sha256": "145e9946ccc8bdeb01d9a5cb97e2fdbaa4c973c8376f1aa103158de176a3fad3",
+      "width": 1080,
+      "height": 1080,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/social/exports/crow-family-story-1080x1920.png",
+      "kind": "social",
+      "bytes": 1837633,
+      "sha256": "db10174b9fd391c1f037e07da56968bcec5024115fec5d1b9bcb55bcf52bf255",
+      "width": 1080,
+      "height": 1920,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/social/exports/crow-family-wide-1500x500.png",
+      "kind": "social",
+      "bytes": 896628,
+      "sha256": "28df092a7d94e5a41e9e24a0c05206a8afb92238ac4379786fa886433a92d657",
+      "width": 1500,
+      "height": 500,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/source/3EyedCrow-reference.jpg",
+      "kind": "project",
+      "bytes": 512599,
+      "sha256": "817f319e50d8cb444ea5f5ecce69995a371ab188c2e8aca45646e86c637e37c9",
+      "width": 1024,
+      "height": 1021,
+      "mode": "RGB",
+      "format": "JPEG"
+    },
+    {
+      "file": "build.ps1",
+      "kind": "project",
+      "bytes": 651,
+      "sha256": "dcb95f3310cb5d32fe3b14f576c28290b9e86892fee12a0654e0dc067138e0f8"
+    },
+    {
+      "file": "CHANGELOG.md",
+      "kind": "project",
+      "bytes": 945,
+      "sha256": "a8643b12809347129b4cd837d7fbb0bee0907586a42a849bd591e3e75afa84ba"
+    },
+    {
+      "file": "cursors/Crow-Talon.inf",
+      "kind": "project",
+      "bytes": 1640,
+      "sha256": "29b1e48209a1b0df5eefd8d010180ca9af52586c939c2ce392bf03ff73e4e265"
+    },
+    {
+      "file": "cursors/install.ps1",
+      "kind": "project",
+      "bytes": 3000,
+      "sha256": "a8cd48b129930b1cba0c7dd5ee8426ba3462979715886bf3c5862519de85b2d0"
+    },
+    {
+      "file": "cursors/manifest.json",
+      "kind": "project",
+      "bytes": 13921,
+      "sha256": "feeb2c7198b6b8b0272b358fe7031df461f9ab61dfdad7fd008b0d142e9f5af2"
+    },
+    {
+      "file": "cursors/preview.png",
+      "kind": "project",
+      "bytes": 100535,
+      "sha256": "4a72f8f9683039ec3cfead50852dc1d93d419a8374e43def1b24475447950c09",
+      "width": 1100,
+      "height": 540,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/alternate.png",
+      "kind": "project",
+      "bytes": 18527,
+      "sha256": "d5092a834e558711be1eb2ebaaa50aaae41490a8980a14210b79db3024c25205",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/busy.png",
+      "kind": "project",
+      "bytes": 28349,
+      "sha256": "e20d224e894366ac20d1a14c71d01f3daf2cdd0462abaa0eb2457ff843846f44",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/handwriting.png",
+      "kind": "project",
+      "bytes": 24500,
+      "sha256": "475e9140fc92fc54e5457675232f5b32d65550c1f2f620dd85ad08a5c7da8bfb",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/help.png",
+      "kind": "project",
+      "bytes": 39519,
+      "sha256": "72f419e13e6f20c8b99996f7cf99948fc45c145170980a24ed526564b6faf5f4",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/link.png",
+      "kind": "project",
+      "bytes": 14770,
+      "sha256": "ed74765b5c5b903013585eb35616c77e47a616292d26ff33ab70841284315619",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/move.png",
+      "kind": "project",
+      "bytes": 13538,
+      "sha256": "c81e48e69e1f9d9bec19135498d1de97394af5ec4094c7f2e23135f30ff3c621",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/normal.png",
+      "kind": "project",
+      "bytes": 28746,
+      "sha256": "10138f37f54dcc92205ebfc91a34861e3c320a18edbee8df74764f139b95f5a9",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/precision.png",
+      "kind": "project",
+      "bytes": 24951,
+      "sha256": "e3d6b0d0ecc227e0c66b25dc82aa8057fe725749fe67d6b26c94686b80b1df03",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/resize-d1.png",
+      "kind": "project",
+      "bytes": 10299,
+      "sha256": "3e4b82f32639596bc499afd6399c037b2597ae143bd9f4adc38cf00473c8081c",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/resize-d2.png",
+      "kind": "project",
+      "bytes": 10253,
+      "sha256": "51224cbd2bc6d0644b12d77b8e5c6e328a05537bc145b1a7deb6b2dbae91e9d9",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/resize-h.png",
+      "kind": "project",
+      "bytes": 9006,
+      "sha256": "fe4a8abc5f6ebdbdfd27ccc42de9253104c2447cb1a2a5578f3ce97f4bf2da1f",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/resize-v.png",
+      "kind": "project",
+      "bytes": 8453,
+      "sha256": "026113a19ed056c15ab957ca2bf49ec964e41a3d5c85bf3b888732dfdf2d98e2",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/text.png",
+      "kind": "project",
+      "bytes": 8822,
+      "sha256": "cb058b46ad766cf0304679c5e70f6e508d7e927b14f0c3e849da77be50f9acf1",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/unavailable.png",
+      "kind": "project",
+      "bytes": 21321,
+      "sha256": "5f104170440ff563f55fd16bc05d1f4980406c78025bf1d02f6525806028ce4e",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/working.png",
+      "kind": "project",
+      "bytes": 37375,
+      "sha256": "5614fa7ad1bc5cab5c05b516c93f2e330cdbf0c670e21cbb68a97b7ae76cd2f1",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/uninstall.ps1",
+      "kind": "project",
+      "bytes": 1850,
+      "sha256": "ece4474f3e5642a56b9a2fc7e0dbc7e7e56d4ef4e12e0a62ce0cb9cceb5c9e38"
+    },
+    {
+      "file": "cursors/windows/alternate.cur",
+      "kind": "windows-cursor",
+      "bytes": 12351,
+      "sha256": "3e200fefde565114f44b833fa6421d4375a379446cc35bdacfdea987cf4d2ad6"
+    },
+    {
+      "file": "cursors/windows/busy.ani",
+      "kind": "windows-cursor",
+      "bytes": 235998,
+      "sha256": "7534d39dcce306d85f6dfa9db61178638df372d6f4f76440bc6348075d79f07e"
+    },
+    {
+      "file": "cursors/windows/busy.cur",
+      "kind": "windows-cursor",
+      "bytes": 19536,
+      "sha256": "b5348a685cd8572d9016d8c2ff075e12b90d9f162433601de2102178c5bcb3ac"
+    },
+    {
+      "file": "cursors/windows/handwriting.cur",
+      "kind": "windows-cursor",
+      "bytes": 16213,
+      "sha256": "ee15b9c10b15b9f9e263913aaef755d9d978d4c816ea6e0e1691b7351cca00aa"
+    },
+    {
+      "file": "cursors/windows/help.cur",
+      "kind": "windows-cursor",
+      "bytes": 27445,
+      "sha256": "e2023a4ddfed009c88fcb458337af27df8cdf9b4184682482b2d9869fac5c82c"
+    },
+    {
+      "file": "cursors/windows/link.cur",
+      "kind": "windows-cursor",
+      "bytes": 14068,
+      "sha256": "a9906b08242bea989b96f9b25d393316d9b4f39ef884d1491e96673ad2e09073"
+    },
+    {
+      "file": "cursors/windows/move.cur",
+      "kind": "windows-cursor",
+      "bytes": 10778,
+      "sha256": "73676a1123c05af219883099420497007d33adce1d28210f0651ed976496ade3"
+    },
+    {
+      "file": "cursors/windows/normal.cur",
+      "kind": "windows-cursor",
+      "bytes": 20621,
+      "sha256": "98d6182631b1e0ba56525a9f39d6e41c2cf1a5832ac4ec104793d52ec51171c9"
+    },
+    {
+      "file": "cursors/windows/precision.cur",
+      "kind": "windows-cursor",
+      "bytes": 19530,
+      "sha256": "52008acb71ea5ad1c1536b3e9f8cb87e1d685aa663b0054c6a031bf9d34fd325"
+    },
+    {
+      "file": "cursors/windows/resize-d1.cur",
+      "kind": "windows-cursor",
+      "bytes": 8140,
+      "sha256": "96a4d417f69fa084bf533713b65e1321a39122fa6981923a65c2d14ac7999934"
+    },
+    {
+      "file": "cursors/windows/resize-d2.cur",
+      "kind": "windows-cursor",
+      "bytes": 8248,
+      "sha256": "254dfd91a1ad8622f03cb39bcd0a51cdc8a5dcf73cd4cc8ff5486e1d1a110141"
+    },
+    {
+      "file": "cursors/windows/resize-h.cur",
+      "kind": "windows-cursor",
+      "bytes": 6778,
+      "sha256": "5eefdbea244b039871d0ed071dbe77ebc4f1bd784ee63b2692cded0e7cef9748"
+    },
+    {
+      "file": "cursors/windows/resize-v.cur",
+      "kind": "windows-cursor",
+      "bytes": 7527,
+      "sha256": "51bab086a63de67925477601e0fcf710b67293be2a89034e1e6f76f0376789e1"
+    },
+    {
+      "file": "cursors/windows/text.cur",
+      "kind": "windows-cursor",
+      "bytes": 8163,
+      "sha256": "6c35432537b1f7dacd711b82f5f9216cf74c00ff86f9c1821654b6cd79186598"
+    },
+    {
+      "file": "cursors/windows/unavailable.cur",
+      "kind": "windows-cursor",
+      "bytes": 19061,
+      "sha256": "4d6b80b54a7c48f375adb5a62ce99d7fcc8752bd3da705c810a4724110ed2a69"
+    },
+    {
+      "file": "cursors/windows/working.ani",
+      "kind": "windows-cursor",
+      "bytes": 307898,
+      "sha256": "49ceb16f7395081b129943b44d845cfcae102df254afda9b226db7864a755fa6"
+    },
+    {
+      "file": "cursors/windows/working.cur",
+      "kind": "windows-cursor",
+      "bytes": 25589,
+      "sha256": "3f9bbe0070ef48dfe85cf4da5cb712ae56d6a0bae136851b08eb04ed7c08fa44"
+    },
+    {
+      "file": "docs/BRAND-GUIDE.md",
+      "kind": "documentation",
+      "bytes": 7153,
+      "sha256": "4e7c38d8549c238182bcbecd1db457671f8da5bf314f8358639d2c571ec5bb00"
+    },
+    {
+      "file": "docs/MASCOT-GUIDE.md",
+      "kind": "documentation",
+      "bytes": 7271,
+      "sha256": "a7d758dd30b5b716cd337cc5d6b6d2fe5584ed54256cc0ade01da968178bde95"
+    },
+    {
+      "file": "downloads/Crow-Signal-Windows-v0.1.0.zip",
+      "kind": "project",
+      "bytes": 97365,
+      "sha256": "53dd2e8763815ad2adecf0815b31788c0683d13bedca23ac14ed6398f23a06ce"
+    },
+    {
+      "file": "downloads/Crow-Talon-Windows-v0.1.0.zip",
+      "kind": "project",
+      "bytes": 1166176,
+      "sha256": "070515558a5e5eb0f4bd4f0a2ae1b08242134b2cdbfa4630a143b956a85a69a4"
+    },
+    {
+      "file": "fonts/crow-signal.css",
+      "kind": "project",
+      "bytes": 948,
+      "sha256": "7eaf8e5842cdb3e0ba9e4f543c078e84c4dcd69eac66313cc2291b68aa6d2113"
+    },
+    {
+      "file": "fonts/install.ps1",
+      "kind": "project",
+      "bytes": 1827,
+      "sha256": "465f92e006c9396164bf5f9a5ece85fbe00269c00ea96f7cb7b5ce3596515824"
+    },
+    {
+      "file": "fonts/manifest.json",
+      "kind": "project",
+      "bytes": 4379,
+      "sha256": "1e006393e05b128a9071c64177ddd769b59d38030ec24e8a3b9f7e343dd4ad00"
+    },
+    {
+      "file": "fonts/README.md",
+      "kind": "project",
+      "bytes": 1882,
+      "sha256": "4814746e51cff39c6c79ba4cabfe0032f5824f76cde6790a411b40156f0f791e"
+    },
+    {
+      "file": "fonts/specimens/crow-signal-v0.1.png",
+      "kind": "project",
+      "bytes": 64774,
+      "sha256": "96e248af32e059fce7038381c1e9819302803e041d1fec954b75cc472cf7ee57",
+      "width": 2400,
+      "height": 1760,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "fonts/ttf/CrowSignalDisplay-Bold.ttf",
+      "kind": "font",
+      "bytes": 40972,
+      "sha256": "9237eb65df51167bb77ef0d226d4e860c38a9c9a6bbc9757e30724c96183ae96"
+    },
+    {
+      "file": "fonts/ttf/CrowSignalDisplay-Regular.ttf",
+      "kind": "font",
+      "bytes": 41008,
+      "sha256": "06be80fd542316bf11e89c646aee6265d55c4c4da25001a3acc127c910408ea6"
+    },
+    {
+      "file": "fonts/ttf/CrowSignalMono-Bold.ttf",
+      "kind": "font",
+      "bytes": 40700,
+      "sha256": "fd61fd7ee18fba3448544d23a7aae69ad9156896c531c75a2d042baa2a584e2d"
+    },
+    {
+      "file": "fonts/ttf/CrowSignalMono-Regular.ttf",
+      "kind": "font",
+      "bytes": 40736,
+      "sha256": "7f084346b7d810d17d335e7508734da7303e64ea077386e8ef64f94823850201"
+    },
+    {
+      "file": "fonts/uninstall.ps1",
+      "kind": "project",
+      "bytes": 1543,
+      "sha256": "6db8b4beb498735f6fe4dddff872c9b77a7a38a9d7db662433b798d8efd964bf"
+    },
+    {
+      "file": "fonts/woff2/CrowSignalDisplay-Bold.woff2",
+      "kind": "font",
+      "bytes": 3616,
+      "sha256": "08cfd468fcf4e9db5f0a65f27fdf95de9c47568e2eba86e4b453470ee97f0ef9"
+    },
+    {
+      "file": "fonts/woff2/CrowSignalDisplay-Regular.woff2",
+      "kind": "font",
+      "bytes": 3664,
+      "sha256": "40b23fde9dc50031497d0b046fded7540cc203945c77f6e4b6c9604acbd330f5"
+    },
+    {
+      "file": "fonts/woff2/CrowSignalMono-Bold.woff2",
+      "kind": "font",
+      "bytes": 3752,
+      "sha256": "9e7d9a9456e6c5ee532269488409b8753d32b5a5ca0ab4d93bc7aaf6d5ccdc8c"
+    },
+    {
+      "file": "fonts/woff2/CrowSignalMono-Regular.woff2",
+      "kind": "font",
+      "bytes": 3840,
+      "sha256": "965d08be3aac2c132c76d72a5479da02dfda3ce324690fae021953f95a2d1873"
+    },
+    {
+      "file": "LICENSE.md",
+      "kind": "project",
+      "bytes": 784,
+      "sha256": "5e1ca97e5d420cb5a4efab018a92ecd16d0a1d3b5068b5d6244b73fe91433e52"
+    },
+    {
+      "file": "prompts/asset-generation.md",
+      "kind": "documentation",
+      "bytes": 1797,
+      "sha256": "dae2406264c0db2f1e1bb7e60d061bcc07d89e6ef96e16ddcaedd3d02030057e"
+    },
+    {
+      "file": "prompts/mascot-consistency.md",
+      "kind": "documentation",
+      "bytes": 4404,
+      "sha256": "86bcc7a34d784d9634c5acc288b29658ef6007f345f0870424207a7c53a48459"
+    },
+    {
+      "file": "provenance/SOURCES.md",
+      "kind": "project",
+      "bytes": 1411,
+      "sha256": "6f046851ba494e06d4b8fb238e9e915be4c6623355c41a7ad4d2887ca1bb2f83"
+    },
+    {
+      "file": "README.md",
+      "kind": "project",
+      "bytes": 4262,
+      "sha256": "eefb128bec6d49fa312653bd5ebb8c8c710523a383e44b3ad24a769528a353ff"
+    },
+    {
+      "file": "requirements.txt",
+      "kind": "project",
+      "bytes": 40,
+      "sha256": "5ba6394abed3229d9e09dc82de27b7389fcf272afcf3038f879674d91e13fc5a"
+    },
+    {
+      "file": "scripts/build_cursors.py",
+      "kind": "build-source",
+      "bytes": 35865,
+      "sha256": "611115e82d2ced3639c26f715baad084c935dcce22084458b7a4f4e75d2155f2"
+    },
+    {
+      "file": "scripts/build_fonts.py",
+      "kind": "build-source",
+      "bytes": 26720,
+      "sha256": "f7197de8463486744b2b205e26286abb35d47c564d02f9dd00ac5199840f5ea8"
+    },
+    {
+      "file": "scripts/build_icons.py",
+      "kind": "build-source",
+      "bytes": 16665,
+      "sha256": "4d457ceb31c6fd7bd31d522bced168c5a23a3e15475a3bdf4af93e8605d2f504"
+    },
+    {
+      "file": "scripts/build_manifest.py",
+      "kind": "build-source",
+      "bytes": 3809,
+      "sha256": "a65f518285ae3f94eea9dd9ea9d05d901a3c7a3ce8e5469efa3ebaeb6d46dc55"
+    },
+    {
+      "file": "scripts/build_raster_exports.py",
+      "kind": "build-source",
+      "bytes": 3900,
+      "sha256": "7dd78f9197bf0afc4c3fe8cb5788e889efcd3c5645b960de7dfd54c03ac8e5c3"
+    },
+    {
+      "file": "scripts/validate_pack.py",
+      "kind": "build-source",
+      "bytes": 7648,
+      "sha256": "3853ab1804fed5bfb37a575a81b83ed6ae080df28e8cb3aee5512c39a42fd38c"
+    },
+    {
+      "file": "setup.ps1",
+      "kind": "project",
+      "bytes": 383,
+      "sha256": "63882d42d6950de2f2a2441a0527ef8e32344e8e304f7b026f6b8e7583c2d92e"
+    },
+    {
+      "file": "tokens/crow-theme.css",
+      "kind": "design-token",
+      "bytes": 7021,
+      "sha256": "76a0409dc91eb01f3f97250e45798e60ba690a7d35cc99c03b5854b5828ca084"
+    },
+    {
+      "file": "tokens/crow-theme.json",
+      "kind": "design-token",
+      "bytes": 8405,
+      "sha256": "46b6166d1b9b5a1bdbceb86bcc544027f8231752a05e524dc0e63a8dd396d71c"
+    },
+    {
+      "file": "tokens/crow-theme.ts",
+      "kind": "design-token",
+      "bytes": 7697,
+      "sha256": "577ade79fc7b83420b11480021072b1966e8e92a4541dfbe88542f385e1b21ba"
+    },
+    {
+      "file": "VERSION",
+      "kind": "project",
+      "bytes": 7,
+      "sha256": "9ca90d4ac8fbe86d8aca4aa37a80e0f984c01df281f25f62c779e784fd155a21"
+    }
+  ]
+}

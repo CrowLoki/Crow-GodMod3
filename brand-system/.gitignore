@@ -1,0 +1,16 @@
+.DS_Store
+Thumbs.db
+desktop.ini
+node_modules/
+.venv/
+dist/
+coverage/
+build/
+__pycache__/
+*.pyc
+*.log
+*.tmp
+
+# Local working exports; approved deliverables belong under assets/raster.
+/scratch/
+/exports/

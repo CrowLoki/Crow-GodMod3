@@ -1,14 +1,29 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Crow Signal Display";
+  src: url("/crow-theme/fonts/woff2/CrowSignalDisplay-Bold.woff2")
+    format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Crow Signal Mono";
+  src: url("/crow-theme/fonts/woff2/CrowSignalMono-Regular.woff2")
+    format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+
 :root {
   color-scheme: dark;
-  --background: #07050c;
-  --surface: #0b0812;
-  --text: #f7f3ff;
-  --muted: #aa9fbc;
-  --magenta: #f044ff;
-  --violet: #9b6cff;
-  --cyan: #42dcff;
+  --background: #03040a;
+  --surface: #0a0e1b;
+  --text: #f2f7ff;
+  --muted: #8fa2c5;
+  --violet: #734cff;
+  --cyan: #45e7ff;
 }
 
 * {
@@ -26,21 +41,27 @@ body {
 body {
   display: grid;
   place-items: center;
-  font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+  font-family: "Crow Signal Mono", "Cascadia Code", Consolas, monospace;
+  background:
+    linear-gradient(90deg, rgb(3 4 10 / 96%), rgb(3 4 10 / 38%)),
+    url("/crow-theme/assets/product-variants/exports/crow-godmod3-1920x1080.png")
+      center / cover no-repeat;
 }
 
 main {
   width: min(560px, calc(100% - 32px));
   padding: 32px;
-  border: 1px solid rgba(155, 108, 255, 0.28);
+  border: 1px solid rgb(115 76 255 / 36%);
   border-radius: 18px;
-  background: var(--surface);
-  box-shadow: 0 0 48px rgba(240, 68, 255, 0.12);
+  background: rgb(10 14 27 / 88%);
+  box-shadow: 0 18px 60px rgb(0 0 0 / 46%);
 }
 
 h1 {
   margin: 0 0 12px;
-  color: var(--magenta);
+  color: var(--text);
+  font-family: "Crow Signal Display", "Segoe UI", sans-serif;
+  letter-spacing: 0.045em;
 }
 
 p {

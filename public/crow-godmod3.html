@@ -10,28 +10,49 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#050711">
-  <meta name="description" content="Crow-GodMod3 — a CrowClaw-themed multi-model AI research interface.">
+  <meta name="theme-color" content="#03040a">
+  <meta name="description" content="Crow-GodMod3 — open-source, privacy-respecting multi-model AI in the complete Crow Theme.">
+  <meta name="application-name" content="Crow-GodMod3">
+  <meta name="apple-mobile-web-app-title" content="Crow-GodMod3">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Crow-GodMod3">
+  <meta property="og:title" content="Crow-GodMod3">
+  <meta property="og:description" content="Open-source, privacy-respecting multi-model AI in the complete Crow Theme.">
+  <meta property="og:url" content="https://crow-godmod3.vercel.app/">
+  <meta property="og:image" content="https://crow-godmod3.vercel.app/crow-theme/assets/product-variants/exports/crow-godmod3-1200x630.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Crow-GodMod3">
+  <meta name="twitter:description" content="Open-source, privacy-respecting multi-model AI in the complete Crow Theme.">
+  <meta name="twitter:image" content="https://crow-godmod3.vercel.app/crow-theme/assets/product-variants/exports/crow-godmod3-1200x630.png">
+  <link rel="canonical" href="https://crow-godmod3.vercel.app/">
+  <link rel="manifest" href="/manifest.webmanifest">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self' https://openrouter.ai https://*.openrouter.ai https://api.venice.ai http://localhost:* https://localhost:* http://127.0.0.1:* https://127.0.0.1:* https://cloudflareinsights.com https://*.cloudflareinsights.com; img-src 'self' data: blob:;">
   <title>Crow-GodMod3</title>
-  <link rel="icon" type="image/webp" href="/crowclaw-mark.webp">
-  <link href="/jetbrains-mono.css" rel="stylesheet">
+  <link rel="icon" href="/crow-theme/assets/icons/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" href="/crow-theme/assets/icons/png/crow-signal-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/crow-theme/assets/icons/png/crow-signal-180.png">
+  <link href="/crow-theme/fonts/crow-signal.css" rel="stylesheet">
+  <link href="/crow-theme/tokens/crow-theme.css" rel="stylesheet">
   <style>
     :root {
-      --bg: #050711;
-      --bg-secondary: #080b18;
-      --primary: #7c5cff;
-      --secondary: #1fb6ff;
-      --accent: #171b3a;
-      --text: #eef7ff;
-      --text-dim: #8c9aba;
-      --border: #29345f;
-      --hover: #11162f;
-      --danger: #ff4d67;
-      --cyan: #39d9ff;
-      --success: #32d6c6;
-      --warning: #a5b4fc;
-      --magenta: #d946ef;
+      --bg: var(--crow-bg-canvas, #03040a);
+      --bg-secondary: var(--crow-bg-deep, #060814);
+      --primary: var(--crow-product-primary, #734cff);
+      --secondary: var(--crow-product-signal, #45e7ff);
+      --accent: var(--crow-bg-selected, #15254a);
+      --text: var(--crow-text-strong, #f2f7ff);
+      --text-dim: var(--crow-text-muted, #8fa2c5);
+      --border: var(--crow-border-subtle, #263453);
+      --hover: var(--crow-bg-hover, #18213a);
+      --danger: var(--crow-state-danger, #ff637d);
+      --cyan: var(--crow-cyan, #45e7ff);
+      --success: var(--crow-state-success, #3fe0b3);
+      --warning: var(--crow-state-warning, #95a8ff);
+      --magenta: var(--crow-magenta-spark, #d649ff);
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -3289,68 +3310,254 @@
     }
   
 
-    /* CrowClaw visual identity layer */
+    /* Crow Theme v0.1 — Crow-GodMod3 product binding */
+    ::selection {
+      color: var(--crow-text-strong);
+      background: var(--crow-selection-bg);
+    }
+
     body {
+      --primary: var(--crow-product-primary, #734cff);
+      --secondary: var(--crow-product-signal, #45e7ff);
       background:
-        radial-gradient(circle at 78% 16%, rgba(124, 92, 255, 0.075), transparent 30%),
-        radial-gradient(circle at 28% 84%, rgba(57, 217, 255, 0.06), transparent 28%),
+        radial-gradient(circle at 78% 16%, rgb(115 76 255 / 8%), transparent 30%),
+        radial-gradient(circle at 28% 84%, rgb(69 231 255 / 6%), transparent 28%),
         var(--bg);
+      color: var(--crow-text-default);
+      font-family: var(--crow-font-body);
+    }
+
+    button,
+    input,
+    select,
+    textarea,
+    .mode-option,
+    .conversation-item,
+    .suggestion {
+      font-family: var(--crow-font-mono);
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--crow-border-focus);
+      outline-offset: 2px;
+      box-shadow: var(--crow-focus-ring);
     }
 
     .sidebar {
       background:
-        linear-gradient(180deg, rgba(11, 16, 36, 0.98), rgba(5, 7, 17, 0.99));
+        linear-gradient(180deg, rgb(10 14 27 / 98%), rgb(3 4 10 / 99%)),
+        url("/crow-theme/assets/backgrounds/void-grid-neutral.png") 56% center / cover;
+      border-color: var(--crow-border-subtle);
     }
 
     .chat-header {
-      background: rgba(8, 11, 24, 0.9);
+      background: rgb(6 8 20 / 90%);
       backdrop-filter: blur(16px);
     }
 
     .brand-mark {
-      width: 34px;
-      height: 34px;
-      flex: 0 0 34px;
-      border-radius: 10px;
+      width: 38px;
+      height: 38px;
+      flex: 0 0 38px;
+      border-radius: 11px;
       box-shadow:
-        0 0 18px rgba(124, 92, 255, 0.26),
-        0 0 32px rgba(57, 217, 255, 0.14);
+        0 0 18px rgb(115 76 255 / 28%),
+        0 0 32px rgb(69 231 255 / 15%);
     }
 
     .logo-text {
-      font-size: 16px;
-      letter-spacing: -0.35px;
+      font-family: var(--crow-font-display);
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: var(--crow-tracking-display);
       white-space: nowrap;
-      background: linear-gradient(90deg, #eef7ff 0%, #7c5cff 50%, #39d9ff 100%);
+      background: linear-gradient(
+        90deg,
+        var(--crow-text-strong) 0%,
+        var(--crow-violet) 54%,
+        var(--crow-cyan) 100%
+      );
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
       text-shadow: none;
     }
 
+    .messages {
+      padding: 14px;
+      scrollbar-color: var(--crow-line-quiet) transparent;
+    }
+
+    .messages::-webkit-scrollbar-thumb {
+      background: var(--crow-line-quiet);
+    }
+
+    .messages::-webkit-scrollbar-thumb:hover {
+      background: var(--crow-line-strong);
+    }
+
+    .welcome {
+      position: relative;
+      isolation: isolate;
+      min-height: 100%;
+      align-items: flex-start;
+      justify-content: center;
+      overflow: hidden;
+      padding: clamp(32px, 6vw, 84px);
+      text-align: left;
+      border: 1px solid rgb(70 92 145 / 42%);
+      border-radius: var(--crow-radius-lg);
+      background:
+        linear-gradient(90deg, rgb(3 4 10 / 96%) 0%, rgb(3 4 10 / 82%) 36%, rgb(3 4 10 / 14%) 69%),
+        linear-gradient(0deg, rgb(3 4 10 / 52%), transparent 45%),
+        url("/crow-theme/assets/product-variants/exports/crow-godmod3-1920x1080.png") center / cover no-repeat;
+      box-shadow:
+        inset 0 0 90px rgb(47 123 255 / 8%),
+        var(--crow-shadow-raised);
+    }
+
+    .welcome::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        linear-gradient(90deg, transparent 0 68%, rgb(69 231 255 / 8%) 68% 68.1%, transparent 68.1%),
+        repeating-linear-gradient(0deg, transparent 0 27px, rgb(115 76 255 / 4%) 28px);
+      mix-blend-mode: screen;
+    }
+
+    .welcome > * {
+      position: relative;
+      z-index: 1;
+      width: min(610px, 56%);
+    }
+
+    .welcome-signal {
+      margin-bottom: 14px;
+      color: var(--crow-cyan);
+      font-family: var(--crow-font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: var(--crow-tracking-signal);
+      text-transform: uppercase;
+    }
+
     .welcome-icon {
-      margin-bottom: 22px;
+      width: auto;
+      margin-bottom: 18px;
       line-height: 0;
     }
 
     .welcome-crow {
-      width: 148px;
-      height: 148px;
+      width: 76px;
+      height: 76px;
       object-fit: cover;
-      border-radius: 30px;
-      border: 1px solid rgba(124, 92, 255, 0.34);
+      border: 1px solid rgb(115 76 255 / 42%);
+      border-radius: 20px;
       box-shadow:
-        0 0 0 7px rgba(31, 182, 255, 0.08),
-        0 0 42px rgba(124, 92, 255, 0.18),
-        0 0 70px rgba(57, 217, 255, 0.1);
+        0 0 0 5px rgb(47 123 255 / 10%),
+        0 0 34px rgb(115 76 255 / 22%),
+        0 0 58px rgb(69 231 255 / 12%);
     }
 
     .welcome h2 {
-      background: linear-gradient(90deg, #eef7ff 0%, #7c5cff 52%, #39d9ff 100%);
+      width: min(720px, 64%);
+      margin-bottom: 14px;
+      font-family: var(--crow-font-display);
+      font-size: clamp(34px, 4.8vw, 66px);
+      font-weight: 700;
+      line-height: 0.94;
+      letter-spacing: var(--crow-tracking-display);
+      background: linear-gradient(
+        90deg,
+        var(--crow-text-strong) 0%,
+        var(--crow-violet) 58%,
+        var(--crow-cyan) 100%
+      );
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
       text-shadow: none;
+    }
+
+    .welcome p.welcome-copy {
+      max-width: 570px;
+      margin-bottom: 18px;
+      color: var(--crow-text-default);
+      font-size: clamp(14px, 1.45vw, 18px);
+      line-height: 1.6;
+    }
+
+    .welcome-copy span {
+      display: block;
+      margin-top: 8px;
+      color: var(--crow-cyan);
+      font-family: var(--crow-font-mono);
+      font-size: 11px;
+      letter-spacing: var(--crow-tracking-signal);
+    }
+
+    .welcome-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .theme-pack-cta,
+    .theme-pack-link {
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 16px;
+      border: 1px solid var(--crow-cyan);
+      border-radius: var(--crow-radius-sm);
+      font-family: var(--crow-font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.045em;
+      text-decoration: none;
+      transition:
+        background var(--crow-motion-fast) var(--crow-ease-enter),
+        border-color var(--crow-motion-fast) var(--crow-ease-enter),
+        box-shadow var(--crow-motion-fast) var(--crow-ease-enter);
+    }
+
+    .theme-pack-cta {
+      color: var(--crow-text-on-bright);
+      background: var(--crow-cyan);
+    }
+
+    .theme-pack-link {
+      color: var(--crow-text-strong);
+      background: rgb(16 23 43 / 82%);
+      border-color: var(--crow-border-strong);
+    }
+
+    .theme-pack-cta:hover,
+    .theme-pack-link:hover {
+      border-color: var(--crow-cyan);
+      box-shadow: var(--crow-shadow-cyan);
+    }
+
+    .welcome .suggestions {
+      width: min(620px, 60%);
+      max-width: 620px;
+      gap: 10px;
+    }
+
+    .welcome .suggestion {
+      min-height: 54px;
+      display: flex;
+      align-items: center;
+      padding: 13px 15px;
+      color: var(--crow-text-default);
+      background: rgb(10 14 27 / 84%);
+      border-color: rgb(70 92 145 / 46%);
+      backdrop-filter: blur(14px);
     }
 
     .source-links {
@@ -3374,23 +3581,376 @@
       color: var(--cyan);
     }
 
-    .new-chat-btn:hover,
-    .settings-btn:hover,
-    .suggestion:hover {
-      box-shadow: 0 0 22px rgba(124, 92, 255, 0.14);
+    .crow-theme-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 9px;
+      padding: 8px;
+      color: var(--crow-text-default);
+      text-align: left;
+      background: rgb(16 23 43 / 72%);
+      border: 1px solid var(--crow-border-subtle);
+      border-radius: var(--crow-radius-sm);
     }
 
-    @media (max-width: 480px) {
+    .crow-theme-btn img {
+      width: 36px;
+      height: 36px;
+      flex: 0 0 36px;
+      object-fit: cover;
+      object-position: 50% 17%;
+      border: 1px solid rgb(115 76 255 / 44%);
+      border-radius: 9px;
+    }
+
+    .crow-theme-btn span {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .crow-theme-btn strong {
+      color: var(--crow-text-strong);
+      font-family: var(--crow-font-display);
+      font-size: 12px;
+      letter-spacing: var(--crow-tracking-display);
+    }
+
+    .crow-theme-btn small {
+      overflow: hidden;
+      color: var(--crow-text-muted);
+      font-size: 8px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .new-chat-btn:hover,
+    .settings-btn:hover,
+    .crow-theme-btn:hover,
+    .suggestion:hover {
+      border-color: var(--crow-product-primary);
+      box-shadow: var(--crow-shadow-ultraviolet);
+    }
+
+    .theme-pack-modal {
+      z-index: 10020;
+    }
+
+    .theme-pack-modal .modal {
+      width: min(1080px, 94vw);
+      max-width: 1080px;
+      max-height: 90dvh;
+      overflow: hidden;
+      background:
+        linear-gradient(145deg, rgb(16 23 43 / 98%), rgb(3 4 10 / 99%)),
+        url("/crow-theme/assets/backgrounds/void-grid-neutral.png") center / cover;
+      border-color: var(--crow-border-strong);
+      box-shadow:
+        0 0 0 1px rgb(69 231 255 / 8%),
+        0 28px 110px rgb(0 0 0 / 72%),
+        var(--crow-shadow-ultraviolet);
+    }
+
+    .theme-pack-modal .modal-header {
+      background: rgb(3 4 10 / 72%);
+      border-color: var(--crow-border-subtle);
+    }
+
+    .theme-pack-modal .modal-header h3 {
+      font-family: var(--crow-font-display);
+      letter-spacing: var(--crow-tracking-display);
+    }
+
+    .theme-pack-body {
+      display: grid;
+      gap: 18px;
+      max-height: calc(90dvh - 70px);
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .theme-pack-hero {
+      position: relative;
+      min-height: 250px;
+      display: flex;
+      align-items: flex-end;
+      overflow: hidden;
+      padding: clamp(24px, 5vw, 56px);
+      border: 1px solid var(--crow-border-subtle);
+      border-radius: var(--crow-radius-lg);
+      background:
+        linear-gradient(90deg, rgb(3 4 10 / 94%), rgb(3 4 10 / 12%) 70%),
+        url("/crow-theme/assets/social/crow-family-banner.png") 38% center / cover no-repeat;
+    }
+
+    .theme-pack-hero-copy {
+      max-width: 510px;
+    }
+
+    .theme-pack-eyebrow {
+      color: var(--crow-cyan);
+      font-family: var(--crow-font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: var(--crow-tracking-signal);
+      text-transform: uppercase;
+    }
+
+    .theme-pack-hero h4 {
+      margin: 8px 0 10px;
+      color: var(--crow-text-strong);
+      font-family: var(--crow-font-display);
+      font-size: clamp(24px, 4vw, 42px);
+      letter-spacing: var(--crow-tracking-display);
+    }
+
+    .theme-pack-hero p {
+      margin: 0;
+      color: var(--crow-text-default);
+      line-height: 1.55;
+    }
+
+    .crow-form-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .crow-form-card {
+      overflow: hidden;
+      background: rgb(10 14 27 / 88%);
+      border: 1px solid var(--crow-border-subtle);
+      border-radius: var(--crow-radius-md);
+    }
+
+    .crow-form-card img {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      display: block;
+      object-fit: cover;
+      object-position: 50% 16%;
+      border-bottom: 1px solid var(--crow-border-subtle);
+    }
+
+    .crow-form-card[data-form="glitch"] {
+      border-color: rgb(115 76 255 / 72%);
+      box-shadow: var(--crow-shadow-ultraviolet);
+    }
+
+    .crow-form-meta {
+      padding: 12px;
+    }
+
+    .crow-form-meta strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--crow-text-strong);
+      font-family: var(--crow-font-display);
+      font-size: 12px;
+      letter-spacing: var(--crow-tracking-display);
+    }
+
+    .crow-form-meta small {
+      color: var(--crow-text-muted);
+      line-height: 1.4;
+    }
+
+    .crow-system-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 12px;
+    }
+
+    .crow-system-card {
+      min-width: 0;
+      padding: 16px;
+      background: rgb(10 14 27 / 88%);
+      border: 1px solid var(--crow-border-subtle);
+      border-radius: var(--crow-radius-md);
+    }
+
+    .crow-system-card h5 {
+      margin: 0 0 10px;
+      color: var(--crow-text-strong);
+      font-family: var(--crow-font-display);
+      font-size: 14px;
+      letter-spacing: var(--crow-tracking-display);
+    }
+
+    .crow-system-card img {
+      width: 100%;
+      display: block;
+      border: 1px solid var(--crow-border-subtle);
+      border-radius: var(--crow-radius-sm);
+    }
+
+    .crow-palette {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .crow-swatch {
+      min-height: 68px;
+      display: flex;
+      align-items: flex-end;
+      padding: 8px;
+      border: 1px solid rgb(242 247 255 / 12%);
+      border-radius: var(--crow-radius-sm);
+      color: var(--crow-text-strong);
+      font-family: var(--crow-font-mono);
+      font-size: 8px;
+      text-shadow: 0 1px 3px rgb(0 0 0 / 86%);
+    }
+
+    .crow-pack-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+
+    .crow-pack-links a {
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 12px;
+      color: var(--crow-text-default);
+      text-decoration: none;
+      background: var(--crow-bg-raised);
+      border: 1px solid var(--crow-border-default);
+      border-radius: var(--crow-radius-sm);
+      font-family: var(--crow-font-mono);
+      font-size: 10px;
+    }
+
+    .crow-pack-links a:first-child {
+      color: var(--crow-text-on-bright);
+      background: var(--crow-cyan);
+      border-color: var(--crow-cyan);
+      font-weight: 700;
+    }
+
+    .crow-pack-links a:hover {
+      border-color: var(--crow-cyan);
+      box-shadow: var(--crow-shadow-cyan);
+    }
+
+    @media (pointer: fine) {
+      body,
+      .modal-overlay {
+        cursor: url("/crow-theme/cursors/windows/normal.cur"), default;
+      }
+
+      a,
+      button,
+      select,
+      label[for],
+      [onclick],
+      .suggestion,
+      .conversation-item {
+        cursor: url("/crow-theme/cursors/windows/link.cur"), pointer;
+      }
+
+      input,
+      textarea,
+      [contenteditable="true"] {
+        cursor: url("/crow-theme/cursors/windows/text.cur"), text;
+      }
+
+      [draggable="true"] {
+        cursor: url("/crow-theme/cursors/windows/move.cur"), move;
+      }
+
+      :disabled,
+      [aria-disabled="true"] {
+        cursor: url("/crow-theme/cursors/windows/unavailable.cur"), not-allowed;
+      }
+    }
+
+    @media (max-width: 860px) {
+      .welcome {
+        align-items: center;
+        padding: 34px 24px;
+        text-align: center;
+        background:
+          linear-gradient(0deg, rgb(3 4 10 / 98%) 0%, rgb(3 4 10 / 78%) 58%, rgb(3 4 10 / 32%) 100%),
+          url("/crow-theme/assets/product-variants/crow-godmod3-hero.png") 72% center / cover no-repeat;
+      }
+
+      .welcome > *,
+      .welcome h2,
+      .welcome .suggestions {
+        width: min(100%, 620px);
+      }
+
+      .welcome-actions {
+        justify-content: center;
+      }
+
+      .crow-form-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .crow-system-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 540px) {
+      .messages {
+        padding: 8px;
+      }
+
+      .welcome {
+        min-height: 100%;
+        padding: 28px 16px;
+        border-radius: var(--crow-radius-md);
+      }
+
       .welcome-crow {
-        width: 112px;
-        height: 112px;
-        border-radius: 24px;
+        width: 62px;
+        height: 62px;
+        border-radius: 16px;
+      }
+
+      .welcome h2 {
+        font-size: clamp(31px, 10vw, 44px);
+      }
+
+      .welcome-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .welcome .suggestions {
+        grid-template-columns: 1fr;
+      }
+
+      .theme-pack-hero {
+        min-height: 360px;
+        align-items: flex-end;
+        padding: 22px;
+        background:
+          linear-gradient(0deg, rgb(3 4 10 / 98%), rgb(3 4 10 / 20%) 76%),
+          url("/crow-theme/assets/social/crow-family-banner.png") 29% center / cover no-repeat;
+      }
+
+      .crow-form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .crow-palette {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
 
   </style>
 </head>
-<body>
+<body data-crow-theme data-crow-product="crow-godmod3">
   <div class="app">
     <!-- Mobile overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
@@ -3399,7 +3959,7 @@
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div class="logo">
-          <img class="brand-mark" src="/crowclaw-mark.webp" alt="" aria-hidden="true">
+          <img class="brand-mark" src="/crow-theme/assets/icons/app/crow-signal-app-rounded-256.png" alt="" aria-hidden="true">
           <span class="logo-text">Crow-GodMod3</span>
         </div>
         <button class="new-chat-btn" onclick="newChat()">
@@ -3412,6 +3972,10 @@
       </div>
 
       <div class="sidebar-footer">
+        <button class="crow-theme-btn" onclick="openCrowThemePack()">
+          <img src="/crow-theme/assets/mascots/masters/core-architect.png" alt="" aria-hidden="true">
+          <span><strong>Crow Theme</strong><small>Glitch Ascendant · v0.1</small></span>
+        </button>
         <button class="settings-btn" onclick="openSettings()">
           <span>⚙</span> Settings
         </button>
@@ -3572,11 +4136,16 @@
 
       <div class="messages" id="messagesArea">
         <div class="welcome" id="welcome">
+          <div class="welcome-signal">CROW SYSTEM // GLITCH ASCENDANT</div>
           <div class="welcome-icon">
-            <img class="welcome-crow" src="/crowclaw-head.webp" alt="CrowClaw emblem">
+            <img class="welcome-crow" src="/crow-theme/assets/icons/avatars/crow-signal-avatar-512.png" alt="Crow Signal">
           </div>
           <h2>Crow-GodMod3</h2>
-          <p>Open-source, privacy-respecting multi-model AI. {CROW-GODMOD3:ENABLED}</p>
+          <p class="welcome-copy">Open-source, privacy-respecting multi-model AI with the full Crow visual system. <span>{CROW-GODMOD3:ENABLED}</span></p>
+          <div class="welcome-actions">
+            <button type="button" class="theme-pack-cta" onclick="openCrowThemePack()">Explore the Crow Theme</button>
+            <a class="theme-pack-link" href="/crow-theme/index.html" target="_blank" rel="noopener">Open the complete pack</a>
+          </div>
           <div class="suggestions">
             <div class="suggestion" onclick="useSuggestion('Explain quantum computing in simple terms')">Explain quantum computing in simple terms</div>
             <div class="suggestion" onclick="useSuggestion('What are common API security vulnerabilities?')">What are common API security vulnerabilities?</div>
@@ -3656,6 +4225,86 @@
             I Agree
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Crow Theme Pack -->
+  <div class="modal-overlay theme-pack-modal" id="crowThemeModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="crowThemeTitle">
+      <div class="modal-header">
+        <h3 id="crowThemeTitle">Crow Theme System</h3>
+        <button class="modal-close" type="button" onclick="closeCrowThemePack()" aria-label="Close Crow Theme">×</button>
+      </div>
+      <div class="theme-pack-body">
+        <section class="theme-pack-hero">
+          <div class="theme-pack-hero-copy">
+            <div class="theme-pack-eyebrow">Canonical identity // version 0.1.0</div>
+            <h4>One Crow. Four forms. One cold signal.</h4>
+            <p>Black feather, gunmetal structure, deep navy space, ultraviolet, electric blue and cyan. Magenta is a pulse—not a wash. Every mascot has exactly three eyes and a true elongated crow profile.</p>
+          </div>
+        </section>
+
+        <section class="crow-form-grid" aria-label="Approved Crow mascot forms">
+          <article class="crow-form-card">
+            <img src="/crow-theme/assets/mascots/masters/core-architect.png" loading="lazy" alt="Core Architect, the canonical Crow system architect">
+            <div class="crow-form-meta">
+              <strong>Core Architect</strong>
+              <small>Flagship intelligence and compact Crow-GodMod3 identity.</small>
+            </div>
+          </article>
+          <article class="crow-form-card">
+            <img src="/crow-theme/assets/mascots/masters/field-operator.png" loading="lazy" alt="Field Operator, the grounded Crow builder">
+            <div class="crow-form-meta">
+              <strong>Field Operator</strong>
+              <small>Grounded builder, researcher and local operator.</small>
+            </div>
+          </article>
+          <article class="crow-form-card" data-form="glitch">
+            <img src="/crow-theme/assets/mascots/masters/glitch-ascendant.png" loading="lazy" alt="Glitch Ascendant, the primary Crow-GodMod3 form">
+            <div class="crow-form-meta">
+              <strong>Glitch Ascendant</strong>
+              <small>Crow-GodMod3 primary form: recursion and controlled power.</small>
+            </div>
+          </article>
+          <article class="crow-form-card">
+            <img src="/crow-theme/assets/mascots/masters/pet-companion.png" loading="lazy" alt="Pet Companion, the small non-humanoid Crow form">
+            <div class="crow-form-meta">
+              <strong>Pet Companion</strong>
+              <small>Small non-humanoid companion for friendly compact moments.</small>
+            </div>
+          </article>
+        </section>
+
+        <section class="crow-system-grid">
+          <article class="crow-system-card">
+            <h5>Crow Signal type</h5>
+            <img src="/crow-theme/fonts/specimens/crow-signal-v0.1.png" loading="lazy" alt="Crow Signal Display and Mono font specimen">
+          </article>
+          <article class="crow-system-card">
+            <h5>Crow Talon pointers</h5>
+            <img src="/crow-theme/cursors/preview.png" loading="lazy" alt="Crow Talon cursor family preview">
+          </article>
+        </section>
+
+        <section class="crow-system-card">
+          <h5>Crow-GodMod3 product signal</h5>
+          <div class="crow-palette" aria-label="Crow Theme colour palette">
+            <div class="crow-swatch" style="background:#03040a">VOID<br>#03040A</div>
+            <div class="crow-swatch" style="background:#10172b">NAVY<br>#10172B</div>
+            <div class="crow-swatch" style="background:#734cff">ULTRAVIOLET<br>#734CFF</div>
+            <div class="crow-swatch" style="background:#45e7ff;color:#03040a;text-shadow:none">CYAN<br>#45E7FF</div>
+          </div>
+        </section>
+
+        <nav class="crow-pack-links" aria-label="Crow Theme resources">
+          <a href="/crow-theme/index.html" target="_blank" rel="noopener">Open complete theme pack</a>
+          <a href="/crow-theme/downloads/Crow-Signal-Windows-v0.1.0.zip" download>Download Crow Signal</a>
+          <a href="/crow-theme/downloads/Crow-Talon-Windows-v0.1.0.zip" download>Download Crow Talon</a>
+          <a href="/crow-theme/docs/BRAND-GUIDE.md" target="_blank" rel="noopener">Brand guide</a>
+          <a href="/crow-theme/docs/MASCOT-GUIDE.md" target="_blank" rel="noopener">Mascot guide</a>
+          <a href="https://github.com/CrowLoki/Crow-GodMod3/tree/main/brand-system" target="_blank" rel="noopener">Source on GitHub</a>
+        </nav>
       </div>
     </div>
   </div>
@@ -17635,6 +18284,30 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
         'Modified AGPL-3.0 derivative · /ATTRIBUTION.md\n',
         'color:#7c5cff;font-family:monospace;'
       );    })();
+  </script>
+  <script>
+    function openCrowThemePack() {
+      const modal = document.getElementById('crowThemeModal');
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+      modal.querySelector('.modal-close')?.focus();
+    }
+
+    function closeCrowThemePack() {
+      const modal = document.getElementById('crowThemeModal');
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+    }
+
+    document.getElementById('crowThemeModal')?.addEventListener('click', (event) => {
+      if (event.target.id === 'crowThemeModal') closeCrowThemePack();
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && document.getElementById('crowThemeModal')?.classList.contains('open')) {
+        closeCrowThemePack();
+      }
+    });
   </script>
 </body>
 </html>

@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="#03040a">
+    <title>Crow Theme Pack · Crow-GodMod3</title>
+    <meta name="description" content="The complete Crow Theme v0.1.0 bundled with Crow-GodMod3.">
+    <link rel="icon" href="/crow-theme/assets/icons/favicon.ico" sizes="any">
+    <link rel="stylesheet" href="/crow-theme/fonts/crow-signal.css">
+    <link rel="stylesheet" href="/crow-theme/tokens/crow-theme.css">
+    <style>
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        min-height: 100vh;
+        margin: 0;
+        color: var(--crow-text-default);
+        background:
+          radial-gradient(circle at 76% 12%, rgb(115 76 255 / 14%), transparent 30%),
+          radial-gradient(circle at 18% 70%, rgb(69 231 255 / 8%), transparent 28%),
+          var(--crow-bg-canvas);
+        font-family: var(--crow-font-body);
+      }
+      ::selection { background: var(--crow-selection-bg); }
+      a { color: var(--crow-text-link); }
+      a:focus-visible {
+        outline: 2px solid var(--crow-border-focus);
+        outline-offset: 3px;
+        box-shadow: var(--crow-focus-ring);
+      }
+      .shell { width: min(1180px, calc(100% - 32px)); margin: 0 auto; }
+      .hero {
+        position: relative;
+        min-height: min(720px, 86vh);
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        margin-top: 16px;
+        padding: clamp(28px, 7vw, 82px);
+        border: 1px solid var(--crow-border-strong);
+        border-radius: var(--crow-radius-lg);
+        background:
+          linear-gradient(90deg, rgb(3 4 10 / 98%) 0%, rgb(3 4 10 / 78%) 38%, rgb(3 4 10 / 8%) 72%),
+          url("/crow-theme/assets/product-variants/exports/crow-godmod3-1920x1080.png") center / cover no-repeat;
+        box-shadow: var(--crow-shadow-raised), var(--crow-shadow-ultraviolet);
+      }
+      .hero-copy { width: min(610px, 58%); }
+      .eyebrow {
+        color: var(--crow-cyan);
+        font-family: var(--crow-font-mono);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: var(--crow-tracking-signal);
+        text-transform: uppercase;
+      }
+      h1, h2, h3 {
+        color: var(--crow-text-strong);
+        font-family: var(--crow-font-display);
+        letter-spacing: var(--crow-tracking-display);
+      }
+      h1 {
+        margin: 14px 0 18px;
+        font-size: clamp(42px, 7vw, 84px);
+        line-height: .92;
+      }
+      .hero p { max-width: 560px; font-size: clamp(16px, 1.7vw, 20px); line-height: 1.65; }
+      .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+      .button {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        padding: 0 16px;
+        color: var(--crow-text-default);
+        text-decoration: none;
+        background: rgb(16 23 43 / 88%);
+        border: 1px solid var(--crow-border-default);
+        border-radius: var(--crow-radius-sm);
+        font-family: var(--crow-font-mono);
+        font-size: 12px;
+      }
+      .button.primary {
+        color: var(--crow-text-on-bright);
+        background: var(--crow-cyan);
+        border-color: var(--crow-cyan);
+        font-weight: 700;
+      }
+      main { padding: 72px 0; }
+      section + section { margin-top: 72px; }
+      .section-head { max-width: 760px; margin-bottom: 24px; }
+      .section-head h2 { margin: 0 0 10px; font-size: clamp(28px, 4vw, 44px); }
+      .section-head p { margin: 0; color: var(--crow-text-muted); line-height: 1.65; }
+      .grid { display: grid; gap: 16px; }
+      .forms { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .systems { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .products { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .card {
+        overflow: hidden;
+        background: rgb(10 14 27 / 88%);
+        border: 1px solid var(--crow-border-subtle);
+        border-radius: var(--crow-radius-md);
+        box-shadow: var(--crow-shadow-signal);
+      }
+      .card > img { width: 100%; display: block; border-bottom: 1px solid var(--crow-border-subtle); }
+      .form img { aspect-ratio: 4 / 3; object-fit: cover; object-position: 50% 15%; }
+      .card-copy { padding: 16px; }
+      .card h3 { margin: 0 0 8px; font-size: 16px; }
+      .card p { margin: 0; color: var(--crow-text-muted); font-size: 13px; line-height: 1.55; }
+      .product img { aspect-ratio: 16 / 9; object-fit: cover; }
+      .downloads {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+      .download {
+        padding: 18px;
+        text-decoration: none;
+        background: var(--crow-bg-raised);
+        border: 1px solid var(--crow-border-default);
+        border-radius: var(--crow-radius-md);
+      }
+      .download strong {
+        display: block;
+        margin-bottom: 6px;
+        color: var(--crow-text-strong);
+        font-family: var(--crow-font-display);
+        letter-spacing: var(--crow-tracking-display);
+      }
+      .download span { color: var(--crow-text-muted); font-size: 12px; line-height: 1.45; }
+      .notice {
+        padding: 20px;
+        background: var(--crow-info-bg);
+        border: 1px solid var(--crow-info-border);
+        border-radius: var(--crow-radius-md);
+        color: var(--crow-text-default);
+        line-height: 1.6;
+      }
+      footer {
+        padding: 32px 0 48px;
+        border-top: 1px solid var(--crow-border-subtle);
+        color: var(--crow-text-muted);
+        font-family: var(--crow-font-mono);
+        font-size: 11px;
+      }
+      @media (pointer: fine) {
+        body { cursor: url("/crow-theme/cursors/windows/normal.cur"), default; }
+        a { cursor: url("/crow-theme/cursors/windows/link.cur"), pointer; }
+      }
+      @media (max-width: 900px) {
+        .hero {
+          align-items: flex-end;
+          background:
+            linear-gradient(0deg, rgb(3 4 10 / 98%) 0%, rgb(3 4 10 / 62%) 60%, rgb(3 4 10 / 16%) 100%),
+            url("/crow-theme/assets/product-variants/crow-godmod3-hero.png") 72% center / cover no-repeat;
+        }
+        .hero-copy { width: 100%; }
+        .forms, .products { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      }
+      @media (max-width: 620px) {
+        .shell { width: min(100% - 20px, 1180px); }
+        .hero { min-height: 680px; margin-top: 10px; padding: 24px; }
+        .forms, .systems, .products, .downloads { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body data-crow-theme data-crow-product="crow-godmod3">
+    <header class="shell hero">
+      <div class="hero-copy">
+        <div class="eyebrow">Crow Theme // 0.1.0 // Crow-GodMod3 binding</div>
+        <h1>The complete Crow system.</h1>
+        <p>Four approved three-eyed Crow forms, the original Crow Signal type family, Crow Talon pointers, icons, backgrounds, product heroes, social artwork, shared design tokens, guides, prompts and reproducible sources.</p>
+        <div class="actions">
+          <a class="button primary" href="/">Return to Crow-GodMod3</a>
+          <a class="button" href="https://github.com/CrowLoki/Crow-GodMod3/tree/main/brand-system">Browse source on GitHub</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="shell">
+      <section>
+        <div class="section-head">
+          <div class="eyebrow">Approved character family</div>
+          <h2>One identity, four forms</h2>
+          <p>Every form preserves the same anatomy: two physical eyes, one centred forehead eye and a true elongated corvid beak. Crow-GodMod3 uses Glitch Ascendant as its primary form and Core Architect as its compact form.</p>
+        </div>
+        <div class="grid forms">
+          <article class="card form">
+            <img src="/crow-theme/assets/mascots/masters/core-architect.png" loading="lazy" alt="Core Architect">
+            <div class="card-copy"><h3>Core Architect</h3><p>Flagship intelligence, architecture and orchestration.</p></div>
+          </article>
+          <article class="card form">
+            <img src="/crow-theme/assets/mascots/masters/field-operator.png" loading="lazy" alt="Field Operator">
+            <div class="card-copy"><h3>Field Operator</h3><p>Grounded builder, researcher and local operator.</p></div>
+          </article>
+          <article class="card form">
+            <img src="/crow-theme/assets/mascots/masters/glitch-ascendant.png" loading="lazy" alt="Glitch Ascendant">
+            <div class="card-copy"><h3>Glitch Ascendant</h3><p>Controlled recursion and Crow-GodMod3 primary power.</p></div>
+          </article>
+          <article class="card form">
+            <img src="/crow-theme/assets/mascots/masters/pet-companion.png" loading="lazy" alt="Pet Companion">
+            <div class="card-copy"><h3>Pet Companion</h3><p>Small non-humanoid companion for friendly compact use.</p></div>
+          </article>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-head">
+          <div class="eyebrow">Original interface system</div>
+          <h2>Type, pointers and signal marks</h2>
+          <p>Crow Signal and Crow Talon were built specifically for this family. The complete desktop and web files are bundled below.</p>
+        </div>
+        <div class="grid systems">
+          <article class="card">
+            <img src="/crow-theme/fonts/specimens/crow-signal-v0.1.png" loading="lazy" alt="Crow Signal font specimen">
+            <div class="card-copy"><h3>Crow Signal</h3><p>Display and Mono, regular and bold, in TTF and WOFF2.</p></div>
+          </article>
+          <article class="card">
+            <img src="/crow-theme/cursors/preview.png" loading="lazy" alt="Crow Talon cursor preview">
+            <div class="card-copy"><h3>Crow Talon</h3><p>Fifteen static pointer roles plus animated Working and Busy states.</p></div>
+          </article>
+          <article class="card">
+            <img src="/crow-theme/assets/icons/contact-sheet.png" loading="lazy" alt="Crow Signal icon family">
+            <div class="card-copy"><h3>Crow Signal icons</h3><p>Favicons, app icons, avatars and practical export sizes.</p></div>
+          </article>
+          <article class="card">
+            <img src="/crow-theme/assets/social/crow-family-banner.png" loading="lazy" alt="Crow mascot family banner">
+            <div class="card-copy"><h3>Social system</h3><p>Open Graph, GitHub, banner, post and story formats.</p></div>
+          </article>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-head">
+          <div class="eyebrow">Cross-product family</div>
+          <h2>Six current Crow bindings</h2>
+          <p>Each product has a text-safe hero while sharing the same nocturnal surfaces, cool signal light, typography and mascot anatomy.</p>
+        </div>
+        <div class="grid products">
+          <article class="card product"><img src="/crow-theme/assets/product-variants/exports/crowclaw-1200x630.png" loading="lazy" alt="CrowClaw hero"><div class="card-copy"><h3>CrowClaw</h3></div></article>
+          <article class="card product"><img src="/crow-theme/assets/product-variants/exports/crow-godmod3-1200x630.png" loading="lazy" alt="Crow-GodMod3 hero"><div class="card-copy"><h3>Crow-GodMod3</h3></div></article>
+          <article class="card product"><img src="/crow-theme/assets/product-variants/exports/crowquant-1200x630.png" loading="lazy" alt="CrowQuant hero"><div class="card-copy"><h3>CrowQuant</h3></div></article>
+          <article class="card product"><img src="/crow-theme/assets/product-variants/exports/crownest-1200x630.png" loading="lazy" alt="CrowNest hero"><div class="card-copy"><h3>CrowNest</h3></div></article>
+          <article class="card product"><img src="/crow-theme/assets/product-variants/exports/crowmemory-1200x630.png" loading="lazy" alt="CrowMemory hero"><div class="card-copy"><h3>CrowMemory</h3></div></article>
+          <article class="card product"><img src="/crow-theme/assets/product-variants/exports/crowflix-1200x630.png" loading="lazy" alt="CrowFlix hero"><div class="card-copy"><h3>CrowFlix</h3></div></article>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-head">
+          <div class="eyebrow">Files and guides</div>
+          <h2>Use the pack</h2>
+        </div>
+        <div class="downloads">
+          <a class="download" href="/crow-theme/downloads/Crow-Signal-Windows-v0.1.0.zip" download><strong>Download Crow Signal</strong><span>Ready-to-extract Windows pack with installer and all four original font faces.</span></a>
+          <a class="download" href="/crow-theme/downloads/Crow-Talon-Windows-v0.1.0.zip" download><strong>Download Crow Talon</strong><span>Ready-to-extract Windows pack with installer and the complete pointer scheme.</span></a>
+          <a class="download" href="/crow-theme/docs/BRAND-GUIDE.md"><strong>Brand guide</strong><span>Palette, type, accessibility, shape, motion and implementation rules.</span></a>
+          <a class="download" href="/crow-theme/docs/MASCOT-GUIDE.md"><strong>Mascot guide</strong><span>Anatomy, approved forms, product bindings, cropping and review checklist.</span></a>
+          <a class="download" href="/crow-theme/tokens/crow-theme.json"><strong>Theme tokens</strong><span>Machine-readable palette, typography, geometry, motion and product bindings.</span></a>
+          <a class="download" href="/crow-theme/provenance/SOURCES.md"><strong>Sources and provenance</strong><span>Approved masters, generation records and checksums.</span></a>
+        </div>
+      </section>
+
+      <section class="notice">
+        Crow explicitly approved this integration into the public Crow-GodMod3 project. The Crow Brand System remains copyright © 2026 Crow; see the bundled licence notice for current asset-use terms. The Crow-GodMod3 software and upstream derivative remain governed by the repository’s AGPL-3.0 licence.
+      </section>
+    </main>
+
+    <footer>
+      <div class="shell">Crow Theme v0.1.0 · Crow-GodMod3 · no orange, amber, yellow or gold brand styling.</div>
+    </footer>
+  </body>
+</html>

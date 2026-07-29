@@ -1,0 +1,208 @@
+/*
+ * Crow Theme v0.1
+ * Canonical CSS custom properties for the Crow product family.
+ *
+ * Load fonts/crow-signal.css before this file when the Crow Signal font files
+ * are available. Product bindings are selected with data-crow-product.
+ */
+
+:root,
+[data-crow-theme] {
+  color-scheme: dark;
+
+  /* Primitive colour: void, metal and signal light. */
+  --crow-void-950: #03040a;
+  --crow-void-900: #060814;
+  --crow-navy-850: #0a0e1b;
+  --crow-navy-800: #10172b;
+  --crow-navy-700: #18213a;
+  --crow-gunmetal-600: #222b3f;
+  --crow-gunmetal-500: #34415d;
+  --crow-line-quiet: #263453;
+  --crow-line-strong: #465c91;
+
+  --crow-white: #f2f7ff;
+  --crow-mist: #c5d2ea;
+  --crow-steel: #8fa2c5;
+
+  --crow-electric-blue: #2f7bff;
+  --crow-cyan: #45e7ff;
+  --crow-ultraviolet: #734cff;
+  --crow-indigo: #3b2d8f;
+  --crow-indigo-bright: #6876ff;
+  --crow-violet: #9b6cff;
+  --crow-magenta-spark: #d649ff;
+
+  --crow-state-success: #3fe0b3;
+  --crow-state-warning: #95a8ff;
+  --crow-state-danger: #ff637d;
+  --crow-state-info: #45e7ff;
+
+  /* Semantic surfaces and text. */
+  --crow-bg-canvas: var(--crow-void-950);
+  --crow-bg-deep: var(--crow-void-900);
+  --crow-bg-surface: var(--crow-navy-850);
+  --crow-bg-raised: var(--crow-navy-800);
+  --crow-bg-hover: var(--crow-navy-700);
+  --crow-bg-selected: #15254a;
+  --crow-bg-overlay: rgb(3 4 10 / 82%);
+
+  --crow-border-subtle: var(--crow-line-quiet);
+  --crow-border-default: var(--crow-gunmetal-500);
+  --crow-border-strong: var(--crow-line-strong);
+  --crow-border-focus: var(--crow-cyan);
+
+  --crow-text-strong: var(--crow-white);
+  --crow-text-default: var(--crow-mist);
+  --crow-text-muted: var(--crow-steel);
+  --crow-text-link: var(--crow-cyan);
+  --crow-text-on-bright: var(--crow-void-950);
+  --crow-text-on-ultraviolet: var(--crow-white);
+
+  --crow-action-primary: var(--crow-cyan);
+  --crow-action-primary-hover: #82efff;
+  --crow-action-secondary: var(--crow-ultraviolet);
+  --crow-action-secondary-hover: #896bff;
+  --crow-focus-ring: 0 0 0 3px rgb(69 231 255 / 38%);
+  --crow-selection-bg: rgb(47 123 255 / 42%);
+
+  /* State treatments use colour, icon and text together. */
+  --crow-success-fg: var(--crow-state-success);
+  --crow-success-bg: rgb(63 224 179 / 11%);
+  --crow-success-border: rgb(63 224 179 / 44%);
+  --crow-warning-fg: var(--crow-state-warning);
+  --crow-warning-bg: rgb(149 168 255 / 12%);
+  --crow-warning-border: rgb(149 168 255 / 46%);
+  --crow-danger-fg: var(--crow-state-danger);
+  --crow-danger-bg: rgb(255 99 125 / 11%);
+  --crow-danger-border: rgb(255 99 125 / 46%);
+  --crow-info-fg: var(--crow-state-info);
+  --crow-info-bg: rgb(69 231 255 / 10%);
+  --crow-info-border: rgb(69 231 255 / 42%);
+
+  /* Typography. */
+  --crow-font-display: "Crow Signal Display", "Segoe UI Variable Display",
+    "Segoe UI", sans-serif;
+  --crow-font-body: "Segoe UI Variable Text", "Segoe UI", sans-serif;
+  --crow-font-mono: "Crow Signal Mono", "Cascadia Mono", Consolas, monospace;
+  --crow-font-weight-regular: 400;
+  --crow-font-weight-bold: 700;
+  --crow-tracking-display: 0.045em;
+  --crow-tracking-signal: 0.08em;
+
+  /* Geometry. */
+  --crow-space-1: 0.25rem;
+  --crow-space-2: 0.5rem;
+  --crow-space-3: 0.75rem;
+  --crow-space-4: 1rem;
+  --crow-space-5: 1.5rem;
+  --crow-space-6: 2rem;
+  --crow-space-7: 3rem;
+  --crow-radius-sm: 0.5rem;
+  --crow-radius-md: 0.75rem;
+  --crow-radius-lg: 1.125rem;
+  --crow-radius-pill: 999px;
+  --crow-stroke-ui: 1px;
+  --crow-stroke-emphasis: 2px;
+
+  /* Depth and light. */
+  --crow-shadow-raised: 0 18px 60px rgb(0 0 0 / 46%);
+  --crow-shadow-signal: 0 0 28px rgb(47 123 255 / 20%);
+  --crow-shadow-cyan: 0 0 24px rgb(69 231 255 / 18%);
+  --crow-shadow-ultraviolet: 0 0 30px rgb(115 76 255 / 22%);
+  --crow-grid-line: rgb(69 231 255 / 8%);
+
+  /* Motion. */
+  --crow-motion-instant: 0ms;
+  --crow-motion-fast: 120ms;
+  --crow-motion-standard: 200ms;
+  --crow-motion-deliberate: 320ms;
+  --crow-motion-ambient: 1600ms;
+  --crow-ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
+  --crow-ease-exit: cubic-bezier(0.7, 0, 0.84, 0);
+  --crow-ease-signal: cubic-bezier(0.22, 1, 0.36, 1);
+  --crow-motion-distance: 8px;
+
+  /* Cursor family names. CSS keywords remain safe fallbacks until installed. */
+  --crow-cursor-family: "Crow Talon";
+  --crow-cursor-default-name: "Crow Talon Default";
+  --crow-cursor-link-name: "Crow Talon Link";
+  --crow-cursor-text-name: "Crow Talon Text";
+  --crow-cursor-precision-name: "Crow Talon Precision";
+  --crow-cursor-move-name: "Crow Talon Move";
+  --crow-cursor-busy-name: "Crow Talon Busy";
+  --crow-cursor-unavailable-name: "Crow Talon Unavailable";
+  --crow-cursor-default: default;
+  --crow-cursor-link: pointer;
+  --crow-cursor-text: text;
+  --crow-cursor-precision: crosshair;
+  --crow-cursor-move: move;
+  --crow-cursor-busy: progress;
+  --crow-cursor-unavailable: not-allowed;
+
+  /* Default product binding: CrowClaw. */
+  --crow-product-primary: var(--crow-cyan);
+  --crow-product-secondary: var(--crow-ultraviolet);
+  --crow-product-signal: var(--crow-electric-blue);
+  --crow-product-mascot: "core-architect";
+  --crow-product-compact-mascot: "pet-companion";
+}
+
+[data-crow-product="crowclaw"] {
+  --crow-product-primary: var(--crow-cyan);
+  --crow-product-secondary: var(--crow-ultraviolet);
+  --crow-product-signal: var(--crow-electric-blue);
+  --crow-product-mascot: "core-architect";
+  --crow-product-compact-mascot: "pet-companion";
+}
+
+[data-crow-product="crow-godmod3"] {
+  --crow-product-primary: var(--crow-ultraviolet);
+  --crow-product-secondary: var(--crow-magenta-spark);
+  --crow-product-signal: var(--crow-cyan);
+  --crow-product-mascot: "glitch-ascendant";
+  --crow-product-compact-mascot: "core-architect";
+}
+
+[data-crow-product="crowquant"] {
+  --crow-product-primary: var(--crow-electric-blue);
+  --crow-product-secondary: var(--crow-cyan);
+  --crow-product-signal: var(--crow-state-success);
+  --crow-product-mascot: "field-operator";
+  --crow-product-compact-mascot: "pet-companion";
+}
+
+[data-crow-product="crownest"] {
+  --crow-product-primary: var(--crow-indigo-bright);
+  --crow-product-secondary: var(--crow-cyan);
+  --crow-product-signal: var(--crow-violet);
+  --crow-product-mascot: "core-architect";
+  --crow-product-compact-mascot: "pet-companion";
+}
+
+[data-crow-product="crowmemory"] {
+  --crow-product-primary: var(--crow-violet);
+  --crow-product-secondary: var(--crow-cyan);
+  --crow-product-signal: var(--crow-electric-blue);
+  --crow-product-mascot: "core-architect";
+  --crow-product-compact-mascot: "pet-companion";
+}
+
+[data-crow-product="crowflix"] {
+  --crow-product-primary: var(--crow-electric-blue);
+  --crow-product-secondary: var(--crow-violet);
+  --crow-product-signal: var(--crow-magenta-spark);
+  --crow-product-mascot: "field-operator";
+  --crow-product-compact-mascot: "pet-companion";
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root,
+  [data-crow-theme] {
+    --crow-motion-fast: 0ms;
+    --crow-motion-standard: 0ms;
+    --crow-motion-deliberate: 0ms;
+    --crow-motion-ambient: 0ms;
+    --crow-motion-distance: 0px;
+  }
+}

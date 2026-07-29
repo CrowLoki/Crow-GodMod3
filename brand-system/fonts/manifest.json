@@ -1,0 +1,154 @@
+{
+  "name": "Crow Signal",
+  "version": "0.1.0",
+  "generated_at": "2026-07-29T14:19:14.456059+00:00",
+  "originality": "All glyph outlines are generated from hand-authored modular feather-plate patterns in scripts/build_fonts.py. No third-party font binaries or outlines are consumed.",
+  "metrics": {
+    "units_per_em": 1000,
+    "ascender": 900,
+    "descender": -250,
+    "cap_height": 700,
+    "x_height": 500
+  },
+  "coverage": {
+    "printable_basic_latin": "U+0020-U+007E",
+    "extras": [
+      "U+00A0",
+      "U+00A9",
+      "U+00AE",
+      "U+2013",
+      "U+2014",
+      "U+2018",
+      "U+2019",
+      "U+201C",
+      "U+201D",
+      "U+2022",
+      "U+2026",
+      "U+2122",
+      "U+2190",
+      "U+2191",
+      "U+2192",
+      "U+2193",
+      "U+2194",
+      "U+2195",
+      "U+21A9",
+      "U+21AA",
+      "U+21D2",
+      "U+2212",
+      "U+2260",
+      "U+2264",
+      "U+2265",
+      "U+25C6",
+      "U+25C7",
+      "U+2605"
+    ]
+  },
+  "licence": {
+    "status": "internal-preview",
+    "note": "External redistribution terms have not yet been selected. Publishing requires Crow's explicit approval."
+  },
+  "files": [
+    {
+      "file": "fonts/ttf/CrowSignalDisplay-Regular.ttf",
+      "sha256": "06be80fd542316bf11e89c646aee6265d55c4c4da25001a3acc127c910408ea6",
+      "bytes": 41008,
+      "glyphs": 126,
+      "mapped_codepoints": 123,
+      "monospaced": false,
+      "format": "ttf",
+      "family": "Crow Signal Display",
+      "style": "Regular",
+      "weight": 400
+    },
+    {
+      "file": "fonts/woff2/CrowSignalDisplay-Regular.woff2",
+      "sha256": "40b23fde9dc50031497d0b046fded7540cc203945c77f6e4b6c9604acbd330f5",
+      "bytes": 3664,
+      "glyphs": 126,
+      "mapped_codepoints": 123,
+      "monospaced": false,
+      "format": "woff2",
+      "family": "Crow Signal Display",
+      "style": "Regular",
+      "weight": 400
+    },
+    {
+      "file": "fonts/ttf/CrowSignalDisplay-Bold.ttf",
+      "sha256": "9237eb65df51167bb77ef0d226d4e860c38a9c9a6bbc9757e30724c96183ae96",
+      "bytes": 40972,
+      "glyphs": 126,
+      "mapped_codepoints": 123,
+      "monospaced": false,
+      "format": "ttf",
+      "family": "Crow Signal Display",
+      "style": "Bold",
+      "weight": 700
+    },
+    {
+      "file": "fonts/woff2/CrowSignalDisplay-Bold.woff2",
+      "sha256": "08cfd468fcf4e9db5f0a65f27fdf95de9c47568e2eba86e4b453470ee97f0ef9",
+      "bytes": 3616,
+      "glyphs": 126,
+      "mapped_codepoints": 123,
+      "monospaced": false,
+      "format": "woff2",
+      "family": "Crow Signal Display",
+      "style": "Bold",
+      "weight": 700
+    },
+    {
+      "file": "fonts/ttf/CrowSignalMono-Regular.ttf",
+      "sha256": "7f084346b7d810d17d335e7508734da7303e64ea077386e8ef64f94823850201",
+      "bytes": 40736,
+      "glyphs": 126,
+      "mapped_codepoints": 123,
+      "monospaced": true,
+      "format": "ttf",
+      "family": "Crow Signal Mono",
+      "style": "Regular",
+      "weight": 400
+    },
+    {
+      "file": "fonts/woff2/CrowSignalMono-Regular.woff2",
+      "sha256": "965d08be3aac2c132c76d72a5479da02dfda3ce324690fae021953f95a2d1873",
+      "bytes": 3840,
+      "glyphs": 126,
+      "mapped_codepoints": 123,
+      "monospaced": true,
+      "format": "woff2",
+      "family": "Crow Signal Mono",
+      "style": "Regular",
+      "weight": 400
+    },
+    {
+      "file": "fonts/ttf/CrowSignalMono-Bold.ttf",
+      "sha256": "fd61fd7ee18fba3448544d23a7aae69ad9156896c531c75a2d042baa2a584e2d",
+      "bytes": 40700,
+      "glyphs": 126,
+      "mapped_codepoints": 123,
+      "monospaced": true,
+      "format": "ttf",
+      "family": "Crow Signal Mono",
+      "style": "Bold",
+      "weight": 700
+    },
+    {
+      "file": "fonts/woff2/CrowSignalMono-Bold.woff2",
+      "sha256": "9e7d9a9456e6c5ee532269488409b8753d32b5a5ca0ab4d93bc7aaf6d5ccdc8c",
+      "bytes": 3752,
+      "glyphs": 126,
+      "mapped_codepoints": 123,
+      "monospaced": true,
+      "format": "woff2",
+      "family": "Crow Signal Mono",
+      "style": "Bold",
+      "weight": 700
+    },
+    {
+      "file": "fonts/specimens/crow-signal-v0.1.png",
+      "sha256": "96e248af32e059fce7038381c1e9819302803e041d1fec954b75cc472cf7ee57",
+      "bytes": 64774,
+      "kind": "specimen"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "name": "Crow-GodMod3",
+  "short_name": "Crow-GodMod3",
+  "description": "Open-source, privacy-respecting multi-model AI in the complete Crow Theme.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#03040a",
+  "theme_color": "#03040a",
+  "icons": [
+    {
+      "src": "/crow-theme/assets/icons/png/crow-signal-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/crow-theme/assets/icons/png/crow-signal-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/crow-theme/assets/icons/app/crow-signal-app-rounded-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

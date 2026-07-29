@@ -1,0 +1,116 @@
+{
+  "version": "0.1.0",
+  "generator": "scripts/build_raster_exports.py",
+  "outputs": [
+    {
+      "file": "assets/social/exports/crow-family-open-graph-1200x630.png",
+      "bytes": 916959,
+      "sha256": "1b331cd8f6f674c4d32b4d9189518fefd76a5ab8ae3a5df05324b6098753707e"
+    },
+    {
+      "file": "assets/social/exports/crow-family-github-1280x640.png",
+      "bytes": 971319,
+      "sha256": "b7fb8261764007494fa6a6fb4c2098c7753fbee0fd1084b487249f7f23777279"
+    },
+    {
+      "file": "assets/social/exports/crow-family-wide-1500x500.png",
+      "bytes": 896628,
+      "sha256": "28df092a7d94e5a41e9e24a0c05206a8afb92238ac4379786fa886433a92d657"
+    },
+    {
+      "file": "assets/social/exports/crow-family-post-1080x1080.png",
+      "bytes": 1568140,
+      "sha256": "145e9946ccc8bdeb01d9a5cb97e2fdbaa4c973c8376f1aa103158de176a3fad3"
+    },
+    {
+      "file": "assets/social/exports/crow-family-story-1080x1920.png",
+      "bytes": 1837633,
+      "sha256": "db10174b9fd391c1f037e07da56968bcec5024115fec5d1b9bcb55bcf52bf255"
+    },
+    {
+      "file": "assets/backgrounds/exports/void-grid-1920x1080.png",
+      "bytes": 2117035,
+      "sha256": "53eea5e6609be075c5980b4cc58c54a6a4546a0c31ee1e9142122d1d474dda14"
+    },
+    {
+      "file": "assets/backgrounds/exports/void-grid-2560x1440.png",
+      "bytes": 3180260,
+      "sha256": "1bd8b1a61c6a5637fd2fd5724221d0f35954c2cb9c2c541842e456a61381eb0b"
+    },
+    {
+      "file": "assets/backgrounds/exports/void-grid-3440x1440.png",
+      "bytes": 3265850,
+      "sha256": "fab716ce65311a80569c98854f596ceefafd62096076009a300898a0c18ca581"
+    },
+    {
+      "file": "assets/backgrounds/exports/void-grid-mobile-1440x2560.png",
+      "bytes": 1325594,
+      "sha256": "9d2ee0618a297dc96cbee388be938164ec903164584b48c7a144fa63fb5d418d"
+    },
+    {
+      "file": "assets/backgrounds/exports/void-grid-square-2048x2048.png",
+      "bytes": 2341968,
+      "sha256": "1f7f07cc27d96b22c6611ad9918ad3d765882679cc8905b8d40da7e917334582"
+    },
+    {
+      "file": "assets/product-variants/exports/crow-godmod3-1920x1080.png",
+      "bytes": 2725968,
+      "sha256": "a5bcb2488664a56384c50e57982164adf42510655d8f5e395c4f4b4d6e74fa58"
+    },
+    {
+      "file": "assets/product-variants/exports/crow-godmod3-1200x630.png",
+      "bytes": 1154027,
+      "sha256": "bc6480c6896f5ebce5346f0216eb6d4cedaa78c84b25372c4e1a09bf40691ff8"
+    },
+    {
+      "file": "assets/product-variants/exports/crowclaw-1920x1080.png",
+      "bytes": 2273666,
+      "sha256": "58c548c63074a3ef9fa50f47f0900c55842e59fd3d8a808717cdfcfaecaa5fc4"
+    },
+    {
+      "file": "assets/product-variants/exports/crowclaw-1200x630.png",
+      "bytes": 968477,
+      "sha256": "984b22e2eda4640059ed979b5fb50c1a381a0fef4bedd98c5047871a4ed11e8d"
+    },
+    {
+      "file": "assets/product-variants/exports/crowflix-1920x1080.png",
+      "bytes": 2616720,
+      "sha256": "ace58830615200a94d1811b633e1e0d1b8c06cff41a40a9670d48b400c039826"
+    },
+    {
+      "file": "assets/product-variants/exports/crowflix-1200x630.png",
+      "bytes": 1083165,
+      "sha256": "39067eacb2602bb9510db744c4604aef068f511d3f77d95bce6f740170f499ab"
+    },
+    {
+      "file": "assets/product-variants/exports/crowmemory-1920x1080.png",
+      "bytes": 2521615,
+      "sha256": "e262f51bf8d29f6ccf9401aea96ce4e14eed0efeb4b50b3b8a51fe67be2d4ef1"
+    },
+    {
+      "file": "assets/product-variants/exports/crowmemory-1200x630.png",
+      "bytes": 1049901,
+      "sha256": "4d20a456d80d1a958045a39762113e23d0b2ba6410fe740e82f135f854044b73"
+    },
+    {
+      "file": "assets/product-variants/exports/crownest-1920x1080.png",
+      "bytes": 2238367,
+      "sha256": "d05422b4c8a4bc3396ad38019bc31a4bf1649489c376a840272cda65b9e21f55"
+    },
+    {
+      "file": "assets/product-variants/exports/crownest-1200x630.png",
+      "bytes": 952773,
+      "sha256": "de7c796f9cccbfa21948a754a0a9b0d4ef76ab133055eb1a4de357bd6cfb23e0"
+    },
+    {
+      "file": "assets/product-variants/exports/crowquant-1920x1080.png",
+      "bytes": 2688920,
+      "sha256": "07d2bfa5c1411a1f96579b7e7d28df5267dc4e59a0ca09c7cbeb25d755a23cdf"
+    },
+    {
+      "file": "assets/product-variants/exports/crowquant-1200x630.png",
+      "bytes": 1113746,
+      "sha256": "b4adae9bcb48c4a1aa08ed545d1579270dc090500804ef4f748f807bde0d5c92"
+    }
+  ]
+}

@@ -1,0 +1,685 @@
+{
+  "name": "Crow Signal Icon Family",
+  "version": "0.1.0",
+  "generated_at": "2026-07-29T14:19:18.326094+00:00",
+  "source_policy": "Derived only by crop, Lanczos resampling, restrained sharpening, and rounded alpha masking. No source artwork was redrawn.",
+  "sources": [
+    {
+      "file": "assets/marks/crow-signal-master.png",
+      "width": 1254,
+      "height": 1254,
+      "sha256": "de3b381e21c29c1d87d69554daa474c9a4d11c146eaea44dd4c843d9b197f472"
+    },
+    {
+      "file": "assets/mascots/masters/pet-companion.png",
+      "width": 1024,
+      "height": 1536,
+      "sha256": "644a121117370fcc01babbd4e30682a768a9e723e99ad2b3e40d404f0575d1c0"
+    }
+  ],
+  "square_sizes": [
+    16,
+    20,
+    24,
+    32,
+    40,
+    48,
+    64,
+    96,
+    128,
+    180,
+    192,
+    256,
+    512,
+    1024
+  ],
+  "app_sizes": [
+    256,
+    512,
+    1024
+  ],
+  "ico_sizes": [
+    16,
+    20,
+    24,
+    32,
+    40,
+    48,
+    64,
+    96,
+    128,
+    180,
+    192,
+    256
+  ],
+  "resampling": "Pillow Image.Resampling.LANCZOS",
+  "files": [
+    {
+      "file": "assets/icons/png/crow-signal-16.png",
+      "kind": "square-icon",
+      "source": "assets/marks/crow-signal-master.png",
+      "width": 16,
+      "height": 16,
+      "mode": "RGB",
+      "bytes": 705,
+      "sha256": "dac2f1f115473d8f63fa02ec848fb29b3c040d2a1b8a6fbde4ebb59720d36426",
+      "crop_box": [
+        307,
+        219,
+        947,
+        859
+      ],
+      "optical_tier": "micro",
+      "eye_scores": [
+        {
+          "eye": 1,
+          "peak_blue": 150,
+          "peak_signal": 108
+        },
+        {
+          "eye": 2,
+          "peak_blue": 173,
+          "peak_signal": 110
+        },
+        {
+          "eye": 3,
+          "peak_blue": 255,
+          "peak_signal": 173
+        }
+      ]
+    },
+    {
+      "file": "assets/icons/png/crow-signal-20.png",
+      "kind": "square-icon",
+      "source": "assets/marks/crow-signal-master.png",
+      "width": 20,
+      "height": 20,
+      "mode": "RGB",
+      "bytes": 1033,
+      "sha256": "157731bbef2553c9c6e2131083a0b01b2e04a721fe68b8c59943fd5f04d27dc4",
+      "crop_box": [
+        307,
+        219,
+        947,
+        859
+      ],
+      "optical_tier": "micro",
+      "eye_scores": [
+        {
+          "eye": 1,
+          "peak_blue": 255,
+          "peak_signal": 166
+        },
+        {
+          "eye": 2,
+          "peak_blue": 197,
+          "peak_signal": 140
+        },
+        {
+          "eye": 3,
+          "peak_blue": 255,
+          "peak_signal": 171
+        }
+      ]
+    },
+    {
+      "file": "assets/icons/png/crow-signal-24.png",
+      "kind": "square-icon",
+      "source": "assets/marks/crow-signal-master.png",
+      "width": 24,
+      "height": 24,
+      "mode": "RGB",
+      "bytes": 1416,
+      "sha256": "8e0776e8bb5a8af341d84342f269970d8c30dce454be46905837355dd462f446",
+      "crop_box": [
+        307,
+        219,
+        947,
+        859
+      ],
+      "optical_tier": "micro",
+      "eye_scores": [
+        {
+          "eye": 1,
+          "peak_blue": 255,
+          "peak_signal": 172
+        },
+        {
+          "eye": 2,
+          "peak_blue": 255,
+          "peak_signal": 156
+        },
+        {
+          "eye": 3,
+          "peak_blue": 255,
+          "peak_signal": 197
+        }
+      ]
+    },
+    {
+      "file": "assets/icons/png/crow-signal-32.png",
+      "kind": "square-icon",
+      "source": "assets/marks/crow-signal-master.png",
+      "width": 32,
+      "height": 32,
+      "mode": "RGB",
+      "bytes": 2416,
+      "sha256": "2730f713c165441b106718f607b54a4caf5c68fad90adba722ab2c57f3b6a83b",
+      "crop_box": [
+        307,
+        219,
+        947,
+        859
+      ],
+      "optical_tier": "micro",
+      "eye_scores": [
+        {
+          "eye": 1,
+          "peak_blue": 255,
+          "peak_signal": 193
+        },
+        {
+          "eye": 2,
+          "peak_blue": 255,
+          "peak_signal": 190
+        },
+        {
+          "eye": 3,
+          "peak_blue": 255,
+          "peak_signal": 208
+        }
+      ]
+    },
+    {
+      "file": "assets/icons/png/crow-signal-40.png",
+      "kind": "square-icon",
+      "source": "assets/marks/crow-signal-master.png",
+      "width": 40,
+      "height": 40,
+      "mode": "RGB",
+      "bytes": 3765,
+      "sha256": "cffaaefea91f67d509c7cb109ef70ef7922eb7ffb2c84512edd8ace70c1220db",
+      "crop_box": [
+        307,
+        219,
+        947,
+        859
+      ],
+      "optical_tier": "micro",
+      "eye_scores": [
+        {
+          "eye": 1,
+          "peak_blue": 255,
+          "peak_signal": 203
+        },
+        {
+          "eye": 2,
+          "peak_blue": 255,
+          "peak_signal": 186
+        },
+        {
+          "eye": 3,
+          "peak_blue": 255,
+          "peak_signal": 235
+        }
+      ]
+    },
+    {
+      "file": "assets/icons/png/crow-signal-48.png",
+      "kind": "square-icon",
+      "source": "assets/marks/crow-signal-master.png",
+      "width": 48,
+      "height": 48,
+      "mode": "RGB",
+      "bytes": 5363,
+      "sha256": "36f4504b03589787790f66d8d899146f642a64c6ff780a4600fde03a84e73662",
+      "crop_box": [
+        307,
+        219,
+        947,
+        859
+      ],
+      "optical_tier": "micro",
+      "eye_scores": [
+        {
+          "eye": 1,
+          "peak_blue": 255,
+          "peak_signal": 190
+        },
+        {
+          "eye": 2,
+          "peak_blue": 255,
+          "peak_signal": 203
+        },
+        {
+          "eye": 3,
+          "peak_blue": 255,
+          "peak_signal": 247
+        }
+      ]
+    },
+    {
+      "file": "assets/icons/png/crow-signal-64.png",
+      "kind": "square-icon",
+      "source": "assets/marks/crow-signal-master.png",
+      "width": 64,
+      "height": 64,
+      "mode": "RGB",
+      "bytes": 9137,
+      "sha256": "9897e280a67383144d5b341b61b06e92ca009bdbfb84888c533e2a55c35c145e",
+      "crop_box": [
+        226,
+        100,
+        1029,
+        903
+      ],
+      "optical_tier": "compact",
+      "eye_scores": [
+        {
+          "eye": 1,
+          "peak_blue": 255,
+          "peak_signal": 207
+        },
+        {
+          "eye": 2,
+          "peak_blue": 255,
+          "peak_signal": 210
+        },
+        {
+          "eye": 3,
+          "peak_blue": 255,
+          "peak_signal": 251
+        }
+      ]
+    },
+    {
+      "file": "assets/icons/png/crow-signal-96.png",
+      "kind": "square-icon",
+      "source": "assets/marks/crow-signal-master.png",
+      "width": 96,
+      "height": 96,
+      "mode": "RGB",
+      "bytes": 19806,
+      "sha256": "b6e269acf3fac811d99a17b711eb69d4d929881de4814fa274722ef5b87baf0b",
+      "crop_box": [
+        226,
+        100,
+        1029,
+        903
+      ],
+      "optical_tier": "compact",
+      "eye_scores": [
+        {
+          "eye": 1,
+          "peak_blue": 255,
+          "peak_signal": 255
+        },
+        {
+          "eye": 2,
+          "peak_blue": 255,
+          "peak_signal": 248
+        },
+        {
+          "eye": 3,
+          "peak_blue": 255,
+          "peak_signal": 255
+        }
+      ]
+    },
+    {
+      "file": "assets/icons/png/crow-signal-128.png",
+      "kind": "square-icon",
+      "source": "assets/marks/crow-signal-master.png",
+      "width": 128,
+      "height": 128,
+      "mode": "RGB",
+      "bytes": 34542,
+      "sha256": "ff6bbdff613acc55f7f004171fa67215b6b49b618b02bf5d3a88d48c780e8f18",
+      "crop_box": [
+        226,
+        100,
+        1029,
+        903
+      ],
+      "optical_tier": "compact",
+      "eye_scores": [
+        {
+          "eye": 1,
+          "peak_blue": 255,
+          "peak_signal": 253
+        },
+        {
+          "eye": 2,
+          "peak_blue": 255,
+          "peak_signal": 247
+        },
+        {
+          "eye": 3,
+          "peak_blue": 255,
+          "peak_signal": 255
+        }
+      ]
+    },
+    {
+      "file": "assets/icons/png/crow-signal-180.png",
+      "kind": "square-icon",
+      "source": "assets/marks/crow-signal-master.png",
+      "width": 180,
+      "height": 180,
+      "mode": "RGB",
+      "bytes": 66979,
+      "sha256": "75ade137a7af57043a7ce42b3cac8e63e9720dd5dada0fb47c4afe5ffb13467d",
+      "crop_box": [
+        226,
+        100,
+        1029,
+        903
+      ],
+      "optical_tier": "compact",
+      "eye_scores": [
+        {
+          "eye": 1,
+          "peak_blue": 255,
+          "peak_signal": 255
+        },
+        {
+          "eye": 2,
+          "peak_blue": 255,
+          "peak_signal": 255
+        },
+        {
+          "eye": 3,
+          "peak_blue": 255,
+          "peak_signal": 253
+        }
+      ]
+    },
+    {
+      "file": "assets/icons/png/crow-signal-192.png",
+      "kind": "square-icon",
+      "source": "assets/marks/crow-signal-master.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGB",
+      "bytes": 75773,
+      "sha256": "705da099cde24a21c5ba471b5ac67af338cf9b6ca4a938901cf9f908f25caad3",
+      "crop_box": [
+        226,
+        100,
+        1029,
+        903
+      ],
+      "optical_tier": "compact",
+      "eye_scores": [
+        {
+          "eye": 1,
+          "peak_blue": 255,
+          "peak_signal": 255
+        },
+        {
+          "eye": 2,
+          "peak_blue": 255,
+          "peak_signal": 246
+        },
+        {
+          "eye": 3,
+          "peak_blue": 255,
+          "peak_signal": 255
+        }
+      ]
+    },
+    {
+      "file": "assets/icons/png/crow-signal-256.png",
+      "kind": "square-icon",
+      "source": "assets/marks/crow-signal-master.png",
+      "width": 256,
+      "height": 256,
+      "mode": "RGB",
+      "bytes": 103405,
+      "sha256": "dea4da2edead995b0ccb431ce9c2fd20777fe9e7d72896aead334a2e8cadaace",
+      "crop_box": [
+        88,
+        0,
+        1166,
+        1078
+      ],
+      "optical_tier": "standard",
+      "eye_scores": [
+        {
+          "eye": 1,
+          "peak_blue": 255,
+          "peak_signal": 255
+        },
+        {
+          "eye": 2,
+          "peak_blue": 255,
+          "peak_signal": 245
+        },
+        {
+          "eye": 3,
+          "peak_blue": 255,
+          "peak_signal": 255
+        }
+      ]
+    },
+    {
+      "file": "assets/icons/png/crow-signal-512.png",
+      "kind": "square-icon",
+      "source": "assets/marks/crow-signal-master.png",
+      "width": 512,
+      "height": 512,
+      "mode": "RGB",
+      "bytes": 319308,
+      "sha256": "830b53da8581ef50cec9d759cab8a5e282b5241140b27e0d395b27e8670e21cd",
+      "crop_box": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "optical_tier": "full",
+      "eye_scores": [
+        {
+          "eye": 1,
+          "peak_blue": 255,
+          "peak_signal": 235
+        },
+        {
+          "eye": 2,
+          "peak_blue": 255,
+          "peak_signal": 227
+        },
+        {
+          "eye": 3,
+          "peak_blue": 255,
+          "peak_signal": 250
+        }
+      ]
+    },
+    {
+      "file": "assets/icons/png/crow-signal-1024.png",
+      "kind": "square-icon",
+      "source": "assets/marks/crow-signal-master.png",
+      "width": 1024,
+      "height": 1024,
+      "mode": "RGB",
+      "bytes": 1209436,
+      "sha256": "ee65879a2cecd02ef9bb1d386738ef391158c3791ec0c4638cc9d48bf337ea9c",
+      "crop_box": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "optical_tier": "full",
+      "eye_scores": [
+        {
+          "eye": 1,
+          "peak_blue": 255,
+          "peak_signal": 251
+        },
+        {
+          "eye": 2,
+          "peak_blue": 255,
+          "peak_signal": 248
+        },
+        {
+          "eye": 3,
+          "peak_blue": 255,
+          "peak_signal": 250
+        }
+      ]
+    },
+    {
+      "file": "assets/icons/favicon.ico",
+      "kind": "multi-size-ico",
+      "source": "assets/marks/crow-signal-master.png",
+      "entries": [
+        [
+          16,
+          16
+        ],
+        [
+          20,
+          20
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          40,
+          40
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          96,
+          96
+        ],
+        [
+          128,
+          128
+        ],
+        [
+          180,
+          180
+        ],
+        [
+          192,
+          192
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "bytes": 369966,
+      "sha256": "0e2a991721cf2d1f05a7f2d68704656cff8bd574e1fa931b2a19c848f24d8f15"
+    },
+    {
+      "file": "assets/icons/app/crow-signal-app-rounded-256.png",
+      "kind": "rounded-app-icon",
+      "source": "assets/marks/crow-signal-master.png",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "bytes": 94339,
+      "sha256": "29b9f9afe84e51392503bdd18041dd1e2c314f65bcce735da1c1514fedc04bd7",
+      "crop_box": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "corner_radius_ratio": 0.22
+    },
+    {
+      "file": "assets/icons/app/crow-signal-app-rounded-512.png",
+      "kind": "rounded-app-icon",
+      "source": "assets/marks/crow-signal-master.png",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "bytes": 372106,
+      "sha256": "0779dcaf9f723e13e560b59a325de9dadbf8356d5807401f5c3437aee5bf0a42",
+      "crop_box": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "corner_radius_ratio": 0.22
+    },
+    {
+      "file": "assets/icons/app/crow-signal-app-rounded-1024.png",
+      "kind": "rounded-app-icon",
+      "source": "assets/marks/crow-signal-master.png",
+      "width": 1024,
+      "height": 1024,
+      "mode": "RGBA",
+      "bytes": 1352750,
+      "sha256": "30725f9aa921822d2daf1a101a2fbb310463f6b64deefa7a8b3af52f18456e2e",
+      "crop_box": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "corner_radius_ratio": 0.22
+    },
+    {
+      "file": "assets/icons/avatars/crow-signal-avatar-512.png",
+      "kind": "avatar",
+      "source": "assets/marks/crow-signal-master.png",
+      "width": 512,
+      "height": 512,
+      "mode": "RGB",
+      "bytes": 471123,
+      "sha256": "ce0a32d4a8fd410233548d2ee7f094399a07d326804281fba92ee6ab7cb3d5fe",
+      "crop_box": [
+        176,
+        75,
+        1079,
+        978
+      ]
+    },
+    {
+      "file": "assets/icons/avatars/pet-companion-avatar-512.png",
+      "kind": "pet-avatar",
+      "source": "assets/mascots/masters/pet-companion.png",
+      "width": 512,
+      "height": 512,
+      "mode": "RGB",
+      "bytes": 430444,
+      "sha256": "393b0dfd5cd86ce69b51a90dc784ac443e76ea358b44ff716ba0dee4ea0f9501",
+      "crop_box": [
+        215,
+        77,
+        932,
+        794
+      ]
+    },
+    {
+      "file": "assets/icons/contact-sheet.png",
+      "kind": "contact-sheet",
+      "source": "assets/marks/crow-signal-master.png",
+      "width": 2400,
+      "height": 1760,
+      "mode": "RGB",
+      "bytes": 879645,
+      "sha256": "a688dff1772c1610fe79d3e67205aaa4281f607e69b3e61e7f43bdbc290d5317",
+      "secondary_source": "assets/mascots/masters/pet-companion.png"
+    }
+  ]
+}

@@ -1,0 +1,604 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Crow Talon",
+  "version": "1.0.0",
+  "description": "Original procedural Windows cursor family for the Crow Theme.",
+  "authorship": {
+    "method": "Drawn from original geometric primitives in scripts/build_cursors.py",
+    "third_party_art": false,
+    "system_cursor_assets_embedded": false
+  },
+  "windows_scheme_order": [
+    "Arrow",
+    "Help",
+    "AppStarting",
+    "Wait",
+    "Crosshair",
+    "IBeam",
+    "NWPen",
+    "No",
+    "SizeNS",
+    "SizeWE",
+    "SizeNWSE",
+    "SizeNESW",
+    "SizeAll",
+    "UpArrow",
+    "Hand"
+  ],
+  "embedded_sizes": [
+    32,
+    48,
+    64,
+    96
+  ],
+  "animation": {
+    "roles": [
+      "working",
+      "busy"
+    ],
+    "frames": 12,
+    "jiffies_per_frame": 5,
+    "static_fallbacks": [
+      "windows/working.cur",
+      "windows/busy.cur"
+    ]
+  },
+  "installers": {
+    "recommended_per_user": "install.ps1",
+    "uninstall": "uninstall.ps1",
+    "classic_inf": "Crow-Talon.inf",
+    "installed_during_build": false
+  },
+  "preview": {
+    "path": "preview.png",
+    "width": 1100,
+    "height": 540,
+    "sha256": "4A72F8F9683039EC3CFEAD50852DC1D93D419A8374E43DEF1B24475447950C09"
+  },
+  "roles": [
+    {
+      "role": "normal",
+      "windows_registry_name": "Arrow",
+      "source_png": "src/normal.png",
+      "static_cursor": "windows/normal.cur",
+      "embedded_images": [
+        {
+          "size": 32,
+          "hotspot_x": 3,
+          "hotspot_y": 2,
+          "bytes": 1955
+        },
+        {
+          "size": 48,
+          "hotspot_x": 4,
+          "hotspot_y": 4,
+          "bytes": 3526
+        },
+        {
+          "size": 64,
+          "hotspot_x": 5,
+          "hotspot_y": 5,
+          "bytes": 5598
+        },
+        {
+          "size": 96,
+          "hotspot_x": 8,
+          "hotspot_y": 7,
+          "bytes": 9472
+        }
+      ],
+      "sha256": {
+        "windows/normal.cur": "98D6182631B1E0BA56525A9F39D6E41C2CF1A5832AC4EC104793D52EC51171C9"
+      }
+    },
+    {
+      "role": "help",
+      "windows_registry_name": "Help",
+      "source_png": "src/help.png",
+      "static_cursor": "windows/help.cur",
+      "embedded_images": [
+        {
+          "size": 32,
+          "hotspot_x": 3,
+          "hotspot_y": 2,
+          "bytes": 2519
+        },
+        {
+          "size": 48,
+          "hotspot_x": 4,
+          "hotspot_y": 4,
+          "bytes": 4621
+        },
+        {
+          "size": 64,
+          "hotspot_x": 5,
+          "hotspot_y": 5,
+          "bytes": 7518
+        },
+        {
+          "size": 96,
+          "hotspot_x": 8,
+          "hotspot_y": 7,
+          "bytes": 12717
+        }
+      ],
+      "sha256": {
+        "windows/help.cur": "E2023A4DDFED009C88FCB458337AF27DF8CDF9B4184682482B2D9869FAC5C82C"
+      }
+    },
+    {
+      "role": "working",
+      "windows_registry_name": "AppStarting",
+      "source_png": "src/working.png",
+      "static_cursor": "windows/working.cur",
+      "embedded_images": [
+        {
+          "size": 32,
+          "hotspot_x": 3,
+          "hotspot_y": 2,
+          "bytes": 2391
+        },
+        {
+          "size": 48,
+          "hotspot_x": 4,
+          "hotspot_y": 4,
+          "bytes": 4374
+        },
+        {
+          "size": 64,
+          "hotspot_x": 5,
+          "hotspot_y": 5,
+          "bytes": 6939
+        },
+        {
+          "size": 96,
+          "hotspot_x": 8,
+          "hotspot_y": 7,
+          "bytes": 11815
+        }
+      ],
+      "sha256": {
+        "windows/working.cur": "3F9BBE0070EF48DFE85CF4DA5CB712AE56D6A0BAE136851B08EB04ED7C08FA44",
+        "windows/working.ani": "49CEB16F7395081B129943B44D845CFCAE102DF254AFDA9B226DB7864A755FA6"
+      },
+      "animated_cursor": "windows/working.ani",
+      "animation": {
+        "frames": 12,
+        "steps": 12,
+        "jiffies": 5
+      }
+    },
+    {
+      "role": "busy",
+      "windows_registry_name": "Wait",
+      "source_png": "src/busy.png",
+      "static_cursor": "windows/busy.cur",
+      "embedded_images": [
+        {
+          "size": 32,
+          "hotspot_x": 16,
+          "hotspot_y": 16,
+          "bytes": 2106
+        },
+        {
+          "size": 48,
+          "hotspot_x": 24,
+          "hotspot_y": 24,
+          "bytes": 3572
+        },
+        {
+          "size": 64,
+          "hotspot_x": 32,
+          "hotspot_y": 32,
+          "bytes": 5296
+        },
+        {
+          "size": 96,
+          "hotspot_x": 48,
+          "hotspot_y": 48,
+          "bytes": 8492
+        }
+      ],
+      "sha256": {
+        "windows/busy.cur": "B5348A685CD8572D9016D8C2FF075E12B90D9F162433601DE2102178C5BCB3AC",
+        "windows/busy.ani": "7534D39DCCE306D85F6DFA9DB61178638DF372D6F4F76440BC6348075D79F07E"
+      },
+      "animated_cursor": "windows/busy.ani",
+      "animation": {
+        "frames": 12,
+        "steps": 12,
+        "jiffies": 5
+      }
+    },
+    {
+      "role": "precision",
+      "windows_registry_name": "Crosshair",
+      "source_png": "src/precision.png",
+      "static_cursor": "windows/precision.cur",
+      "embedded_images": [
+        {
+          "size": 32,
+          "hotspot_x": 16,
+          "hotspot_y": 16,
+          "bytes": 1970
+        },
+        {
+          "size": 48,
+          "hotspot_x": 24,
+          "hotspot_y": 24,
+          "bytes": 3614
+        },
+        {
+          "size": 64,
+          "hotspot_x": 32,
+          "hotspot_y": 32,
+          "bytes": 5472
+        },
+        {
+          "size": 96,
+          "hotspot_x": 48,
+          "hotspot_y": 48,
+          "bytes": 8404
+        }
+      ],
+      "sha256": {
+        "windows/precision.cur": "52008ACB71EA5AD1C1536B3E9F8CB87E1D685AA663B0054C6A031BF9D34FD325"
+      }
+    },
+    {
+      "role": "text",
+      "windows_registry_name": "IBeam",
+      "source_png": "src/text.png",
+      "static_cursor": "windows/text.cur",
+      "embedded_images": [
+        {
+          "size": 32,
+          "hotspot_x": 16,
+          "hotspot_y": 16,
+          "bytes": 1170
+        },
+        {
+          "size": 48,
+          "hotspot_x": 24,
+          "hotspot_y": 24,
+          "bytes": 1541
+        },
+        {
+          "size": 64,
+          "hotspot_x": 32,
+          "hotspot_y": 32,
+          "bytes": 2379
+        },
+        {
+          "size": 96,
+          "hotspot_x": 48,
+          "hotspot_y": 48,
+          "bytes": 3003
+        }
+      ],
+      "sha256": {
+        "windows/text.cur": "6C35432537B1F7DACD711B82F5F9216CF74C00FF86F9C1821654B6CD79186598"
+      }
+    },
+    {
+      "role": "handwriting",
+      "windows_registry_name": "NWPen",
+      "source_png": "src/handwriting.png",
+      "static_cursor": "windows/handwriting.cur",
+      "embedded_images": [
+        {
+          "size": 32,
+          "hotspot_x": 4,
+          "hotspot_y": 28,
+          "bytes": 1481
+        },
+        {
+          "size": 48,
+          "hotspot_x": 6,
+          "hotspot_y": 42,
+          "bytes": 2745
+        },
+        {
+          "size": 64,
+          "hotspot_x": 9,
+          "hotspot_y": 56,
+          "bytes": 4429
+        },
+        {
+          "size": 96,
+          "hotspot_x": 13,
+          "hotspot_y": 84,
+          "bytes": 7488
+        }
+      ],
+      "sha256": {
+        "windows/handwriting.cur": "EE15B9C10B15B9F9E263913AAEF755D9D978D4C816EA6E0E1691B7351CCA00AA"
+      }
+    },
+    {
+      "role": "unavailable",
+      "windows_registry_name": "No",
+      "source_png": "src/unavailable.png",
+      "static_cursor": "windows/unavailable.cur",
+      "embedded_images": [
+        {
+          "size": 32,
+          "hotspot_x": 16,
+          "hotspot_y": 16,
+          "bytes": 2145
+        },
+        {
+          "size": 48,
+          "hotspot_x": 24,
+          "hotspot_y": 24,
+          "bytes": 3659
+        },
+        {
+          "size": 64,
+          "hotspot_x": 32,
+          "hotspot_y": 32,
+          "bytes": 5404
+        },
+        {
+          "size": 96,
+          "hotspot_x": 48,
+          "hotspot_y": 48,
+          "bytes": 7783
+        }
+      ],
+      "sha256": {
+        "windows/unavailable.cur": "4D6B80B54A7C48F375ADB5A62CE99D7FCC8752BD3DA705C810A4724110ED2A69"
+      }
+    },
+    {
+      "role": "resize-v",
+      "windows_registry_name": "SizeNS",
+      "source_png": "src/resize-v.png",
+      "static_cursor": "windows/resize-v.cur",
+      "embedded_images": [
+        {
+          "size": 32,
+          "hotspot_x": 16,
+          "hotspot_y": 16,
+          "bytes": 913
+        },
+        {
+          "size": 48,
+          "hotspot_x": 24,
+          "hotspot_y": 24,
+          "bytes": 1391
+        },
+        {
+          "size": 64,
+          "hotspot_x": 32,
+          "hotspot_y": 32,
+          "bytes": 2017
+        },
+        {
+          "size": 96,
+          "hotspot_x": 48,
+          "hotspot_y": 48,
+          "bytes": 3136
+        }
+      ],
+      "sha256": {
+        "windows/resize-v.cur": "51BAB086A63DE67925477601E0FCF710B67293BE2A89034E1E6F76F0376789E1"
+      }
+    },
+    {
+      "role": "resize-h",
+      "windows_registry_name": "SizeWE",
+      "source_png": "src/resize-h.png",
+      "static_cursor": "windows/resize-h.cur",
+      "embedded_images": [
+        {
+          "size": 32,
+          "hotspot_x": 16,
+          "hotspot_y": 16,
+          "bytes": 784
+        },
+        {
+          "size": 48,
+          "hotspot_x": 24,
+          "hotspot_y": 24,
+          "bytes": 1258
+        },
+        {
+          "size": 64,
+          "hotspot_x": 32,
+          "hotspot_y": 32,
+          "bytes": 1832
+        },
+        {
+          "size": 96,
+          "hotspot_x": 48,
+          "hotspot_y": 48,
+          "bytes": 2834
+        }
+      ],
+      "sha256": {
+        "windows/resize-h.cur": "5EEFDBEA244B039871D0ED071DBE77EBC4F1BD784EE63B2692CDED0E7CEF9748"
+      }
+    },
+    {
+      "role": "resize-d1",
+      "windows_registry_name": "SizeNWSE",
+      "source_png": "src/resize-d1.png",
+      "static_cursor": "windows/resize-d1.cur",
+      "embedded_images": [
+        {
+          "size": 32,
+          "hotspot_x": 16,
+          "hotspot_y": 16,
+          "bytes": 865
+        },
+        {
+          "size": 48,
+          "hotspot_x": 24,
+          "hotspot_y": 24,
+          "bytes": 1441
+        },
+        {
+          "size": 64,
+          "hotspot_x": 32,
+          "hotspot_y": 32,
+          "bytes": 2264
+        },
+        {
+          "size": 96,
+          "hotspot_x": 48,
+          "hotspot_y": 48,
+          "bytes": 3500
+        }
+      ],
+      "sha256": {
+        "windows/resize-d1.cur": "96A4D417F69FA084BF533713B65E1321A39122FA6981923A65C2D14AC7999934"
+      }
+    },
+    {
+      "role": "resize-d2",
+      "windows_registry_name": "SizeNESW",
+      "source_png": "src/resize-d2.png",
+      "static_cursor": "windows/resize-d2.cur",
+      "embedded_images": [
+        {
+          "size": 32,
+          "hotspot_x": 16,
+          "hotspot_y": 16,
+          "bytes": 917
+        },
+        {
+          "size": 48,
+          "hotspot_x": 24,
+          "hotspot_y": 24,
+          "bytes": 1496
+        },
+        {
+          "size": 64,
+          "hotspot_x": 32,
+          "hotspot_y": 32,
+          "bytes": 2319
+        },
+        {
+          "size": 96,
+          "hotspot_x": 48,
+          "hotspot_y": 48,
+          "bytes": 3446
+        }
+      ],
+      "sha256": {
+        "windows/resize-d2.cur": "254DFD91A1AD8622F03CB39BCD0A51CDC8A5DCF73CD4CC8FF5486E1D1A110141"
+      }
+    },
+    {
+      "role": "move",
+      "windows_registry_name": "SizeAll",
+      "source_png": "src/move.png",
+      "static_cursor": "windows/move.cur",
+      "embedded_images": [
+        {
+          "size": 32,
+          "hotspot_x": 16,
+          "hotspot_y": 16,
+          "bytes": 1245
+        },
+        {
+          "size": 48,
+          "hotspot_x": 24,
+          "hotspot_y": 24,
+          "bytes": 1969
+        },
+        {
+          "size": 64,
+          "hotspot_x": 32,
+          "hotspot_y": 32,
+          "bytes": 2850
+        },
+        {
+          "size": 96,
+          "hotspot_x": 48,
+          "hotspot_y": 48,
+          "bytes": 4644
+        }
+      ],
+      "sha256": {
+        "windows/move.cur": "73676A1123C05AF219883099420497007D33ADCE1D28210F0651ED976496ADE3"
+      }
+    },
+    {
+      "role": "alternate",
+      "windows_registry_name": "UpArrow",
+      "source_png": "src/alternate.png",
+      "static_cursor": "windows/alternate.cur",
+      "embedded_images": [
+        {
+          "size": 32,
+          "hotspot_x": 16,
+          "hotspot_y": 2,
+          "bytes": 1296
+        },
+        {
+          "size": 48,
+          "hotspot_x": 24,
+          "hotspot_y": 4,
+          "bytes": 2197
+        },
+        {
+          "size": 64,
+          "hotspot_x": 32,
+          "hotspot_y": 5,
+          "bytes": 3294
+        },
+        {
+          "size": 96,
+          "hotspot_x": 48,
+          "hotspot_y": 7,
+          "bytes": 5494
+        }
+      ],
+      "sha256": {
+        "windows/alternate.cur": "3E200FEFDE565114F44B833FA6421D4375A379446CC35BDACFDEA987CF4D2AD6"
+      }
+    },
+    {
+      "role": "link",
+      "windows_registry_name": "Hand",
+      "source_png": "src/link.png",
+      "static_cursor": "windows/link.cur",
+      "embedded_images": [
+        {
+          "size": 32,
+          "hotspot_x": 10,
+          "hotspot_y": 3,
+          "bytes": 1664
+        },
+        {
+          "size": 48,
+          "hotspot_x": 14,
+          "hotspot_y": 4,
+          "bytes": 2721
+        },
+        {
+          "size": 64,
+          "hotspot_x": 19,
+          "hotspot_y": 5,
+          "bytes": 3997
+        },
+        {
+          "size": 96,
+          "hotspot_x": 29,
+          "hotspot_y": 8,
+          "bytes": 5616
+        }
+      ],
+      "sha256": {
+        "windows/link.cur": "A9906B08242BEA989B96F9B25D393316D9B4F39EF884D1491E96673AD2E09073"
+      }
+    }
+  ],
+  "validation": {
+    "cur_structure": "passed",
+    "ani_structure": "passed",
+    "windows_load_cursor_from_file": "passed"
+  }
+}
