@@ -54,8 +54,24 @@ test("serves the verified static clone directly at the root", async () => {
 test("contains no orange, amber, yellow, or gold visual colour tokens", async () => {
   const html = await readFile(publicEntry, "utf8");
   const forbidden =
-    /#(?:f59e0b|f97316|fbbf24|ff6600|ff7b00|ff9900|ffa500|ffaa00|ffb733|ffcc00|ffd700)\b|rgba\(\s*255\s*,\s*(?:102|123|153|165|170|204|215)\s*,|rgba\(\s*251\s*,\s*191\s*,\s*36|rgba\(\s*249\s*,\s*115\s*,\s*22|rgba\(\s*245\s*,\s*158\s*,\s*11/gi;
+    /#(?:f59e0b|f97316|fbbf24|ff6600|ff7b00|ff9900|ffa500|ffaa00|ffb733|ffcc00|ffd700)\b|rgba\(\s*255\s*,\s*(?:100|102|123|153|165|170|204|215)\s*,|rgba\(\s*251\s*,\s*191\s*,\s*36|rgba\(\s*249\s*,\s*115\s*,\s*22|rgba\(\s*245\s*,\s*158\s*,\s*11/gi;
   assert.doesNotMatch(html, forbidden);
+});
+
+test("uses the CrowClaw black, ultraviolet, blue, and cyan palette", async () => {
+  const html = await readFile(publicEntry, "utf8");
+
+  assert.match(html, /--bg: #050711;/);
+  assert.match(html, /--primary: #7c5cff;/);
+  assert.match(html, /--secondary: #1fb6ff;/);
+  assert.match(html, /--cyan: #39d9ff;/);
+  assert.doesNotMatch(
+    html,
+    /#(?:e84bff|ec4899|ff0055)\b|rgba\(\s*(?:232\s*,\s*75\s*,\s*255|236\s*,\s*72\s*,\s*153|255\s*,\s*0\s*,\s*(?:85|100|128))\s*,/i,
+  );
+
+  const magenta = html.match(/#d946ef\b/gi) ?? [];
+  assert.ok(magenta.length > 0 && magenta.length <= 3);
 });
 
 test("packages the public source byte-for-byte", async () => {

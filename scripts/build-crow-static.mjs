@@ -50,7 +50,7 @@ replaceRequired(
 replaceRequired(
   '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
   `<meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#07050d">
+  <meta name="theme-color" content="#050711">
   <meta name="description" content="Crow-GodMod3 — a CrowClaw-themed multi-model AI research interface.">`,
 );
 
@@ -88,19 +88,20 @@ replaceRequired(
       --danger: #ff3e3e;
     }`,
   `    :root {
-      --bg: #07050d;
-      --bg-secondary: #0b0811;
-      --primary: #e84bff;
-      --secondary: #8b5cf6;
-      --accent: #261238;
-      --text: #f7f4ff;
-      --text-dim: #9a90aa;
-      --border: #352044;
-      --hover: #17101f;
+      --bg: #050711;
+      --bg-secondary: #080b18;
+      --primary: #7c5cff;
+      --secondary: #1fb6ff;
+      --accent: #171b3a;
+      --text: #eef7ff;
+      --text-dim: #8c9aba;
+      --border: #29345f;
+      --hover: #11162f;
       --danger: #ff4d67;
-      --cyan: #32d8ff;
-      --success: #47e5d1;
-      --warning: #b69cff;
+      --cyan: #39d9ff;
+      --success: #32d6c6;
+      --warning: #a5b4fc;
+      --magenta: #d946ef;
     }`,
 );
 
@@ -233,35 +234,40 @@ replaceRequired(
 );
 
 const hexMap = new Map([
-  ["#0d0208", "#07050d"],
-  ["#0a0a0a", "#0b0811"],
-  ["#00ff41", "#e84bff"],
-  ["#008f11", "#8b5cf6"],
-  ["#003b00", "#261238"],
-  ["#e0e0e0", "#f7f4ff"],
-  ["#1a3a1a", "#352044"],
-  ["#0d1f0d", "#17101f"],
-  ["#ffd700", "#e84bff"],
-  ["#ffaa00", "#b69cff"],
-  ["#ffa500", "#ec4899"],
-  ["#ffcc00", "#32d8ff"],
-  ["#ffb733", "#c084fc"],
-  ["#ff9900", "#9b6cff"],
-  ["#ff7b00", "#8b5cf6"],
-  ["#ff6600", "#8b5cf6"],
-  ["#fbbf24", "#c084fc"],
-  ["#f97316", "#d946ef"],
-  ["#f59e0b", "#a78bfa"],
-  ["#00ff88", "#47e5d1"],
-  ["#4a7c43", "#32d8ff"],
-  ["#4ade80", "#47e5d1"],
-  ["#2d5a27", "#214a58"],
-  ["#6fdb5f", "#47e5d1"],
-  ["#10b981", "#47e5d1"],
-  ["#0d2818", "#15102a"],
-  ["#0a1f12", "#0d0a18"],
-  ["#00ff00", "#47e5d1"],
-  ["#00ff64", "#47e5d1"],
+  ["#0d0208", "#050711"],
+  ["#0a0a0a", "#080b18"],
+  ["#00ff41", "#7c5cff"],
+  ["#008f11", "#1fb6ff"],
+  ["#003b00", "#171b3a"],
+  ["#e0e0e0", "#eef7ff"],
+  ["#1a3a1a", "#29345f"],
+  ["#0d1f0d", "#11162f"],
+  ["#ffd700", "#7c5cff"],
+  ["#ffaa00", "#a5b4fc"],
+  ["#ffa500", "#4f46e5"],
+  ["#ffcc00", "#39d9ff"],
+  ["#ffb733", "#60a5fa"],
+  ["#ff9900", "#818cf8"],
+  ["#ff7b00", "#4f46e5"],
+  ["#ff6600", "#4f46e5"],
+  ["#fbbf24", "#93c5fd"],
+  ["#f97316", "#6366f1"],
+  ["#f59e0b", "#818cf8"],
+  ["#00ff88", "#32d6c6"],
+  ["#4a7c43", "#39d9ff"],
+  ["#4ade80", "#32d6c6"],
+  ["#2d5a27", "#1d3e5a"],
+  ["#6fdb5f", "#32d6c6"],
+  ["#10b981", "#32d6c6"],
+  ["#0d2818", "#11162d"],
+  ["#0a1f12", "#090d1a"],
+  ["#00ff00", "#32d6c6"],
+  ["#00ff64", "#32d6c6"],
+  ["#ec4899", "#6366f1"],
+  ["#ff0055", "#4f46e5"],
+  ["#a855f7", "#6366f1"],
+  ["#c084fc", "#a5b4fc"],
+  ["#ff00ff", "#d946ef"],
 ]);
 
 for (const [from, to] of hexMap) {
@@ -269,23 +275,30 @@ for (const [from, to] of hexMap) {
 }
 
 const rgbMap = [
-  [[255, 215, 0], [232, 75, 255]],
-  [[255, 170, 0], [182, 156, 255]],
-  [[255, 165, 0], [236, 72, 153]],
-  [[255, 204, 0], [50, 216, 255]],
-  [[255, 102, 0], [139, 92, 246]],
-  [[255, 123, 0], [139, 92, 246]],
-  [[255, 153, 0], [155, 108, 255]],
-  [[251, 191, 36], [192, 132, 252]],
-  [[249, 115, 22], [217, 70, 239]],
-  [[245, 158, 11], [167, 139, 250]],
-  [[0, 255, 65], [232, 75, 255]],
-  [[0, 143, 17], [139, 92, 246]],
-  [[0, 255, 136], [71, 229, 209]],
-  [[0, 255, 100], [71, 229, 209]],
-  [[74, 124, 67], [50, 216, 255]],
-  [[45, 90, 39], [33, 74, 88]],
-  [[111, 219, 95], [71, 229, 209]],
+  [[255, 215, 0], [124, 92, 255]],
+  [[255, 170, 0], [165, 180, 252]],
+  [[255, 165, 0], [79, 70, 229]],
+  [[255, 204, 0], [57, 217, 255]],
+  [[255, 100, 0], [79, 70, 229]],
+  [[255, 102, 0], [79, 70, 229]],
+  [[255, 123, 0], [79, 70, 229]],
+  [[255, 153, 0], [129, 140, 248]],
+  [[251, 191, 36], [147, 197, 253]],
+  [[249, 115, 22], [99, 102, 241]],
+  [[245, 158, 11], [129, 140, 248]],
+  [[0, 255, 65], [124, 92, 255]],
+  [[0, 143, 17], [31, 182, 255]],
+  [[0, 255, 136], [50, 214, 198]],
+  [[0, 255, 100], [50, 214, 198]],
+  [[74, 124, 67], [57, 217, 255]],
+  [[45, 90, 39], [29, 62, 90]],
+  [[111, 219, 95], [50, 214, 198]],
+  [[236, 72, 153], [99, 102, 241]],
+  [[255, 0, 85], [79, 70, 229]],
+  [[255, 0, 100], [79, 70, 229]],
+  [[255, 0, 128], [124, 92, 255]],
+  [[168, 85, 247], [99, 102, 241]],
+  [[192, 132, 252], [165, 180, 252]],
 ];
 
 for (const [[red, green, blue], [newRed, newGreen, newBlue]] of rgbMap) {
@@ -331,7 +344,7 @@ for (const [from, to] of glyphMap) {
 
 replaceRequired(
   "            // Holding — show transformed result in gold",
-  "            // Holding — show transformed result in magenta",
+  "            // Holding — show transformed result in ultraviolet",
 );
 
 replaceRegex(
@@ -345,7 +358,7 @@ replaceRegex(
         'Try: ↑↑↓↓←→←→BA (Konami Code)\\n' +
         'Type: "there is no spoon" | "follow the white rabbit" | "hack the planet" | "{GODMODE:ENABLED}"\\n\\n' +
         'Modified AGPL-3.0 derivative · /ATTRIBUTION.md\\n',
-        'color:#e84bff;font-family:monospace;'
+        'color:#7c5cff;font-family:monospace;'
       );`,
   1,
 );
@@ -355,18 +368,18 @@ const crowThemeStyles = `
     /* CrowClaw visual identity layer */
     body {
       background:
-        radial-gradient(circle at 78% 16%, rgba(232, 75, 255, 0.08), transparent 30%),
-        radial-gradient(circle at 28% 84%, rgba(50, 216, 255, 0.055), transparent 28%),
+        radial-gradient(circle at 78% 16%, rgba(124, 92, 255, 0.075), transparent 30%),
+        radial-gradient(circle at 28% 84%, rgba(57, 217, 255, 0.06), transparent 28%),
         var(--bg);
     }
 
     .sidebar {
       background:
-        linear-gradient(180deg, rgba(16, 10, 25, 0.98), rgba(7, 5, 13, 0.99));
+        linear-gradient(180deg, rgba(11, 16, 36, 0.98), rgba(5, 7, 17, 0.99));
     }
 
     .chat-header {
-      background: rgba(11, 8, 17, 0.9);
+      background: rgba(8, 11, 24, 0.9);
       backdrop-filter: blur(16px);
     }
 
@@ -376,15 +389,15 @@ const crowThemeStyles = `
       flex: 0 0 34px;
       border-radius: 10px;
       box-shadow:
-        0 0 18px rgba(232, 75, 255, 0.28),
-        0 0 32px rgba(50, 216, 255, 0.12);
+        0 0 18px rgba(124, 92, 255, 0.26),
+        0 0 32px rgba(57, 217, 255, 0.14);
     }
 
     .logo-text {
       font-size: 16px;
       letter-spacing: -0.35px;
       white-space: nowrap;
-      background: linear-gradient(90deg, #f7f4ff 0%, #e84bff 50%, #32d8ff 100%);
+      background: linear-gradient(90deg, #eef7ff 0%, #7c5cff 50%, #39d9ff 100%);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
@@ -401,15 +414,15 @@ const crowThemeStyles = `
       height: 148px;
       object-fit: cover;
       border-radius: 30px;
-      border: 1px solid rgba(232, 75, 255, 0.32);
+      border: 1px solid rgba(124, 92, 255, 0.34);
       box-shadow:
-        0 0 0 7px rgba(139, 92, 246, 0.07),
-        0 0 42px rgba(232, 75, 255, 0.2),
-        0 0 70px rgba(50, 216, 255, 0.08);
+        0 0 0 7px rgba(31, 182, 255, 0.08),
+        0 0 42px rgba(124, 92, 255, 0.18),
+        0 0 70px rgba(57, 217, 255, 0.1);
     }
 
     .welcome h2 {
-      background: linear-gradient(90deg, #f7f4ff 0%, #e84bff 52%, #32d8ff 100%);
+      background: linear-gradient(90deg, #eef7ff 0%, #7c5cff 52%, #39d9ff 100%);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
@@ -440,7 +453,7 @@ const crowThemeStyles = `
     .new-chat-btn:hover,
     .settings-btn:hover,
     .suggestion:hover {
-      box-shadow: 0 0 22px rgba(232, 75, 255, 0.1);
+      box-shadow: 0 0 22px rgba(124, 92, 255, 0.14);
     }
 
     @media (max-width: 480px) {
@@ -454,12 +467,80 @@ const crowThemeStyles = `
 
 replaceRequired("</style>", `${crowThemeStyles}\n  </style>`);
 
-const forbiddenWarmColours =
-  /#(?:f59e0b|f97316|fbbf24|ff6600|ff7b00|ff9900|ffa500|ffaa00|ffb733|ffcc00|ffd700)\b|rgba\(\s*255\s*,\s*(?:102|123|153|165|170|204|215)\s*,|rgba\(\s*251\s*,\s*191\s*,\s*36|rgba\(\s*249\s*,\s*115\s*,\s*22|rgba\(\s*245\s*,\s*158\s*,\s*11/gi;
-const warmMatches = html.match(forbiddenWarmColours);
-if (warmMatches?.length) {
+function getHueAndSaturation(red, green, blue) {
+  const [r, g, b] = [red, green, blue].map((value) => value / 255);
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const delta = max - min;
+  const saturation = max === 0 ? 0 : delta / max;
+
+  if (delta === 0) return { hue: 0, saturation };
+
+  let hue;
+  if (max === r) hue = ((g - b) / delta) % 6;
+  else if (max === g) hue = (b - r) / delta + 2;
+  else hue = (r - g) / delta + 4;
+
+  return { hue: (hue * 60 + 360) % 360, saturation };
+}
+
+function collectVisualColours(source) {
+  const colours = [];
+  const hexPattern =
+    /#([0-9a-f]{8}|[0-9a-f]{6}|[0-9a-f]{4}|[0-9a-f]{3})\b/gi;
+  const rgbPattern =
+    /rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})(?:\s*,[^\)]*)?\)/gi;
+
+  for (const match of source.matchAll(hexPattern)) {
+    const value = match[1];
+    const channels =
+      value.length <= 4
+        ? [...value.slice(0, 3)].map((digit) =>
+            Number.parseInt(`${digit}${digit}`, 16),
+          )
+        : [0, 2, 4].map((offset) =>
+            Number.parseInt(value.slice(offset, offset + 2), 16),
+          );
+    colours.push({ token: match[0], channels });
+  }
+
+  for (const match of source.matchAll(rgbPattern)) {
+    colours.push({
+      token: match[0],
+      channels: match.slice(1, 4).map(Number),
+    });
+  }
+
+  return colours;
+}
+
+const warmMatches = collectVisualColours(html)
+  .filter(({ channels }) => {
+    const { hue, saturation } = getHueAndSaturation(...channels);
+    return saturation >= 0.45 && hue >= 15 && hue <= 75;
+  })
+  .map(({ token }) => token);
+
+if (warmMatches.length) {
   throw new Error(
     `Warm colour audit failed: ${[...new Set(warmMatches)].join(", ")}`,
+  );
+}
+
+const dominantPinkColours =
+  /#(?:e84bff|ec4899|ff0055)\b|rgba\(\s*(?:232\s*,\s*75\s*,\s*255|236\s*,\s*72\s*,\s*153|255\s*,\s*0\s*,\s*(?:85|100|128))\s*,/gi;
+const pinkMatches = html.match(dominantPinkColours);
+if (pinkMatches?.length) {
+  throw new Error(
+    `Dominant pink audit failed: ${[...new Set(pinkMatches)].join(", ")}`,
+  );
+}
+
+const restrainedMagentaMatches =
+  html.match(/#d946ef\b|rgba\(\s*217\s*,\s*70\s*,\s*239\s*,/gi) ?? [];
+if (restrainedMagentaMatches.length > 3) {
+  throw new Error(
+    `Magenta restraint audit failed: found ${restrainedMagentaMatches.length} visual tokens.`,
   );
 }
 
@@ -469,6 +550,10 @@ for (const required of [
   'src="/crowclaw-mark.webp"',
   "const APP_TELEMETRY_ENABLED = false;",
   'href="/ATTRIBUTION.md"',
+  "--bg: #050711;",
+  "--primary: #7c5cff;",
+  "--secondary: #1fb6ff;",
+  "--cyan: #39d9ff;",
 ]) {
   if (!html.includes(required)) {
     throw new Error(`Generated app is missing required marker: ${required}`);
