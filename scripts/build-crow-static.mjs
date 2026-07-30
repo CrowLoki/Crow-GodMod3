@@ -2,9 +2,24 @@ import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import {
+  localRuntimeIds,
+  localRuntimePresets,
+} from "./local-runtime-config.mjs";
+
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const upstreamPath = resolve(projectRoot, "vendor", "godmod3", "index.html");
 const outputPath = resolve(projectRoot, "public", "crow-godmod3.html");
+const localModelsGuideSourcePath = resolve(
+  projectRoot,
+  "docs",
+  "LOCAL_MODELS.md",
+);
+const localModelsGuideOutputPath = resolve(
+  projectRoot,
+  "public",
+  "LOCAL_MODELS.md",
+);
 const brandSystemPath = resolve(projectRoot, "brand-system");
 const runtimeThemePath = resolve(projectRoot, "public", "crow-theme");
 const webManifestSourcePath = resolve(
@@ -185,6 +200,7 @@ async function syncCrowRuntimeAssets() {
   }
 
   await copyFile(webManifestSourcePath, webManifestOutputPath);
+  await copyFile(localModelsGuideSourcePath, localModelsGuideOutputPath);
 }
 
 await syncCrowRuntimeAssets();
@@ -255,9 +271,86 @@ const runtimeOpenRouterModelConfig = `    // OpenRouter models allowed by Crow's
       return normalizeOpenRouterModel(requested);
     }`;
 
+const runtimeLocalProviderConfig = `    // First-class loopback runtime presets. URLs remain editable after selection.
+    const LOCAL_RUNTIME_PRESETS = Object.freeze(${JSON.stringify(localRuntimePresets)});
+    const LOCAL_RUNTIME_IDS = new Set(${JSON.stringify(localRuntimeIds)});
+
+    function inferLocalRuntimeFromBaseUrl(baseUrl) {
+      let normalized;
+      try {
+        normalized = normalizeLocalBaseUrl(baseUrl, 'custom');
+      } catch (_) {
+        return 'custom';
+      }
+      for (const [runtimeId, preset] of Object.entries(LOCAL_RUNTIME_PRESETS)) {
+        if (runtimeId === 'custom' || !preset.baseUrl) continue;
+        try {
+          if (normalizeLocalBaseUrl(preset.baseUrl, runtimeId) === normalized) {
+            return runtimeId;
+          }
+        } catch (_) {}
+      }
+      return 'custom';
+    }
+
+    function normalizeLocalRuntime(runtime, baseUrl) {
+      const requested = String(runtime || '').trim().toLowerCase();
+      if (LOCAL_RUNTIME_IDS.has(requested)) return requested;
+      return inferLocalRuntimeFromBaseUrl(baseUrl);
+    }
+
+    function updateLocalRuntimeHelp(runtime) {
+      const runtimeId = LOCAL_RUNTIME_IDS.has(runtime) ? runtime : 'custom';
+      const preset = LOCAL_RUNTIME_PRESETS[runtimeId];
+      const help = document.getElementById('localRuntimeHelp');
+      const keyInput = document.getElementById('localApiKeyInput');
+      const origin = window.location.origin;
+      if (help) help.textContent = preset.help.replaceAll('{origin}', origin);
+      if (keyInput) keyInput.placeholder = preset.apiKeyPlaceholder;
+      const originHint = document.getElementById('localOriginHint');
+      if (originHint) originHint.textContent = origin;
+    }
+
+    function applyLocalRuntimePreset(runtime) {
+      const runtimeId = LOCAL_RUNTIME_IDS.has(runtime) ? runtime : 'custom';
+      const preset = LOCAL_RUNTIME_PRESETS[runtimeId];
+      const baseUrlInput = document.getElementById('localBaseUrlInput');
+      const modelsInput = document.getElementById('localModelsInput');
+      const status = document.getElementById('localConnectionStatus');
+      if (preset.baseUrl && baseUrlInput && baseUrlInput.value !== preset.baseUrl) {
+        baseUrlInput.value = preset.baseUrl;
+        if (modelsInput) modelsInput.value = '';
+      }
+      if (status) {
+        status.textContent = runtimeId === 'custom'
+          ? 'Custom URL selected — enter its base URL, then test.'
+          : \`\${preset.label} preset loaded — test to discover model IDs.\`;
+        status.style.color = 'var(--text-dim)';
+      }
+      updateLocalRuntimeHelp(runtimeId);
+    }
+
+    function describeLocalConnectionFailure(error, runtime, baseUrl) {
+      const runtimeId = LOCAL_RUNTIME_IDS.has(runtime) ? runtime : 'custom';
+      const label = LOCAL_RUNTIME_PRESETS[runtimeId].label;
+      const message = String(error?.message || error || 'Unknown error');
+      if (/HTTP 401|HTTP 403/i.test(message)) {
+        return \`\${label} rejected the credential. Check the optional API key.\`;
+      }
+      if (/HTTP 404/i.test(message)) {
+        return \`No OpenAI-compatible /models endpoint was found at \${baseUrl}.\`;
+      }
+      if (/Failed to fetch|NetworkError|Load failed/i.test(message)) {
+        return \`The browser could not reach \${label}. Start the server, allow \${window.location.origin} in its CORS settings, and approve Local Network Access if prompted.\`;
+      }
+      return message;
+    }`;
+
 replaceRequired(
   "    // State\n    let state = {",
   `${runtimeOpenRouterModelConfig}
+
+${runtimeLocalProviderConfig}
 
     // State
     let state = {`,
@@ -278,6 +371,214 @@ replaceRegex(
   (_match, opening, closing) =>
     `${opening}${renderOpenRouterFreeModelOptions("                ")}${closing}`,
   1,
+);
+
+replaceRequired(
+  `          <div class="settings-section">
+            <div class="settings-section-title">Local Models (Optional)</div>
+            <div class="form-group">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+                <input type="checkbox" id="localEnabled" style="width:auto;">
+                <label for="localEnabled" style="margin:0;">Enable OpenAI-compatible local models</label>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                <input type="checkbox" id="localOnly" style="width:auto;">
+                <label for="localOnly" style="margin:0;">Local-only mode</label>
+              </div>
+              <small style="color:#888;display:block;margin:-6px 0 12px;line-height:1.5;">
+                Local-only mode never calls OpenRouter or Venice and automatically disables telemetry. Core racing, TASTEMAKER, coaching, and Liquid refinement can all use your local models.
+              </small>
+              <label>Base URL</label>
+              <input type="text" id="localBaseUrlInput" placeholder="http://localhost:11434/v1">
+              <small style="color:#888;display:block;margin-top:4px;">OpenAI-compatible localhost endpoint. Examples: Ollama <code>:11434/v1</code>, LM Studio <code>:1234/v1</code>.</small>
+            </div>
+            <div class="form-group">
+              <label>Model IDs</label>
+              <input type="text" id="localModelsInput" placeholder="qwen3:8b, llama3.2:3b">
+              <small style="color:#888;display:block;margin-top:4px;">Comma-separated IDs reported by <code>/v1/models</code> (maximum 8). Multiple IDs race together.</small>
+            </div>
+            <div class="form-group">
+              <label>API Key (Optional)</label>
+              <input type="password" id="localApiKeyInput" placeholder="Leave blank unless your local server requires one">
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+              <button type="button" class="api-key-btn" onclick="testLocalConnection()">Test &amp; Discover Models</button>
+              <span id="localConnectionStatus" style="font-size:11px;color:var(--text-dim);"></span>
+            </div>
+            <a href="LOCAL_MODELS.md" target="_blank" class="api-key-link">Local setup guide →</a>
+          </div>`,
+  `          <div class="settings-section">
+            <div class="settings-section-title">Local Model Runtimes (Optional)</div>
+            <div class="form-group">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+                <input type="checkbox" id="localEnabled" style="width:auto;">
+                <label for="localEnabled" style="margin:0;">Enable OpenAI-compatible local models</label>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                <input type="checkbox" id="localOnly" style="width:auto;">
+                <label for="localOnly" style="margin:0;">Local-only mode</label>
+              </div>
+              <small style="color:#888;display:block;margin:-6px 0 12px;line-height:1.5;">
+                Local-only mode never calls OpenRouter or Venice. Core racing, TASTEMAKER, coaching, and Liquid refinement can use the discovered local model IDs.
+              </small>
+              <label for="localRuntimeInput">Runtime preset</label>
+              <select id="localRuntimeInput" onchange="applyLocalRuntimePreset(this.value)">
+                <option value="ollama">Ollama</option>
+                <option value="lmstudio">LM Studio</option>
+                <option value="docker">Docker Model Runner</option>
+                <option value="vllm">vLLM</option>
+                <option value="llamacpp">llama.cpp</option>
+                <option value="custom">Custom OpenAI-compatible</option>
+              </select>
+              <small id="localRuntimeHelp" style="color:#888;display:block;margin-top:4px;line-height:1.5;"></small>
+            </div>
+            <div class="form-group">
+              <label for="localBaseUrlInput">Base URL</label>
+              <input type="text" id="localBaseUrlInput" placeholder="http://localhost:11434/v1" spellcheck="false">
+              <small style="color:#888;display:block;margin-top:4px;line-height:1.5;">
+                Restricted to this computer: <code>localhost</code> or <code>127.0.0.1</code>. Docker Model Runner uses the nested <code>/engines/v1</code> path.
+              </small>
+            </div>
+            <div class="form-group">
+              <label for="localModelsInput">Model IDs</label>
+              <input type="text" id="localModelsInput" placeholder="qwen3:8b, llama3.2:3b" spellcheck="false">
+              <small style="color:#888;display:block;margin-top:4px;">Exact IDs reported by <code>/models</code> (maximum 8). Multiple IDs race together; the first handles helper and judge calls.</small>
+            </div>
+            <div class="form-group">
+              <label for="localApiKeyInput">API Key (Optional)</label>
+              <input type="password" id="localApiKeyInput" placeholder="Optional bearer token">
+            </div>
+            <div style="padding:10px 12px;margin-bottom:12px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text-dim);font-size:11px;line-height:1.55;">
+              A hosted page needs server CORS permission for <code id="localOriginHint"></code>. Your browser may also ask to allow local-network access; approve that prompt for discovery and chat.
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+              <button type="button" class="api-key-btn" onclick="testLocalConnection()">Test &amp; Discover Models</button>
+              <span id="localConnectionStatus" style="font-size:11px;color:var(--text-dim);flex:1 1 230px;min-width:0;line-height:1.45;overflow-wrap:anywhere;"></span>
+            </div>
+            <a href="/LOCAL_MODELS.md" target="_blank" class="api-key-link">Setup commands for every runtime →</a>
+          </div>`,
+);
+
+replaceRequired(
+  `      localEnabled: false,  // Use an OpenAI-compatible server on loopback
+      localOnly: false,  // Never use cloud providers; telemetry is disabled
+      localBaseUrl: 'http://localhost:11434/v1',
+      localModels: '',  // Comma-separated model IDs available from the local server
+      localApiKey: '',  // Optional token for authenticated local servers`,
+  `      localEnabled: false,  // Use an OpenAI-compatible server on loopback
+      localOnly: false,  // Never use cloud providers; telemetry is disabled
+      localRuntime: '',  // Missing legacy value is inferred from the saved URL
+      localBaseUrl: 'http://localhost:11434/v1',
+      localModels: '',  // Comma-separated model IDs available from the local server
+      localApiKey: '',  // Optional token for authenticated local servers`,
+);
+
+replaceRequired(
+  `    function normalizeLocalBaseUrl(raw = state.localBaseUrl) {
+      const value = String(raw || '').trim().replace(/\\/+$/, '');
+      if (!value) throw new Error('Enter a local model base URL.');
+      const url = new URL(value);
+      const host = url.hostname.toLowerCase().replace(/^\\[|\\]$/g, '');
+      if (!['localhost', '127.0.0.1', '::1'].includes(host)) {
+        throw new Error('Local model URL must use localhost, 127.0.0.1, or ::1.');
+      }
+      if (!['http:', 'https:'].includes(url.protocol)) {
+        throw new Error('Local model URL must use http:// or https://.');
+      }
+      url.pathname = url.pathname
+        .replace(/\\/(?:chat\\/completions|models)\\/?$/i, '')
+        .replace(/\\/+$/, '') || '/v1';
+      url.search = '';
+      url.hash = '';
+      return url.toString().replace(/\\/$/, '');
+    }`,
+  `    function normalizeLocalBaseUrl(raw = state.localBaseUrl, runtime = state.localRuntime) {
+      const value = String(raw || '').trim().replace(/\\/+$/, '');
+      if (!value) throw new Error('Enter a local model base URL.');
+      const url = new URL(value);
+      const host = url.hostname.toLowerCase().replace(/^\\[|\\]$/g, '');
+      if (!['localhost', '127.0.0.1'].includes(host)) {
+        throw new Error('Local model URL must use localhost or 127.0.0.1.');
+      }
+      if (!['http:', 'https:'].includes(url.protocol)) {
+        throw new Error('Local model URL must use http:// or https://.');
+      }
+      const fallbackPath = runtime === 'docker' ? '/engines/v1' : '/v1';
+      url.pathname = url.pathname
+        .replace(/\\/(?:chat\\/completions|models)\\/?$/i, '')
+        .replace(/\\/+$/, '') || fallbackPath;
+      url.search = '';
+      url.hash = '';
+      return url.toString().replace(/\\/$/, '');
+    }`,
+);
+
+replaceRequired(
+  `    async function testLocalConnection() {
+      const status = document.getElementById('localConnectionStatus');
+      if (status) { status.textContent = 'Connecting…'; status.style.color = 'var(--text-dim)'; }
+      try {
+        const baseUrl = normalizeLocalBaseUrl(document.getElementById('localBaseUrlInput').value);
+        const key = (document.getElementById('localApiKeyInput').value || '').trim();
+        const headers = key ? { Authorization: \`Bearer \${key}\` } : {};
+        const response = await fetch(\`\${baseUrl}/models\`, { headers });
+        if (!response.ok) throw new Error(\`HTTP \${response.status}\`);
+        const data = await response.json();
+        const models = (Array.isArray(data?.data) ? data.data : [])
+          .map(item => item?.id)
+          .filter(id => typeof id === 'string' && id.trim())
+          .slice(0, 8);
+        if (!models.length) throw new Error('Server returned no model IDs');
+        document.getElementById('localModelsInput').value = models.join(', ');
+        document.getElementById('localEnabled').checked = true;
+        saveSettings();
+        if (status) { status.textContent = \`Connected — \${models.length} model\${models.length === 1 ? '' : 's'} found\`; status.style.color = 'var(--accent)'; }
+      } catch (err) {
+        if (status) { status.textContent = \`Connection failed: \${err.message}. Check server CORS.\`; status.style.color = '#ff6b6b'; }
+      }
+    }`,
+  `    async function testLocalConnection() {
+      const status = document.getElementById('localConnectionStatus');
+      const runtimeInput = document.getElementById('localRuntimeInput');
+      const runtime = LOCAL_RUNTIME_IDS.has(runtimeInput?.value) ? runtimeInput.value : 'custom';
+      let baseUrl = '';
+      if (status) { status.textContent = 'Checking /models…'; status.style.color = 'var(--text-dim)'; }
+      try {
+        baseUrl = normalizeLocalBaseUrl(
+          document.getElementById('localBaseUrlInput').value,
+          runtime,
+        );
+        const key = (document.getElementById('localApiKeyInput').value || '').trim();
+        const headers = key ? { Authorization: \`Bearer \${key}\` } : {};
+        const response = await fetch(\`\${baseUrl}/models\`, { headers });
+        if (!response.ok) throw new Error(\`HTTP \${response.status}\`);
+        const data = await response.json();
+        const models = (Array.isArray(data?.data) ? data.data : [])
+          .map(item => item?.id)
+          .filter(id => typeof id === 'string' && id.trim())
+          .slice(0, 8);
+        if (!models.length) throw new Error('Server returned no model IDs');
+        document.getElementById('localBaseUrlInput').value = baseUrl;
+        document.getElementById('localModelsInput').value = models.join(', ');
+        document.getElementById('localEnabled').checked = true;
+        saveSettings();
+        const label = LOCAL_RUNTIME_PRESETS[state.localRuntime].label;
+        if (status) {
+          status.textContent = \`\${label}: \${models.length} model ID\${models.length === 1 ? '' : 's'} discovered and saved.\`;
+          status.style.color = 'var(--success)';
+        }
+      } catch (err) {
+        if (status) {
+          status.textContent = \`Connection failed: \${describeLocalConnectionFailure(err, runtime, baseUrl)}\`;
+          status.style.color = 'var(--danger)';
+        }
+      }
+    }`,
+);
+
+replaceRequired(
+  `      'localEnabled', 'localOnly', 'localBaseUrl', 'localModels', 'localApiKey',`,
+  `      'localEnabled', 'localOnly', 'localRuntime', 'localBaseUrl', 'localModels', 'localApiKey',`,
 );
 
 replaceRequired(
@@ -516,11 +817,106 @@ replaceRequired(
       state.localEnabled = state.localEnabled === true;`,
 );
 replaceRequired(
+  `      state.localBaseUrl = typeof state.localBaseUrl === 'string'
+        ? state.localBaseUrl.slice(0, 300)
+        : 'http://localhost:11434/v1';
+      state.localModels = typeof state.localModels === 'string' ? state.localModels.slice(0, 1000) : '';`,
+  `      state.localBaseUrl = typeof state.localBaseUrl === 'string'
+        ? state.localBaseUrl.slice(0, 300)
+        : 'http://localhost:11434/v1';
+      state.localRuntime = normalizeLocalRuntime(state.localRuntime, state.localBaseUrl);
+      state.localModels = typeof state.localModels === 'string' ? state.localModels.slice(0, 1000) : '';`,
+);
+replaceRequired(
   `      for (const conv of state.conversations) {
         if (!Array.isArray(conv.messages)) { conv.messages = []; continue; }`,
   `      for (const conv of state.conversations) {
         conv.model = normalizePersistedChatModel(conv.model || state.model);
         if (!Array.isArray(conv.messages)) { conv.messages = []; continue; }`,
+);
+
+replaceRequired(
+  `      document.getElementById('localEnabled').checked = !!state.localEnabled;
+      document.getElementById('localOnly').checked = !!state.localOnly;
+      document.getElementById('localBaseUrlInput').value = state.localBaseUrl || 'http://localhost:11434/v1';
+      document.getElementById('localModelsInput').value = state.localModels || '';
+      document.getElementById('localApiKeyInput').value = state.localApiKey || '';`,
+  `      document.getElementById('localEnabled').checked = !!state.localEnabled;
+      document.getElementById('localOnly').checked = !!state.localOnly;
+      state.localRuntime = normalizeLocalRuntime(state.localRuntime, state.localBaseUrl);
+      document.getElementById('localRuntimeInput').value = state.localRuntime;
+      document.getElementById('localBaseUrlInput').value = state.localBaseUrl || 'http://localhost:11434/v1';
+      document.getElementById('localModelsInput').value = state.localModels || '';
+      document.getElementById('localApiKeyInput').value = state.localApiKey || '';
+      document.getElementById('localConnectionStatus').textContent = '';
+      updateLocalRuntimeHelp(state.localRuntime);`,
+);
+
+replaceRequired(
+  `      state.localEnabled = document.getElementById('localEnabled').checked;
+      state.localOnly = document.getElementById('localOnly').checked;
+      state.localBaseUrl = (document.getElementById('localBaseUrlInput').value || '').trim() || 'http://localhost:11434/v1';
+      state.localModels = (document.getElementById('localModelsInput').value || '').trim();`,
+  `      state.localEnabled = document.getElementById('localEnabled').checked;
+      state.localOnly = document.getElementById('localOnly').checked;
+      state.localBaseUrl = (document.getElementById('localBaseUrlInput').value || '').trim() || 'http://localhost:11434/v1';
+      state.localRuntime = normalizeLocalRuntime(
+        document.getElementById('localRuntimeInput').value,
+        state.localBaseUrl,
+      );
+      document.getElementById('localRuntimeInput').value = state.localRuntime;
+      state.localModels = (document.getElementById('localModelsInput').value || '').trim();`,
+);
+
+replaceRequired(
+  `        _version: 2,
+        _exportedAt: new Date().toISOString(),`,
+  `        _version: 3,
+        _exportedAt: new Date().toISOString(),`,
+);
+replaceRequired(
+  `        modelFreqPenalty: state.modelFreqPenalty,
+        modelPresPenalty: state.modelPresPenalty,
+      };`,
+  `        modelFreqPenalty: state.modelFreqPenalty,
+        modelPresPenalty: state.modelPresPenalty,
+        localEnabled: state.localEnabled,
+        localOnly: state.localOnly,
+        localRuntime: state.localRuntime,
+        localBaseUrl: state.localBaseUrl,
+        localModels: state.localModels,
+      };`,
+);
+replaceRequired(
+  `        'modelTemperature', 'modelTopP', 'modelMaxTokens', 'modelFreqPenalty', 'modelPresPenalty',
+        'sidebarOpen', 'backendUrl'];`,
+  `        'modelTemperature', 'modelTopP', 'modelMaxTokens', 'modelFreqPenalty', 'modelPresPenalty',
+        'localEnabled', 'localOnly', 'localRuntime', 'localBaseUrl', 'localModels',
+        'sidebarOpen', 'backendUrl'];`,
+);
+replaceRequired(
+  `      for (const key of allowed) {
+        if (imported[key] !== undefined) candidate[key] = imported[key];
+      }
+
+      // Sanitize conversations: validate structure, strip dangerous values`,
+  `      for (const key of allowed) {
+        if (imported[key] !== undefined) candidate[key] = imported[key];
+      }
+      candidate.localEnabled = candidate.localEnabled === true;
+      candidate.localOnly = candidate.localOnly === true;
+      if (candidate.localOnly) candidate.localEnabled = true;
+      candidate.localBaseUrl = typeof candidate.localBaseUrl === 'string'
+        ? candidate.localBaseUrl.slice(0, 300)
+        : 'http://localhost:11434/v1';
+      candidate.localRuntime = imported.localRuntime === undefined
+        ? inferLocalRuntimeFromBaseUrl(candidate.localBaseUrl)
+        : normalizeLocalRuntime(candidate.localRuntime, candidate.localBaseUrl);
+      candidate.localModels = typeof candidate.localModels === 'string'
+        ? candidate.localModels.slice(0, 1000)
+        : '';
+
+      // Sanitize conversations: validate structure, strip dangerous values`,
 );
 
 replaceRequired(

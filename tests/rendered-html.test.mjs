@@ -1,10 +1,21 @@
 import assert from "node:assert/strict";
 import { readFile, stat } from "node:fs/promises";
 import test from "node:test";
+import vm from "node:vm";
+
+import {
+  localRuntimeIds,
+  localRuntimePresets,
+} from "../scripts/local-runtime-config.mjs";
 
 const publicEntry = new URL("../public/crow-godmod3.html", import.meta.url);
 const publicTheme = new URL("../public/crow-theme/", import.meta.url);
 const sourceTheme = new URL("../brand-system/", import.meta.url);
+const localModelsGuide = new URL("../docs/LOCAL_MODELS.md", import.meta.url);
+const publicLocalModelsGuide = new URL(
+  "../public/LOCAL_MODELS.md",
+  import.meta.url,
+);
 const openRouterFreeChatModels = [
   "inclusionai/ling-3.0-flash:free",
   "poolside/laguna-s-2.1:free",
@@ -193,6 +204,177 @@ test("migrates saved paid-model selections to valid free chat models", async () 
     html,
     /conv\.model = normalizePersistedChatModel\(conv\.model \|\| state\.model\);/,
   );
+});
+
+test("ships first-class loopback presets for every supported local runtime", async () => {
+  assert.deepEqual(localRuntimeIds, [
+    "ollama",
+    "lmstudio",
+    "docker",
+    "vllm",
+    "llamacpp",
+    "custom",
+  ]);
+  assert.equal(
+    localRuntimePresets.lmstudio.baseUrl,
+    "http://localhost:1234/v1",
+  );
+  assert.equal(
+    localRuntimePresets.docker.baseUrl,
+    "http://localhost:12434/engines/v1",
+  );
+  assert.equal(localRuntimePresets.vllm.baseUrl, "http://localhost:8000/v1");
+  assert.equal(
+    localRuntimePresets.llamacpp.baseUrl,
+    "http://localhost:8080/v1",
+  );
+
+  const html = await readFile(publicEntry, "utf8");
+  const selectMatch = html.match(
+    /<select id="localRuntimeInput"[^>]*>([\s\S]*?)<\/select>/,
+  );
+  assert.ok(selectMatch, "Missing local runtime selector");
+  const values = [...selectMatch[1].matchAll(/<option value="([^"]+)"/g)].map(
+    (match) => match[1],
+  );
+  assert.deepEqual(values, localRuntimeIds);
+  assert.match(html, /Docker Model Runner uses the nested <code>\/engines\/v1/);
+  assert.match(html, /approve Local Network Access if prompted/);
+  assert.match(html, /function applyLocalRuntimePreset\(runtime\)/);
+  assert.match(
+    html,
+    /state\.localRuntime = normalizeLocalRuntime\(state\.localRuntime, state\.localBaseUrl\);/,
+  );
+
+  const openSettingsStart = html.indexOf("function openSettings()");
+  const openSettingsEnd = html.indexOf(
+    "\n\n    function switchSettingsTab",
+    openSettingsStart,
+  );
+  const openSettingsSource = html.slice(openSettingsStart, openSettingsEnd);
+  assert.doesNotMatch(
+    openSettingsSource,
+    /applyLocalRuntimePreset\(/,
+    "Opening settings must not overwrite a saved custom URL",
+  );
+  assert.match(openSettingsSource, /updateLocalRuntimeHelp\(state\.localRuntime\)/);
+});
+
+test("normalizes each local runtime endpoint without broadening loopback access", async () => {
+  const html = await readFile(publicEntry, "utf8");
+  const functionStart = html.indexOf("function normalizeLocalBaseUrl");
+  const functionEnd = html.indexOf(
+    "\n\n    function hasLocalProvider",
+    functionStart,
+  );
+  assert.ok(functionStart > 0 && functionEnd > functionStart);
+  const functionSource = html.slice(functionStart, functionEnd);
+  const normalizeLocalBaseUrl = vm.runInNewContext(`(${functionSource})`, {
+    URL,
+  });
+
+  assert.equal(
+    normalizeLocalBaseUrl("http://localhost:12434", "docker"),
+    "http://localhost:12434/engines/v1",
+  );
+  assert.equal(
+    normalizeLocalBaseUrl(
+      "http://localhost:12434/engines/v1/models",
+      "docker",
+    ),
+    "http://localhost:12434/engines/v1",
+  );
+  assert.equal(
+    normalizeLocalBaseUrl(
+      "http://127.0.0.1:8080/v1/chat/completions",
+      "llamacpp",
+    ),
+    "http://127.0.0.1:8080/v1",
+  );
+  assert.throws(
+    () => normalizeLocalBaseUrl("http://192.168.1.10:8000/v1", "vllm"),
+    /must use localhost or 127\.0\.0\.1/,
+  );
+
+  const inferenceStart = html.indexOf("function inferLocalRuntimeFromBaseUrl");
+  const inferenceEnd = html.indexOf(
+    "\n\n    function updateLocalRuntimeHelp",
+    inferenceStart,
+  );
+  const runtimeContext = vm.createContext({
+    URL,
+    LOCAL_RUNTIME_PRESETS: localRuntimePresets,
+    LOCAL_RUNTIME_IDS: new Set(localRuntimeIds),
+  });
+  vm.runInContext(
+    `${functionSource}
+${html.slice(inferenceStart, inferenceEnd)}
+globalThis.normalizeLocalRuntimeForTest = normalizeLocalRuntime;`,
+    runtimeContext,
+  );
+  const normalizeLocalRuntime =
+    runtimeContext.normalizeLocalRuntimeForTest;
+  assert.equal(
+    normalizeLocalRuntime("", "http://localhost:1234/v1"),
+    "lmstudio",
+  );
+  assert.equal(
+    normalizeLocalRuntime("", "http://localhost:9876/v1"),
+    "custom",
+  );
+  assert.equal(
+    normalizeLocalRuntime("custom", "http://localhost:12434/engines/v1"),
+    "custom",
+    "An explicit Custom selection must not be re-inferred as Docker",
+  );
+  assert.equal(
+    normalizeLocalRuntime("vllm", "http://localhost:9000/v1"),
+    "vllm",
+    "A preset must retain its identity when its port is customized",
+  );
+});
+
+test("backs up local runtime settings without exporting its API key", async () => {
+  const html = await readFile(publicEntry, "utf8");
+  const exportStart = html.indexOf("function exportFullBackup()");
+  const exportEnd = html.indexOf(
+    "\n\n    let _pendingImportData",
+    exportStart,
+  );
+  const exportSource = html.slice(exportStart, exportEnd);
+  for (const key of [
+    "localEnabled",
+    "localOnly",
+    "localRuntime",
+    "localBaseUrl",
+    "localModels",
+  ]) {
+    assert.match(exportSource, new RegExp(`${key}: state\\.${key}`));
+  }
+  assert.doesNotMatch(exportSource, /localApiKey/);
+
+  const importStart = html.indexOf("const allowed = ['conversations'");
+  const importEnd = html.indexOf("];", importStart) + 2;
+  const importAllowlist = html.slice(importStart, importEnd);
+  assert.match(importAllowlist, /'localRuntime'/);
+  assert.match(importAllowlist, /'localBaseUrl'/);
+  assert.doesNotMatch(importAllowlist, /'localApiKey'/);
+  assert.match(
+    html,
+    /candidate\.localRuntime = imported\.localRuntime === undefined\s+\? inferLocalRuntimeFromBaseUrl\(candidate\.localBaseUrl\)/,
+  );
+  assert.match(
+    html,
+    /candidate\.localModels = typeof candidate\.localModels === 'string'\s+\? candidate\.localModels\.slice\(0, 1000\)/,
+  );
+});
+
+test("publishes the maintained local runtime guide byte-for-byte", async () => {
+  const [source, published] = await Promise.all([
+    readFile(localModelsGuide),
+    readFile(publicLocalModelsGuide),
+  ]);
+  assert.deepEqual(published, source);
 });
 
 test("uses the canonical Crow black, ultraviolet, blue, and cyan palette", async () => {
