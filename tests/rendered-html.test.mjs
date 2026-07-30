@@ -5,6 +5,21 @@ import test from "node:test";
 const publicEntry = new URL("../public/crow-godmod3.html", import.meta.url);
 const publicTheme = new URL("../public/crow-theme/", import.meta.url);
 const sourceTheme = new URL("../brand-system/", import.meta.url);
+const openRouterFreeChatModels = [
+  "inclusionai/ling-3.0-flash:free",
+  "poolside/laguna-s-2.1:free",
+  "poolside/laguna-xs-2.1:free",
+  "cohere/north-mini-code:free",
+  "nvidia/nemotron-3-ultra-550b-a55b:free",
+  "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+  "google/gemma-4-26b-a4b-it:free",
+  "google/gemma-4-31b-it:free",
+  "nvidia/nemotron-3-super-120b-a12b:free",
+  "nvidia/nemotron-3-nano-30b-a3b:free",
+  "nvidia/nemotron-nano-12b-v2-vl:free",
+  "nvidia/nemotron-nano-9b-v2:free",
+  "openai/gpt-oss-20b:free",
+];
 
 async function render(path = "/?source=test") {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
@@ -71,6 +86,113 @@ test("contains no orange, amber, yellow, or gold visual colour tokens", async ()
   const forbidden =
     /#(?:f59e0b|f97316|fbbf24|ff6600|ff7b00|ff9900|ffa500|ffaa00|ffb733|ffcc00|ffd700)\b|rgba\(\s*255\s*,\s*(?:100|102|123|153|165|170|204|215)\s*,|rgba\(\s*251\s*,\s*191\s*,\s*36|rgba\(\s*249\s*,\s*115\s*,\s*22|rgba\(\s*245\s*,\s*158\s*,\s*11/gi;
   assert.doesNotMatch(html, forbidden);
+});
+
+test("routes OpenRouter chat through the configured free-model allowlist", async () => {
+  const html = await readFile(publicEntry, "utf8");
+  const expectedModels = [...openRouterFreeChatModels].sort();
+
+  const allowlistMatch = html.match(
+    /const OPENROUTER_FREE_CHAT_MODELS = Object\.freeze\((\[[^\n]+\])\);/,
+  );
+  assert.ok(allowlistMatch, "Missing the runtime OpenRouter free-model allowlist");
+  assert.deepEqual(JSON.parse(allowlistMatch[1]).sort(), expectedModels);
+  assert.match(
+    html,
+    /const OPENROUTER_DEFAULT_MODEL = "nvidia\/nemotron-3-ultra-550b-a55b:free";/,
+  );
+
+  for (const selectId of ["modelSelect", "defaultModelInput"]) {
+    const selectMatch = html.match(
+      new RegExp(`<select[^>]*id="${selectId}"[^>]*>([\\s\\S]*?)<\\/select>`),
+    );
+    assert.ok(selectMatch, `Missing ${selectId}`);
+    const values = [
+      ...selectMatch[1].matchAll(/<option value="([^"]+)"/g),
+    ].map((match) => match[1]);
+    assert.deepEqual([...values].sort(), expectedModels);
+    assert.ok(values.every((value) => value.endsWith(":free")));
+  }
+
+  const tierMatch = html.match(
+    /const ULTRAPLINIAN_MODELS = \[([\s\S]*?)\n    \];/,
+  );
+  assert.ok(tierMatch, "Missing ULTRAPLINIAN model tiers");
+  const tierModels = [...tierMatch[1].matchAll(/'([^']+)'/g)].map(
+    (match) => match[1],
+  );
+  assert.deepEqual([...tierModels].sort(), expectedModels);
+  assert.match(
+    html,
+    /const TIER_SIZES = \{ fast: 3, standard: 5, smart: 8, power: 11, ultra: 13 \};/,
+  );
+
+  const hardCodedChatModels = [
+    ...html.matchAll(/model:\s*'([^']+)'/g),
+  ]
+    .map((match) => match[1])
+    .filter((model) => model.includes("/"));
+  assert.ok(hardCodedChatModels.length > 0);
+  for (const model of hardCodedChatModels) {
+    assert.ok(
+      openRouterFreeChatModels.includes(model),
+      `Non-allowlisted hard-coded chat model: ${model}`,
+    );
+  }
+
+  for (const specialistModel of [
+    "nvidia/nemotron-3.5-content-safety:free",
+    "nvidia/llama-nemotron-embed-vl-1b-v2:free",
+    "nvidia/llama-nemotron-rerank-vl-1b-v2:free",
+    "nvidia/nemotron-3-embed-1b:free",
+  ]) {
+    assert.ok(!allowlistMatch[1].includes(specialistModel));
+  }
+
+  assert.match(
+    html,
+    /return \{ provider: 'openrouter', model: normalizeOpenRouterModel\(requestedModel\),/,
+  );
+  assert.match(
+    html,
+    /normalizeOpenRouterRequestBody\(\{ \.\.\.body, model: target\.model \}\)/,
+  );
+  assert.ok(
+    (html.match(/normalizeOpenRouterRequestBody\(/g) ?? []).length >= 5,
+    "Every OpenRouter request path should normalize its model and parameters",
+  );
+
+  const directOpenRouterCalls = [
+    ...html.matchAll(
+      /fetch\('https:\/\/openrouter\.ai\/api\/v1\/chat\/completions'/g,
+    ),
+  ];
+  assert.ok(directOpenRouterCalls.length > 0);
+  for (const call of directOpenRouterCalls) {
+    const requestSource = html.slice(call.index, call.index + 1_500);
+    assert.match(
+      requestSource,
+      /body:\s*JSON\.stringify\(normalizeOpenRouterRequestBody\(/,
+      `Direct OpenRouter request at offset ${call.index} bypasses normalization`,
+    );
+  }
+});
+
+test("migrates saved paid-model selections to valid free chat models", async () => {
+  const html = await readFile(publicEntry, "utf8");
+
+  assert.match(
+    html,
+    /"openai\/gpt-oss-20b":"openai\/gpt-oss-20b:free"/,
+  );
+  assert.match(
+    html,
+    /state\.model = normalizePersistedChatModel\(state\.model\);/,
+  );
+  assert.match(
+    html,
+    /conv\.model = normalizePersistedChatModel\(conv\.model \|\| state\.model\);/,
+  );
 });
 
 test("uses the canonical Crow black, ultraviolet, blue, and cyan palette", async () => {
