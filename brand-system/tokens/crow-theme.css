@@ -2,8 +2,9 @@
  * Crow Theme v0.1
  * Canonical CSS custom properties for the Crow product family.
  *
- * Load fonts/crow-signal.css before this file when the Crow Signal font files
- * are available. Product bindings are selected with data-crow-product.
+ * Load fonts/bitfeather/crow-bitfeather.css before this file when the Crow
+ * Bitfeather font files are available. Product bindings are selected with
+ * data-crow-product.
  */
 
 :root,
@@ -81,10 +82,10 @@
   --crow-info-border: rgb(69 231 255 / 42%);
 
   /* Typography. */
-  --crow-font-display: "Crow Signal Display", "Segoe UI Variable Display",
+  --crow-font-display: "Crow Bitfeather Display", "Segoe UI Variable Display",
     "Segoe UI", sans-serif;
   --crow-font-body: "Segoe UI Variable Text", "Segoe UI", sans-serif;
-  --crow-font-mono: "Crow Signal Mono", "Cascadia Mono", Consolas, monospace;
+  --crow-font-mono: "Crow Bitfeather Mono", "Cascadia Mono", Consolas, monospace;
   --crow-font-weight-regular: 400;
   --crow-font-weight-bold: 700;
   --crow-tracking-display: 0.045em;

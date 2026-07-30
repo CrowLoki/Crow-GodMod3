@@ -117,7 +117,7 @@ replaceRequired(
   `  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">`,
-  `  <link href="/crow-theme/fonts/crow-signal.css" rel="stylesheet">
+  `  <link href="/crow-theme/fonts/bitfeather/crow-bitfeather.css" rel="stylesheet">
   <link href="/crow-theme/tokens/crow-theme.css" rel="stylesheet">`,
 );
 replaceRequired(
@@ -306,8 +306,8 @@ replaceRequired(
 
         <nav class="crow-pack-links" aria-label="Crow Theme resources">
           <a href="/crow-theme/index.html" target="_blank" rel="noopener">Open complete theme pack</a>
-          <a href="/crow-theme/downloads/Crow-Signal-Windows-v0.1.0.zip" download>Download Crow Signal</a>
-          <a href="/crow-theme/downloads/Crow-Talon-Windows-v0.1.0.zip" download>Download Crow Talon</a>
+          <a href="/crow-theme/downloads/Crow-Bitfeather-Windows-v0.3.0.zip" download>Download Crow Bitfeather v0.3</a>
+          <a href="/crow-theme/downloads/Crow-Talon-Windows-v0.5.0.zip" download>Download Crow Talon v0.5</a>
           <a href="/crow-theme/docs/BRAND-GUIDE.md" target="_blank" rel="noopener">Brand guide</a>
           <a href="/crow-theme/docs/MASCOT-GUIDE.md" target="_blank" rel="noopener">Mascot guide</a>
           <a href="https://github.com/CrowLoki/Crow-GodMod3/tree/main/brand-system" target="_blank" rel="noopener">Source on GitHub</a>
@@ -1051,32 +1051,49 @@ const crowThemeStyles = `
     @media (pointer: fine) {
       body,
       .modal-overlay {
-        cursor: url("/crow-theme/cursors/windows/normal.cur"), default;
+        cursor: url("/crow-theme/cursors/v0.5/src/32/normal.png") 6 2, default;
       }
 
       a,
       button,
       select,
+      summary,
       label[for],
       [onclick],
+      [role="button"],
       .suggestion,
-      .conversation-item {
-        cursor: url("/crow-theme/cursors/windows/link.cur"), pointer;
+      .conv-item,
+      .conv-title,
+      input[type="button"],
+      input[type="submit"],
+      input[type="reset"],
+      input[type="checkbox"],
+      input[type="radio"],
+      input[type="range"],
+      input[type="file"] {
+        cursor: url("/crow-theme/cursors/v0.5/src/32/link.png") 6 2, pointer !important;
       }
 
-      input,
+      input:not([type]),
+      input[type="text"],
+      input[type="search"],
+      input[type="email"],
+      input[type="password"],
+      input[type="url"],
+      input[type="number"],
       textarea,
       [contenteditable="true"] {
-        cursor: url("/crow-theme/cursors/windows/text.cur"), text;
+        cursor: url("/crow-theme/cursors/v0.5/src/32/text.png") 16 16, text !important;
       }
 
-      [draggable="true"] {
-        cursor: url("/crow-theme/cursors/windows/move.cur"), move;
+      [draggable="true"],
+      .pong-panel-header {
+        cursor: url("/crow-theme/cursors/v0.5/src/32/move.png") 16 16, move !important;
       }
 
       :disabled,
       [aria-disabled="true"] {
-        cursor: url("/crow-theme/cursors/windows/unavailable.cur"), not-allowed;
+        cursor: url("/crow-theme/cursors/v0.5/src/32/unavailable.png") 16 16, not-allowed !important;
       }
     }
 
@@ -1272,8 +1289,8 @@ for (const required of [
   'src="/crow-theme/assets/icons/app/crow-signal-app-rounded-256.png"',
   'url("/crow-theme/assets/product-variants/exports/crow-godmod3-1920x1080.png")',
   'src="/crow-theme/assets/mascots/masters/glitch-ascendant.png"',
-  'href="/crow-theme/fonts/crow-signal.css"',
-  'url("/crow-theme/cursors/windows/normal.cur")',
+  'href="/crow-theme/fonts/bitfeather/crow-bitfeather.css"',
+  'url("/crow-theme/cursors/v0.5/src/32/normal.png") 6 2',
   'id="crowThemeModal"',
   "const APP_TELEMETRY_ENABLED = false;",
   'href="/ATTRIBUTION.md"',
