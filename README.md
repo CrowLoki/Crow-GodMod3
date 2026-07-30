@@ -31,24 +31,15 @@ This repository is an ongoing project.
 - Application telemetry is disabled. Provider requests still go to the
   provider or local endpoint configured by the user.
 
-## Crow Theme integration
+## CrowClaw styling
 
-Crow-GodMod3 includes the complete approved Crow Brand System under
-[`brand-system/`](brand-system/):
+CrowClaw styling is applied directly to the standalone Crow-GodMod3
+application. The deployed runtime contains only the web assets the application
+uses: Crow Bitfeather fonts, the five 32px Crow Talon cursor roles, Crow-GodMod3
+icons and imagery, and the shared colour tokens.
 
-- Glitch Ascendant as the primary Crow-GodMod3 form
-- Core Architect as its compact form
-- Field Operator and Pet Companion for the wider approved mascot family
-- Crow Signal Display and Mono fonts
-- Crow Talon static and animated Windows pointers
-- signal marks, favicon and application icons
-- backgrounds, six product heroes and social artwork
-- shared CSS, JSON and TypeScript design tokens
-- brand, mascot, prompt, provenance and reproducible-build sources
-
-The build copies the pack into the deployed `/crow-theme/` catalogue and
-applies its product binding, typography, pointers, hero, icons, social preview
-and colour tokens to the application. The upstream snapshot remains unchanged.
+The site does not publish a theme-pack catalogue or downloadable Windows
+installer packages. The upstream snapshot remains unchanged.
 
 ## Development
 

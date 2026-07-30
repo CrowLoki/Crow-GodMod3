@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://crow-godmod3.vercel.app"),
   title: "Crow-GodMod3",
   description:
-    "Open-source, privacy-respecting multi-model AI in the complete Crow Theme.",
+    "Open-source, privacy-respecting multi-model AI with the CrowClaw visual identity.",
   applicationName: "Crow-GodMod3",
   keywords: ["Crow-GodMod3", "CrowClaw", "AI research", "multi-model chat"],
   alternates: {
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     siteName: "Crow-GodMod3",
     title: "Crow-GodMod3",
     description:
-      "Open-source, privacy-respecting multi-model AI in the complete Crow Theme.",
+      "Open-source, privacy-respecting multi-model AI with the CrowClaw visual identity.",
     images: [
       {
         url: "/crow-theme/assets/product-variants/exports/crow-godmod3-1200x630.png",
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Crow-GodMod3",
     description:
-      "Open-source, privacy-respecting multi-model AI in the complete Crow Theme.",
+      "Open-source, privacy-respecting multi-model AI with the CrowClaw visual identity.",
     images: [
       "/crow-theme/assets/product-variants/exports/crow-godmod3-1200x630.png",
     ],
