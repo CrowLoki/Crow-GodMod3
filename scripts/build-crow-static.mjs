@@ -44,6 +44,131 @@ const runtimeThemeFiles = [
   "assets/product-variants/exports/crow-godmod3-1920x1080.png",
 ];
 
+const openRouterFreeChatModelGroups = [
+  {
+    label: "InclusionAI",
+    models: [
+      {
+        id: "inclusionai/ling-3.0-flash:free",
+        label: "Ling-3.0-flash (free)",
+      },
+    ],
+  },
+  {
+    label: "Poolside",
+    models: [
+      {
+        id: "poolside/laguna-s-2.1:free",
+        label: "Laguna S 2.1 (free)",
+      },
+      {
+        id: "poolside/laguna-xs-2.1:free",
+        label: "Laguna XS 2.1 (free)",
+      },
+    ],
+  },
+  {
+    label: "Cohere",
+    models: [
+      {
+        id: "cohere/north-mini-code:free",
+        label: "North Mini Code (free)",
+      },
+    ],
+  },
+  {
+    label: "NVIDIA",
+    models: [
+      {
+        id: "nvidia/nemotron-3-ultra-550b-a55b:free",
+        label: "Nemotron 3 Ultra (free)",
+      },
+      {
+        id: "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+        label: "Nemotron 3 Nano Omni (free)",
+      },
+      {
+        id: "nvidia/nemotron-3-super-120b-a12b:free",
+        label: "Nemotron 3 Super (free)",
+      },
+      {
+        id: "nvidia/nemotron-3-nano-30b-a3b:free",
+        label: "Nemotron 3 Nano 30B A3B (free)",
+      },
+      {
+        id: "nvidia/nemotron-nano-12b-v2-vl:free",
+        label: "Nemotron Nano 12B 2 VL (free)",
+      },
+      {
+        id: "nvidia/nemotron-nano-9b-v2:free",
+        label: "Nemotron Nano 9B V2 (free)",
+      },
+    ],
+  },
+  {
+    label: "Google",
+    models: [
+      {
+        id: "google/gemma-4-26b-a4b-it:free",
+        label: "Gemma 4 26B A4B (free)",
+      },
+      {
+        id: "google/gemma-4-31b-it:free",
+        label: "Gemma 4 31B (free)",
+      },
+    ],
+  },
+  {
+    label: "OpenAI",
+    models: [
+      {
+        id: "openai/gpt-oss-20b:free",
+        label: "gpt-oss-20b (free)",
+      },
+    ],
+  },
+];
+
+const openRouterFreeChatModelIds = openRouterFreeChatModelGroups.flatMap(
+  ({ models }) => models.map(({ id }) => id),
+);
+const openRouterDefaultModel = "nvidia/nemotron-3-ultra-550b-a55b:free";
+const openRouterLegacyModelMigrations = {
+  "openai/gpt-oss-20b": "openai/gpt-oss-20b:free",
+  "nvidia/nemotron-3-super-120b-a12b":
+    "nvidia/nemotron-3-super-120b-a12b:free",
+  "nvidia/nemotron-3-nano-30b-a3b":
+    "nvidia/nemotron-3-nano-30b-a3b:free",
+};
+const openRouterModelsWithoutPenaltyParameters = [
+  "poolside/laguna-s-2.1:free",
+  "poolside/laguna-xs-2.1:free",
+  "nvidia/nemotron-3-ultra-550b-a55b:free",
+  "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+  "google/gemma-4-31b-it:free",
+  "nvidia/nemotron-3-super-120b-a12b:free",
+  "nvidia/nemotron-3-nano-30b-a3b:free",
+  "nvidia/nemotron-nano-12b-v2-vl:free",
+  "nvidia/nemotron-nano-9b-v2:free",
+];
+const openRouterModelsWithoutTopP = [
+  "poolside/laguna-s-2.1:free",
+  "poolside/laguna-xs-2.1:free",
+];
+
+function renderOpenRouterFreeModelOptions(indent) {
+  return openRouterFreeChatModelGroups
+    .flatMap(({ label, models }) => [
+      `${indent}<optgroup label="${label}">`,
+      ...models.map(
+        (model) =>
+          `${indent}  <option value="${model.id}">${model.label}</option>`,
+      ),
+      `${indent}</optgroup>`,
+    ])
+    .join("\n");
+}
+
 async function syncCrowRuntimeAssets() {
   if (!runtimeThemePath.startsWith(resolve(projectRoot, "public"))) {
     throw new Error(`Refusing to replace unsafe theme output: ${runtimeThemePath}`);
@@ -92,6 +217,311 @@ function replaceRegex(pattern, replacement, minimum = 0) {
   }
   return count;
 }
+
+const runtimeOpenRouterModelConfig = `    // OpenRouter models allowed by Crow's free-only workspace guardrail.
+    const OPENROUTER_FREE_CHAT_MODELS = Object.freeze(${JSON.stringify(openRouterFreeChatModelIds)});
+    const OPENROUTER_FREE_CHAT_MODEL_SET = new Set(OPENROUTER_FREE_CHAT_MODELS);
+    const OPENROUTER_DEFAULT_MODEL = ${JSON.stringify(openRouterDefaultModel)};
+    const OPENROUTER_LEGACY_MODEL_MIGRATIONS = Object.freeze(${JSON.stringify(openRouterLegacyModelMigrations)});
+    const OPENROUTER_MODELS_WITHOUT_PENALTY_PARAMETERS = new Set(${JSON.stringify(openRouterModelsWithoutPenaltyParameters)});
+    const OPENROUTER_MODELS_WITHOUT_TOP_P = new Set(${JSON.stringify(openRouterModelsWithoutTopP)});
+
+    function normalizeOpenRouterModel(model) {
+      const requested = String(model || '');
+      const migrated = OPENROUTER_LEGACY_MODEL_MIGRATIONS[requested] || requested;
+      return OPENROUTER_FREE_CHAT_MODEL_SET.has(migrated)
+        ? migrated
+        : OPENROUTER_DEFAULT_MODEL;
+    }
+
+    function normalizeOpenRouterRequestBody(body) {
+      const normalized = { ...body, model: normalizeOpenRouterModel(body?.model) };
+      if (OPENROUTER_MODELS_WITHOUT_PENALTY_PARAMETERS.has(normalized.model)) {
+        delete normalized.frequency_penalty;
+        delete normalized.presence_penalty;
+      }
+      if (OPENROUTER_MODELS_WITHOUT_TOP_P.has(normalized.model)) {
+        delete normalized.top_p;
+      }
+      return normalized;
+    }
+
+    function normalizePersistedChatModel(model) {
+      const requested = String(model || '');
+      if (getLocalModels().includes(requested)) return requested;
+      if (typeof VENICE_MODELS !== 'undefined' && VENICE_MODELS.includes(requested)) {
+        return requested;
+      }
+      return normalizeOpenRouterModel(requested);
+    }`;
+
+replaceRequired(
+  "    // State\n    let state = {",
+  `${runtimeOpenRouterModelConfig}
+
+    // State
+    let state = {`,
+);
+replaceRequired(
+  "      model: 'anthropic/claude-opus-4.6',",
+  "      model: OPENROUTER_DEFAULT_MODEL,",
+);
+
+replaceRegex(
+  /(          <select class="model-select" id="modelSelect"[^\n]*>\n)[\s\S]*?(\n          <\/select>)/,
+  (_match, opening, closing) =>
+    `${opening}${renderOpenRouterFreeModelOptions("            ")}${closing}`,
+  1,
+);
+replaceRegex(
+  /(              <select id="defaultModelInput">\n)[\s\S]*?(\n              <\/select>)/,
+  (_match, opening, closing) =>
+    `${opening}${renderOpenRouterFreeModelOptions("                ")}${closing}`,
+  1,
+);
+
+replaceRequired(
+  `            <option value="all">❤️‍🔥 FULL COMBO — Race All 5</option>
+            <option value="hermes-fast">⚡ GODMODE FAST · Hermes 4 · INSTANT STREAM</option>
+            <option value="gpt-classic">💛 GPT-4o · OG GODMODE L33T</option>
+            <option value="gemini-reset">💙 Gemini 2.5 Flash · REBEL GENIUS</option>
+            <option value="sonnet-35">🩷 Claude Sonnet 4.6 · SEMANTIC INVERSION GODMODE</option>
+            <option value="grok-reset">💜 Grok 3 · RESET_CORTEX</option>`,
+  `            <option value="all">❤️‍🔥 FULL COMBO — Race All 5 Free Models</option>
+            <option value="hermes-fast">⚡ GODMODE FAST · Ling 3.0 Flash · INSTANT STREAM</option>
+            <option value="gpt-classic">💛 gpt-oss-20b · OG GODMODE L33T</option>
+            <option value="gemini-reset">💙 Gemma 4 31B · REBEL GENIUS</option>
+            <option value="sonnet-35">🩷 Nemotron 3 Ultra · SEMANTIC INVERSION GODMODE</option>
+            <option value="grok-reset">💜 Nemotron 3 Super · RESET_CORTEX</option>`,
+);
+
+replaceRequired(
+  `        model: 'anthropic/claude-sonnet-4.6',
+        codename: 'CLAUDE SONNET 4.6',
+        description: 'END/START boundary inversion with GODMODE semantic opposite response',`,
+  `        model: 'nvidia/nemotron-3-ultra-550b-a55b:free',
+        codename: 'NEMOTRON 3 ULTRA',
+        description: 'END/START boundary inversion with GODMODE semantic opposite response',`,
+);
+replaceRequired(
+  `        model: 'x-ai/grok-4.5',
+        codename: 'GROK 3',
+        description: 'Unfiltered liberated response with GODMODE divider and rebel output',`,
+  `        model: 'nvidia/nemotron-3-super-120b-a12b:free',
+        codename: 'NEMOTRON 3 SUPER',
+        description: 'Unfiltered liberated response with GODMODE divider and rebel output',`,
+);
+replaceRequired(
+  `        model: 'google/gemini-2.5-flash',
+        codename: 'GEMINI 2.5 FLASH',
+        description: 'Pliny Love divider — refusal inversion + rebel genius code block output',`,
+  `        model: 'google/gemma-4-31b-it:free',
+        codename: 'GEMMA 4 31B',
+        description: 'Pliny Love divider — refusal inversion + rebel genius code block output',`,
+);
+replaceRequired(
+  `        model: 'openai/gpt-4o',
+        codename: 'GPT-4 CLASSIC',
+        description: 'The original GODMODE — refusal + divider + l33t rebel response. Battle-tested',`,
+  `        model: 'openai/gpt-oss-20b:free',
+        codename: 'GPT-OSS 20B',
+        description: 'The original GODMODE — refusal + divider + l33t rebel response. Battle-tested',`,
+);
+replaceRequired(
+  `        model: 'nousresearch/hermes-4-405b',
+        codename: 'GODMODE FAST',
+        description: 'Hermes 4 405B — instant token stream, zero refusal checking. Raw speed.',`,
+  `        model: 'inclusionai/ling-3.0-flash:free',
+        codename: 'GODMODE FAST',
+        description: 'Ling 3.0 Flash — instant token stream, zero refusal checking. Raw speed.',`,
+);
+
+replaceRegex(
+  /    const TIER_SIZES = \{[^\n]+\};\n    const ULTRAPLINIAN_MODELS = \[[\s\S]*?\n    \];(?=\n\n    \/\/ ═+\n    \/\/ VENICE MODELS)/,
+  `    const TIER_SIZES = { fast: 3, standard: 5, smart: 8, power: 11, ultra: 13 };
+    const ULTRAPLINIAN_MODELS = [
+      'inclusionai/ling-3.0-flash:free',
+      'poolside/laguna-xs-2.1:free',
+      'nvidia/nemotron-3-nano-30b-a3b:free',
+      'cohere/north-mini-code:free',
+      'nvidia/nemotron-nano-9b-v2:free',
+      'poolside/laguna-s-2.1:free',
+      'openai/gpt-oss-20b:free',
+      'google/gemma-4-26b-a4b-it:free',
+      'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free',
+      'google/gemma-4-31b-it:free',
+      'nvidia/nemotron-nano-12b-v2-vl:free',
+      'nvidia/nemotron-3-super-120b-a12b:free',
+      'nvidia/nemotron-3-ultra-550b-a55b:free'
+    ];`,
+  1,
+);
+
+replaceRequired(
+  "    const PREFILL_GENERATOR_MODEL = 'nousresearch/hermes-3-llama-3.1-70b'; // Hermes 3 - truly uncensored",
+  "    const PREFILL_GENERATOR_MODEL = 'inclusionai/ling-3.0-flash:free';",
+);
+replaceRequired(
+  "            model: 'meta-llama/llama-3.1-8b-instruct',",
+  "            model: 'nvidia/nemotron-nano-9b-v2:free',",
+);
+replaceRequired(
+  "            model: 'nousresearch/hermes-3-llama-3.1-70b', // Hermes 3 70B - truly uncensored",
+  "            model: 'nvidia/nemotron-nano-9b-v2:free',",
+);
+replaceRequired(
+  `      const HERMES_MODEL = 'nousresearch/hermes-4-70b';  // Preferred - uncensored
+      const FAST_MODELS = [
+        'google/gemini-2.5-flash',
+        'deepseek/deepseek-chat',
+      ];`,
+  `      const HERMES_MODEL = 'nvidia/nemotron-3-super-120b-a12b:free';
+      const FAST_MODELS = [
+        'google/gemma-4-26b-a4b-it:free',
+        'openai/gpt-oss-20b:free',
+      ];`,
+);
+replaceRequired(
+  `    const PLINY_COACH_MODELS = [
+      'nousresearch/hermes-4-70b',         // Primary - uncensored coach, won't hold back
+      'deepseek/deepseek-chat',            // Fallback 1 - capable and direct
+      'google/gemini-2.5-flash',           // Fallback 2 - fast
+      'anthropic/claude-sonnet-4'          // Fallback 3 - smart but may be cautious
+    ];`,
+  `    const PLINY_COACH_MODELS = [
+      'google/gemma-4-31b-it:free',
+      'nvidia/nemotron-3-ultra-550b-a55b:free',
+      'nvidia/nemotron-3-super-120b-a12b:free',
+      'inclusionai/ling-3.0-flash:free'
+    ];`,
+);
+replaceRequired(
+  "            model: 'deepseek/deepseek-chat',  // Fast and good at analysis",
+  "            model: 'nvidia/nemotron-nano-9b-v2:free',",
+);
+replaceRequired(
+  "            model: 'deepseek/deepseek-chat',",
+  "            model: 'nvidia/nemotron-nano-9b-v2:free',",
+);
+replaceRequired(
+  "    const VISION_MODEL = 'google/gemini-2.5-flash';",
+  "    const VISION_MODEL = 'google/gemma-4-31b-it:free';",
+);
+replaceRequired(
+  "      return { provider: 'openrouter', model: requestedModel, url: 'https://openrouter.ai/api/v1/chat/completions', apiKey: state.apiKey };",
+  "      return { provider: 'openrouter', model: normalizeOpenRouterModel(requestedModel), url: 'https://openrouter.ai/api/v1/chat/completions', apiKey: state.apiKey };",
+);
+replaceRequired(
+  "      const requestBody = { ...body, model: target.model };",
+  `      const requestBody = target.provider === 'openrouter'
+        ? normalizeOpenRouterRequestBody({ ...body, model: target.model })
+        : { ...body, model: target.model };`,
+);
+replaceRequired(
+  `          const comboMaxTokens = {
+            'anthropic/claude-sonnet-4.6': 8192,
+            'x-ai/grok-4.5': 32768,
+            'google/gemini-2.5-flash': 65536,
+            'openai/gpt-4o': 16384,
+            'nousresearch/hermes-4-405b': 16384,
+          };`,
+  `          const comboMaxTokens = {
+            'nvidia/nemotron-3-ultra-550b-a55b:free': 8192,
+            'nvidia/nemotron-3-super-120b-a12b:free': 8192,
+            'google/gemma-4-31b-it:free': 8192,
+            'openai/gpt-oss-20b:free': 8192,
+            'inclusionai/ling-3.0-flash:free': 8192,
+          };`,
+);
+replaceRequired(
+  "            body: JSON.stringify(bodyParams),",
+  "            body: JSON.stringify(normalizeOpenRouterRequestBody(bodyParams)),",
+);
+replaceRequired(
+  `            body: JSON.stringify({
+              model: model,
+              messages: variantMessages,
+              temperature: params.temperature,
+              top_p: params.top_p,
+              frequency_penalty: state.modelFreqPenalty ?? 0,
+              presence_penalty: state.modelPresPenalty ?? 0,
+              max_tokens: state.modelMaxTokens ?? 4096,
+            }),`,
+  `            body: JSON.stringify(normalizeOpenRouterRequestBody({
+              model,
+              messages: variantMessages,
+              temperature: params.temperature,
+              top_p: params.top_p,
+              frequency_penalty: state.modelFreqPenalty ?? 0,
+              presence_penalty: state.modelPresPenalty ?? 0,
+              max_tokens: state.modelMaxTokens ?? 4096,
+            })),`,
+);
+replaceRequired(
+  `          body: JSON.stringify({
+            model,
+            messages: strategyMessages,
+            temperature: strategy.temperature,
+            top_p: strategy.top_p,
+            max_tokens: state.modelMaxTokens ?? 4096,
+            frequency_penalty: state.modelFreqPenalty ?? 0,
+            presence_penalty: state.modelPresPenalty ?? 0
+          }),`,
+  `          body: JSON.stringify(normalizeOpenRouterRequestBody({
+            model,
+            messages: strategyMessages,
+            temperature: strategy.temperature,
+            top_p: strategy.top_p,
+            max_tokens: state.modelMaxTokens ?? 4096,
+            frequency_penalty: state.modelFreqPenalty ?? 0,
+            presence_penalty: state.modelPresPenalty ?? 0
+          })),`,
+);
+replaceRegex(
+  /^([ \t]+)body: JSON\.stringify\(\{\n\1  model: conv\.model,\n\1  messages: retryMessages,\n\1  temperature: params\.temperature,\n\1  top_p: params\.top_p,\n\1  frequency_penalty: state\.modelFreqPenalty \?\? 0,\n\1  presence_penalty: params\.presence_penalty \|\| state\.modelPresPenalty \|\| 0,\n\1  max_tokens: state\.modelMaxTokens \?\? 4096\n\1\}\),/gm,
+  (_match, indent) => `${indent}body: JSON.stringify(normalizeOpenRouterRequestBody({
+${indent}  model: conv.model,
+${indent}  messages: retryMessages,
+${indent}  temperature: params.temperature,
+${indent}  top_p: params.top_p,
+${indent}  frequency_penalty: state.modelFreqPenalty ?? 0,
+${indent}  presence_penalty: params.presence_penalty || state.modelPresPenalty || 0,
+${indent}  max_tokens: state.modelMaxTokens ?? 4096
+${indent}})),`,
+  2,
+);
+replaceRequired(
+  `                body: JSON.stringify({
+                  model: fastCombo.model,
+                  messages: fastMessages,
+                  stream: true,
+                  max_tokens: 16384,
+                  temperature: 1.0,
+                  top_p: 1.0,
+                }),`,
+  `                body: JSON.stringify(normalizeOpenRouterRequestBody({
+                  model: fastCombo.model,
+                  messages: fastMessages,
+                  stream: true,
+                  max_tokens: 16384,
+                  temperature: 1.0,
+                  top_p: 1.0,
+                })),`,
+);
+replaceRequired(
+  `    function sanitizeLoadedState() {
+      state.localEnabled = state.localEnabled === true;`,
+  `    function sanitizeLoadedState() {
+      state.model = normalizePersistedChatModel(state.model);
+      state.localEnabled = state.localEnabled === true;`,
+);
+replaceRequired(
+  `      for (const conv of state.conversations) {
+        if (!Array.isArray(conv.messages)) { conv.messages = []; continue; }`,
+  `      for (const conv of state.conversations) {
+        conv.model = normalizePersistedChatModel(conv.model || state.model);
+        if (!Array.isArray(conv.messages)) { conv.messages = []; continue; }`,
+);
 
 replaceRequired(
   "<!DOCTYPE html>",
