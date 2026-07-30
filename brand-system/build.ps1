@@ -11,7 +11,6 @@ if (-not (Test-Path -LiteralPath $python)) {
 $scripts = @(
     'build_fonts.py',
     'build_cursors.py',
-    'build_visual_assets.py',
     'build_icons.py',
     'build_raster_exports.py',
     'build_manifest.py',
@@ -26,3 +25,4 @@ foreach ($script in $scripts) {
 }
 
 Write-Host 'Crow Brand System build and validation completed.'
+

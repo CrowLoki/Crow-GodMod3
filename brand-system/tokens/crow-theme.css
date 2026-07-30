@@ -1,16 +1,14 @@
 /*
- * Crow Theme v0.2.0
+ * Crow Theme v0.1
  * Canonical CSS custom properties for the Crow product family.
  *
- * Load fonts/bitfeather/crow-bitfeather.css before this file when the Crow
- * Bitfeather font files are available. Product bindings are selected with
- * data-crow-product.
+ * Load fonts/crow-signal.css before this file when the Crow Signal font files
+ * are available. Product bindings are selected with data-crow-product.
  */
 
 :root,
 [data-crow-theme] {
   color-scheme: dark;
-  --crow-theme-version: "0.2.0";
 
   /* Primitive colour: void, metal and signal light. */
   --crow-void-950: #03040a;
@@ -83,12 +81,10 @@
   --crow-info-border: rgb(69 231 255 / 42%);
 
   /* Typography. */
-  --crow-font-release: "Crow Bitfeather v0.3.0";
-  --crow-font-display: "Crow Bitfeather Display", "Segoe UI Variable Display",
+  --crow-font-display: "Crow Signal Display", "Segoe UI Variable Display",
     "Segoe UI", sans-serif;
-  --crow-font-body: "Crow Bitfeather Mono", "Segoe UI Variable Text", "Segoe UI",
-    sans-serif;
-  --crow-font-mono: "Crow Bitfeather Mono", "Cascadia Mono", Consolas, monospace;
+  --crow-font-body: "Segoe UI Variable Text", "Segoe UI", sans-serif;
+  --crow-font-mono: "Crow Signal Mono", "Cascadia Mono", Consolas, monospace;
   --crow-font-weight-regular: 400;
   --crow-font-weight-bold: 700;
   --crow-tracking-display: 0.045em;
@@ -127,98 +123,77 @@
   --crow-ease-signal: cubic-bezier(0.22, 1, 0.36, 1);
   --crow-motion-distance: 8px;
 
-  /* Browser-ready Crow Talon v0.5 with compact 32px sources and safe fallbacks. */
-  --crow-cursor-release: "Crow Talon v0.5.0";
-  --crow-cursor-source-grid: 32px;
+  /* Cursor family names. CSS keywords remain safe fallbacks until installed. */
   --crow-cursor-family: "Crow Talon";
   --crow-cursor-default-name: "Crow Talon Default";
-  --crow-cursor-help-name: "Crow Talon Help";
-  --crow-cursor-working-name: "Crow Talon Working";
   --crow-cursor-link-name: "Crow Talon Link";
   --crow-cursor-text-name: "Crow Talon Text";
-  --crow-cursor-handwriting-name: "Crow Talon Handwriting";
   --crow-cursor-precision-name: "Crow Talon Precision";
   --crow-cursor-move-name: "Crow Talon Move";
   --crow-cursor-busy-name: "Crow Talon Busy";
   --crow-cursor-unavailable-name: "Crow Talon Unavailable";
-  --crow-cursor-default: url("../cursors/v0.5/src/32/normal.png") 6 2,
-    url("../cursors/v0.5/windows/normal.cur"), default;
-  --crow-cursor-help: url("../cursors/v0.5/src/32/help.png") 6 2,
-    url("../cursors/v0.5/windows/help.cur"), help;
-  --crow-cursor-working: url("../cursors/v0.5/src/32/working.png") 6 2,
-    url("../cursors/v0.5/windows/working.cur"), progress;
-  --crow-cursor-link: url("../cursors/v0.5/src/32/link.png") 6 2,
-    url("../cursors/v0.5/windows/link.cur"), pointer;
-  --crow-cursor-text: url("../cursors/v0.5/src/32/text.png") 16 16,
-    url("../cursors/v0.5/windows/text.cur"), text;
-  --crow-cursor-handwriting: url("../cursors/v0.5/src/32/handwriting.png") 3 29,
-    url("../cursors/v0.5/windows/handwriting.cur"), crosshair;
-  --crow-cursor-precision: url("../cursors/v0.5/src/32/precision.png") 16 16,
-    url("../cursors/v0.5/windows/precision.cur"), crosshair;
-  --crow-cursor-move: url("../cursors/v0.5/src/32/move.png") 16 16,
-    url("../cursors/v0.5/windows/move.cur"), move;
-  --crow-cursor-busy: url("../cursors/v0.5/src/32/busy.png") 16 16,
-    url("../cursors/v0.5/windows/busy.cur"), wait;
-  --crow-cursor-unavailable: url("../cursors/v0.5/src/32/unavailable.png") 16 16,
-    url("../cursors/v0.5/windows/unavailable.cur"), not-allowed;
-
-  /* Sole active mascot. Products vary crop, background and accent only. */
-  --crow-mascot-canonical: "assets/mascots/masters/crow-mascot-v3.png";
+  --crow-cursor-default: default;
+  --crow-cursor-link: pointer;
+  --crow-cursor-text: text;
+  --crow-cursor-precision: crosshair;
+  --crow-cursor-move: move;
+  --crow-cursor-busy: progress;
+  --crow-cursor-unavailable: not-allowed;
 
   /* Default product binding: CrowClaw. */
   --crow-product-primary: var(--crow-cyan);
   --crow-product-secondary: var(--crow-ultraviolet);
   --crow-product-signal: var(--crow-electric-blue);
-  --crow-product-mascot: "crow-mascot-v3";
-  --crow-product-compact-mascot: "crow-mascot-v3";
+  --crow-product-mascot: "core-architect";
+  --crow-product-compact-mascot: "pet-companion";
 }
 
 [data-crow-product="crowclaw"] {
   --crow-product-primary: var(--crow-cyan);
   --crow-product-secondary: var(--crow-ultraviolet);
   --crow-product-signal: var(--crow-electric-blue);
-  --crow-product-mascot: "crow-mascot-v3";
-  --crow-product-compact-mascot: "crow-mascot-v3";
+  --crow-product-mascot: "core-architect";
+  --crow-product-compact-mascot: "pet-companion";
 }
 
 [data-crow-product="crow-godmod3"] {
   --crow-product-primary: var(--crow-ultraviolet);
   --crow-product-secondary: var(--crow-magenta-spark);
   --crow-product-signal: var(--crow-cyan);
-  --crow-product-mascot: "crow-mascot-v3";
-  --crow-product-compact-mascot: "crow-mascot-v3";
+  --crow-product-mascot: "glitch-ascendant";
+  --crow-product-compact-mascot: "core-architect";
 }
 
 [data-crow-product="crowquant"] {
   --crow-product-primary: var(--crow-electric-blue);
   --crow-product-secondary: var(--crow-cyan);
   --crow-product-signal: var(--crow-state-success);
-  --crow-product-mascot: "crow-mascot-v3";
-  --crow-product-compact-mascot: "crow-mascot-v3";
+  --crow-product-mascot: "field-operator";
+  --crow-product-compact-mascot: "pet-companion";
 }
 
 [data-crow-product="crownest"] {
   --crow-product-primary: var(--crow-indigo-bright);
   --crow-product-secondary: var(--crow-cyan);
   --crow-product-signal: var(--crow-violet);
-  --crow-product-mascot: "crow-mascot-v3";
-  --crow-product-compact-mascot: "crow-mascot-v3";
+  --crow-product-mascot: "core-architect";
+  --crow-product-compact-mascot: "pet-companion";
 }
 
 [data-crow-product="crowmemory"] {
   --crow-product-primary: var(--crow-violet);
   --crow-product-secondary: var(--crow-cyan);
   --crow-product-signal: var(--crow-electric-blue);
-  --crow-product-mascot: "crow-mascot-v3";
-  --crow-product-compact-mascot: "crow-mascot-v3";
+  --crow-product-mascot: "core-architect";
+  --crow-product-compact-mascot: "pet-companion";
 }
 
 [data-crow-product="crowflix"] {
   --crow-product-primary: var(--crow-electric-blue);
   --crow-product-secondary: var(--crow-violet);
   --crow-product-signal: var(--crow-magenta-spark);
-  --crow-product-mascot: "crow-mascot-v3";
-  --crow-product-compact-mascot: "crow-mascot-v3";
+  --crow-product-mascot: "field-operator";
+  --crow-product-compact-mascot: "pet-companion";
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -42,16 +42,6 @@ def contain(source: Path, destination: Path, size: tuple[int, int]) -> None:
     canvas.save(destination, optimize=True)
 
 
-def save_runtime_derivatives(source: Path) -> list[Path]:
-    with Image.open(source) as opened:
-        image = opened.convert("RGB")
-        webp = source.with_suffix(".webp")
-        avif = source.with_suffix(".avif")
-        image.save(webp, "WEBP", quality=88, method=6, exact=True)
-        image.save(avif, "AVIF", quality=72, speed=6)
-    return [webp, avif]
-
-
 def sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as stream:
@@ -60,38 +50,12 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def output_record(path: Path, source: Path, operation: str) -> dict[str, object]:
-    with Image.open(path) as image:
-        return {
-            "file": path.relative_to(ROOT).as_posix(),
-            "source": source.relative_to(ROOT).as_posix(),
-            "operation": operation,
-            "format": image.format,
-            "width": image.width,
-            "height": image.height,
-            "bytes": path.stat().st_size,
-            "sha256": sha256(path),
-        }
-
-
 def main() -> None:
     banner = ROOT / "assets/social/crow-family-banner.png"
     background = ROOT / "assets/backgrounds/void-grid-neutral.png"
     product_dir = ROOT / "assets/product-variants"
 
-    outputs: list[tuple[Path, Path, str]] = []
-
-    def register(
-        path: Path,
-        source: Path,
-        operation: str,
-        *,
-        runtime: bool = False,
-    ) -> None:
-        outputs.append((path, source, operation))
-        if runtime:
-            for derived in save_runtime_derivatives(path):
-                outputs.append((derived, source, f"{operation}-runtime"))
+    outputs: list[Path] = []
 
     social_specs = [
         ("crow-family-open-graph-1200x630.png", (1200, 630), 0.0),
@@ -103,7 +67,7 @@ def main() -> None:
     for name, size, focus in social_specs:
         target = ROOT / "assets/social/exports" / name
         cover(banner, target, size, focus)
-        register(target, banner, "cover")
+        outputs.append(target)
 
     background_specs = [
         ("void-grid-1920x1080.png", (1920, 1080)),
@@ -115,7 +79,7 @@ def main() -> None:
     for name, size in background_specs:
         target = ROOT / "assets/backgrounds/exports" / name
         contain(background, target, size)
-        register(target, background, "contain")
+        outputs.append(target)
 
     for source in sorted(product_dir.glob("*-hero.png")):
         stem = source.stem.removesuffix("-hero")
@@ -125,34 +89,18 @@ def main() -> None:
         ]:
             target = product_dir / "exports" / f"{stem}-{suffix}.png"
             cover(source, target, size)
-            register(target, source, "cover", runtime=True)
-
-    # Crow-GodMod3 receives platform-specific social derivatives from its
-    # canonical crow-mascot-v3 hero. Right-edge focus keeps the complete
-    # three-eye identity visible without baking text into the image.
-    godmod3_hero = product_dir / "crow-godmod3-hero.png"
-    godmod3_social_specs = [
-        ("crow-godmod3-open-graph-1200x630.png", (1200, 630), 1.0),
-        ("crow-godmod3-wide-1500x500.png", (1500, 500), 1.0),
-        ("crow-godmod3-post-1080x1080.png", (1080, 1080), 1.0),
-        ("crow-godmod3-story-1080x1920.png", (1080, 1920), 1.0),
-    ]
-    for name, size, focus in godmod3_social_specs:
-        target = ROOT / "assets/social/exports" / name
-        cover(godmod3_hero, target, size, focus)
-        register(target, godmod3_hero, "right-focus-cover", runtime=True)
+            outputs.append(target)
 
     manifest = {
-        "version": (ROOT / "VERSION").read_text(encoding="utf-8").strip(),
-        "identity_version": "v3",
+        "version": "0.1.0",
         "generator": "scripts/build_raster_exports.py",
-        "runtime_encodings": {
-            "webp": {"quality": 88, "method": 6, "exact": True},
-            "avif": {"quality": 72, "speed": 6},
-        },
         "outputs": [
-            output_record(path, source, operation)
-            for path, source, operation in outputs
+            {
+                "file": path.relative_to(ROOT).as_posix(),
+                "bytes": path.stat().st_size,
+                "sha256": sha256(path),
+            }
+            for path in outputs
         ],
     }
     manifest_path = ROOT / "assets/raster-manifest.json"
@@ -162,3 +110,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

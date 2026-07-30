@@ -36,13 +36,11 @@ This repository is an ongoing project.
 Crow-GodMod3 includes the complete approved Crow Brand System under
 [`brand-system/`](brand-system/):
 
-- `crow-mascot-v3.png`, the full biomechanical three-eyed crow, as the sole
-  active mascot across Crow-GodMod3 and the wider Crow Theme
-- earlier v1, v2, head, humanoid, and pet artwork retained only as
-  legacy/reference source material
-- Crow Bitfeather v0.3 Display and Mono fonts, applied to the live web interface
-- Crow Talon v0.5 cybernetic claw pointers, applied to the live web interface
-  with compact 32px browser assets and full Windows packages
+- Glitch Ascendant as the primary Crow-GodMod3 form
+- Core Architect as its compact form
+- Field Operator and Pet Companion for the wider approved mascot family
+- Crow Signal Display and Mono fonts
+- Crow Talon static and animated Windows pointers
 - signal marks, favicon and application icons
 - backgrounds, six product heroes and social artwork
 - shared CSS, JSON and TypeScript design tokens

@@ -13,8 +13,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 EXCLUDED_PARTS = {".git", ".venv", "__pycache__"}
 EXCLUDED_FILES = {"brand-manifest.json", "checksums.sha256"}
-IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".webp", ".avif", ".ico"}
-CANONICAL_MASCOT = "assets/mascots/masters/crow-mascot-v3.png"
+IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".webp", ".ico"}
 
 
 def sha256(path: Path) -> str:
@@ -27,16 +26,10 @@ def sha256(path: Path) -> str:
 
 def classify(path: Path) -> str:
     relative = path.relative_to(ROOT).as_posix()
-    if relative == CANONICAL_MASCOT:
-        return "approved-mascot-master"
     if relative.startswith("assets/mascots/masters/"):
-        return "legacy-mascot-master"
-    if relative.startswith("assets/mascots/runtime/"):
-        return "runtime-mascot"
+        return "approved-mascot-master"
     if relative.startswith("assets/mascots/references/"):
         return "identity-reference"
-    if relative.startswith("assets/marks/"):
-        return "brand-mark"
     if relative.startswith("assets/product-variants/"):
         return "product-artwork"
     if relative.startswith("assets/icons/"):
@@ -45,19 +38,10 @@ def classify(path: Path) -> str:
         return "background"
     if relative.startswith("assets/social/"):
         return "social"
-    if (
-        relative.startswith("fonts/ttf/")
-        or relative.startswith("fonts/woff2/")
-        or relative.startswith("fonts/bitfeather/ttf/")
-        or relative.startswith("fonts/bitfeather/woff2/")
-    ):
+    if relative.startswith("fonts/ttf/") or relative.startswith("fonts/woff2/"):
         return "font"
-    if relative.startswith("cursors/windows/") or (
-        relative.startswith("cursors/v") and "/windows/" in relative
-    ):
+    if relative.startswith("cursors/windows/"):
         return "windows-cursor"
-    if relative.startswith("downloads/"):
-        return "distribution"
     if relative.startswith("tokens/"):
         return "design-token"
     if relative.startswith("scripts/"):
@@ -111,13 +95,13 @@ def main() -> None:
         "version": (ROOT / "VERSION").read_text(encoding="utf-8").strip(),
         "status": "internal-preview",
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "approved_mascots": ["crow-mascot-v3"],
-        "canonical_mascot": CANONICAL_MASCOT,
-        "legacy_mascot_policy": (
-            "Earlier mascot files remain physically intact for provenance and "
-            "reference, but are not active product identities."
-        ),
-        "original_asset_families": ["Crow Bitfeather", "Crow Talon"],
+        "approved_forms": [
+            "core-architect",
+            "field-operator",
+            "glitch-ascendant",
+            "pet-companion",
+        ],
+        "original_asset_families": ["Crow Signal", "Crow Talon"],
         "products": [
             "CrowClaw",
             "Crow-GodMod3",
@@ -141,3 +125,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

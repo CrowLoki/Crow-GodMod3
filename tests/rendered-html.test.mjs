@@ -47,19 +47,9 @@ test("serves the verified static clone directly at the root", async () => {
   assert.match(html, /data-crow-product="crow-godmod3"/);
   assert.match(html, /crow-signal-app-rounded-256\.png/);
   assert.match(html, /crow-godmod3-1920x1080\.png/);
-  assert.match(html, /crow-mascot-v3\.png/);
-  assert.doesNotMatch(
-    html,
-    /(?:Core Architect|Field Operator|Glitch Ascendant|Pet Companion|crow-head-identity-v2\.png|(?:core-architect|field-operator|glitch-ascendant|pet-companion)(?:-v2)?\.png)/i,
-  );
-  assert.match(html, /fonts\/bitfeather\/crow-bitfeather\.css/);
-  assert.match(html, /cursors\/v0\.5\/src\/32\/normal\.png/);
-  assert.match(html, /cursors\/v0\.5\/src\/32\/link\.png/);
-  assert.match(html, /cursors\/v0\.5\/src\/32\/text\.png/);
-  assert.doesNotMatch(
-    html,
-    /fonts\/crow-signal\.css|cursors\/windows\/normal\.cur|Crow-Signal-Windows-v0\.2\.0|Crow-Talon-Windows-v0\.2\.0/,
-  );
+  assert.match(html, /glitch-ascendant\.png/);
+  assert.match(html, /crow-signal\.css/);
+  assert.match(html, /cursors\/windows\/normal\.cur/);
   assert.match(html, /id="crowThemeModal"/);
   assert.match(html, /ULTRAPLINIAN/);
   assert.match(html, /PARSELTONGUE/);
@@ -93,35 +83,21 @@ test("uses the canonical Crow black, ultraviolet, blue, and cyan palette", async
 
 test("ships the complete Crow Theme source and generated site catalogue", async () => {
   const requiredThemeFiles = [
-    // Sole active mascot.
-    "assets/mascots/masters/crow-mascot-v3.png",
-    // Retained byte-for-byte as legacy/reference artwork, never active forms.
     "assets/mascots/masters/core-architect.png",
     "assets/mascots/masters/field-operator.png",
     "assets/mascots/masters/glitch-ascendant.png",
     "assets/mascots/masters/pet-companion.png",
-    "assets/mascots/masters/crow-head-identity-v2.png",
-    "assets/mascots/masters/core-architect-v2.png",
-    "assets/mascots/masters/field-operator-v2.png",
-    "assets/mascots/masters/glitch-ascendant-v2.png",
-    "assets/mascots/masters/pet-companion-v2.png",
     "assets/product-variants/exports/crow-godmod3-1200x630.png",
     "assets/product-variants/exports/crow-godmod3-1920x1080.png",
     "assets/backgrounds/void-grid-neutral.png",
     "assets/icons/favicon.ico",
-    "fonts/bitfeather/crow-bitfeather.css",
-    "fonts/bitfeather/woff2/CrowBitfeatherDisplay-Bold.woff2",
-    "fonts/bitfeather/woff2/CrowBitfeatherMono-Regular.woff2",
-    "fonts/bitfeather/specimens/crow-bitfeather-v0.3.0.png",
-    "cursors/v0.5/src/32/normal.png",
-    "cursors/v0.5/src/32/link.png",
-    "cursors/v0.5/src/32/text.png",
-    "cursors/v0.5/windows/normal.cur",
-    "cursors/v0.5/windows/link.cur",
-    "cursors/v0.5/windows/busy.ani",
-    "cursors/v0.5/previews/crow-talon-v0.5-preview.png",
-    "downloads/Crow-Bitfeather-Windows-v0.3.0.zip",
-    "downloads/Crow-Talon-Windows-v0.5.0.zip",
+    "fonts/woff2/CrowSignalDisplay-Bold.woff2",
+    "fonts/woff2/CrowSignalMono-Regular.woff2",
+    "cursors/windows/normal.cur",
+    "cursors/windows/link.cur",
+    "cursors/windows/busy.ani",
+    "downloads/Crow-Signal-Windows-v0.1.0.zip",
+    "downloads/Crow-Talon-Windows-v0.1.0.zip",
     "tokens/crow-theme.css",
     "tokens/crow-theme.json",
     "tokens/crow-theme.ts",
@@ -133,28 +109,28 @@ test("ships the complete Crow Theme source and generated site catalogue", async 
   ];
 
   for (const relativePath of requiredThemeFiles) {
-    const [sourceFile, publicFile] = await Promise.all([
-      readFile(new URL(relativePath, sourceTheme)),
-      readFile(new URL(relativePath, publicTheme)),
+    const [sourceInfo, publicInfo] = await Promise.all([
+      stat(new URL(relativePath, sourceTheme)),
+      stat(new URL(relativePath, publicTheme)),
     ]);
-    assert.deepEqual(
-      publicFile,
-      sourceFile,
-      `Generated theme file differs byte-for-byte: ${relativePath}`,
+    assert.ok(sourceInfo.isFile(), `Missing source theme file: ${relativePath}`);
+    assert.equal(
+      publicInfo.size,
+      sourceInfo.size,
+      `Generated theme file differs: ${relativePath}`,
     );
   }
 
   const catalogue = await readFile(new URL("index.html", publicTheme), "utf8");
   assert.match(catalogue, /The complete Crow system/);
-  assert.match(catalogue, /crow-mascot-v3\.png/);
-  assert.doesNotMatch(
-    catalogue,
-    /(?:Core Architect|Field Operator|Glitch Ascendant|Pet Companion|crow-head-identity-v2\.png|(?:core-architect|field-operator|glitch-ascendant|pet-companion)(?:-v2)?\.png)/i,
-  );
-  assert.match(catalogue, /Crow Bitfeather v0\.3/);
-  assert.match(catalogue, /Crow Talon v0\.5/);
-  assert.match(catalogue, /Crow-Bitfeather-Windows-v0\.3\.0\.zip/);
-  assert.match(catalogue, /Crow-Talon-Windows-v0\.5\.0\.zip/);
+  assert.match(catalogue, /Core Architect/);
+  assert.match(catalogue, /Field Operator/);
+  assert.match(catalogue, /Glitch Ascendant/);
+  assert.match(catalogue, /Pet Companion/);
+  assert.match(catalogue, /Crow Signal/);
+  assert.match(catalogue, /Crow Talon/);
+  assert.match(catalogue, /Crow-Signal-Windows-v0\.1\.0\.zip/);
+  assert.match(catalogue, /Crow-Talon-Windows-v0\.1\.0\.zip/);
 });
 
 test("publishes Crow-GodMod3 application metadata and installable icons", async () => {

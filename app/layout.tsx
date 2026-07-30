@@ -38,7 +38,7 @@ export const metadata: Metadata = {
         url: "/crow-theme/assets/product-variants/exports/crow-godmod3-1200x630.png",
         width: 1200,
         height: 630,
-        alt: "Crow-GodMod3 — biomechanical three-eyed crow mascot",
+        alt: "Crow-GodMod3 — Glitch Ascendant",
       },
     ],
   },

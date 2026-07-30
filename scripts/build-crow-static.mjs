@@ -117,7 +117,7 @@ replaceRequired(
   `  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">`,
-  `  <link href="/crow-theme/fonts/bitfeather/crow-bitfeather.css" rel="stylesheet">
+  `  <link href="/crow-theme/fonts/crow-signal.css" rel="stylesheet">
   <link href="/crow-theme/tokens/crow-theme.css" rel="stylesheet">`,
 );
 replaceRequired(
@@ -178,7 +178,7 @@ replaceRequired(
   `          <div class="welcome-icon">🜏</div>
           <h2>G0DM0<span class="flipped-e">D</span><span class="flipped-e-soft">E</span></h2>
           <p>Open-source, privacy-respecting, liberated AI chat. {GODMODE:ENABLED}</p>`,
-  `          <div class="welcome-signal">CROW SYSTEM // CANONICAL MASCOT V3</div>
+  `          <div class="welcome-signal">CROW SYSTEM // GLITCH ASCENDANT</div>
           <div class="welcome-icon">
             <img class="welcome-crow" src="/crow-theme/assets/icons/avatars/crow-signal-avatar-512.png" alt="Crow Signal">
           </div>
@@ -194,8 +194,8 @@ replaceRequired(
           <span>⚙</span> Settings
         </button>`,
   `        <button class="crow-theme-btn" onclick="openCrowThemePack()">
-          <img src="/crow-theme/assets/icons/avatars/crow-signal-avatar-512.png" alt="" aria-hidden="true">
-          <span><strong>Crow Theme</strong><small>Canonical biomechanical Crow</small></span>
+          <img src="/crow-theme/assets/mascots/masters/core-architect.png" alt="" aria-hidden="true">
+          <span><strong>Crow Theme</strong><small>Glitch Ascendant · v0.1</small></span>
         </button>
         <button class="settings-btn" onclick="openSettings()">
           <span>⚙</span> Settings
@@ -246,39 +246,51 @@ replaceRequired(
       <div class="theme-pack-body">
         <section class="theme-pack-hero">
           <div class="theme-pack-hero-copy">
-            <div class="theme-pack-eyebrow">Canonical mascot // crow-mascot-v3</div>
-            <h4>One Crow. Every product.</h4>
-            <p>The same naturally proportioned adult biomechanical Crow now anchors every Crow product. Product variants change only crop, background and accent emphasis—not character, anatomy, costume or body plan.</p>
+            <div class="theme-pack-eyebrow">Canonical identity // version 0.1.0</div>
+            <h4>One Crow. Four forms. One cold signal.</h4>
+            <p>Black feather, gunmetal structure, deep navy space, ultraviolet, electric blue and cyan. Magenta is a pulse—not a wash. Every mascot has exactly three eyes and a true elongated crow profile.</p>
           </div>
         </section>
 
-        <section class="crow-identity-card">
-          <img src="/crow-theme/assets/mascots/masters/crow-mascot-v3.png" loading="lazy" alt="Canonical full-body biomechanical three-eyed Crow mascot">
-          <div>
-            <div class="theme-pack-eyebrow">Sole active identity // master v3</div>
-            <h5>Biomechanical through the entire body.</h5>
-            <p>Black feathers, tapered beak, wings, legs and talons are one integrated biomechanical anatomy. Exactly three eyes remain readable at every approved crop and scale.</p>
-          </div>
-        </section>
-
-        <section class="crow-form-grid" aria-label="Canonical Crow mascot">
+        <section class="crow-form-grid" aria-label="Approved Crow mascot forms">
           <article class="crow-form-card">
-            <img src="/crow-theme/assets/mascots/masters/crow-mascot-v3.png" loading="lazy" alt="Crow mascot v3, sole active mascot across Crow products">
+            <img src="/crow-theme/assets/mascots/masters/core-architect.png" loading="lazy" alt="Core Architect, the canonical Crow system architect">
             <div class="crow-form-meta">
-              <strong>Canonical Crow v3</strong>
-              <small>Full, compact, icon and hero use all derive from this one approved master.</small>
+              <strong>Core Architect</strong>
+              <small>Flagship intelligence and compact Crow-GodMod3 identity.</small>
+            </div>
+          </article>
+          <article class="crow-form-card">
+            <img src="/crow-theme/assets/mascots/masters/field-operator.png" loading="lazy" alt="Field Operator, the grounded Crow builder">
+            <div class="crow-form-meta">
+              <strong>Field Operator</strong>
+              <small>Grounded builder, researcher and local operator.</small>
+            </div>
+          </article>
+          <article class="crow-form-card" data-form="glitch">
+            <img src="/crow-theme/assets/mascots/masters/glitch-ascendant.png" loading="lazy" alt="Glitch Ascendant, the primary Crow-GodMod3 form">
+            <div class="crow-form-meta">
+              <strong>Glitch Ascendant</strong>
+              <small>Crow-GodMod3 primary form: recursion and controlled power.</small>
+            </div>
+          </article>
+          <article class="crow-form-card">
+            <img src="/crow-theme/assets/mascots/masters/pet-companion.png" loading="lazy" alt="Pet Companion, the small non-humanoid Crow form">
+            <div class="crow-form-meta">
+              <strong>Pet Companion</strong>
+              <small>Small non-humanoid companion for friendly compact moments.</small>
             </div>
           </article>
         </section>
 
         <section class="crow-system-grid">
           <article class="crow-system-card">
-            <h5>Crow Bitfeather type</h5>
-            <img src="/crow-theme/fonts/bitfeather/specimens/crow-bitfeather-v0.3.0.png" loading="lazy" alt="Crow Bitfeather Display and Mono font specimen">
+            <h5>Crow Signal type</h5>
+            <img src="/crow-theme/fonts/specimens/crow-signal-v0.1.png" loading="lazy" alt="Crow Signal Display and Mono font specimen">
           </article>
           <article class="crow-system-card">
             <h5>Crow Talon pointers</h5>
-            <img src="/crow-theme/cursors/v0.5/previews/crow-talon-v0.5-preview.png" loading="lazy" alt="Crow Talon v0.5 cursor family preview">
+            <img src="/crow-theme/cursors/preview.png" loading="lazy" alt="Crow Talon cursor family preview">
           </article>
         </section>
 
@@ -294,8 +306,8 @@ replaceRequired(
 
         <nav class="crow-pack-links" aria-label="Crow Theme resources">
           <a href="/crow-theme/index.html" target="_blank" rel="noopener">Open complete theme pack</a>
-          <a href="/crow-theme/downloads/Crow-Bitfeather-Windows-v0.3.0.zip" download>Download Crow Bitfeather v0.3</a>
-          <a href="/crow-theme/downloads/Crow-Talon-Windows-v0.5.0.zip" download>Download Crow Talon v0.5</a>
+          <a href="/crow-theme/downloads/Crow-Signal-Windows-v0.1.0.zip" download>Download Crow Signal</a>
+          <a href="/crow-theme/downloads/Crow-Talon-Windows-v0.1.0.zip" download>Download Crow Talon</a>
           <a href="/crow-theme/docs/BRAND-GUIDE.md" target="_blank" rel="noopener">Brand guide</a>
           <a href="/crow-theme/docs/MASCOT-GUIDE.md" target="_blank" rel="noopener">Mascot guide</a>
           <a href="https://github.com/CrowLoki/Crow-GodMod3/tree/main/brand-system" target="_blank" rel="noopener">Source on GitHub</a>
@@ -507,7 +519,7 @@ replaceRegex(
 
 const crowThemeStyles = `
 
-    /* Crow Theme v0.2 — canonical biomechanical Crow product binding */
+    /* Crow Theme v0.1 — Crow-GodMod3 product binding */
     ::selection {
       color: var(--crow-text-strong);
       background: var(--crow-selection-bg);
@@ -910,46 +922,6 @@ const crowThemeStyles = `
       line-height: 1.55;
     }
 
-    .crow-identity-card {
-      display: grid;
-      grid-template-columns: minmax(210px, 0.72fr) minmax(280px, 1.28fr);
-      overflow: hidden;
-      background:
-        linear-gradient(135deg, rgb(10 14 27 / 96%), rgb(3 4 10 / 98%));
-      border: 1px solid rgb(69 231 255 / 34%);
-      border-radius: var(--crow-radius-lg);
-      box-shadow: var(--crow-shadow-cyan);
-    }
-
-    .crow-identity-card > img {
-      width: 100%;
-      height: 100%;
-      min-height: 280px;
-      display: block;
-      object-fit: cover;
-      object-position: 50% 34%;
-      border-right: 1px solid var(--crow-border-subtle);
-    }
-
-    .crow-identity-card > div {
-      align-self: center;
-      padding: clamp(22px, 4vw, 42px);
-    }
-
-    .crow-identity-card h5 {
-      margin: 8px 0 10px;
-      color: var(--crow-text-strong);
-      font-family: var(--crow-font-display);
-      font-size: clamp(20px, 3vw, 32px);
-      letter-spacing: var(--crow-tracking-display);
-    }
-
-    .crow-identity-card p {
-      margin: 0;
-      color: var(--crow-text-default);
-      line-height: 1.6;
-    }
-
     .crow-form-grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1079,10 +1051,7 @@ const crowThemeStyles = `
     @media (pointer: fine) {
       body,
       .modal-overlay {
-        cursor:
-          url("/crow-theme/cursors/v0.5/src/32/normal.png") 6 2,
-          url("/crow-theme/cursors/v0.5/windows/normal.cur"),
-          default;
+        cursor: url("/crow-theme/cursors/windows/normal.cur"), default;
       }
 
       a,
@@ -1092,57 +1061,22 @@ const crowThemeStyles = `
       [onclick],
       .suggestion,
       .conversation-item {
-        cursor:
-          url("/crow-theme/cursors/v0.5/src/32/link.png") 6 2,
-          url("/crow-theme/cursors/v0.5/windows/link.cur"),
-          pointer !important;
+        cursor: url("/crow-theme/cursors/windows/link.cur"), pointer;
       }
 
       input,
       textarea,
       [contenteditable="true"] {
-        cursor:
-          url("/crow-theme/cursors/v0.5/src/32/text.png") 16 16,
-          url("/crow-theme/cursors/v0.5/windows/text.cur"),
-          text !important;
+        cursor: url("/crow-theme/cursors/windows/text.cur"), text;
       }
 
-      [draggable="true"],
-      [data-crow-cursor="move"] {
-        cursor:
-          url("/crow-theme/cursors/v0.5/src/32/move.png") 16 16,
-          url("/crow-theme/cursors/v0.5/windows/move.cur"),
-          move !important;
-      }
-
-      [aria-busy="true"],
-      [data-crow-cursor="working"] {
-        cursor:
-          url("/crow-theme/cursors/v0.5/src/32/working.png") 6 2,
-          url("/crow-theme/cursors/v0.5/windows/working.cur"),
-          progress !important;
-      }
-
-      [data-crow-cursor="busy"] {
-        cursor:
-          url("/crow-theme/cursors/v0.5/src/32/busy.png") 16 16,
-          url("/crow-theme/cursors/v0.5/windows/busy.cur"),
-          wait !important;
-      }
-
-      [data-crow-cursor="precision"] {
-        cursor:
-          url("/crow-theme/cursors/v0.5/src/32/precision.png") 16 16,
-          url("/crow-theme/cursors/v0.5/windows/precision.cur"),
-          crosshair !important;
+      [draggable="true"] {
+        cursor: url("/crow-theme/cursors/windows/move.cur"), move;
       }
 
       :disabled,
       [aria-disabled="true"] {
-        cursor:
-          url("/crow-theme/cursors/v0.5/src/32/unavailable.png") 16 16,
-          url("/crow-theme/cursors/v0.5/windows/unavailable.cur"),
-          not-allowed !important;
+        cursor: url("/crow-theme/cursors/windows/unavailable.cur"), not-allowed;
       }
     }
 
@@ -1164,16 +1098,6 @@ const crowThemeStyles = `
 
       .welcome-actions {
         justify-content: center;
-      }
-
-      .crow-identity-card {
-        grid-template-columns: 1fr;
-      }
-
-      .crow-identity-card > img {
-        min-height: 360px;
-        border-right: 0;
-        border-bottom: 1px solid var(--crow-border-subtle);
       }
 
       .crow-form-grid {
@@ -1347,9 +1271,9 @@ for (const required of [
   'data-crow-product="crow-godmod3"',
   'src="/crow-theme/assets/icons/app/crow-signal-app-rounded-256.png"',
   'url("/crow-theme/assets/product-variants/exports/crow-godmod3-1920x1080.png")',
-  'src="/crow-theme/assets/mascots/masters/crow-mascot-v3.png"',
-  'href="/crow-theme/fonts/bitfeather/crow-bitfeather.css"',
-  'url("/crow-theme/cursors/v0.5/src/32/normal.png") 6 2',
+  'src="/crow-theme/assets/mascots/masters/glitch-ascendant.png"',
+  'href="/crow-theme/fonts/crow-signal.css"',
+  'url("/crow-theme/cursors/windows/normal.cur")',
   'id="crowThemeModal"',
   "const APP_TELEMETRY_ENABLED = false;",
   'href="/ATTRIBUTION.md"',
