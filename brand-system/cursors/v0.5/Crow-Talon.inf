@@ -1,0 +1,61 @@
+; Crow Talon v0.5 Windows cursor scheme
+; Right-click this file and choose Install. Administrative rights may be
+; required because the INF convention stores files under %SystemRoot%\Cursors.
+[Version]
+Signature="$CHICAGO$"
+Class=Mouse
+
+[DefaultInstall]
+CopyFiles=CrowTalon.CopyFiles
+AddReg=CrowTalon.AddReg
+
+[DefaultInstall.NT]
+CopyFiles=CrowTalon.CopyFiles
+AddReg=CrowTalon.AddReg
+
+[DestinationDirs]
+CrowTalon.CopyFiles=10,"Cursors\Crow-Talon-v0.5"
+
+[SourceDisksNames]
+1="Crow Talon v0.5 Cursor Scheme",,,
+
+[SourceDisksFiles]
+normal.cur=1,windows
+help.cur=1,windows
+working.ani=1,windows
+working.cur=1,windows
+busy.ani=1,windows
+busy.cur=1,windows
+precision.cur=1,windows
+text.cur=1,windows
+handwriting.cur=1,windows
+unavailable.cur=1,windows
+resize-v.cur=1,windows
+resize-h.cur=1,windows
+resize-d1.cur=1,windows
+resize-d2.cur=1,windows
+move.cur=1,windows
+alternate.cur=1,windows
+link.cur=1,windows
+
+[CrowTalon.CopyFiles]
+normal.cur
+help.cur
+working.ani
+working.cur
+busy.ani
+busy.cur
+precision.cur
+text.cur
+handwriting.cur
+unavailable.cur
+resize-v.cur
+resize-h.cur
+resize-d1.cur
+resize-d2.cur
+move.cur
+alternate.cur
+link.cur
+
+[CrowTalon.AddReg]
+HKCU,"Control Panel\Cursors\Schemes","Crow Talon v0.5",0x00000000,"%10%\Cursors\Crow-Talon-v0.5\normal.cur,%10%\Cursors\Crow-Talon-v0.5\help.cur,%10%\Cursors\Crow-Talon-v0.5\working.ani,%10%\Cursors\Crow-Talon-v0.5\busy.ani,%10%\Cursors\Crow-Talon-v0.5\precision.cur,%10%\Cursors\Crow-Talon-v0.5\text.cur,%10%\Cursors\Crow-Talon-v0.5\handwriting.cur,%10%\Cursors\Crow-Talon-v0.5\unavailable.cur,%10%\Cursors\Crow-Talon-v0.5\resize-v.cur,%10%\Cursors\Crow-Talon-v0.5\resize-h.cur,%10%\Cursors\Crow-Talon-v0.5\resize-d1.cur,%10%\Cursors\Crow-Talon-v0.5\resize-d2.cur,%10%\Cursors\Crow-Talon-v0.5\move.cur,%10%\Cursors\Crow-Talon-v0.5\alternate.cur,%10%\Cursors\Crow-Talon-v0.5\link.cur"

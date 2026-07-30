@@ -1,13 +1,13 @@
 /**
- * Crow Theme v0.1
+ * Crow Theme v0.2.0
  * Typed token source for application integrations.
  */
 
 export const crowTheme = {
   id: "crow-theme",
   name: "Crow Theme",
-  version: "0.1.0",
-  status: "internal-preview",
+  version: "0.2.0",
+  status: "crow-godmod3-integration",
   color: {
     primitive: {
       void950: "#03040A",
@@ -94,11 +94,15 @@ export const crowTheme = {
     },
   },
   typography: {
+    release: "Crow Bitfeather v0.3.0",
+    construction:
+      "Solid stepped-pixel CrowClaw letterforms with slightly thickened strokes for clarity at interface sizes.",
     family: {
       display:
-        '"Crow Signal Display", "Segoe UI Variable Display", "Segoe UI", sans-serif',
-      body: '"Segoe UI Variable Text", "Segoe UI", sans-serif',
-      mono: '"Crow Signal Mono", "Cascadia Mono", Consolas, monospace',
+        '"Crow Bitfeather Display", "Segoe UI Variable Display", "Segoe UI", sans-serif',
+      body:
+        '"Crow Bitfeather Mono", "Segoe UI Variable Text", "Segoe UI", sans-serif',
+      mono: '"Crow Bitfeather Mono", "Cascadia Mono", Consolas, monospace',
     },
     weight: {
       regular: 400,
@@ -152,27 +156,118 @@ export const crowTheme = {
   },
   cursor: {
     family: "Crow Talon",
+    release: "Crow Talon v0.5.0",
+    construction:
+      "Compact antialiased cybernetic crow-claw hand pointers with 32px browser assets and 32, 48, 64 and 96px Windows exports.",
     roles: {
-      default: { name: "Crow Talon Default", fallback: "default" },
-      link: { name: "Crow Talon Link", fallback: "pointer" },
-      text: { name: "Crow Talon Text", fallback: "text" },
-      precision: { name: "Crow Talon Precision", fallback: "crosshair" },
-      move: { name: "Crow Talon Move", fallback: "move" },
-      busy: { name: "Crow Talon Busy", fallback: "progress" },
+      default: {
+        name: "Crow Talon Default",
+        asset: "cursors/v0.5/src/32/normal.png",
+        hotspot: [6, 2],
+        fallback: "default",
+      },
+      help: {
+        name: "Crow Talon Help",
+        asset: "cursors/v0.5/src/32/help.png",
+        hotspot: [6, 2],
+        fallback: "help",
+      },
+      working: {
+        name: "Crow Talon Working",
+        asset: "cursors/v0.5/src/32/working.png",
+        hotspot: [6, 2],
+        fallback: "progress",
+      },
+      link: {
+        name: "Crow Talon Link",
+        asset: "cursors/v0.5/src/32/link.png",
+        hotspot: [6, 2],
+        fallback: "pointer",
+      },
+      text: {
+        name: "Crow Talon Text",
+        asset: "cursors/v0.5/src/32/text.png",
+        hotspot: [16, 16],
+        fallback: "text",
+      },
+      handwriting: {
+        name: "Crow Talon Handwriting",
+        asset: "cursors/v0.5/src/32/handwriting.png",
+        hotspot: [3, 29],
+        fallback: "crosshair",
+      },
+      precision: {
+        name: "Crow Talon Precision",
+        asset: "cursors/v0.5/src/32/precision.png",
+        hotspot: [16, 16],
+        fallback: "crosshair",
+      },
+      move: {
+        name: "Crow Talon Move",
+        asset: "cursors/v0.5/src/32/move.png",
+        hotspot: [16, 16],
+        fallback: "move",
+      },
+      busy: {
+        name: "Crow Talon Busy",
+        asset: "cursors/v0.5/src/32/busy.png",
+        hotspot: [16, 16],
+        fallback: "wait",
+      },
       unavailable: {
         name: "Crow Talon Unavailable",
+        asset: "cursors/v0.5/src/32/unavailable.png",
+        hotspot: [16, 16],
         fallback: "not-allowed",
+      },
+      resizeVertical: {
+        name: "Crow Talon Resize Vertical",
+        asset: "cursors/v0.5/src/32/resize-v.png",
+        hotspot: [16, 16],
+        fallback: "ns-resize",
+      },
+      resizeHorizontal: {
+        name: "Crow Talon Resize Horizontal",
+        asset: "cursors/v0.5/src/32/resize-h.png",
+        hotspot: [16, 16],
+        fallback: "ew-resize",
+      },
+      resizeDiagonalDown: {
+        name: "Crow Talon Resize Diagonal Down",
+        asset: "cursors/v0.5/src/32/resize-d1.png",
+        hotspot: [16, 16],
+        fallback: "nwse-resize",
+      },
+      resizeDiagonalUp: {
+        name: "Crow Talon Resize Diagonal Up",
+        asset: "cursors/v0.5/src/32/resize-d2.png",
+        hotspot: [16, 16],
+        fallback: "nesw-resize",
+      },
+      alternate: {
+        name: "Crow Talon Alternate",
+        asset: "cursors/v0.5/src/32/alternate.png",
+        hotspot: [16, 1],
+        fallback: "n-resize",
       },
     },
   },
   mascot: {
+    identityAnchor: "assets/mascots/masters/crow-mascot-v3.png",
+    activePolicy:
+      "crow-mascot-v3 is the sole active mascot. Product variants may change crop, background and accent emphasis only.",
     invariants: {
       eyes: 3,
       eyeRule: "Exactly two physical eyes and one centred forehead eye.",
       head: "A real elongated crow head with a tapered corvid beak.",
+      bodyPlan: "A naturally proportioned adult crow; never humanoid.",
+      cybernetics:
+        "Biomechanical systems are integrated through feathers, face, torso, wings, legs and talons rather than applied as jewellery.",
       palette:
         "Black, gunmetal, navy, indigo, ultraviolet, electric blue and cyan; magenta only as a restrained iris or pulse accent.",
       forbidden: [
+        "humanoid body",
+        "human clothing",
         "moon head",
         "orb head",
         "owl face",
@@ -185,26 +280,27 @@ export const crowTheme = {
       ],
     },
     forms: {
-      coreArchitect: {
-        id: "core-architect",
-        master: "assets/mascots/masters/core-architect.png",
-        role: "Primary flagship intelligence and system architect.",
+      canonicalCrow: {
+        id: "crow-mascot-v3",
+        master: "assets/mascots/masters/crow-mascot-v3.png",
+        role: "Sole canonical Crow identity for every product and context.",
+        bodyPlan: "adult crow",
+        silhouette:
+          "Naturally proportioned adult crow with dominant body and wings, a tapered beak, three eyes and integrated biomechanical anatomy.",
       },
-      fieldOperator: {
-        id: "field-operator",
-        master: "assets/mascots/masters/field-operator.png",
-        role: "Grounded builder, hacker and local operator.",
-      },
-      glitchAscendant: {
-        id: "glitch-ascendant",
-        master: "assets/mascots/masters/glitch-ascendant.png",
-        role: "Rare transformed state for recursion, power and controlled reality distortion.",
-      },
-      petCompanion: {
-        id: "pet-companion",
-        master: "assets/mascots/masters/pet-companion.png",
-        role: "Small non-humanoid companion for friendly and compact contexts.",
-      },
+    },
+    legacyMasters: {
+      preservation:
+        "Prior mascot files remain physically intact as inactive legacy and reference records; never overwrite or delete them.",
+      crowHeadIdentityV2: "assets/mascots/masters/crow-head-identity-v2.png",
+      coreArchitectV2: "assets/mascots/masters/core-architect-v2.png",
+      fieldOperatorV2: "assets/mascots/masters/field-operator-v2.png",
+      glitchAscendantV2: "assets/mascots/masters/glitch-ascendant-v2.png",
+      petCompanionV2: "assets/mascots/masters/pet-companion-v2.png",
+      coreArchitectV1: "assets/mascots/masters/core-architect.png",
+      fieldOperatorV1: "assets/mascots/masters/field-operator.png",
+      glitchAscendantV1: "assets/mascots/masters/glitch-ascendant.png",
+      petCompanionV1: "assets/mascots/masters/pet-companion.png",
     },
   },
   products: {
@@ -213,8 +309,9 @@ export const crowTheme = {
       primary: "#45E7FF",
       secondary: "#734CFF",
       signal: "#2F7BFF",
-      mascot: "core-architect",
-      compactMascot: "pet-companion",
+      mascot: "crow-mascot-v3",
+      compactMascot: "crow-mascot-v3",
+      variantPolicy: "Crop, background and accent emphasis only.",
       tone: "Capable, local, precise and action-oriented.",
     },
     "crow-godmod3": {
@@ -222,8 +319,9 @@ export const crowTheme = {
       primary: "#734CFF",
       secondary: "#D649FF",
       signal: "#45E7FF",
-      mascot: "glitch-ascendant",
-      compactMascot: "core-architect",
+      mascot: "crow-mascot-v3",
+      compactMascot: "crow-mascot-v3",
+      variantPolicy: "Crop, background and accent emphasis only.",
       tone: "Recursive, high-power and reality-bending without visual chaos.",
     },
     crowquant: {
@@ -231,8 +329,9 @@ export const crowTheme = {
       primary: "#2F7BFF",
       secondary: "#45E7FF",
       signal: "#3FE0B3",
-      mascot: "field-operator",
-      compactMascot: "pet-companion",
+      mascot: "crow-mascot-v3",
+      compactMascot: "crow-mascot-v3",
+      variantPolicy: "Crop, background and accent emphasis only.",
       tone: "Analytical, exact and data-luminous.",
     },
     crownest: {
@@ -240,8 +339,9 @@ export const crowTheme = {
       primary: "#6876FF",
       secondary: "#45E7FF",
       signal: "#9B6CFF",
-      mascot: "core-architect",
-      compactMascot: "pet-companion",
+      mascot: "crow-mascot-v3",
+      compactMascot: "crow-mascot-v3",
+      variantPolicy: "Crop, background and accent emphasis only.",
       tone: "Networked, systemic and inhabited.",
     },
     crowmemory: {
@@ -249,8 +349,9 @@ export const crowTheme = {
       primary: "#9B6CFF",
       secondary: "#45E7FF",
       signal: "#2F7BFF",
-      mascot: "core-architect",
-      compactMascot: "pet-companion",
+      mascot: "crow-mascot-v3",
+      compactMascot: "crow-mascot-v3",
+      variantPolicy: "Crop, background and accent emphasis only.",
       tone: "Familiar, persistent and quietly luminous.",
     },
     crowflix: {
@@ -258,8 +359,9 @@ export const crowTheme = {
       primary: "#2F7BFF",
       secondary: "#9B6CFF",
       signal: "#D649FF",
-      mascot: "field-operator",
-      compactMascot: "pet-companion",
+      mascot: "crow-mascot-v3",
+      compactMascot: "crow-mascot-v3",
+      variantPolicy: "Crop, background and accent emphasis only.",
       tone: "Cinematic, nocturnal and energetic.",
     },
   },

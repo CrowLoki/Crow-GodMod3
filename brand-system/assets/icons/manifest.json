@@ -1,20 +1,21 @@
 {
   "name": "Crow Signal Icon Family",
-  "version": "0.1.0",
-  "generated_at": "2026-07-29T14:19:18.326094+00:00",
+  "version": "0.2.0",
+  "identity_version": "v3",
+  "generated_at": "2026-07-30T04:40:47.880060+00:00",
   "source_policy": "Derived only by crop, Lanczos resampling, restrained sharpening, and rounded alpha masking. No source artwork was redrawn.",
   "sources": [
     {
       "file": "assets/marks/crow-signal-master.png",
-      "width": 1254,
-      "height": 1254,
-      "sha256": "de3b381e21c29c1d87d69554daa474c9a4d11c146eaea44dd4c843d9b197f472"
+      "width": 1024,
+      "height": 1024,
+      "sha256": "0d9ce14117fa37393df6d2ff90128c6de30d607ca48f65b53e2432b3f53b6913"
     },
     {
-      "file": "assets/mascots/masters/pet-companion.png",
-      "width": 1024,
-      "height": 1536,
-      "sha256": "644a121117370fcc01babbd4e30682a768a9e723e99ad2b3e40d404f0575d1c0"
+      "file": "assets/mascots/masters/crow-mascot-v3.png",
+      "width": 1254,
+      "height": 1254,
+      "sha256": "d640ce9685aca512375be5cb66600ebfdf3a4bccbb5f32479798a6ef3917b319"
     }
   ],
   "square_sizes": [
@@ -61,30 +62,30 @@
       "width": 16,
       "height": 16,
       "mode": "RGB",
-      "bytes": 705,
-      "sha256": "dac2f1f115473d8f63fa02ec848fb29b3c040d2a1b8a6fbde4ebb59720d36426",
+      "bytes": 794,
+      "sha256": "aafe680e4f7fcfceb8fd9728c7e385c317530aa93b1052bcb6ac11310c6cfd05",
       "crop_box": [
-        307,
-        219,
-        947,
-        859
+        251,
+        184,
+        773,
+        706
       ],
       "optical_tier": "micro",
       "eye_scores": [
         {
           "eye": 1,
-          "peak_blue": 150,
-          "peak_signal": 108
+          "peak_blue": 247,
+          "peak_signal": 133
         },
         {
           "eye": 2,
-          "peak_blue": 173,
-          "peak_signal": 110
+          "peak_blue": 255,
+          "peak_signal": 122
         },
         {
           "eye": 3,
-          "peak_blue": 255,
-          "peak_signal": 173
+          "peak_blue": 241,
+          "peak_signal": 130
         }
       ]
     },
@@ -95,30 +96,30 @@
       "width": 20,
       "height": 20,
       "mode": "RGB",
-      "bytes": 1033,
-      "sha256": "157731bbef2553c9c6e2131083a0b01b2e04a721fe68b8c59943fd5f04d27dc4",
+      "bytes": 1177,
+      "sha256": "2a8ebf90b94ae85c1a2b181b739f7195117567d9e2540efdb03a226f3e4ef095",
       "crop_box": [
-        307,
-        219,
-        947,
-        859
+        251,
+        184,
+        773,
+        706
       ],
       "optical_tier": "micro",
       "eye_scores": [
         {
           "eye": 1,
           "peak_blue": 255,
-          "peak_signal": 166
+          "peak_signal": 148
         },
         {
           "eye": 2,
-          "peak_blue": 197,
-          "peak_signal": 140
+          "peak_blue": 255,
+          "peak_signal": 147
         },
         {
           "eye": 3,
           "peak_blue": 255,
-          "peak_signal": 171
+          "peak_signal": 108
         }
       ]
     },
@@ -129,30 +130,30 @@
       "width": 24,
       "height": 24,
       "mode": "RGB",
-      "bytes": 1416,
-      "sha256": "8e0776e8bb5a8af341d84342f269970d8c30dce454be46905837355dd462f446",
+      "bytes": 1673,
+      "sha256": "89e37a2c4ae0636672edcba1717f989b9e59389df7bf22db72df96a57deebccc",
       "crop_box": [
-        307,
-        219,
-        947,
-        859
+        251,
+        184,
+        773,
+        706
       ],
       "optical_tier": "micro",
       "eye_scores": [
         {
           "eye": 1,
           "peak_blue": 255,
-          "peak_signal": 172
+          "peak_signal": 137
         },
         {
           "eye": 2,
-          "peak_blue": 255,
-          "peak_signal": 156
+          "peak_blue": 232,
+          "peak_signal": 157
         },
         {
           "eye": 3,
           "peak_blue": 255,
-          "peak_signal": 197
+          "peak_signal": 116
         }
       ]
     },
@@ -163,30 +164,30 @@
       "width": 32,
       "height": 32,
       "mode": "RGB",
-      "bytes": 2416,
-      "sha256": "2730f713c165441b106718f607b54a4caf5c68fad90adba722ab2c57f3b6a83b",
+      "bytes": 2862,
+      "sha256": "f74ac743cff7eb924d72f38ebbae7bda934656bff8fee60f5298459d7c020830",
       "crop_box": [
-        307,
-        219,
-        947,
-        859
+        251,
+        184,
+        773,
+        706
       ],
       "optical_tier": "micro",
       "eye_scores": [
         {
           "eye": 1,
           "peak_blue": 255,
-          "peak_signal": 193
+          "peak_signal": 174
         },
         {
           "eye": 2,
-          "peak_blue": 255,
-          "peak_signal": 190
+          "peak_blue": 221,
+          "peak_signal": 159
         },
         {
           "eye": 3,
           "peak_blue": 255,
-          "peak_signal": 208
+          "peak_signal": 131
         }
       ]
     },
@@ -197,30 +198,30 @@
       "width": 40,
       "height": 40,
       "mode": "RGB",
-      "bytes": 3765,
-      "sha256": "cffaaefea91f67d509c7cb109ef70ef7922eb7ffb2c84512edd8ace70c1220db",
+      "bytes": 4390,
+      "sha256": "26ba57970275298b54e087ad93ac03524604a23d92753c0748065bba78817ebd",
       "crop_box": [
-        307,
-        219,
-        947,
-        859
+        251,
+        184,
+        773,
+        706
       ],
       "optical_tier": "micro",
       "eye_scores": [
         {
           "eye": 1,
           "peak_blue": 255,
-          "peak_signal": 203
+          "peak_signal": 171
         },
         {
           "eye": 2,
           "peak_blue": 255,
-          "peak_signal": 186
+          "peak_signal": 162
         },
         {
           "eye": 3,
           "peak_blue": 255,
-          "peak_signal": 235
+          "peak_signal": 179
         }
       ]
     },
@@ -231,30 +232,30 @@
       "width": 48,
       "height": 48,
       "mode": "RGB",
-      "bytes": 5363,
-      "sha256": "36f4504b03589787790f66d8d899146f642a64c6ff780a4600fde03a84e73662",
+      "bytes": 6223,
+      "sha256": "566939181812cef5452625ec2107f4a5933f08ef56b537b66c6446f167745cf1",
       "crop_box": [
-        307,
-        219,
-        947,
-        859
+        251,
+        184,
+        773,
+        706
       ],
       "optical_tier": "micro",
       "eye_scores": [
         {
           "eye": 1,
           "peak_blue": 255,
-          "peak_signal": 190
+          "peak_signal": 182
         },
         {
           "eye": 2,
           "peak_blue": 255,
-          "peak_signal": 203
+          "peak_signal": 189
         },
         {
           "eye": 3,
           "peak_blue": 255,
-          "peak_signal": 247
+          "peak_signal": 175
         }
       ]
     },
@@ -265,30 +266,30 @@
       "width": 64,
       "height": 64,
       "mode": "RGB",
-      "bytes": 9137,
-      "sha256": "9897e280a67383144d5b341b61b06e92ca009bdbfb84888c533e2a55c35c145e",
+      "bytes": 10346,
+      "sha256": "2aa9a2ff64821aa7a5ce848e8e9cf5ba216f757c2f253767daac6aee4204cd48",
       "crop_box": [
-        226,
-        100,
-        1029,
-        903
+        184,
+        103,
+        839,
+        758
       ],
       "optical_tier": "compact",
       "eye_scores": [
         {
           "eye": 1,
           "peak_blue": 255,
-          "peak_signal": 207
+          "peak_signal": 194
         },
         {
           "eye": 2,
           "peak_blue": 255,
-          "peak_signal": 210
+          "peak_signal": 211
         },
         {
           "eye": 3,
           "peak_blue": 255,
-          "peak_signal": 251
+          "peak_signal": 177
         }
       ]
     },
@@ -299,30 +300,30 @@
       "width": 96,
       "height": 96,
       "mode": "RGB",
-      "bytes": 19806,
-      "sha256": "b6e269acf3fac811d99a17b711eb69d4d929881de4814fa274722ef5b87baf0b",
+      "bytes": 22460,
+      "sha256": "880589c22957476165ed933e9ed78612d5d79c183451c19700f192ca8aace9b0",
       "crop_box": [
-        226,
-        100,
-        1029,
-        903
+        184,
+        103,
+        839,
+        758
       ],
       "optical_tier": "compact",
       "eye_scores": [
         {
           "eye": 1,
           "peak_blue": 255,
-          "peak_signal": 255
+          "peak_signal": 208
         },
         {
           "eye": 2,
           "peak_blue": 255,
-          "peak_signal": 248
+          "peak_signal": 238
         },
         {
           "eye": 3,
           "peak_blue": 255,
-          "peak_signal": 255
+          "peak_signal": 199
         }
       ]
     },
@@ -333,30 +334,30 @@
       "width": 128,
       "height": 128,
       "mode": "RGB",
-      "bytes": 34542,
-      "sha256": "ff6bbdff613acc55f7f004171fa67215b6b49b618b02bf5d3a88d48c780e8f18",
+      "bytes": 38967,
+      "sha256": "ff7ddcda86737a287adbbdf12eeb112e608c9694bd4be1d7ffd8aa8f0d2f18b9",
       "crop_box": [
-        226,
-        100,
-        1029,
-        903
+        184,
+        103,
+        839,
+        758
       ],
       "optical_tier": "compact",
       "eye_scores": [
         {
           "eye": 1,
           "peak_blue": 255,
-          "peak_signal": 253
+          "peak_signal": 226
         },
         {
           "eye": 2,
           "peak_blue": 255,
-          "peak_signal": 247
+          "peak_signal": 227
         },
         {
           "eye": 3,
           "peak_blue": 255,
-          "peak_signal": 255
+          "peak_signal": 212
         }
       ]
     },
@@ -367,30 +368,30 @@
       "width": 180,
       "height": 180,
       "mode": "RGB",
-      "bytes": 66979,
-      "sha256": "75ade137a7af57043a7ce42b3cac8e63e9720dd5dada0fb47c4afe5ffb13467d",
+      "bytes": 73582,
+      "sha256": "d3593a87a7458a95bc1b22299efc9c7ee15e26dd31aaf426a5ef454b45c8ab96",
       "crop_box": [
-        226,
-        100,
-        1029,
-        903
+        184,
+        103,
+        839,
+        758
       ],
       "optical_tier": "compact",
       "eye_scores": [
         {
           "eye": 1,
           "peak_blue": 255,
-          "peak_signal": 255
+          "peak_signal": 223
         },
         {
           "eye": 2,
           "peak_blue": 255,
-          "peak_signal": 255
+          "peak_signal": 224
         },
         {
           "eye": 3,
           "peak_blue": 255,
-          "peak_signal": 253
+          "peak_signal": 213
         }
       ]
     },
@@ -401,30 +402,98 @@
       "width": 192,
       "height": 192,
       "mode": "RGB",
-      "bytes": 75773,
-      "sha256": "705da099cde24a21c5ba471b5ac67af338cf9b6ca4a938901cf9f908f25caad3",
+      "bytes": 83151,
+      "sha256": "d193a4837c41be75da1edeb024eaa0ecf18920d6e74ea9cdf3a47ec958daa897",
       "crop_box": [
-        226,
-        100,
-        1029,
-        903
+        184,
+        103,
+        839,
+        758
       ],
       "optical_tier": "compact",
       "eye_scores": [
         {
           "eye": 1,
           "peak_blue": 255,
-          "peak_signal": 255
+          "peak_signal": 244
         },
         {
           "eye": 2,
           "peak_blue": 255,
-          "peak_signal": 246
+          "peak_signal": 213
         },
         {
           "eye": 3,
           "peak_blue": 255,
-          "peak_signal": 255
+          "peak_signal": 214
+        }
+      ]
+    },
+    {
+      "file": "assets/icons/runtime/square/crow-signal-192.webp",
+      "kind": "runtime-square-icon",
+      "source": "assets/marks/crow-signal-master.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGB",
+      "bytes": 18562,
+      "sha256": "f8cd7d117dfa9a7cbc10d4a8734dd7974d21fcbdf0253af1ff57e58fe9687103",
+      "crop_box": [
+        184,
+        103,
+        839,
+        758
+      ],
+      "optical_tier": "compact",
+      "eye_scores": [
+        {
+          "eye": 1,
+          "peak_blue": 255,
+          "peak_signal": 244
+        },
+        {
+          "eye": 2,
+          "peak_blue": 255,
+          "peak_signal": 213
+        },
+        {
+          "eye": 3,
+          "peak_blue": 255,
+          "peak_signal": 214
+        }
+      ]
+    },
+    {
+      "file": "assets/icons/runtime/square/crow-signal-192.avif",
+      "kind": "runtime-square-icon",
+      "source": "assets/marks/crow-signal-master.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGB",
+      "bytes": 14895,
+      "sha256": "6947ab30904a6879c2f3e1d03d44629d5f317f66eca62a7214df7bde4da08f37",
+      "crop_box": [
+        184,
+        103,
+        839,
+        758
+      ],
+      "optical_tier": "compact",
+      "eye_scores": [
+        {
+          "eye": 1,
+          "peak_blue": 255,
+          "peak_signal": 244
+        },
+        {
+          "eye": 2,
+          "peak_blue": 255,
+          "peak_signal": 213
+        },
+        {
+          "eye": 3,
+          "peak_blue": 255,
+          "peak_signal": 214
         }
       ]
     },
@@ -435,30 +504,30 @@
       "width": 256,
       "height": 256,
       "mode": "RGB",
-      "bytes": 103405,
-      "sha256": "dea4da2edead995b0ccb431ce9c2fd20777fe9e7d72896aead334a2e8cadaace",
+      "bytes": 122217,
+      "sha256": "326f4c667be037d0dbe8a1e8fdfb10315b78b333777164ce626222d6f9dedda7",
       "crop_box": [
-        88,
-        0,
-        1166,
-        1078
+        82,
+        21,
+        942,
+        881
       ],
       "optical_tier": "standard",
       "eye_scores": [
         {
           "eye": 1,
           "peak_blue": 255,
-          "peak_signal": 255
+          "peak_signal": 249
         },
         {
           "eye": 2,
           "peak_blue": 255,
-          "peak_signal": 245
+          "peak_signal": 237
         },
         {
           "eye": 3,
           "peak_blue": 255,
-          "peak_signal": 255
+          "peak_signal": 221
         }
       ]
     },
@@ -469,30 +538,98 @@
       "width": 512,
       "height": 512,
       "mode": "RGB",
-      "bytes": 319308,
-      "sha256": "830b53da8581ef50cec9d759cab8a5e282b5241140b27e0d395b27e8670e21cd",
+      "bytes": 396519,
+      "sha256": "c1e82083dae43ad7e1904afb98f9d71ef6616e80fddee1d170d29562f6eb0e67",
       "crop_box": [
         0,
         0,
-        1254,
-        1254
+        1024,
+        1024
       ],
       "optical_tier": "full",
       "eye_scores": [
         {
           "eye": 1,
           "peak_blue": 255,
-          "peak_signal": 235
+          "peak_signal": 209
         },
         {
           "eye": 2,
           "peak_blue": 255,
-          "peak_signal": 227
+          "peak_signal": 211
         },
         {
           "eye": 3,
           "peak_blue": 255,
-          "peak_signal": 250
+          "peak_signal": 193
+        }
+      ]
+    },
+    {
+      "file": "assets/icons/runtime/square/crow-signal-512.webp",
+      "kind": "runtime-square-icon",
+      "source": "assets/marks/crow-signal-master.png",
+      "width": 512,
+      "height": 512,
+      "mode": "RGB",
+      "bytes": 67590,
+      "sha256": "5a7d4b6552c2a8b49185f409433999d83ee07b23c64de13117a15dfe496134fa",
+      "crop_box": [
+        0,
+        0,
+        1024,
+        1024
+      ],
+      "optical_tier": "full",
+      "eye_scores": [
+        {
+          "eye": 1,
+          "peak_blue": 255,
+          "peak_signal": 209
+        },
+        {
+          "eye": 2,
+          "peak_blue": 255,
+          "peak_signal": 211
+        },
+        {
+          "eye": 3,
+          "peak_blue": 255,
+          "peak_signal": 193
+        }
+      ]
+    },
+    {
+      "file": "assets/icons/runtime/square/crow-signal-512.avif",
+      "kind": "runtime-square-icon",
+      "source": "assets/marks/crow-signal-master.png",
+      "width": 512,
+      "height": 512,
+      "mode": "RGB",
+      "bytes": 52706,
+      "sha256": "2ffeca5ce670cfcd952449c9fd86c864d8e21f68122d103625b4e62cfe1c8098",
+      "crop_box": [
+        0,
+        0,
+        1024,
+        1024
+      ],
+      "optical_tier": "full",
+      "eye_scores": [
+        {
+          "eye": 1,
+          "peak_blue": 255,
+          "peak_signal": 209
+        },
+        {
+          "eye": 2,
+          "peak_blue": 255,
+          "peak_signal": 211
+        },
+        {
+          "eye": 3,
+          "peak_blue": 255,
+          "peak_signal": 193
         }
       ]
     },
@@ -503,30 +640,98 @@
       "width": 1024,
       "height": 1024,
       "mode": "RGB",
-      "bytes": 1209436,
-      "sha256": "ee65879a2cecd02ef9bb1d386738ef391158c3791ec0c4638cc9d48bf337ea9c",
+      "bytes": 1254662,
+      "sha256": "0d9ce14117fa37393df6d2ff90128c6de30d607ca48f65b53e2432b3f53b6913",
       "crop_box": [
         0,
         0,
-        1254,
-        1254
+        1024,
+        1024
       ],
       "optical_tier": "full",
       "eye_scores": [
         {
           "eye": 1,
           "peak_blue": 255,
-          "peak_signal": 251
+          "peak_signal": 210
         },
         {
           "eye": 2,
           "peak_blue": 255,
-          "peak_signal": 248
+          "peak_signal": 210
         },
         {
           "eye": 3,
           "peak_blue": 255,
-          "peak_signal": 250
+          "peak_signal": 194
+        }
+      ]
+    },
+    {
+      "file": "assets/icons/runtime/square/crow-signal-1024.webp",
+      "kind": "runtime-square-icon",
+      "source": "assets/marks/crow-signal-master.png",
+      "width": 1024,
+      "height": 1024,
+      "mode": "RGB",
+      "bytes": 154816,
+      "sha256": "a3a8f2b2d50577ffbb6aa0b67bbeb855dcaeb3cc6d6d14d3b8b0a8f886e02cfb",
+      "crop_box": [
+        0,
+        0,
+        1024,
+        1024
+      ],
+      "optical_tier": "full",
+      "eye_scores": [
+        {
+          "eye": 1,
+          "peak_blue": 255,
+          "peak_signal": 210
+        },
+        {
+          "eye": 2,
+          "peak_blue": 255,
+          "peak_signal": 210
+        },
+        {
+          "eye": 3,
+          "peak_blue": 255,
+          "peak_signal": 194
+        }
+      ]
+    },
+    {
+      "file": "assets/icons/runtime/square/crow-signal-1024.avif",
+      "kind": "runtime-square-icon",
+      "source": "assets/marks/crow-signal-master.png",
+      "width": 1024,
+      "height": 1024,
+      "mode": "RGB",
+      "bytes": 113890,
+      "sha256": "b7f621d7fdee9e63bb77f0cd13c1ef591b6fdc1b658490d2b9f5624a96f65f0a",
+      "crop_box": [
+        0,
+        0,
+        1024,
+        1024
+      ],
+      "optical_tier": "full",
+      "eye_scores": [
+        {
+          "eye": 1,
+          "peak_blue": 255,
+          "peak_signal": 210
+        },
+        {
+          "eye": 2,
+          "peak_blue": 255,
+          "peak_signal": 210
+        },
+        {
+          "eye": 3,
+          "peak_blue": 255,
+          "peak_signal": 194
         }
       ]
     },
@@ -584,8 +789,8 @@
           256
         ]
       ],
-      "bytes": 369966,
-      "sha256": "0e2a991721cf2d1f05a7f2d68704656cff8bd574e1fa931b2a19c848f24d8f15"
+      "bytes": 413542,
+      "sha256": "a5df8f2b21727d449aca1cd9e02ea586b67367c4d0b24d1941dae7c8f0666433"
     },
     {
       "file": "assets/icons/app/crow-signal-app-rounded-256.png",
@@ -594,13 +799,47 @@
       "width": 256,
       "height": 256,
       "mode": "RGBA",
-      "bytes": 94339,
-      "sha256": "29b9f9afe84e51392503bdd18041dd1e2c314f65bcce735da1c1514fedc04bd7",
+      "bytes": 128886,
+      "sha256": "c9a2bfa9bbe3c0b11d76fea3c2064b6570490a107c61bdc7883c3c3d56c048cf",
       "crop_box": [
         0,
         0,
-        1254,
-        1254
+        1024,
+        1024
+      ],
+      "corner_radius_ratio": 0.22
+    },
+    {
+      "file": "assets/icons/runtime/app/crow-signal-app-rounded-256.webp",
+      "kind": "runtime-rounded-app-icon",
+      "source": "assets/marks/crow-signal-master.png",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "bytes": 23534,
+      "sha256": "0a13edfe845775f08f4446dfc3b5886425e057cfb70af947411368fd00ea3fa3",
+      "crop_box": [
+        0,
+        0,
+        1024,
+        1024
+      ],
+      "corner_radius_ratio": 0.22
+    },
+    {
+      "file": "assets/icons/runtime/app/crow-signal-app-rounded-256.avif",
+      "kind": "runtime-rounded-app-icon",
+      "source": "assets/marks/crow-signal-master.png",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "bytes": 19523,
+      "sha256": "bb0847c4bdd96764795f409e65d7f55154800d34fd81138f16d6931fbe195c2f",
+      "crop_box": [
+        0,
+        0,
+        1024,
+        1024
       ],
       "corner_radius_ratio": 0.22
     },
@@ -611,13 +850,47 @@
       "width": 512,
       "height": 512,
       "mode": "RGBA",
-      "bytes": 372106,
-      "sha256": "0779dcaf9f723e13e560b59a325de9dadbf8356d5807401f5c3437aee5bf0a42",
+      "bytes": 460833,
+      "sha256": "df2580273e12ee114f1bc1d80fa600e80ca90881c425aa8e8e644e28e42e4096",
       "crop_box": [
         0,
         0,
-        1254,
-        1254
+        1024,
+        1024
+      ],
+      "corner_radius_ratio": 0.22
+    },
+    {
+      "file": "assets/icons/runtime/app/crow-signal-app-rounded-512.webp",
+      "kind": "runtime-rounded-app-icon",
+      "source": "assets/marks/crow-signal-master.png",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "bytes": 78966,
+      "sha256": "11d33b7d437754d222aa1d4dc012303ce9f9d5846480c0010725ee08c93f8fec",
+      "crop_box": [
+        0,
+        0,
+        1024,
+        1024
+      ],
+      "corner_radius_ratio": 0.22
+    },
+    {
+      "file": "assets/icons/runtime/app/crow-signal-app-rounded-512.avif",
+      "kind": "runtime-rounded-app-icon",
+      "source": "assets/marks/crow-signal-master.png",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "bytes": 63274,
+      "sha256": "f2195e4ff942bc2a1b7ffca2c42635aec9b88a8fb9a2cbe590747524a9fd9c35",
+      "crop_box": [
+        0,
+        0,
+        1024,
+        1024
       ],
       "corner_radius_ratio": 0.22
     },
@@ -628,13 +901,47 @@
       "width": 1024,
       "height": 1024,
       "mode": "RGBA",
-      "bytes": 1352750,
-      "sha256": "30725f9aa921822d2daf1a101a2fbb310463f6b64deefa7a8b3af52f18456e2e",
+      "bytes": 1408941,
+      "sha256": "af815eb99d53985ee5f180f89667b8ebb0bd607b9302549fdfb670150c007327",
       "crop_box": [
         0,
         0,
-        1254,
-        1254
+        1024,
+        1024
+      ],
+      "corner_radius_ratio": 0.22
+    },
+    {
+      "file": "assets/icons/runtime/app/crow-signal-app-rounded-1024.webp",
+      "kind": "runtime-rounded-app-icon",
+      "source": "assets/marks/crow-signal-master.png",
+      "width": 1024,
+      "height": 1024,
+      "mode": "RGBA",
+      "bytes": 155830,
+      "sha256": "e960369e9761bbed9a52443da698209eff0307d593baa4b1bf80ea19a3a0e0c7",
+      "crop_box": [
+        0,
+        0,
+        1024,
+        1024
+      ],
+      "corner_radius_ratio": 0.22
+    },
+    {
+      "file": "assets/icons/runtime/app/crow-signal-app-rounded-1024.avif",
+      "kind": "runtime-rounded-app-icon",
+      "source": "assets/marks/crow-signal-master.png",
+      "width": 1024,
+      "height": 1024,
+      "mode": "RGBA",
+      "bytes": 116786,
+      "sha256": "6e4342ccb0639bc71b3ef15bce482362e04536ab175964ddb2a295d2a0955551",
+      "crop_box": [
+        0,
+        0,
+        1024,
+        1024
       ],
       "corner_radius_ratio": 0.22
     },
@@ -645,29 +952,93 @@
       "width": 512,
       "height": 512,
       "mode": "RGB",
-      "bytes": 471123,
-      "sha256": "ce0a32d4a8fd410233548d2ee7f094399a07d326804281fba92ee6ab7cb3d5fe",
+      "bytes": 419493,
+      "sha256": "7f20ac300e16a6f4fa4ff54b2701d2bd11daf104ae410a19f12a8c7c57bd10f7",
       "crop_box": [
-        176,
-        75,
-        1079,
-        978
+        62,
+        0,
+        963,
+        901
       ]
     },
     {
-      "file": "assets/icons/avatars/pet-companion-avatar-512.png",
-      "kind": "pet-avatar",
-      "source": "assets/mascots/masters/pet-companion.png",
+      "file": "assets/icons/runtime/avatars/crow-signal-avatar-512.webp",
+      "kind": "runtime-avatar",
+      "source": "assets/marks/crow-signal-master.png",
       "width": 512,
       "height": 512,
       "mode": "RGB",
-      "bytes": 430444,
-      "sha256": "393b0dfd5cd86ce69b51a90dc784ac443e76ea358b44ff716ba0dee4ea0f9501",
+      "bytes": 77682,
+      "sha256": "8a6c813ec1300fa3a09661948c1a12eec46c1326cb895a0f4c11ff7fdd868f04",
       "crop_box": [
-        215,
-        77,
-        932,
-        794
+        62,
+        0,
+        963,
+        901
+      ]
+    },
+    {
+      "file": "assets/icons/runtime/avatars/crow-signal-avatar-512.avif",
+      "kind": "runtime-avatar",
+      "source": "assets/marks/crow-signal-master.png",
+      "width": 512,
+      "height": 512,
+      "mode": "RGB",
+      "bytes": 59277,
+      "sha256": "63c7aa4525f939e1727e45fa4783e349a095cfb3fe7b34b503db2dbe02050ab9",
+      "crop_box": [
+        62,
+        0,
+        963,
+        901
+      ]
+    },
+    {
+      "file": "assets/icons/avatars/crow-mascot-avatar-512.png",
+      "kind": "canonical-mascot-avatar",
+      "source": "assets/mascots/masters/crow-mascot-v3.png",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "bytes": 385675,
+      "sha256": "390fd441980b9212b33d495953898436a02b2501f27628eda05d0d234e8ae87e",
+      "crop_box": [
+        238,
+        25,
+        1141,
+        928
+      ]
+    },
+    {
+      "file": "assets/icons/runtime/avatars/crow-mascot-avatar-512.webp",
+      "kind": "runtime-canonical-mascot-avatar",
+      "source": "assets/mascots/masters/crow-mascot-v3.png",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "bytes": 76102,
+      "sha256": "e372571041c0a1183d747c2f8926b556e7d7ab56501c7a09be6f87018c9b03e4",
+      "crop_box": [
+        238,
+        25,
+        1141,
+        928
+      ]
+    },
+    {
+      "file": "assets/icons/runtime/avatars/crow-mascot-avatar-512.avif",
+      "kind": "runtime-canonical-mascot-avatar",
+      "source": "assets/mascots/masters/crow-mascot-v3.png",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "bytes": 59765,
+      "sha256": "dd705a6255171aea6601fe24f702e7e30ca3f8a2773df50e25d821639dbbb17f",
+      "crop_box": [
+        238,
+        25,
+        1141,
+        928
       ]
     },
     {
@@ -677,9 +1048,9 @@
       "width": 2400,
       "height": 1760,
       "mode": "RGB",
-      "bytes": 879645,
-      "sha256": "a688dff1772c1610fe79d3e67205aaa4281f607e69b3e61e7f43bdbc290d5317",
-      "secondary_source": "assets/mascots/masters/pet-companion.png"
+      "bytes": 931665,
+      "sha256": "42fab132538dccc348c70fa3ec5cf6d635c58e2538e4c4e7c6a72c97b01c518b",
+      "secondary_source": "assets/mascots/masters/crow-mascot-v3.png"
     }
   ]
 }

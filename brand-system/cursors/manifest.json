@@ -1,12 +1,32 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "name": "Crow Talon",
-  "version": "1.0.0",
-  "description": "Original procedural Windows cursor family for the Crow Theme.",
+  "version": "0.3.0",
+  "description": "Four-talon biomechanical crow-foot Windows cursor family for the Crow Theme.",
   "authorship": {
-    "method": "Drawn from original geometric primitives in scripts/build_cursors.py",
+    "method": "Drawn from original geometric primitives with native 32- and 48-pixel rendering in scripts/build_cursors.py",
     "third_party_art": false,
-    "system_cursor_assets_embedded": false
+    "system_cursor_assets_embedded": false,
+    "identity_reference": {
+      "name": "Approved full biomechanical three-eyed Crow mascot",
+      "source_filename": "crow-mascot-v3.png",
+      "usage": "Visual identity reference only; raster not embedded"
+    }
+  },
+  "design": {
+    "geometry": "hard-edged native 32- and 48-pixel sources with direct 64- and 96-pixel renders",
+    "primary_pointer": "anisodactyl cybernetic crow foot with exactly three forward hooked toes, one opposed rear hallux, compact palm, and segmented tarsus",
+    "default_visible_art_scale": 1.0,
+    "scale_calibration": "native 32- and 48-pixel footprints calibrated to standard Windows pointer dimensions before larger direct renders",
+    "fill": [
+      "black",
+      "night",
+      "gunmetal"
+    ],
+    "edge": "signal cyan",
+    "identity_signal": "restrained ultraviolet mechanical joint nodes",
+    "warm_colours": false,
+    "alpha": "1-bit"
   },
   "windows_scheme_order": [
     "Arrow",
@@ -41,7 +61,8 @@
     "static_fallbacks": [
       "windows/working.cur",
       "windows/busy.cur"
-    ]
+    ],
+    "busy_wait_state": "centered mechanical orb with twelve rotating hooked talon plates"
   },
   "installers": {
     "recommended_per_user": "install.ps1",
@@ -49,556 +70,1339 @@
     "classic_inf": "Crow-Talon.inf",
     "installed_during_build": false
   },
+  "distribution": {
+    "archive": "downloads/Crow-Talon-Windows-v0.3.0.zip",
+    "archive_sha256": "downloads/Crow-Talon-Windows-v0.3.0.sha256",
+    "payload_sha256": "cursors/package-files.sha256",
+    "extract_before_install": true
+  },
   "preview": {
     "path": "preview.png",
-    "width": 1100,
-    "height": 540,
-    "sha256": "4A72F8F9683039EC3CFEAD50852DC1D93D419A8374E43DEF1B24475447950C09"
+    "width": 1600,
+    "height": 1010,
+    "sha256": "48884FFDD1C2D923C75F6B93859E07984B8FF5F46C796577DE0D45695548FD9C",
+    "native_size_proof": {
+      "path": "previews/native-size-proof.png",
+      "sha256": "2C0586D777C39AA581B54AECF8B93D5591EF135B8D25020606B9C88D76537DE3",
+      "backgrounds": [
+        "dark",
+        "light"
+      ],
+      "sizes": [
+        32,
+        48
+      ]
+    },
+    "animation_frame_proof": {
+      "path": "previews/animation-frames.png",
+      "sha256": "31AC005955A2195C42AEB667A34B916EB89B4F920944CA6B58DD903A0175FC55",
+      "native_size": 32,
+      "magnification": 3,
+      "frames_per_role": 12
+    }
   },
   "roles": [
     {
       "role": "normal",
       "windows_registry_name": "Arrow",
+      "visible_art_scale": 1.0,
       "source_png": "src/normal.png",
+      "native_source_pngs": [
+        "src/32/normal.png",
+        "src/48/normal.png"
+      ],
       "static_cursor": "windows/normal.cur",
+      "pixel_source": {
+        "32": {
+          "grid": [
+            32,
+            32
+          ],
+          "alpha": "1-bit",
+          "palette_colours_used": 9,
+          "opaque_pixels": 435,
+          "bounds": [
+            1,
+            1,
+            32,
+            32
+          ],
+          "hotspot_is_opaque": true
+        },
+        "48": {
+          "grid": [
+            48,
+            48
+          ],
+          "alpha": "1-bit",
+          "palette_colours_used": 10,
+          "opaque_pixels": 1001,
+          "bounds": [
+            1,
+            2,
+            48,
+            47
+          ],
+          "hotspot_is_opaque": true
+        },
+        "anatomy_32": {
+          "anatomy": "anisodactyl",
+          "forward_toes": 3,
+          "rear_hallux": 1,
+          "compact_palm": true,
+          "segmented_tarsus": true,
+          "landmark_anchors_opaque": [
+            "digit_ii_tip",
+            "digit_iii_hotspot",
+            "digit_iv_tip",
+            "hallux_hook",
+            "palm",
+            "tarsus"
+          ]
+        },
+        "anatomy_48": {
+          "anatomy": "anisodactyl",
+          "forward_toes": 3,
+          "rear_hallux": 1,
+          "compact_palm": true,
+          "segmented_tarsus": true,
+          "landmark_anchors_opaque": [
+            "digit_ii_tip",
+            "digit_iii_hotspot",
+            "digit_iv_tip",
+            "hallux_hook",
+            "palm",
+            "tarsus"
+          ]
+        }
+      },
       "embedded_images": [
         {
           "size": 32,
-          "hotspot_x": 3,
-          "hotspot_y": 2,
-          "bytes": 1955
+          "hotspot_x": 1,
+          "hotspot_y": 1,
+          "bytes": 860
         },
         {
           "size": 48,
-          "hotspot_x": 4,
-          "hotspot_y": 4,
-          "bytes": 3526
+          "hotspot_x": 2,
+          "hotspot_y": 2,
+          "bytes": 1110
         },
         {
           "size": 64,
-          "hotspot_x": 5,
-          "hotspot_y": 5,
-          "bytes": 5598
+          "hotspot_x": 2,
+          "hotspot_y": 2,
+          "bytes": 1433
         },
         {
           "size": 96,
-          "hotspot_x": 8,
-          "hotspot_y": 7,
-          "bytes": 9472
+          "hotspot_x": 3,
+          "hotspot_y": 3,
+          "bytes": 2044
         }
       ],
       "sha256": {
-        "windows/normal.cur": "98D6182631B1E0BA56525A9F39D6E41C2CF1A5832AC4EC104793D52EC51171C9"
+        "src/normal.png": "679577C55C8C30FE8EB9682C0C6DE8CA0343180C78B1721DC621EFF31E510BD2",
+        "src/32/normal.png": "FB63E28ABA35B7A17FC77227C5B72612C4A2CF12D200963CC2E9D4B03FFFDDEA",
+        "src/48/normal.png": "50686C46009E77088DA96D97ECE83A337C5A3441D489EF4F7E2C10626C513749",
+        "windows/normal.cur": "C2C826004D8281239EF2BD5D1A8EEBD24C596A7EED7037EEB96F34AA3D4325CC"
       }
     },
     {
       "role": "help",
       "windows_registry_name": "Help",
+      "visible_art_scale": 1.0,
       "source_png": "src/help.png",
+      "native_source_pngs": [
+        "src/32/help.png",
+        "src/48/help.png"
+      ],
       "static_cursor": "windows/help.cur",
+      "pixel_source": {
+        "32": {
+          "grid": [
+            32,
+            32
+          ],
+          "alpha": "1-bit",
+          "palette_colours_used": 10,
+          "opaque_pixels": 551,
+          "bounds": [
+            1,
+            1,
+            32,
+            32
+          ],
+          "hotspot_is_opaque": true
+        },
+        "48": {
+          "grid": [
+            48,
+            48
+          ],
+          "alpha": "1-bit",
+          "palette_colours_used": 10,
+          "opaque_pixels": 1242,
+          "bounds": [
+            1,
+            2,
+            48,
+            47
+          ],
+          "hotspot_is_opaque": true
+        }
+      },
       "embedded_images": [
         {
           "size": 32,
-          "hotspot_x": 3,
-          "hotspot_y": 2,
-          "bytes": 2519
+          "hotspot_x": 1,
+          "hotspot_y": 1,
+          "bytes": 938
         },
         {
           "size": 48,
-          "hotspot_x": 4,
-          "hotspot_y": 4,
-          "bytes": 4621
+          "hotspot_x": 2,
+          "hotspot_y": 2,
+          "bytes": 1185
         },
         {
           "size": 64,
-          "hotspot_x": 5,
-          "hotspot_y": 5,
-          "bytes": 7518
+          "hotspot_x": 2,
+          "hotspot_y": 2,
+          "bytes": 1525
         },
         {
           "size": 96,
-          "hotspot_x": 8,
-          "hotspot_y": 7,
-          "bytes": 12717
+          "hotspot_x": 3,
+          "hotspot_y": 3,
+          "bytes": 2103
         }
       ],
       "sha256": {
-        "windows/help.cur": "E2023A4DDFED009C88FCB458337AF27DF8CDF9B4184682482B2D9869FAC5C82C"
+        "src/help.png": "63BCEACC50C9A5B6B12D3E1E31DA04342A75F27FFE4A57FA1F1EA4C1DDA4680E",
+        "src/32/help.png": "C33AA488DFAF45081213B5527BC8CCA9F5ACE232C5808246D0B638E5E0FD4A03",
+        "src/48/help.png": "4180F788C0F3E7578DEAAEB9814A40C1710E0BD4F89CBE7B118B9D22EAFB0268",
+        "windows/help.cur": "7E8A0DDAF8C6F0831B56E7A9D70AA302E2C2549A7FB48B71E5A2D7EEA2C7B9B7"
       }
     },
     {
       "role": "working",
       "windows_registry_name": "AppStarting",
+      "visible_art_scale": 1.0,
       "source_png": "src/working.png",
+      "native_source_pngs": [
+        "src/32/working.png",
+        "src/48/working.png"
+      ],
       "static_cursor": "windows/working.cur",
+      "pixel_source": {
+        "32": {
+          "grid": [
+            32,
+            32
+          ],
+          "alpha": "1-bit",
+          "palette_colours_used": 9,
+          "opaque_pixels": 538,
+          "bounds": [
+            1,
+            1,
+            32,
+            32
+          ],
+          "hotspot_is_opaque": true
+        },
+        "48": {
+          "grid": [
+            48,
+            48
+          ],
+          "alpha": "1-bit",
+          "palette_colours_used": 9,
+          "opaque_pixels": 1229,
+          "bounds": [
+            1,
+            2,
+            48,
+            48
+          ],
+          "hotspot_is_opaque": true
+        }
+      },
       "embedded_images": [
         {
           "size": 32,
-          "hotspot_x": 3,
-          "hotspot_y": 2,
-          "bytes": 2391
+          "hotspot_x": 1,
+          "hotspot_y": 1,
+          "bytes": 853
         },
         {
           "size": 48,
-          "hotspot_x": 4,
-          "hotspot_y": 4,
-          "bytes": 4374
+          "hotspot_x": 2,
+          "hotspot_y": 2,
+          "bytes": 1121
         },
         {
           "size": 64,
-          "hotspot_x": 5,
-          "hotspot_y": 5,
-          "bytes": 6939
+          "hotspot_x": 2,
+          "hotspot_y": 2,
+          "bytes": 1439
         },
         {
           "size": 96,
-          "hotspot_x": 8,
-          "hotspot_y": 7,
-          "bytes": 11815
+          "hotspot_x": 3,
+          "hotspot_y": 3,
+          "bytes": 1952
         }
       ],
       "sha256": {
-        "windows/working.cur": "3F9BBE0070EF48DFE85CF4DA5CB712AE56D6A0BAE136851B08EB04ED7C08FA44",
-        "windows/working.ani": "49CEB16F7395081B129943B44D845CFCAE102DF254AFDA9B226DB7864A755FA6"
+        "src/working.png": "5B14534E1B633F7F8EC92F9E029CC136EDEA5484AB5BAEBC62E19890DB604D09",
+        "src/32/working.png": "ADBA3C748A158F507C5E885837AB3AD7C27EBEFC1F726B5DDF65E6672E322583",
+        "src/48/working.png": "7F3083A8787A21021C24627B2357B26184FF655CC5D22F62FD9B66A567D033FE",
+        "windows/working.cur": "2B15F145FDAEA0030DCBC8490856B604D102CB3F9C3A9D925235BAB9BBEB24F8",
+        "windows/working.ani": "D9C0ECA42C2459C41DBF157A0238B0CDD15BF9A1EF331B04E53F511D842687E3"
       },
       "animated_cursor": "windows/working.ani",
       "animation": {
         "frames": 12,
         "steps": 12,
-        "jiffies": 5
+        "jiffies": 5,
+        "unique_frames": 12,
+        "native_motion": {
+          "32": {
+            "unique_frames": 12,
+            "minimum_pixels_changed_per_step": 4,
+            "maximum_pixels_changed_per_step": 4,
+            "mean_pixels_changed_per_step": 4.0,
+            "minimum_required": 4
+          },
+          "48": {
+            "unique_frames": 12,
+            "minimum_pixels_changed_per_step": 10,
+            "maximum_pixels_changed_per_step": 16,
+            "mean_pixels_changed_per_step": 13.33,
+            "minimum_required": 8
+          }
+        }
       }
     },
     {
       "role": "busy",
       "windows_registry_name": "Wait",
+      "visible_art_scale": 1.0,
       "source_png": "src/busy.png",
+      "native_source_pngs": [
+        "src/32/busy.png",
+        "src/48/busy.png"
+      ],
       "static_cursor": "windows/busy.cur",
+      "pixel_source": {
+        "32": {
+          "grid": [
+            32,
+            32
+          ],
+          "alpha": "1-bit",
+          "palette_colours_used": 9,
+          "opaque_pixels": 555,
+          "bounds": [
+            1,
+            1,
+            32,
+            32
+          ],
+          "hotspot_is_opaque": true
+        },
+        "48": {
+          "grid": [
+            48,
+            48
+          ],
+          "alpha": "1-bit",
+          "palette_colours_used": 9,
+          "opaque_pixels": 1225,
+          "bounds": [
+            1,
+            2,
+            48,
+            47
+          ],
+          "hotspot_is_opaque": true
+        }
+      },
       "embedded_images": [
         {
           "size": 32,
           "hotspot_x": 16,
           "hotspot_y": 16,
-          "bytes": 2106
+          "bytes": 687
         },
         {
           "size": 48,
           "hotspot_x": 24,
           "hotspot_y": 24,
-          "bytes": 3572
+          "bytes": 1066
         },
         {
           "size": 64,
           "hotspot_x": 32,
           "hotspot_y": 32,
-          "bytes": 5296
+          "bytes": 1435
         },
         {
           "size": 96,
           "hotspot_x": 48,
           "hotspot_y": 48,
-          "bytes": 8492
+          "bytes": 1973
         }
       ],
       "sha256": {
-        "windows/busy.cur": "B5348A685CD8572D9016D8C2FF075E12B90D9F162433601DE2102178C5BCB3AC",
-        "windows/busy.ani": "7534D39DCCE306D85F6DFA9DB61178638DF372D6F4F76440BC6348075D79F07E"
+        "src/busy.png": "3124AD00D3331FFC128AB959E2B035AC45E6A79517FEEA575C234AFF5A8A0E70",
+        "src/32/busy.png": "0DC0BBE7F58FD836904278FA7E9996842B5A6922A07D2AA56B003854D8F4C387",
+        "src/48/busy.png": "BA1256C21EFFFA08E2D41C29E05F18BF524FC4860811B2F7AD2CEA3AE08CCB61",
+        "windows/busy.cur": "6297E205C76ABBBFE57909F4704AE630AD5AD238CFCBA33F33CA5144B42164AE",
+        "windows/busy.ani": "130987862F10F512201BF856C269DAA2818851CFEA9DC3C59516D159D51482AA"
       },
       "animated_cursor": "windows/busy.ani",
       "animation": {
         "frames": 12,
         "steps": 12,
-        "jiffies": 5
+        "jiffies": 5,
+        "unique_frames": 12,
+        "native_motion": {
+          "32": {
+            "unique_frames": 12,
+            "minimum_pixels_changed_per_step": 68,
+            "maximum_pixels_changed_per_step": 77,
+            "mean_pixels_changed_per_step": 73.5,
+            "minimum_required": 24
+          },
+          "48": {
+            "unique_frames": 12,
+            "minimum_pixels_changed_per_step": 158,
+            "maximum_pixels_changed_per_step": 174,
+            "mean_pixels_changed_per_step": 165.0,
+            "minimum_required": 60
+          }
+        }
       }
     },
     {
       "role": "precision",
       "windows_registry_name": "Crosshair",
+      "visible_art_scale": 1.0,
       "source_png": "src/precision.png",
+      "native_source_pngs": [
+        "src/32/precision.png",
+        "src/48/precision.png"
+      ],
       "static_cursor": "windows/precision.cur",
+      "pixel_source": {
+        "32": {
+          "grid": [
+            32,
+            32
+          ],
+          "alpha": "1-bit",
+          "palette_colours_used": 5,
+          "opaque_pixels": 235,
+          "bounds": [
+            1,
+            1,
+            31,
+            31
+          ],
+          "hotspot_is_opaque": true
+        },
+        "48": {
+          "grid": [
+            48,
+            48
+          ],
+          "alpha": "1-bit",
+          "palette_colours_used": 5,
+          "opaque_pixels": 505,
+          "bounds": [
+            2,
+            2,
+            46,
+            46
+          ],
+          "hotspot_is_opaque": true
+        }
+      },
       "embedded_images": [
         {
           "size": 32,
           "hotspot_x": 16,
           "hotspot_y": 16,
-          "bytes": 1970
+          "bytes": 274
         },
         {
           "size": 48,
           "hotspot_x": 24,
           "hotspot_y": 24,
-          "bytes": 3614
+          "bytes": 332
         },
         {
           "size": 64,
           "hotspot_x": 32,
           "hotspot_y": 32,
-          "bytes": 5472
+          "bytes": 408
         },
         {
           "size": 96,
           "hotspot_x": 48,
           "hotspot_y": 48,
-          "bytes": 8404
+          "bytes": 549
         }
       ],
       "sha256": {
-        "windows/precision.cur": "52008ACB71EA5AD1C1536B3E9F8CB87E1D685AA663B0054C6A031BF9D34FD325"
+        "src/precision.png": "5A0B05E2B3971DB6F612B7344D7B01FF59A9C7F1311F7EAAEE6120231A34B4AF",
+        "src/32/precision.png": "0716DB52B15DECEB76109798F65CE857AE87EAA71773BC3CC0E306DEC8C3B5DA",
+        "src/48/precision.png": "A54468DEBD75F700ADBFF508CB7341CFB2DAD1395F3406AC6F42448F9AC1A879",
+        "windows/precision.cur": "B376E78AA659DCA00A483AF2899C571D6B1B6820250F8A21FD583700C4A75092"
       }
     },
     {
       "role": "text",
       "windows_registry_name": "IBeam",
+      "visible_art_scale": 1.0,
       "source_png": "src/text.png",
+      "native_source_pngs": [
+        "src/32/text.png",
+        "src/48/text.png"
+      ],
       "static_cursor": "windows/text.cur",
+      "pixel_source": {
+        "32": {
+          "grid": [
+            32,
+            32
+          ],
+          "alpha": "1-bit",
+          "palette_colours_used": 5,
+          "opaque_pixels": 219,
+          "bounds": [
+            8,
+            1,
+            25,
+            32
+          ],
+          "hotspot_is_opaque": true
+        },
+        "48": {
+          "grid": [
+            48,
+            48
+          ],
+          "alpha": "1-bit",
+          "palette_colours_used": 5,
+          "opaque_pixels": 443,
+          "bounds": [
+            12,
+            1,
+            37,
+            48
+          ],
+          "hotspot_is_opaque": true
+        }
+      },
       "embedded_images": [
         {
           "size": 32,
           "hotspot_x": 16,
           "hotspot_y": 16,
-          "bytes": 1170
+          "bytes": 253
         },
         {
           "size": 48,
           "hotspot_x": 24,
           "hotspot_y": 24,
-          "bytes": 1541
+          "bytes": 371
         },
         {
           "size": 64,
           "hotspot_x": 32,
           "hotspot_y": 32,
-          "bytes": 2379
+          "bytes": 466
         },
         {
           "size": 96,
           "hotspot_x": 48,
           "hotspot_y": 48,
-          "bytes": 3003
+          "bytes": 587
         }
       ],
       "sha256": {
-        "windows/text.cur": "6C35432537B1F7DACD711B82F5F9216CF74C00FF86F9C1821654B6CD79186598"
+        "src/text.png": "6B3C2AAEDE5295934947CE652BFF7993B1490CD3D0D43A836846FFEFE16DB15F",
+        "src/32/text.png": "E003135008D9EA2142C2E393215C327249FCE5C5C8BDCCF1A0C04F6F2AE2DEAD",
+        "src/48/text.png": "A53683F82302832CE09DCF2F1BAB5F47D0AD13F50ACE8C97E5E6D1A712DACE0A",
+        "windows/text.cur": "08AAFBAD188FDB55A160C6BFD9A8A5B3E7BDC6F6DB92CCFEFAED03520F53F86E"
       }
     },
     {
       "role": "handwriting",
       "windows_registry_name": "NWPen",
+      "visible_art_scale": 1.0,
       "source_png": "src/handwriting.png",
+      "native_source_pngs": [
+        "src/32/handwriting.png",
+        "src/48/handwriting.png"
+      ],
       "static_cursor": "windows/handwriting.cur",
+      "pixel_source": {
+        "32": {
+          "grid": [
+            32,
+            32
+          ],
+          "alpha": "1-bit",
+          "palette_colours_used": 6,
+          "opaque_pixels": 245,
+          "bounds": [
+            2,
+            2,
+            29,
+            30
+          ],
+          "hotspot_is_opaque": true
+        },
+        "48": {
+          "grid": [
+            48,
+            48
+          ],
+          "alpha": "1-bit",
+          "palette_colours_used": 6,
+          "opaque_pixels": 576,
+          "bounds": [
+            3,
+            2,
+            42,
+            46
+          ],
+          "hotspot_is_opaque": true
+        }
+      },
       "embedded_images": [
         {
           "size": 32,
-          "hotspot_x": 4,
-          "hotspot_y": 28,
-          "bytes": 1481
+          "hotspot_x": 3,
+          "hotspot_y": 29,
+          "bytes": 396
         },
         {
           "size": 48,
-          "hotspot_x": 6,
-          "hotspot_y": 42,
-          "bytes": 2745
+          "hotspot_x": 4,
+          "hotspot_y": 44,
+          "bytes": 553
         },
         {
           "size": 64,
-          "hotspot_x": 9,
-          "hotspot_y": 56,
-          "bytes": 4429
+          "hotspot_x": 6,
+          "hotspot_y": 58,
+          "bytes": 686
         },
         {
           "size": 96,
-          "hotspot_x": 13,
-          "hotspot_y": 84,
-          "bytes": 7488
+          "hotspot_x": 9,
+          "hotspot_y": 87,
+          "bytes": 1007
         }
       ],
       "sha256": {
-        "windows/handwriting.cur": "EE15B9C10B15B9F9E263913AAEF755D9D978D4C816EA6E0E1691B7351CCA00AA"
+        "src/handwriting.png": "C1C79E0F9106D681F0F6CCE5B654F8D94C571EDD57B49D3E466947A2B09D6E08",
+        "src/32/handwriting.png": "5B970D82415139ACCE5E2DFE276BB1071330019E2FDD5E609AA388F6B60AA875",
+        "src/48/handwriting.png": "88CE93E604B4237F5A621BFCAA572A51B97A812384DA5AB4FD9ECEDDD46C2F1B",
+        "windows/handwriting.cur": "DB6D330A412C6B83DE171C238B6BCC16CC5644F38E1B0D6FA4B5A55A8CDF93BB"
       }
     },
     {
       "role": "unavailable",
       "windows_registry_name": "No",
+      "visible_art_scale": 1.0,
       "source_png": "src/unavailable.png",
+      "native_source_pngs": [
+        "src/32/unavailable.png",
+        "src/48/unavailable.png"
+      ],
       "static_cursor": "windows/unavailable.cur",
+      "pixel_source": {
+        "32": {
+          "grid": [
+            32,
+            32
+          ],
+          "alpha": "1-bit",
+          "palette_colours_used": 7,
+          "opaque_pixels": 787,
+          "bounds": [
+            1,
+            2,
+            32,
+            31
+          ],
+          "hotspot_is_opaque": true
+        },
+        "48": {
+          "grid": [
+            48,
+            48
+          ],
+          "alpha": "1-bit",
+          "palette_colours_used": 7,
+          "opaque_pixels": 1761,
+          "bounds": [
+            2,
+            2,
+            47,
+            47
+          ],
+          "hotspot_is_opaque": true
+        }
+      },
       "embedded_images": [
         {
           "size": 32,
           "hotspot_x": 16,
           "hotspot_y": 16,
-          "bytes": 2145
+          "bytes": 570
         },
         {
           "size": 48,
           "hotspot_x": 24,
           "hotspot_y": 24,
-          "bytes": 3659
+          "bytes": 713
         },
         {
           "size": 64,
           "hotspot_x": 32,
           "hotspot_y": 32,
-          "bytes": 5404
+          "bytes": 896
         },
         {
           "size": 96,
           "hotspot_x": 48,
           "hotspot_y": 48,
-          "bytes": 7783
+          "bytes": 1293
         }
       ],
       "sha256": {
-        "windows/unavailable.cur": "4D6B80B54A7C48F375ADB5A62CE99D7FCC8752BD3DA705C810A4724110ED2A69"
+        "src/unavailable.png": "65D2ED4C19A1E3EF5271D0E4D3B2C630E377BE1503E81E378DAFBE70650FE010",
+        "src/32/unavailable.png": "E6CE96C7F23EC9B1FB3A5C39286D762BAB84EE8039F89450B700F76D09D8BF7C",
+        "src/48/unavailable.png": "95E71B769750D9FAE9C1BAF024680C0EE7960775B7D841DC41159F9E2CBA863C",
+        "windows/unavailable.cur": "061D8ECD46DC73F78005989D92931DF11124AFB2951D45E20DF03362F7A4BE5C"
       }
     },
     {
       "role": "resize-v",
       "windows_registry_name": "SizeNS",
+      "visible_art_scale": 1.0,
       "source_png": "src/resize-v.png",
+      "native_source_pngs": [
+        "src/32/resize-v.png",
+        "src/48/resize-v.png"
+      ],
       "static_cursor": "windows/resize-v.cur",
+      "pixel_source": {
+        "32": {
+          "grid": [
+            32,
+            32
+          ],
+          "alpha": "1-bit",
+          "palette_colours_used": 7,
+          "opaque_pixels": 201,
+          "bounds": [
+            11,
+            1,
+            22,
+            32
+          ],
+          "hotspot_is_opaque": true
+        },
+        "48": {
+          "grid": [
+            48,
+            48
+          ],
+          "alpha": "1-bit",
+          "palette_colours_used": 7,
+          "opaque_pixels": 455,
+          "bounds": [
+            18,
+            1,
+            32,
+            48
+          ],
+          "hotspot_is_opaque": true
+        }
+      },
       "embedded_images": [
         {
           "size": 32,
           "hotspot_x": 16,
           "hotspot_y": 16,
-          "bytes": 913
+          "bytes": 368
         },
         {
           "size": 48,
           "hotspot_x": 24,
           "hotspot_y": 24,
-          "bytes": 1391
+          "bytes": 497
         },
         {
           "size": 64,
           "hotspot_x": 32,
           "hotspot_y": 32,
-          "bytes": 2017
+          "bytes": 632
         },
         {
           "size": 96,
           "hotspot_x": 48,
           "hotspot_y": 48,
-          "bytes": 3136
+          "bytes": 887
         }
       ],
       "sha256": {
-        "windows/resize-v.cur": "51BAB086A63DE67925477601E0FCF710B67293BE2A89034E1E6F76F0376789E1"
+        "src/resize-v.png": "FAF543771E3DD5595FD6404168C60E3ED5F50C355956A4C4F264BFC1C100C764",
+        "src/32/resize-v.png": "3AA59B03699BA52FE3EC748822D4989BEA07989B91C99D8BFA5F968BB58057E9",
+        "src/48/resize-v.png": "C9A826AF2DBDF7E332880B5EFF36C708AE6DF0622BDD998BB3115EDBCD923906",
+        "windows/resize-v.cur": "ADF42960FBE83AF8465EE728B2F920CD96EBCA3321A0D2218C46A88953719FBC"
       }
     },
     {
       "role": "resize-h",
       "windows_registry_name": "SizeWE",
+      "visible_art_scale": 1.0,
       "source_png": "src/resize-h.png",
+      "native_source_pngs": [
+        "src/32/resize-h.png",
+        "src/48/resize-h.png"
+      ],
       "static_cursor": "windows/resize-h.cur",
+      "pixel_source": {
+        "32": {
+          "grid": [
+            32,
+            32
+          ],
+          "alpha": "1-bit",
+          "palette_colours_used": 7,
+          "opaque_pixels": 203,
+          "bounds": [
+            1,
+            11,
+            32,
+            22
+          ],
+          "hotspot_is_opaque": true
+        },
+        "48": {
+          "grid": [
+            48,
+            48
+          ],
+          "alpha": "1-bit",
+          "palette_colours_used": 7,
+          "opaque_pixels": 456,
+          "bounds": [
+            2,
+            17,
+            47,
+            32
+          ],
+          "hotspot_is_opaque": true
+        }
+      },
       "embedded_images": [
         {
           "size": 32,
           "hotspot_x": 16,
           "hotspot_y": 16,
-          "bytes": 784
+          "bytes": 358
         },
         {
           "size": 48,
           "hotspot_x": 24,
           "hotspot_y": 24,
-          "bytes": 1258
+          "bytes": 452
         },
         {
           "size": 64,
           "hotspot_x": 32,
           "hotspot_y": 32,
-          "bytes": 1832
+          "bytes": 616
         },
         {
           "size": 96,
           "hotspot_x": 48,
           "hotspot_y": 48,
-          "bytes": 2834
+          "bytes": 820
         }
       ],
       "sha256": {
-        "windows/resize-h.cur": "5EEFDBEA244B039871D0ED071DBE77EBC4F1BD784EE63B2692CDED0E7CEF9748"
+        "src/resize-h.png": "62F391BB74B18349947D960940AA45803275CB3BC9A689B2A39FFE82430E504E",
+        "src/32/resize-h.png": "4228C995770B1F97DE1AC7FCEFD204C9DA65165ABE12518E938AAAB31E88E7CE",
+        "src/48/resize-h.png": "473892292A61721B079F210EF1A08D953E52431E48CB6287DF4C6E6C3C661E4B",
+        "windows/resize-h.cur": "460DACA70F7A6FE893B1E701F425DE55092F89F36D79C0A5DD9D76A5E2D89D79"
       }
     },
     {
       "role": "resize-d1",
       "windows_registry_name": "SizeNWSE",
+      "visible_art_scale": 1.0,
       "source_png": "src/resize-d1.png",
+      "native_source_pngs": [
+        "src/32/resize-d1.png",
+        "src/48/resize-d1.png"
+      ],
       "static_cursor": "windows/resize-d1.cur",
+      "pixel_source": {
+        "32": {
+          "grid": [
+            32,
+            32
+          ],
+          "alpha": "1-bit",
+          "palette_colours_used": 6,
+          "opaque_pixels": 173,
+          "bounds": [
+            6,
+            4,
+            27,
+            29
+          ],
+          "hotspot_is_opaque": true
+        },
+        "48": {
+          "grid": [
+            48,
+            48
+          ],
+          "alpha": "1-bit",
+          "palette_colours_used": 7,
+          "opaque_pixels": 452,
+          "bounds": [
+            8,
+            5,
+            42,
+            44
+          ],
+          "hotspot_is_opaque": true
+        }
+      },
       "embedded_images": [
         {
           "size": 32,
           "hotspot_x": 16,
           "hotspot_y": 16,
-          "bytes": 865
+          "bytes": 371
         },
         {
           "size": 48,
           "hotspot_x": 24,
           "hotspot_y": 24,
-          "bytes": 1441
+          "bytes": 499
         },
         {
           "size": 64,
           "hotspot_x": 32,
           "hotspot_y": 32,
-          "bytes": 2264
+          "bytes": 657
         },
         {
           "size": 96,
           "hotspot_x": 48,
           "hotspot_y": 48,
-          "bytes": 3500
+          "bytes": 901
         }
       ],
       "sha256": {
-        "windows/resize-d1.cur": "96A4D417F69FA084BF533713B65E1321A39122FA6981923A65C2D14AC7999934"
+        "src/resize-d1.png": "806EA91C9E33E7D721CA741E4B39EA07A9E2C47EB2A28DE0F5FE9E892D51B1AC",
+        "src/32/resize-d1.png": "3B4B2DCB092DD03A7BE955E792997505F988067A717DDEC4E459E1755CA56F26",
+        "src/48/resize-d1.png": "87F8943292D5B1AE7553D823A6BDDCC834E7DA3014C87E4A924B86C6FB67338E",
+        "windows/resize-d1.cur": "8838DF7090DB9AE36ACBB009C5B85ED70E4E88FA9F5BB7EBC3AE34EB5F79990A"
       }
     },
     {
       "role": "resize-d2",
       "windows_registry_name": "SizeNESW",
+      "visible_art_scale": 1.0,
       "source_png": "src/resize-d2.png",
+      "native_source_pngs": [
+        "src/32/resize-d2.png",
+        "src/48/resize-d2.png"
+      ],
       "static_cursor": "windows/resize-d2.cur",
+      "pixel_source": {
+        "32": {
+          "grid": [
+            32,
+            32
+          ],
+          "alpha": "1-bit",
+          "palette_colours_used": 6,
+          "opaque_pixels": 174,
+          "bounds": [
+            4,
+            6,
+            29,
+            27
+          ],
+          "hotspot_is_opaque": true
+        },
+        "48": {
+          "grid": [
+            48,
+            48
+          ],
+          "alpha": "1-bit",
+          "palette_colours_used": 7,
+          "opaque_pixels": 446,
+          "bounds": [
+            6,
+            8,
+            43,
+            42
+          ],
+          "hotspot_is_opaque": true
+        }
+      },
       "embedded_images": [
         {
           "size": 32,
           "hotspot_x": 16,
           "hotspot_y": 16,
-          "bytes": 917
+          "bytes": 358
         },
         {
           "size": 48,
           "hotspot_x": 24,
           "hotspot_y": 24,
-          "bytes": 1496
+          "bytes": 458
         },
         {
           "size": 64,
           "hotspot_x": 32,
           "hotspot_y": 32,
-          "bytes": 2319
+          "bytes": 650
         },
         {
           "size": 96,
           "hotspot_x": 48,
           "hotspot_y": 48,
-          "bytes": 3446
+          "bytes": 862
         }
       ],
       "sha256": {
-        "windows/resize-d2.cur": "254DFD91A1AD8622F03CB39BCD0A51CDC8A5DCF73CD4CC8FF5486E1D1A110141"
+        "src/resize-d2.png": "853BAEA88F8F3171EE6A23FBFA1194E049517A79440DF028C06DBF20CDFCE43B",
+        "src/32/resize-d2.png": "11A214A9EEAD77C6B33DC5093E6471E3302F5B32DA3D227A0893831BE7D7FB12",
+        "src/48/resize-d2.png": "0C3E4931D0091E091BE3D05BCA3331C136A880AE2663AEE674B516A0C80B2875",
+        "windows/resize-d2.cur": "F31E680F4A10196C71BCCBF65EF7A78FD235D6026298F585871B5025186698DC"
       }
     },
     {
       "role": "move",
       "windows_registry_name": "SizeAll",
+      "visible_art_scale": 1.0,
       "source_png": "src/move.png",
+      "native_source_pngs": [
+        "src/32/move.png",
+        "src/48/move.png"
+      ],
       "static_cursor": "windows/move.cur",
+      "pixel_source": {
+        "32": {
+          "grid": [
+            32,
+            32
+          ],
+          "alpha": "1-bit",
+          "palette_colours_used": 7,
+          "opaque_pixels": 325,
+          "bounds": [
+            0,
+            0,
+            32,
+            32
+          ],
+          "hotspot_is_opaque": true
+        },
+        "48": {
+          "grid": [
+            48,
+            48
+          ],
+          "alpha": "1-bit",
+          "palette_colours_used": 7,
+          "opaque_pixels": 754,
+          "bounds": [
+            0,
+            0,
+            48,
+            48
+          ],
+          "hotspot_is_opaque": true
+        }
+      },
       "embedded_images": [
         {
           "size": 32,
           "hotspot_x": 16,
           "hotspot_y": 16,
-          "bytes": 1245
+          "bytes": 512
         },
         {
           "size": 48,
           "hotspot_x": 24,
           "hotspot_y": 24,
-          "bytes": 1969
+          "bytes": 705
         },
         {
           "size": 64,
           "hotspot_x": 32,
           "hotspot_y": 32,
-          "bytes": 2850
+          "bytes": 929
         },
         {
           "size": 96,
           "hotspot_x": 48,
           "hotspot_y": 48,
-          "bytes": 4644
+          "bytes": 1229
         }
       ],
       "sha256": {
-        "windows/move.cur": "73676A1123C05AF219883099420497007D33ADCE1D28210F0651ED976496ADE3"
+        "src/move.png": "5031D45427EA4B932B61E56750581BF6FC96C225BBD47121DB035AA97AF539AE",
+        "src/32/move.png": "4CC080275B8A1BFAEADA9A5BF492B352BBD9B06E0214009718EE2702B1E0B96B",
+        "src/48/move.png": "BEA213530E07784FB9A2E3F0D2A5F79F6FEA9B5A0611371DC19D2A13D7CA4BF0",
+        "windows/move.cur": "8ECD3CFE35CE29AD76543C0054AB8E1AF5D1F3D7DF9CCBA3A26D604A9D0CBD13"
       }
     },
     {
       "role": "alternate",
       "windows_registry_name": "UpArrow",
+      "visible_art_scale": 1.0,
       "source_png": "src/alternate.png",
+      "native_source_pngs": [
+        "src/32/alternate.png",
+        "src/48/alternate.png"
+      ],
       "static_cursor": "windows/alternate.cur",
+      "pixel_source": {
+        "32": {
+          "grid": [
+            32,
+            32
+          ],
+          "alpha": "1-bit",
+          "palette_colours_used": 7,
+          "opaque_pixels": 272,
+          "bounds": [
+            11,
+            1,
+            28,
+            32
+          ],
+          "hotspot_is_opaque": true
+        },
+        "48": {
+          "grid": [
+            48,
+            48
+          ],
+          "alpha": "1-bit",
+          "palette_colours_used": 7,
+          "opaque_pixels": 567,
+          "bounds": [
+            17,
+            1,
+            42,
+            48
+          ],
+          "hotspot_is_opaque": true
+        }
+      },
       "embedded_images": [
         {
           "size": 32,
           "hotspot_x": 16,
-          "hotspot_y": 2,
-          "bytes": 1296
+          "hotspot_y": 1,
+          "bytes": 432
         },
         {
           "size": 48,
           "hotspot_x": 24,
-          "hotspot_y": 4,
-          "bytes": 2197
+          "hotspot_y": 2,
+          "bytes": 554
         },
         {
           "size": 64,
           "hotspot_x": 32,
-          "hotspot_y": 5,
-          "bytes": 3294
+          "hotspot_y": 2,
+          "bytes": 673
         },
         {
           "size": 96,
           "hotspot_x": 48,
-          "hotspot_y": 7,
-          "bytes": 5494
+          "hotspot_y": 3,
+          "bytes": 948
         }
       ],
       "sha256": {
-        "windows/alternate.cur": "3E200FEFDE565114F44B833FA6421D4375A379446CC35BDACFDEA987CF4D2AD6"
+        "src/alternate.png": "2F9F92C601B85ADAE76183685E426C70A89CF229248D975BD5FE5BFE84861E01",
+        "src/32/alternate.png": "230368DA8A4F3CC9B2F4855489F2C4B5A2F966AF38F64D7372CB27418DD7749B",
+        "src/48/alternate.png": "24D761B798A7084FDA9709588C8329E39EE1827067C1FAA4F38FA9322D7BA976",
+        "windows/alternate.cur": "461A3932D6B6F252D434F1AB3A5168322DD348FFDB1DF3447D6528E8EE590DFF"
       }
     },
     {
       "role": "link",
       "windows_registry_name": "Hand",
+      "visible_art_scale": 1.0,
       "source_png": "src/link.png",
+      "native_source_pngs": [
+        "src/32/link.png",
+        "src/48/link.png"
+      ],
       "static_cursor": "windows/link.cur",
+      "pixel_source": {
+        "32": {
+          "grid": [
+            32,
+            32
+          ],
+          "alpha": "1-bit",
+          "palette_colours_used": 9,
+          "opaque_pixels": 477,
+          "bounds": [
+            1,
+            1,
+            32,
+            32
+          ],
+          "hotspot_is_opaque": true
+        },
+        "48": {
+          "grid": [
+            48,
+            48
+          ],
+          "alpha": "1-bit",
+          "palette_colours_used": 9,
+          "opaque_pixels": 1094,
+          "bounds": [
+            1,
+            2,
+            48,
+            47
+          ],
+          "hotspot_is_opaque": true
+        }
+      },
       "embedded_images": [
         {
           "size": 32,
-          "hotspot_x": 10,
-          "hotspot_y": 3,
-          "bytes": 1664
+          "hotspot_x": 1,
+          "hotspot_y": 1,
+          "bytes": 894
         },
         {
           "size": 48,
-          "hotspot_x": 14,
-          "hotspot_y": 4,
-          "bytes": 2721
+          "hotspot_x": 2,
+          "hotspot_y": 2,
+          "bytes": 1127
         },
         {
           "size": 64,
-          "hotspot_x": 19,
-          "hotspot_y": 5,
-          "bytes": 3997
+          "hotspot_x": 2,
+          "hotspot_y": 2,
+          "bytes": 1500
         },
         {
           "size": 96,
-          "hotspot_x": 29,
-          "hotspot_y": 8,
-          "bytes": 5616
+          "hotspot_x": 3,
+          "hotspot_y": 3,
+          "bytes": 2087
         }
       ],
       "sha256": {
-        "windows/link.cur": "A9906B08242BEA989B96F9B25D393316D9B4F39EF884D1491E96673AD2E09073"
+        "src/link.png": "713E4F760A0558C6D406B633D12C6AC1E1F2EFE63661139BB9D2A205B13CA5D3",
+        "src/32/link.png": "B1E6CF4C8DCD13D609E7878E595B4D900843F15C4068EA6615FDFB06530FAA4F",
+        "src/48/link.png": "7FFAE57C594DB52B32AF513B83CAC80FED9C5722C5FD47796DCF1D2E40BD18BB",
+        "windows/link.cur": "9686F256BE1D97D3C4512CE5D7E785456CB182E74B8A07EBBD87BBEA4922B9C5"
       }
     }
   ],
   "validation": {
     "cur_structure": "passed",
     "ani_structure": "passed",
-    "windows_load_cursor_from_file": "passed"
+    "windows_load_cursor_from_file": "passed",
+    "pixel_grid_and_palette": "passed",
+    "opaque_hotspots": "passed",
+    "role_silhouettes_unique": "passed",
+    "native_role_alpha_masks_unique": {
+      "status": "passed",
+      "roles": 15,
+      "sizes": {
+        "32": 15,
+        "48": 15
+      }
+    },
+    "busy_distinct_from_normal": {
+      "status": "passed",
+      "minimum_ratio": 0.35,
+      "sizes": {
+        "32": {
+          "different_pixels": 396,
+          "union_pixels": 693,
+          "difference_ratio": 0.5714
+        },
+        "48": {
+          "different_pixels": 830,
+          "union_pixels": 1528,
+          "difference_ratio": 0.5432
+        }
+      }
+    },
+    "animation_motion": {
+      "working": {
+        "32": {
+          "unique_frames": 12,
+          "minimum_pixels_changed_per_step": 4,
+          "maximum_pixels_changed_per_step": 4,
+          "mean_pixels_changed_per_step": 4.0,
+          "minimum_required": 4
+        },
+        "48": {
+          "unique_frames": 12,
+          "minimum_pixels_changed_per_step": 10,
+          "maximum_pixels_changed_per_step": 16,
+          "mean_pixels_changed_per_step": 13.33,
+          "minimum_required": 8
+        }
+      },
+      "busy": {
+        "32": {
+          "unique_frames": 12,
+          "minimum_pixels_changed_per_step": 68,
+          "maximum_pixels_changed_per_step": 77,
+          "mean_pixels_changed_per_step": 73.5,
+          "minimum_required": 24
+        },
+        "48": {
+          "unique_frames": 12,
+          "minimum_pixels_changed_per_step": 158,
+          "maximum_pixels_changed_per_step": 174,
+          "mean_pixels_changed_per_step": 165.0,
+          "minimum_required": 60
+        }
+      }
+    },
+    "normal_anisodactyl_anatomy": "passed",
+    "native_32_and_48_sources": "passed",
+    "warm_colours": "none"
   }
 }

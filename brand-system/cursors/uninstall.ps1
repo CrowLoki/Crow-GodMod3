@@ -1,4 +1,4 @@
-# Crow Talon per-user cursor scheme uninstaller.
+# Crow Talon v0.3 per-user cursor scheme uninstaller.
 [CmdletBinding(SupportsShouldProcess)]
 param()
 
@@ -11,6 +11,7 @@ $registryRoles = @(
     'Arrow','Help','AppStarting','Wait','Crosshair','IBeam','NWPen','No',
     'SizeNS','SizeWE','SizeNWSE','SizeNESW','SizeAll','UpArrow','Hand'
 )
+$removed = $false
 
 if ($PSCmdlet.ShouldProcess($schemeName, 'Unregister cursor scheme')) {
     Remove-ItemProperty -Path $schemesKey -Name $schemeName -ErrorAction SilentlyContinue
@@ -43,6 +44,11 @@ public static class CrowCursorRefresh {
         $destination.StartsWith($safeRoot, [StringComparison]::OrdinalIgnoreCase)) {
         Remove-Item -LiteralPath $destination -Recurse -Force
     }
+    $removed = $true
 }
 
-Write-Host 'Crow Talon has been removed from this Windows account.'
+if ($removed) {
+    Write-Host 'Crow Talon has been removed from this Windows account.'
+} else {
+    Write-Host 'Crow Talon removal was not performed.'
+}

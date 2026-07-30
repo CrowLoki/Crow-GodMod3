@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="theme-color" content="#03040a">
     <title>Crow Theme Pack · Crow-GodMod3</title>
-    <meta name="description" content="The complete Crow Theme v0.1.0 bundled with Crow-GodMod3.">
+    <meta name="description" content="The complete Crow Theme for Crow-GodMod3, including Crow Bitfeather v0.3 and Crow Talon v0.5.">
     <link rel="icon" href="/crow-theme/assets/icons/favicon.ico" sizes="any">
-    <link rel="stylesheet" href="/crow-theme/fonts/crow-signal.css">
+    <link rel="stylesheet" href="/crow-theme/fonts/bitfeather/crow-bitfeather.css">
     <link rel="stylesheet" href="/crow-theme/tokens/crow-theme.css">
     <style>
       * { box-sizing: border-box; }
@@ -91,9 +91,57 @@
       .section-head h2 { margin: 0 0 10px; font-size: clamp(28px, 4vw, 44px); }
       .section-head p { margin: 0; color: var(--crow-text-muted); line-height: 1.65; }
       .grid { display: grid; gap: 16px; }
-      .forms { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .forms { grid-template-columns: minmax(0, 1fr); }
       .systems { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .products { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .identity-anchor {
+        display: grid;
+        grid-template-columns: minmax(280px, .82fr) minmax(320px, 1.18fr);
+        overflow: hidden;
+        margin-bottom: 18px;
+        background:
+          linear-gradient(135deg, rgb(10 14 27 / 96%), rgb(3 4 10 / 98%));
+        border: 1px solid rgb(69 231 255 / 34%);
+        border-radius: var(--crow-radius-lg);
+        box-shadow: var(--crow-shadow-cyan), var(--crow-shadow-raised);
+      }
+      .identity-anchor img {
+        width: 100%;
+        height: 100%;
+        min-height: 430px;
+        display: block;
+        object-fit: contain;
+        object-position: center;
+        border-right: 1px solid var(--crow-border-subtle);
+      }
+      .identity-copy {
+        align-self: center;
+        padding: clamp(26px, 5vw, 58px);
+      }
+      .identity-copy h3 {
+        margin: 10px 0 14px;
+        font-size: clamp(24px, 4vw, 46px);
+      }
+      .identity-copy p {
+        color: var(--crow-text-default);
+        font-size: 15px;
+        line-height: 1.7;
+      }
+      .identity-rules {
+        display: grid;
+        gap: 8px;
+        margin: 22px 0 0;
+        padding: 0;
+        list-style: none;
+        color: var(--crow-text-muted);
+        font-family: var(--crow-font-mono);
+        font-size: 11px;
+      }
+      .identity-rules li::before {
+        content: "◆";
+        margin-right: 9px;
+        color: var(--crow-cyan);
+      }
       .card {
         overflow: hidden;
         background: rgb(10 14 27 / 88%);
@@ -143,8 +191,18 @@
         font-size: 11px;
       }
       @media (pointer: fine) {
-        body { cursor: url("/crow-theme/cursors/windows/normal.cur"), default; }
-        a { cursor: url("/crow-theme/cursors/windows/link.cur"), pointer; }
+        body {
+          cursor:
+            url("/crow-theme/cursors/v0.5/src/32/normal.png") 6 2,
+            url("/crow-theme/cursors/v0.5/windows/normal.cur"),
+            default;
+        }
+        a {
+          cursor:
+            url("/crow-theme/cursors/v0.5/src/32/link.png") 6 2,
+            url("/crow-theme/cursors/v0.5/windows/link.cur"),
+            pointer;
+        }
       }
       @media (max-width: 900px) {
         .hero {
@@ -154,6 +212,12 @@
             url("/crow-theme/assets/product-variants/crow-godmod3-hero.png") 72% center / cover no-repeat;
         }
         .hero-copy { width: 100%; }
+        .identity-anchor { grid-template-columns: 1fr; }
+        .identity-anchor img {
+          min-height: 520px;
+          border-right: 0;
+          border-bottom: 1px solid var(--crow-border-subtle);
+        }
         .forms, .products { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       }
       @media (max-width: 620px) {
@@ -166,9 +230,9 @@
   <body data-crow-theme data-crow-product="crow-godmod3">
     <header class="shell hero">
       <div class="hero-copy">
-        <div class="eyebrow">Crow Theme // 0.1.0 // Crow-GodMod3 binding</div>
+        <div class="eyebrow">Crow Theme // Bitfeather 0.3 // Talon 0.5 // canonical mascot v3</div>
         <h1>The complete Crow system.</h1>
-        <p>Four approved three-eyed Crow forms, the original Crow Signal type family, Crow Talon pointers, icons, backgrounds, product heroes, social artwork, shared design tokens, guides, prompts and reproducible sources.</p>
+        <p>One canonical biomechanical Crow mascot, the original Crow Bitfeather type family, compact cybernetic Crow Talon pointers, icons, backgrounds, product heroes, social artwork, shared design tokens, guides and reproducible sources.</p>
         <div class="actions">
           <a class="button primary" href="/">Return to Crow-GodMod3</a>
           <a class="button" href="https://github.com/CrowLoki/Crow-GodMod3/tree/main/brand-system">Browse source on GitHub</a>
@@ -179,26 +243,33 @@
     <main class="shell">
       <section>
         <div class="section-head">
-          <div class="eyebrow">Approved character family</div>
-          <h2>One identity, four forms</h2>
-          <p>Every form preserves the same anatomy: two physical eyes, one centred forehead eye and a true elongated corvid beak. Crow-GodMod3 uses Glitch Ascendant as its primary form and Core Architect as its compact form.</p>
+          <div class="eyebrow">Sole active mascot</div>
+          <h2>One Crow. Every product.</h2>
+          <p>The approved full-body biomechanical crow is the source of truth for every Crow product. Variants change only crop, background and accent emphasis.</p>
+        </div>
+        <article class="identity-anchor">
+          <img src="/crow-theme/assets/mascots/masters/crow-mascot-v3.png" alt="Canonical full-body biomechanical three-eyed Crow mascot">
+          <div class="identity-copy">
+            <div class="eyebrow">Crow identity // master v3</div>
+            <h3>Biomechanical through the entire body.</h3>
+            <p>Black feathers, cool-metal beak, wings, legs, talons, embedded plates, micro-cables and optical machinery form one living adult crow. The three dominant eyes remain fixed across every crop and scale.</p>
+            <ul class="identity-rules">
+              <li>Dense cybernetics integrated through the entire anatomy</li>
+              <li>True tapered corvid beak, adult body and readable wing silhouette</li>
+              <li>Black, gunmetal, cyan, ultraviolet and restrained magenta</li>
+              <li>No humanoid body, costume, warm metal or substitute character</li>
+            </ul>
+          </div>
+        </article>
+        <div class="section-head">
+          <div class="eyebrow">Approved identity</div>
+          <h2>Canonical Crow v3</h2>
+          <p>Full, compact, icon, hero and editorial uses all derive from this one master. Earlier mascot concepts remain preserved only as inactive legacy and reference files.</p>
         </div>
         <div class="grid forms">
           <article class="card form">
-            <img src="/crow-theme/assets/mascots/masters/core-architect.png" loading="lazy" alt="Core Architect">
-            <div class="card-copy"><h3>Core Architect</h3><p>Flagship intelligence, architecture and orchestration.</p></div>
-          </article>
-          <article class="card form">
-            <img src="/crow-theme/assets/mascots/masters/field-operator.png" loading="lazy" alt="Field Operator">
-            <div class="card-copy"><h3>Field Operator</h3><p>Grounded builder, researcher and local operator.</p></div>
-          </article>
-          <article class="card form">
-            <img src="/crow-theme/assets/mascots/masters/glitch-ascendant.png" loading="lazy" alt="Glitch Ascendant">
-            <div class="card-copy"><h3>Glitch Ascendant</h3><p>Controlled recursion and Crow-GodMod3 primary power.</p></div>
-          </article>
-          <article class="card form">
-            <img src="/crow-theme/assets/mascots/masters/pet-companion.png" loading="lazy" alt="Pet Companion">
-            <div class="card-copy"><h3>Pet Companion</h3><p>Small non-humanoid companion for friendly compact use.</p></div>
+            <img src="/crow-theme/assets/mascots/masters/crow-mascot-v3.png" loading="lazy" alt="Canonical Crow mascot v3">
+            <div class="card-copy"><h3>Canonical Crow v3</h3><p>Sole active mascot across CrowClaw, Crow-GodMod3, CrowQuant, CrowNest, CrowMemory and CrowFlix.</p></div>
           </article>
         </div>
       </section>
@@ -207,23 +278,23 @@
         <div class="section-head">
           <div class="eyebrow">Original interface system</div>
           <h2>Type, pointers and signal marks</h2>
-          <p>Crow Signal and Crow Talon were built specifically for this family. The complete desktop and web files are bundled below.</p>
+          <p>Crow Bitfeather and Crow Talon were built specifically for this family. The complete desktop and web files are bundled below.</p>
         </div>
         <div class="grid systems">
           <article class="card">
-            <img src="/crow-theme/fonts/specimens/crow-signal-v0.1.png" loading="lazy" alt="Crow Signal font specimen">
-            <div class="card-copy"><h3>Crow Signal</h3><p>Display and Mono, regular and bold, in TTF and WOFF2.</p></div>
+            <img src="/crow-theme/fonts/bitfeather/specimens/crow-bitfeather-v0.3.0.png" loading="lazy" alt="Crow Bitfeather v0.3 font specimen">
+            <div class="card-copy"><h3>Crow Bitfeather v0.3</h3><p>Original stepped-pixel Display and Mono faces, regular and bold, in TTF and WOFF2.</p></div>
           </article>
           <article class="card">
-            <img src="/crow-theme/cursors/preview.png" loading="lazy" alt="Crow Talon cursor preview">
-            <div class="card-copy"><h3>Crow Talon</h3><p>Fifteen static pointer roles plus animated Working and Busy states.</p></div>
+            <img src="/crow-theme/cursors/v0.5/previews/crow-talon-v0.5-preview.png" loading="lazy" alt="Crow Talon v0.5 cursor preview">
+            <div class="card-copy"><h3>Crow Talon v0.5</h3><p>Compact cybernetic crow-claw pointers: fifteen static roles plus animated Working and Busy Windows states.</p></div>
           </article>
           <article class="card">
             <img src="/crow-theme/assets/icons/contact-sheet.png" loading="lazy" alt="Crow Signal icon family">
             <div class="card-copy"><h3>Crow Signal icons</h3><p>Favicons, app icons, avatars and practical export sizes.</p></div>
           </article>
           <article class="card">
-            <img src="/crow-theme/assets/social/crow-family-banner.png" loading="lazy" alt="Crow mascot family banner">
+            <img src="/crow-theme/assets/social/crow-family-banner.png" loading="lazy" alt="Canonical Crow mascot banner">
             <div class="card-copy"><h3>Social system</h3><p>Open Graph, GitHub, banner, post and story formats.</p></div>
           </article>
         </div>
@@ -251,10 +322,10 @@
           <h2>Use the pack</h2>
         </div>
         <div class="downloads">
-          <a class="download" href="/crow-theme/downloads/Crow-Signal-Windows-v0.1.0.zip" download><strong>Download Crow Signal</strong><span>Ready-to-extract Windows pack with installer and all four original font faces.</span></a>
-          <a class="download" href="/crow-theme/downloads/Crow-Talon-Windows-v0.1.0.zip" download><strong>Download Crow Talon</strong><span>Ready-to-extract Windows pack with installer and the complete pointer scheme.</span></a>
+          <a class="download" href="/crow-theme/downloads/Crow-Bitfeather-Windows-v0.3.0.zip" download><strong>Download Crow Bitfeather v0.3</strong><span>Ready-to-extract Windows pack with all four original CrowClaw font faces and matching web fonts.</span></a>
+          <a class="download" href="/crow-theme/downloads/Crow-Talon-Windows-v0.5.0.zip" download><strong>Download Crow Talon v0.5</strong><span>Ready-to-extract Windows pack with the complete compact cybernetic crow-claw pointer scheme.</span></a>
           <a class="download" href="/crow-theme/docs/BRAND-GUIDE.md"><strong>Brand guide</strong><span>Palette, type, accessibility, shape, motion and implementation rules.</span></a>
-          <a class="download" href="/crow-theme/docs/MASCOT-GUIDE.md"><strong>Mascot guide</strong><span>Anatomy, approved forms, product bindings, cropping and review checklist.</span></a>
+          <a class="download" href="/crow-theme/docs/MASCOT-GUIDE.md"><strong>Mascot guide</strong><span>Canonical anatomy, product bindings, cropping and review checklist.</span></a>
           <a class="download" href="/crow-theme/tokens/crow-theme.json"><strong>Theme tokens</strong><span>Machine-readable palette, typography, geometry, motion and product bindings.</span></a>
           <a class="download" href="/crow-theme/provenance/SOURCES.md"><strong>Sources and provenance</strong><span>Approved masters, generation records and checksums.</span></a>
         </div>
@@ -266,7 +337,7 @@
     </main>
 
     <footer>
-      <div class="shell">Crow Theme v0.1.0 · Crow-GodMod3 · no orange, amber, yellow or gold brand styling.</div>
+      <div class="shell">Crow Theme · Crow Bitfeather v0.3 · Crow Talon v0.5 · canonical biomechanical Crow identity · no orange, amber, yellow or gold brand styling.</div>
     </footer>
   </body>
 </html>

@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
-"""Build the original Crow Signal v0.1 font family.
+"""Build the original Crow Signal v0.2 pixel font family.
 
-The glyphs in this file are constructed from a hand-authored modular
-"feather plate" grammar.  No third-party font files or outlines are read.
+Every glyph begins as a hand-authored bitmap and is converted directly into
+hard-edged, connected square-pixel geometry. No third-party font files,
+bitmap alphabets, or outlines are read.
 """
 
 from __future__ import annotations
 
 import hashlib
+import io
 import json
+import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -24,13 +27,15 @@ FONT_ROOT = ROOT / "fonts"
 TTF_DIR = FONT_ROOT / "ttf"
 WOFF2_DIR = FONT_ROOT / "woff2"
 SPECIMEN_DIR = FONT_ROOT / "specimens"
+DOWNLOAD_DIR = ROOT / "downloads"
 
 UPM = 1000
 ASCENDER = 900
 DESCENDER = -250
 CAP_HEIGHT = 700
 X_HEIGHT = 500
-VERSION = "0.1.0"
+VERSION = "0.2.0"
+PACKAGE_NAME = f"Crow-Signal-Windows-v{VERSION}"
 
 
 def rows(*values: str) -> tuple[str, ...]:
@@ -39,74 +44,75 @@ def rows(*values: str) -> tuple[str, ...]:
     return tuple(values)
 
 
-# These patterns were drawn for Crow Signal. They are deliberately angular,
-# compact, and plate-like rather than traced from an existing typeface.
+# These patterns were drawn for Crow Signal. They use a compact 5x7 core grid,
+# with wider cells only where readability requires it. Filled cells form
+# continuous strokes; this is a pixel typeface, not a dotted matrix face.
 PATTERNS: dict[str, tuple[str, ...]] = {
     # Uppercase
-    "A": rows("01110", "11011", "11011", "11111", "11011", "11011", "11011"),
-    "B": rows("11110", "11011", "11011", "11110", "11011", "11011", "11110"),
-    "C": rows("01111", "11000", "11000", "11000", "11000", "11000", "01111"),
-    "D": rows("11110", "11011", "11011", "11011", "11011", "11011", "11110"),
-    "E": rows("11111", "11000", "11000", "11110", "11000", "11000", "11111"),
-    "F": rows("11111", "11000", "11000", "11110", "11000", "11000", "11000"),
-    "G": rows("01111", "11000", "11000", "11011", "11011", "11011", "01111"),
-    "H": rows("11011", "11011", "11011", "11111", "11011", "11011", "11011"),
+    "A": rows("01110", "10001", "10001", "11111", "10001", "10001", "10001"),
+    "B": rows("11110", "10001", "10001", "11110", "10001", "10001", "11110"),
+    "C": rows("01111", "10000", "10000", "10000", "10000", "10000", "01111"),
+    "D": rows("11110", "10001", "10001", "10001", "10001", "10001", "11110"),
+    "E": rows("11111", "10000", "10000", "11110", "10000", "10000", "11111"),
+    "F": rows("11111", "10000", "10000", "11110", "10000", "10000", "10000"),
+    "G": rows("01111", "10000", "10000", "10111", "10001", "10001", "01111"),
+    "H": rows("10001", "10001", "10001", "11111", "10001", "10001", "10001"),
     "I": rows("11111", "00100", "00100", "00100", "00100", "00100", "11111"),
-    "J": rows("00111", "00011", "00011", "00011", "11011", "11011", "01110"),
-    "K": rows("11011", "11110", "11100", "11000", "11100", "11110", "11011"),
-    "L": rows("11000", "11000", "11000", "11000", "11000", "11000", "11111"),
-    "M": rows("1100011", "1110111", "1111111", "1101011", "1100011", "1100011", "1100011"),
-    "N": rows("110011", "111011", "111111", "110111", "110011", "110011", "110011"),
-    "O": rows("01110", "11011", "11011", "11011", "11011", "11011", "01110"),
-    "P": rows("11110", "11011", "11011", "11110", "11000", "11000", "11000"),
-    "Q": rows("01110", "11011", "11011", "11011", "11111", "01110", "00011"),
-    "R": rows("11110", "11011", "11011", "11110", "11100", "11110", "11011"),
-    "S": rows("01111", "11000", "11000", "01110", "00011", "00011", "11110"),
+    "J": rows("00111", "00010", "00010", "00010", "10010", "10010", "01100"),
+    "K": rows("10001", "10010", "10100", "11000", "10100", "10010", "10001"),
+    "L": rows("10000", "10000", "10000", "10000", "10000", "10000", "11111"),
+    "M": rows("1000001", "1100011", "1010101", "1001001", "1000001", "1000001", "1000001"),
+    "N": rows("10001", "11001", "10101", "10101", "10011", "10001", "10001"),
+    "O": rows("01110", "10001", "10001", "10001", "10001", "10001", "01110"),
+    "P": rows("11110", "10001", "10001", "11110", "10000", "10000", "10000"),
+    "Q": rows("01110", "10001", "10001", "10001", "10101", "10010", "01101"),
+    "R": rows("11110", "10001", "10001", "11110", "10100", "10010", "10001"),
+    "S": rows("01111", "10000", "10000", "01110", "00001", "00001", "11110"),
     "T": rows("11111", "00100", "00100", "00100", "00100", "00100", "00100"),
-    "U": rows("11011", "11011", "11011", "11011", "11011", "11011", "01110"),
-    "V": rows("11011", "11011", "11011", "11011", "11011", "01110", "00100"),
-    "W": rows("1100011", "1100011", "1100011", "1101011", "1111111", "1110111", "0100010"),
-    "X": rows("11011", "11011", "01110", "00100", "01110", "11011", "11011"),
-    "Y": rows("11011", "11011", "01110", "00100", "00100", "00100", "00100"),
-    "Z": rows("11111", "00011", "00110", "01100", "11000", "11000", "11111"),
+    "U": rows("10001", "10001", "10001", "10001", "10001", "10001", "01110"),
+    "V": rows("10001", "10001", "10001", "10001", "10001", "01010", "00100"),
+    "W": rows("1000001", "1000001", "1000001", "1001001", "1010101", "1100011", "1000001"),
+    "X": rows("10001", "10001", "01010", "00100", "01010", "10001", "10001"),
+    "Y": rows("10001", "10001", "01010", "00100", "00100", "00100", "00100"),
+    "Z": rows("11111", "00001", "00010", "00100", "01000", "10000", "11111"),
     # Lowercase. Ascenders occupy the cap grid; normal lowercase begins at row 2.
-    "a": rows("00000", "00000", "01110", "00011", "01111", "11011", "01111"),
-    "b": rows("11000", "11000", "11110", "11011", "11011", "11011", "11110"),
-    "c": rows("00000", "00000", "01111", "11000", "11000", "11000", "01111"),
-    "d": rows("00011", "00011", "01111", "11011", "11011", "11011", "01111"),
-    "e": rows("00000", "00000", "01110", "11011", "11111", "11000", "01111"),
-    "f": rows("00111", "01100", "01100", "11110", "01100", "01100", "01100"),
-    "g": rows("00000", "00000", "01111", "11011", "11011", "01111", "00011", "11011", "01110"),
-    "h": rows("11000", "11000", "11110", "11011", "11011", "11011", "11011"),
+    "a": rows("00000", "00000", "01110", "00001", "01111", "10001", "01111"),
+    "b": rows("10000", "10000", "11110", "10001", "10001", "10001", "11110"),
+    "c": rows("00000", "00000", "01111", "10000", "10000", "10000", "01111"),
+    "d": rows("00001", "00001", "01111", "10001", "10001", "10001", "01111"),
+    "e": rows("00000", "00000", "01110", "10001", "11111", "10000", "01111"),
+    "f": rows("00111", "00100", "00100", "11110", "00100", "00100", "00100"),
+    "g": rows("00000", "00000", "01111", "10001", "10001", "01111", "00001", "10001", "01110"),
+    "h": rows("10000", "10000", "11110", "10001", "10001", "10001", "10001"),
     "i": rows("00100", "00000", "01100", "00100", "00100", "00100", "01110"),
-    "j": rows("00010", "00000", "00110", "00010", "00010", "00010", "00010", "11010", "01100"),
-    "k": rows("11000", "11000", "11011", "11110", "11100", "11110", "11011"),
+    "j": rows("00010", "00000", "00110", "00010", "00010", "00010", "00010", "10010", "01100"),
+    "k": rows("10000", "10000", "10010", "10100", "11000", "10100", "10010"),
     "l": rows("01100", "00100", "00100", "00100", "00100", "00100", "01110"),
-    "m": rows("0000000", "0000000", "1111110", "1101011", "1101011", "1101011", "1100011"),
-    "n": rows("00000", "00000", "11110", "11011", "11011", "11011", "11011"),
-    "o": rows("00000", "00000", "01110", "11011", "11011", "11011", "01110"),
-    "p": rows("00000", "00000", "11110", "11011", "11011", "11110", "11000", "11000", "11000"),
-    "q": rows("00000", "00000", "01111", "11011", "11011", "01111", "00011", "00011", "00011"),
-    "r": rows("00000", "00000", "11011", "11110", "11000", "11000", "11000"),
-    "s": rows("00000", "00000", "01111", "11000", "01110", "00011", "11110"),
-    "t": rows("00100", "00100", "11111", "00100", "00100", "00100", "00011"),
-    "u": rows("00000", "00000", "11011", "11011", "11011", "11011", "01111"),
-    "v": rows("00000", "00000", "11011", "11011", "11011", "01110", "00100"),
-    "w": rows("0000000", "0000000", "1100011", "1100011", "1101011", "1111111", "0100010"),
-    "x": rows("00000", "00000", "11011", "01110", "00100", "01110", "11011"),
-    "y": rows("00000", "00000", "11011", "11011", "11011", "01111", "00011", "11011", "01110"),
-    "z": rows("00000", "00000", "11111", "00011", "01110", "11000", "11111"),
+    "m": rows("0000000", "0000000", "1111110", "1001001", "1001001", "1001001", "1001001"),
+    "n": rows("00000", "00000", "11110", "10001", "10001", "10001", "10001"),
+    "o": rows("00000", "00000", "01110", "10001", "10001", "10001", "01110"),
+    "p": rows("00000", "00000", "11110", "10001", "10001", "11110", "10000", "10000", "10000"),
+    "q": rows("00000", "00000", "01111", "10001", "10001", "01111", "00001", "00001", "00001"),
+    "r": rows("00000", "00000", "10110", "11001", "10000", "10000", "10000"),
+    "s": rows("00000", "00000", "01111", "10000", "01110", "00001", "11110"),
+    "t": rows("00100", "00100", "11111", "00100", "00100", "00101", "00010"),
+    "u": rows("00000", "00000", "10001", "10001", "10001", "10001", "01111"),
+    "v": rows("00000", "00000", "10001", "10001", "10001", "01010", "00100"),
+    "w": rows("0000000", "0000000", "1000001", "1000001", "1001001", "1010101", "0100010"),
+    "x": rows("00000", "00000", "10001", "01010", "00100", "01010", "10001"),
+    "y": rows("00000", "00000", "10001", "10001", "10001", "01111", "00001", "10001", "01110"),
+    "z": rows("00000", "00000", "11111", "00010", "00100", "01000", "11111"),
     # Numerals. Zero has a deliberate diagonal signal slash.
-    "0": rows("01110", "11011", "11011", "11111", "11011", "11011", "01110"),
-    "1": rows("00100", "01100", "11100", "00100", "00100", "00100", "11111"),
-    "2": rows("01110", "11011", "00011", "00110", "01100", "11000", "11111"),
-    "3": rows("11110", "00011", "00011", "01110", "00011", "00011", "11110"),
-    "4": rows("11011", "11011", "11011", "11111", "00011", "00011", "00011"),
-    "5": rows("11111", "11000", "11000", "11110", "00011", "00011", "11110"),
-    "6": rows("01111", "11000", "11000", "11110", "11011", "11011", "01110"),
-    "7": rows("11111", "00011", "00110", "00110", "01100", "01100", "01100"),
-    "8": rows("01110", "11011", "11011", "01110", "11011", "11011", "01110"),
-    "9": rows("01110", "11011", "11011", "01111", "00011", "00011", "11110"),
+    "0": rows("01110", "10011", "10101", "10101", "11001", "10001", "01110"),
+    "1": rows("00100", "01100", "00100", "00100", "00100", "00100", "01110"),
+    "2": rows("01110", "10001", "00001", "00010", "00100", "01000", "11111"),
+    "3": rows("11110", "00001", "00001", "01110", "00001", "00001", "11110"),
+    "4": rows("10001", "10001", "10001", "11111", "00001", "00001", "00001"),
+    "5": rows("11111", "10000", "10000", "11110", "00001", "00001", "11110"),
+    "6": rows("01111", "10000", "10000", "11110", "10001", "10001", "01110"),
+    "7": rows("11111", "00001", "00010", "00100", "01000", "01000", "01000"),
+    "8": rows("01110", "10001", "10001", "01110", "10001", "10001", "01110"),
+    "9": rows("01110", "10001", "10001", "01111", "00001", "00001", "11110"),
     # Printable ASCII punctuation.
     "!": rows("1", "1", "1", "1", "1", "0", "1"),
     '"': rows("101", "101", "101", "000", "000", "000", "000"),
@@ -204,60 +210,62 @@ def draw_polygon(pen: TTGlyphPen, points: list[tuple[int, int]]) -> None:
     pen.closePath()
 
 
-def draw_plate(
+def draw_pixel_run(
     pen: TTGlyphPen,
-    x: float,
-    y: float,
-    width: float,
-    height: float,
-    weight: int,
-    phase: int,
+    x0: int,
+    y0: int,
+    x1: int,
+    y1: int,
+    *,
+    cut_top_right: bool,
+    cut_bottom_left: bool,
+    cut: int,
 ) -> None:
-    """Draw one asymmetric feather plate.
+    """Draw a connected horizontal run of square pixels.
 
-    The alternating clipped corners create a subtle layered-feather rhythm
-    while retaining the regularity needed for small UI text.
+    Adjacent cells share an edge, so strokes remain continuous. A small cut is
+    permitted only on an exposed terminal corner; it never separates cells
+    inside a stroke.
     """
 
-    cut = max(6, round(min(width, height) * (0.14 if weight == 400 else 0.10)))
-    x0, y0 = round(x), round(y)
-    x1, y1 = round(x + width), round(y + height)
-
-    if phase % 3 == 0:
-        points = [
-            (x0 + cut, y0),
-            (x1, y0),
-            (x1, y1 - cut),
-            (x1 - cut, y1),
-            (x0, y1),
-            (x0, y0 + cut),
-        ]
-    elif phase % 3 == 1:
-        points = [
-            (x0, y0),
-            (x1 - cut, y0),
-            (x1, y0 + cut),
-            (x1, y1),
-            (x0 + cut, y1),
-            (x0, y1 - cut),
-        ]
+    points = [(x0 + cut if cut_bottom_left else x0, y0), (x1, y0)]
+    if cut_top_right:
+        points.extend([(x1, y1 - cut), (x1 - cut, y1)])
     else:
-        points = [
-            (x0 + cut, y0),
-            (x1 - cut, y0),
-            (x1, y0 + cut),
-            (x1, y1 - cut),
-            (x1 - cut, y1),
-            (x0 + cut, y1),
-            (x0, y1 - cut),
-            (x0, y0 + cut),
-        ]
+        points.append((x1, y1))
+    points.append((x0, y1))
+    if cut_bottom_left:
+        points.append((x0, y0 + cut))
     draw_polygon(pen, points)
+
+
+def is_filled(pattern: tuple[str, ...], row: int, column: int) -> bool:
+    if row < 0 or row >= len(pattern):
+        return False
+    if column < 0 or column >= len(pattern[row]):
+        return False
+    return pattern[row][column] not in {"0", ".", " "}
+
+
+def filled_runs(row: str) -> list[tuple[int, int]]:
+    """Return inclusive horizontal runs of filled bitmap cells."""
+
+    runs: list[tuple[int, int]] = []
+    start: int | None = None
+    for column, cell in enumerate(row + "0"):
+        filled = cell not in {"0", ".", " "}
+        if filled and start is None:
+            start = column
+        elif not filled and start is not None:
+            runs.append((start, column - 1))
+            start = None
+    return runs
 
 
 def make_glyph(
     pattern: tuple[str, ...],
     *,
+    character: str,
     weight: int,
     monospaced: bool,
     blank_width: int | None = None,
@@ -268,39 +276,51 @@ def make_glyph(
     if blank_width is not None:
         return pen.glyph(), (blank_width, 0)
 
-    side = 62 if not monospaced else 70
-    mono_advance = 720
+    cell = 100
+    side = 60
+    mono_advance = 820
     if monospaced:
-        available = mono_advance - 2 * side
-        x_pitch = min(104.0, available / max(columns, 1))
-        pattern_width = x_pitch * columns
+        pattern_width = cell * columns
+        if pattern_width + 2 * side > mono_advance:
+            raise RuntimeError(
+                f"{character!r} is too wide for the {mono_advance}-unit mono grid"
+            )
         origin_x = (mono_advance - pattern_width) / 2
         advance = mono_advance
     else:
-        x_pitch = 104.0
-        pattern_width = x_pitch * columns
+        pattern_width = cell * columns
         origin_x = side
         advance = round(pattern_width + 2 * side)
 
-    gap_x = 14 if weight == 400 else 5
-    gap_y = 13 if weight == 400 else 4
-    plate_width = max(14, x_pitch - gap_x)
-    plate_height = 100 - gap_y
-
+    embolden = 0 if weight == 400 else 12
+    talon_glyphs = frozenset("AKMNRVWXYZ237?<>/\\")
+    talon_cut = 16 if weight == 400 else 14
     for row_index, row in enumerate(cleaned):
-        for column_index, cell in enumerate(row):
-            if cell in {"0", ".", " "}:
-                continue
-            x = origin_x + column_index * x_pitch + gap_x / 2
-            y = CAP_HEIGHT - (row_index + 1) * 100 + gap_y / 2
-            draw_plate(
+        for start, end in filled_runs(row):
+            x0 = round(origin_x + start * cell - embolden)
+            x1 = round(origin_x + (end + 1) * cell + embolden)
+            y0 = CAP_HEIGHT - (row_index + 1) * cell - embolden
+            y1 = CAP_HEIGHT - row_index * cell + embolden
+            stylise = character in talon_glyphs
+            cut_top_right = (
+                stylise
+                and not is_filled(cleaned, row_index - 1, end)
+                and not is_filled(cleaned, row_index, end + 1)
+            )
+            cut_bottom_left = (
+                stylise
+                and not is_filled(cleaned, row_index + 1, start)
+                and not is_filled(cleaned, row_index, start - 1)
+            )
+            draw_pixel_run(
                 pen,
-                x,
-                y,
-                plate_width,
-                plate_height,
-                weight,
-                row_index + column_index,
+                x0,
+                y0,
+                x1,
+                y1,
+                cut_top_right=cut_top_right,
+                cut_bottom_left=cut_bottom_left,
+                cut=talon_cut,
             )
 
     return pen.glyph(), (advance, 0)
@@ -362,6 +382,7 @@ def build_font(family: str, style: str, weight: int, monospaced: bool) -> Path:
         else:
             glyphs[name], metrics[name] = make_glyph(
                 pattern,
+                character=chr(codepoint),
                 weight=weight,
                 monospaced=monospaced,
             )
@@ -385,8 +406,8 @@ def build_font(family: str, style: str, weight: int, monospaced: bool) -> Path:
             "psName": postscript_name,
             "version": f"Version {VERSION}",
             "description": (
-                "Original modular cyber-corvid typeface generated from "
-                "hand-authored Crow feather-plate glyph patterns."
+                "Original hard-edged pixel typeface generated from "
+                "hand-authored Crow Signal bitmap glyph patterns."
             ),
             "designer": "Crow",
             "manufacturer": "Crow Brand System",
@@ -421,7 +442,7 @@ def build_font(family: str, style: str, weight: int, monospaced: bool) -> Path:
     fb.setupMaxp()
 
     font = fb.font
-    font["head"].fontRevision = 0.1
+    font["head"].fontRevision = 0.2
     font["head"].lowestRecPPEM = 8
     font["head"].macStyle = 0x0001 if weight >= 700 else 0
 
@@ -474,21 +495,26 @@ def draw_specimen(font_paths: dict[tuple[str, str], Path]) -> Path:
 
     title = fit_text("CROW SIGNAL", display_bold, 132, 84, 1900)
     draw.text((300, 105), "CROW SIGNAL", font=title, fill="#F2F7FF")
-    draw.text((305, 255), "ORIGINAL TYPE SYSTEM  /  VERSION 0.1", font=font_for(mono_bold, 36), fill="#8B6CFF")
+    draw.text(
+        (305, 255),
+        "ORIGINAL PIXEL TYPE SYSTEM  /  VERSION 0.2",
+        font=font_for(mono_bold, 36),
+        fill="#8B6CFF",
+    )
 
     draw.line((160, 345, width - 160, 345), fill="#29345F", width=3)
 
     y = 405
     label_font = font_for(mono_bold, 28)
     samples = [
-        ("DISPLAY BOLD", display_bold, "THREE EYES / ONE SYSTEM", 82, "#F2F7FF"),
-        ("DISPLAY REGULAR", display_regular, "PERCEPTION  REFLECTION  ACTION", 58, "#32DFFF"),
-        ("UPPERCASE", display_regular, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", 48, "#8B6CFF"),
-        ("LOWERCASE", display_regular, "abcdefghijklmnopqrstuvwxyz", 48, "#F2F7FF"),
-        ("NUMERALS", mono_bold, "0 O  1 I l  23456789", 60, "#32DFFF"),
+        ("DISPLAY BOLD", display_bold, "CROW-GODMOD3 / SIGNAL ONLINE", 74, "#F2F7FF"),
+        ("DISPLAY REGULAR", display_regular, "THREE EYES  ONE SYSTEM", 64, "#32DFFF"),
+        ("UPPERCASE", display_regular, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", 46, "#8B6CFF"),
+        ("LOWERCASE", display_regular, "abcdefghijklmnopqrstuvwxyz", 46, "#F2F7FF"),
+        ("NUMERALS", mono_bold, "0 O  1 I l  23456789", 58, "#32DFFF"),
         ("PUNCTUATION", mono_regular, "! \" # $ % & ' ( ) * + , - . / : ; < = > ? @", 40, "#F2F7FF"),
         ("SIGNALS", mono_bold, "← ↑ → ↓ ↔ ↕ ↩ ↪ ⇒  − ≠ ≤ ≥  ◆ ◇ ★", 48, "#8B6CFF"),
-        ("MONO", mono_regular, "crow.run(model=\"local\")  =>  score != 0", 43, "#32DFFF"),
+        ("MONO", mono_regular, "crow.run(model=\"local\") => score != 0", 41, "#32DFFF"),
     ]
     for label, font_path, text, size, color in samples:
         draw.text((160, y), label, font=label_font, fill="#7F8DA8")
@@ -499,9 +525,9 @@ def draw_specimen(font_paths: dict[tuple[str, str], Path]) -> Path:
     draw.rounded_rectangle((160, 1530, width - 160, 1650), radius=22, fill="#11162F", outline="#6D4AFF", width=2)
     draw.text(
         (205, 1565),
-        "HAND-AUTHORED MODULAR GLYPHS  •  NO THIRD-PARTY OUTLINES",
+        "CONNECTED SQUARE PIXELS  •  HARD EDGES  •  NO THIRD-PARTY OUTLINES",
         font=fit_text(
-            "HAND-AUTHORED MODULAR GLYPHS  •  NO THIRD-PARTY OUTLINES",
+            "CONNECTED SQUARE PIXELS  •  HARD EDGES  •  NO THIRD-PARTY OUTLINES",
             mono_bold,
             34,
             24,
@@ -510,7 +536,7 @@ def draw_specimen(font_paths: dict[tuple[str, str], Path]) -> Path:
         fill="#F2F7FF",
     )
 
-    output = SPECIMEN_DIR / "crow-signal-v0.1.png"
+    output = SPECIMEN_DIR / "crow-signal-v0.2.png"
     image.save(output, optimize=True)
     return output
 
@@ -521,6 +547,54 @@ def sha256(path: Path) -> str:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def write_css() -> Path:
+    css = f"""/*
+ * Crow Signal v{VERSION}
+ * Original pixel font software generated by scripts/build_fonts.py.
+ */
+
+@font-face {{
+  font-family: "Crow Signal Display";
+  src: url("./woff2/CrowSignalDisplay-Regular.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}}
+
+@font-face {{
+  font-family: "Crow Signal Display";
+  src: url("./woff2/CrowSignalDisplay-Bold.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}}
+
+@font-face {{
+  font-family: "Crow Signal Mono";
+  src: url("./woff2/CrowSignalMono-Regular.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}}
+
+@font-face {{
+  font-family: "Crow Signal Mono";
+  src: url("./woff2/CrowSignalMono-Bold.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}}
+
+:root {{
+  --crow-font-display: "Crow Signal Display", sans-serif;
+  --crow-font-mono: "Crow Signal Mono", monospace;
+}}
+"""
+    path = FONT_ROOT / "crow-signal.css"
+    path.write_text(css, encoding="utf-8", newline="\n")
+    return path
 
 
 def validate_font(path: Path, *, monospaced: bool) -> dict[str, object]:
@@ -541,8 +615,27 @@ def validate_font(path: Path, *, monospaced: bool) -> dict[str, object]:
         raise RuntimeError(f"{path.name} lacks proportional widths")
 
     critical = {char: cmap[ord(char)] for char in "Il1O0"}
-    if len(set(critical.values())) != len(critical):
-        raise RuntimeError(f"{path.name} aliases critical glyphs")
+    glyf = font["glyf"]
+
+    def outline_signature(glyph_name_: str) -> tuple[object, ...]:
+        coordinates, endpoints, flags = glyf[glyph_name_].getCoordinates(glyf)
+        return (
+            tuple((point[0], point[1]) for point in coordinates),
+            tuple(endpoints),
+            tuple(flags),
+        )
+
+    critical_shapes = {char: outline_signature(name) for char, name in critical.items()}
+    if len(set(critical_shapes.values())) != len(critical_shapes):
+        raise RuntimeError(f"{path.name} does not visually distinguish I/l/1/O/0")
+
+    for glyph_name_ in cmap.values():
+        glyph = glyf[glyph_name_]
+        if glyph.numberOfContours <= 0:
+            continue
+        _, _, flags = glyph.getCoordinates(glyf)
+        if any(not (flag & 0x01) for flag in flags):
+            raise RuntimeError(f"{path.name} contains a curved point in {glyph_name_}")
 
     return {
         "file": path.relative_to(ROOT).as_posix(),
@@ -557,16 +650,28 @@ def validate_font(path: Path, *, monospaced: bool) -> dict[str, object]:
 def write_manifest(
     records: list[dict[str, object]],
     specimen: Path,
+    css: Path,
 ) -> Path:
     manifest = {
         "name": "Crow Signal",
         "version": VERSION,
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "originality": (
-            "All glyph outlines are generated from hand-authored modular "
-            "feather-plate patterns in scripts/build_fonts.py. No third-party "
-            "font binaries or outlines are consumed."
+            "All glyph outlines are generated from hand-authored Crow Signal "
+            "bitmap patterns in scripts/build_fonts.py. No third-party font "
+            "binaries, bitmap alphabets, or outlines are consumed."
         ),
+        "design": {
+            "construction": "connected-square-pixel-runs",
+            "cell_units": 100,
+            "regular_embolden_units": 0,
+            "bold_embolden_units": 12,
+            "talon_terminal_cut_units": {
+                "regular": 16,
+                "bold": 14,
+            },
+            "curves": False,
+        },
         "metrics": {
             "units_per_em": UPM,
             "ascender": ASCENDER,
@@ -592,7 +697,13 @@ def write_manifest(
                 "sha256": sha256(specimen),
                 "bytes": specimen.stat().st_size,
                 "kind": "specimen",
-            }
+            },
+            {
+                "file": css.relative_to(ROOT).as_posix(),
+                "sha256": sha256(css),
+                "bytes": css.stat().st_size,
+                "kind": "stylesheet",
+            },
         ],
     }
     path = FONT_ROOT / "manifest.json"
@@ -600,8 +711,103 @@ def write_manifest(
     return path
 
 
+def package_sources(manifest: Path, specimen: Path, css: Path) -> list[tuple[Path, str]]:
+    sources: list[tuple[Path, str]] = [
+        (css, "crow-signal.css"),
+        (FONT_ROOT / "install.ps1", "install.ps1"),
+        (ROOT / "LICENSE.md", "LICENSE.md"),
+        (manifest, "manifest.json"),
+        (FONT_ROOT / "README.md", "README.md"),
+        (ROOT / "scripts" / "build_fonts.py", "scripts/build_fonts.py"),
+        (specimen, f"specimens/{specimen.name}"),
+        (FONT_ROOT / "uninstall.ps1", "uninstall.ps1"),
+    ]
+    sources.extend(
+        (path, f"ttf/{path.name}") for path in sorted(TTF_DIR.glob("*.ttf"))
+    )
+    sources.extend(
+        (path, f"woff2/{path.name}") for path in sorted(WOFF2_DIR.glob("*.woff2"))
+    )
+    for path, _ in sources:
+        if not path.is_file():
+            raise RuntimeError(f"Missing package payload: {path}")
+    return sources
+
+
+def write_package_checksums(sources: list[tuple[Path, str]]) -> Path:
+    path = FONT_ROOT / "package-files.sha256"
+    lines = [f"{sha256(source).upper()}  {relative}" for source, relative in sources]
+    path.write_text("\n".join(lines) + "\n", encoding="ascii", newline="\n")
+    return path
+
+
+def write_package(sources: list[tuple[Path, str]]) -> tuple[Path, Path]:
+    archive_path = DOWNLOAD_DIR / f"{PACKAGE_NAME}.zip"
+    with zipfile.ZipFile(
+        archive_path,
+        mode="w",
+        compression=zipfile.ZIP_DEFLATED,
+        compresslevel=9,
+    ) as archive:
+        for source, relative in sources:
+            info = zipfile.ZipInfo(
+                f"{PACKAGE_NAME}/{relative}",
+                date_time=(2026, 7, 30, 0, 0, 0),
+            )
+            info.compress_type = zipfile.ZIP_DEFLATED
+            info.external_attr = 0o100644 << 16
+            archive.writestr(info, source.read_bytes(), compresslevel=9)
+
+    checksum_path = DOWNLOAD_DIR / f"{PACKAGE_NAME}.sha256"
+    checksum_path.write_text(
+        f"{sha256(archive_path).upper()}  {archive_path.name}\n",
+        encoding="ascii",
+        newline="\n",
+    )
+    return archive_path, checksum_path
+
+
+def validate_package(
+    archive_path: Path,
+    sources: list[tuple[Path, str]],
+) -> dict[str, object]:
+    expected = {f"{PACKAGE_NAME}/{relative}" for _, relative in sources}
+    with zipfile.ZipFile(archive_path, mode="r") as archive:
+        names = set(archive.namelist())
+        if names != expected:
+            missing = sorted(expected - names)
+            extra = sorted(names - expected)
+            raise RuntimeError(
+                f"{archive_path.name} payload mismatch; missing={missing}, extra={extra}"
+            )
+        corrupt = archive.testzip()
+        if corrupt is not None:
+            raise RuntimeError(f"{archive_path.name} has corrupt member {corrupt}")
+
+        loaded_fonts = 0
+        for name in sorted(names):
+            if not name.endswith((".ttf", ".woff2")):
+                continue
+            font = TTFont(io.BytesIO(archive.read(name)))
+            if not set(range(0x20, 0x7F)).issubset(font.getBestCmap()):
+                raise RuntimeError(f"{name} loses printable Basic Latin in ZIP")
+            loaded_fonts += 1
+        if loaded_fonts != 8:
+            raise RuntimeError(
+                f"{archive_path.name} should contain 8 font binaries, found {loaded_fonts}"
+            )
+
+    return {
+        "file": archive_path.relative_to(ROOT).as_posix(),
+        "sha256": sha256(archive_path),
+        "bytes": archive_path.stat().st_size,
+        "members": len(expected),
+        "loadable_font_binaries": loaded_fonts,
+    }
+
+
 def main() -> None:
-    for directory in (TTF_DIR, WOFF2_DIR, SPECIMEN_DIR):
+    for directory in (TTF_DIR, WOFF2_DIR, SPECIMEN_DIR, DOWNLOAD_DIR):
         directory.mkdir(parents=True, exist_ok=True)
 
     configurations = [
@@ -641,7 +847,15 @@ def main() -> None:
         records.append(woff2_record)
 
     specimen = draw_specimen(font_paths)
-    manifest = write_manifest(records, specimen)
+    css = write_css()
+    manifest = write_manifest(records, specimen, css)
+    payload = package_sources(manifest, specimen, css)
+    package_checksums = write_package_checksums(payload)
+    packaged_payload = payload + [
+        (package_checksums, package_checksums.name),
+    ]
+    archive, archive_checksum = write_package(packaged_payload)
+    package_record = validate_package(archive, packaged_payload)
 
     print(f"Built {len(configurations)} original Crow Signal fonts.")
     for record in records:
@@ -650,7 +864,15 @@ def main() -> None:
             f"({record['glyphs']} glyphs, {record['mapped_codepoints']} codepoints)"
         )
     print(f"  {specimen.relative_to(ROOT).as_posix()}")
+    print(f"  {css.relative_to(ROOT).as_posix()}")
     print(f"  {manifest.relative_to(ROOT).as_posix()}")
+    print(f"  {package_checksums.relative_to(ROOT).as_posix()}")
+    print(
+        f"  {package_record['file']} "
+        f"({package_record['members']} members, "
+        f"{package_record['loadable_font_binaries']} loadable font binaries)"
+    )
+    print(f"  {archive_checksum.relative_to(ROOT).as_posix()}")
 
 
 if __name__ == "__main__":

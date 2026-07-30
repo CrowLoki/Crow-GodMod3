@@ -1,7 +1,8 @@
 # Crow Brand Guide
 
-Status: Crow-GodMod3 integration preview  
-Token version: `0.1.0`
+Status: Crow-GodMod3 integration release
+
+Token version: `0.2.0`
 
 The Crow Brand System is the shared visual language for CrowClaw,
 Crow-GodMod3, CrowQuant, CrowNest, CrowMemory and CrowFlix. Product interfaces
@@ -56,6 +57,10 @@ short and use regular or bold weights only.
 `Crow Signal Mono` is the signal face. Use it for code, telemetry, timestamps,
 keyboard hints, identifiers and small uppercase eyebrow labels.
 
+Crow Signal v0.2 is built from connected, hard-edged square-pixel strokes. The
+letters should read as deliberate pixel typography, not a separated dot-matrix
+display. Do not round, blur, or disconnect its source geometry.
+
 Body copy uses the system UI family for sustained reading. The supplied CSS
 provides safe fallbacks:
 
@@ -80,26 +85,52 @@ The cursor family is named `Crow Talon`. Official role names are:
 - Crow Talon Busy
 - Crow Talon Unavailable
 
-Until native cursor assets are present and installed, integrations must use
-the CSS fallback keywords in the token files. Cursors must remain immediately
+Crow Talon v0.2 is drawn as crisp 32 px pixel art and exported at 32, 48, 64,
+and 96 px for Windows. Integrations use the CSS fallback keywords in the token
+files when the native scheme is not installed. Cursors must remain immediately
 recognisable at Windows accessibility sizes; silhouette clarity outranks
 ornament.
+
+## Mascot identity anchor
+
+`assets/mascots/masters/crow-mascot-v3.png` is the sole active Crow mascot
+master. It is the same naturally proportioned adult biomechanical crow across
+CrowClaw, Crow-GodMod3, CrowQuant, CrowNest, CrowMemory, CrowFlix and future
+Crow products.
+
+Product derivatives may change only:
+
+- crop;
+- background or surrounding scene;
+- emphasis among the approved cyan, electric-blue, indigo, ultraviolet,
+  violet and restrained-magenta accents.
+
+Do not alter the character's anatomy, proportions, pose language or
+biomechanical construction to create a product role. Do not introduce a
+humanoid body, clothing, pet/chick proportions, a separate head-only identity,
+or another character.
+
+All earlier head, humanoid, companion/pet, v1 and v2 files remain physically
+intact as inactive legacy/reference records. They must not be overwritten,
+deleted, substituted for `crow-mascot-v3.png`, or used as an active identity
+reference.
 
 ## Product bindings
 
 Set `data-crow-product` on a product root to receive its CSS binding.
 
-| Product | Attribute value | Primary form | Compact form | Colour emphasis |
+| Product | Attribute value | Suggested crop | Background direction | Colour emphasis |
 | --- | --- | --- | --- | --- |
-| CrowClaw | `crowclaw` | Core Architect | Pet Companion | Cyan, ultraviolet, electric blue |
-| Crow-GodMod3 | `crow-godmod3` | Glitch Ascendant | Core Architect | Ultraviolet, cyan, restrained magenta |
-| CrowQuant | `crowquant` | Field Operator | Pet Companion | Electric blue, cyan, success teal |
-| CrowNest | `crownest` | Core Architect | Pet Companion | Bright indigo, cyan, violet |
-| CrowMemory | `crowmemory` | Core Architect | Pet Companion | Violet, cyan, electric blue |
-| CrowFlix | `crowflix` | Field Operator | Pet Companion | Electric blue, violet, restrained magenta |
+| CrowClaw | `crowclaw` | Full crow or close portrait | Local system space and permission geometry | Cyan, ultraviolet, electric blue |
+| Crow-GodMod3 | `crow-godmod3` | Full crow | Controlled recursion and data-space distortion | Ultraviolet, cyan, restrained magenta |
+| CrowQuant | `crowquant` | Full crow or wing-and-head crop | Quantitative lattice and analytical signals | Electric blue, cyan, success teal |
+| CrowNest | `crownest` | Full crow | Linked nodes and system stewardship | Bright indigo, cyan, violet |
+| CrowMemory | `crowmemory` | Portrait or full crow | Protected archive and recall geometry | Violet, cyan, electric blue |
+| CrowFlix | `crowflix` | Full crow or cinematic portrait | Projection, framing and signal flow | Electric blue, violet, restrained magenta |
 
-Bindings create emphasis, not new palettes. Products must still use the
-shared surfaces, text colours, semantic states and mascot anatomy.
+Bindings create environmental and accent emphasis around the one active
+mascot; they never create a new mascot form. Products must still use the
+shared surfaces, text colours, semantic states and exact v3 mascot identity.
 
 ## Accessibility
 

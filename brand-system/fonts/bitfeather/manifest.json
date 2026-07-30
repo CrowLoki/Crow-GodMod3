@@ -1,0 +1,177 @@
+{
+  "name": "Crow Bitfeather",
+  "version": "0.3.0",
+  "generated_at": "2026-07-30T00:00:00+00:00",
+  "approved_source": "fonts/specimens/crow-type-audition-v0.6.png row 03 BITFEATHER",
+  "construction": {
+    "logical_grid_scale": 8,
+    "proof_equivalent_stroke": 16,
+    "regular_stroke": 18,
+    "regular_weight_increase": "12.5%",
+    "bold_stroke": 21,
+    "outline": "orthogonal filled polygons; no curves or detached dots"
+  },
+  "coverage": {
+    "printable_basic_latin": "U+0020-U+007E",
+    "extras": [
+      "U+00A0",
+      "U+00A9",
+      "U+00AE",
+      "U+2013",
+      "U+2014",
+      "U+2018",
+      "U+2019",
+      "U+201C",
+      "U+201D",
+      "U+2022",
+      "U+2026",
+      "U+2122",
+      "U+2190",
+      "U+2191",
+      "U+2192",
+      "U+2193",
+      "U+2194",
+      "U+2195",
+      "U+21A9",
+      "U+21AA",
+      "U+21D2",
+      "U+2212",
+      "U+2260",
+      "U+2264",
+      "U+2265",
+      "U+25C6",
+      "U+25C7",
+      "U+2605"
+    ]
+  },
+  "small_size_render_pixels": {
+    "16px": 1734,
+    "20px": 2134,
+    "28px": 3766,
+    "48px": 9329,
+    "96px": 33487
+  },
+  "files": [
+    {
+      "file": "fonts/bitfeather/ttf/CrowBitfeatherDisplay-Regular.ttf",
+      "sha256": "6d594a7c213535258f5294524c74509299a065be0f0f8f08e7fd7d85ca36e776",
+      "bytes": 57804,
+      "glyphs": 126,
+      "mapped_codepoints": 123,
+      "monospaced": false,
+      "format": "ttf",
+      "family": "Crow Bitfeather Display",
+      "style": "Regular",
+      "weight": 400
+    },
+    {
+      "file": "fonts/bitfeather/woff2/CrowBitfeatherDisplay-Regular.woff2",
+      "sha256": "32acc84b70db3aec0670f0f5ec4d82444d62b1efac9dcb580ff9f038678f8d93",
+      "bytes": 10360,
+      "glyphs": 126,
+      "mapped_codepoints": 123,
+      "monospaced": false,
+      "format": "woff2",
+      "family": "Crow Bitfeather Display",
+      "style": "Regular",
+      "weight": 400
+    },
+    {
+      "file": "fonts/bitfeather/ttf/CrowBitfeatherDisplay-Bold.ttf",
+      "sha256": "cf87605a19bb4121714ff0c79760e50a0e933972331e304d51c3957fe36e7db3",
+      "bytes": 58044,
+      "glyphs": 126,
+      "mapped_codepoints": 123,
+      "monospaced": false,
+      "format": "ttf",
+      "family": "Crow Bitfeather Display",
+      "style": "Bold",
+      "weight": 700
+    },
+    {
+      "file": "fonts/bitfeather/woff2/CrowBitfeatherDisplay-Bold.woff2",
+      "sha256": "620595684feb9faf562f9b8ecdb1239a6a041b69d9dc2441dabcb81219d74588",
+      "bytes": 10324,
+      "glyphs": 126,
+      "mapped_codepoints": 123,
+      "monospaced": false,
+      "format": "woff2",
+      "family": "Crow Bitfeather Display",
+      "style": "Bold",
+      "weight": 700
+    },
+    {
+      "file": "fonts/bitfeather/ttf/CrowBitfeatherMono-Regular.ttf",
+      "sha256": "7d0382677f3c28367187156209c1b468c19037eb88084e365b7a3e8e627c4395",
+      "bytes": 57560,
+      "glyphs": 126,
+      "mapped_codepoints": 123,
+      "monospaced": true,
+      "format": "ttf",
+      "family": "Crow Bitfeather Mono",
+      "style": "Regular",
+      "weight": 400
+    },
+    {
+      "file": "fonts/bitfeather/woff2/CrowBitfeatherMono-Regular.woff2",
+      "sha256": "f6e188dfc90ce3b38805b503d53c1738b7356550658e0c19f5f2f6d9249fcec5",
+      "bytes": 10260,
+      "glyphs": 126,
+      "mapped_codepoints": 123,
+      "monospaced": true,
+      "format": "woff2",
+      "family": "Crow Bitfeather Mono",
+      "style": "Regular",
+      "weight": 400
+    },
+    {
+      "file": "fonts/bitfeather/ttf/CrowBitfeatherMono-Bold.ttf",
+      "sha256": "2cbbdee64b8c50df7321a4de584933ecb32374af9f59d9d32d2f76274f1f42cd",
+      "bytes": 57800,
+      "glyphs": 126,
+      "mapped_codepoints": 123,
+      "monospaced": true,
+      "format": "ttf",
+      "family": "Crow Bitfeather Mono",
+      "style": "Bold",
+      "weight": 700
+    },
+    {
+      "file": "fonts/bitfeather/woff2/CrowBitfeatherMono-Bold.woff2",
+      "sha256": "0e07a9afb8f6a06fd7420432c770cc5ea71bce6b5d33519e08f34adbb580ecf2",
+      "bytes": 10284,
+      "glyphs": 126,
+      "mapped_codepoints": 123,
+      "monospaced": true,
+      "format": "woff2",
+      "family": "Crow Bitfeather Mono",
+      "style": "Bold",
+      "weight": 700
+    },
+    {
+      "file": "fonts/bitfeather/specimens/crow-bitfeather-v0.3.0.png",
+      "sha256": "69412cfd35370a301865570c3ee7188ba3b6d76975ec88840063e0350341503d",
+      "bytes": 178218
+    },
+    {
+      "file": "fonts/bitfeather/crow-bitfeather.css",
+      "sha256": "d0986a446b9ef87c5dc3811c3110eece489034b2620aeeee1a19d2c06ec11dd5",
+      "bytes": 850
+    },
+    {
+      "file": "fonts/bitfeather/install.ps1",
+      "sha256": "a8fd851accf9877e91486221004d5b3fbea8386e182769fc95ad942b7a6f0e7f",
+      "bytes": 5463
+    },
+    {
+      "file": "fonts/bitfeather/uninstall.ps1",
+      "sha256": "d86cdbd353c3ede3db4d791a96a55d52e0ef11feec5fe7653f68a6ed6a38cd48",
+      "bytes": 5607
+    },
+    {
+      "file": "fonts/bitfeather/README.md",
+      "sha256": "91b445fc9fd4a0ad71a7664b4bb6f396845b52d06a48a7ee84c9764014f77cd8",
+      "bytes": 920
+    }
+  ]
+}

@@ -1,18 +1,34 @@
 @import "tailwindcss";
 
 @font-face {
-  font-family: "Crow Signal Display";
-  src: url("/crow-theme/fonts/woff2/CrowSignalDisplay-Bold.woff2")
+  font-family: "Crow Bitfeather Display";
+  src: url("/crow-theme/fonts/bitfeather/woff2/CrowBitfeatherDisplay-Regular.woff2")
+    format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Crow Bitfeather Display";
+  src: url("/crow-theme/fonts/bitfeather/woff2/CrowBitfeatherDisplay-Bold.woff2")
     format("woff2");
   font-weight: 700;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Crow Signal Mono";
-  src: url("/crow-theme/fonts/woff2/CrowSignalMono-Regular.woff2")
+  font-family: "Crow Bitfeather Mono";
+  src: url("/crow-theme/fonts/bitfeather/woff2/CrowBitfeatherMono-Regular.woff2")
     format("woff2");
   font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Crow Bitfeather Mono";
+  src: url("/crow-theme/fonts/bitfeather/woff2/CrowBitfeatherMono-Bold.woff2")
+    format("woff2");
+  font-weight: 700;
   font-display: swap;
 }
 
@@ -41,7 +57,7 @@ body {
 body {
   display: grid;
   place-items: center;
-  font-family: "Crow Signal Mono", "Cascadia Code", Consolas, monospace;
+  font-family: "Crow Bitfeather Mono", "Cascadia Code", Consolas, monospace;
   background:
     linear-gradient(90deg, rgb(3 4 10 / 96%), rgb(3 4 10 / 38%)),
     url("/crow-theme/assets/product-variants/exports/crow-godmod3-1920x1080.png")
@@ -60,11 +76,28 @@ main {
 h1 {
   margin: 0 0 12px;
   color: var(--text);
-  font-family: "Crow Signal Display", "Segoe UI", sans-serif;
+  font-family: "Crow Bitfeather Display", "Segoe UI", sans-serif;
   letter-spacing: 0.045em;
 }
 
 p {
   margin: 0;
   color: var(--muted);
+}
+
+@media (pointer: fine) {
+  body {
+    cursor:
+      url("/crow-theme/cursors/v0.5/src/32/normal.png") 6 2,
+      url("/crow-theme/cursors/v0.5/windows/normal.cur"),
+      default;
+  }
+
+  a,
+  button {
+    cursor:
+      url("/crow-theme/cursors/v0.5/src/32/link.png") 6 2,
+      url("/crow-theme/cursors/v0.5/windows/link.cur"),
+      pointer;
+  }
 }

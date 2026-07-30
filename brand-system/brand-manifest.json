@@ -1,17 +1,16 @@
 {
   "id": "crow-brand-system",
   "name": "Crow Brand System",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "status": "internal-preview",
-  "generated_at": "2026-07-29T15:02:53.164611+00:00",
-  "approved_forms": [
-    "core-architect",
-    "field-operator",
-    "glitch-ascendant",
-    "pet-companion"
+  "generated_at": "2026-07-30T09:51:25.054993+00:00",
+  "approved_mascots": [
+    "crow-mascot-v3"
   ],
+  "canonical_mascot": "assets/mascots/masters/crow-mascot-v3.png",
+  "legacy_mascot_policy": "Earlier mascot files remain physically intact for provenance and reference, but are not active product identities.",
   "original_asset_families": [
-    "Crow Signal",
+    "Crow Bitfeather",
     "Crow Talon"
   ],
   "products": [
@@ -32,8 +31,8 @@
     {
       "file": "AGENTS.md",
       "kind": "project",
-      "bytes": 1819,
-      "sha256": "63d8cea58dc1ec51c0d25f171bab2f2ff6368b37c729bfc08cb6dc1159beb103"
+      "bytes": 2609,
+      "sha256": "c73dc16554f22206236d269a9d19951f81022cd5d4c65a1e9819e823db5e6f8d"
     },
     {
       "file": "assets/backgrounds/exports/void-grid-1920x1080.png",
@@ -98,8 +97,8 @@
     {
       "file": "assets/icons/app/crow-signal-app-rounded-1024.png",
       "kind": "icon",
-      "bytes": 1352750,
-      "sha256": "30725f9aa921822d2daf1a101a2fbb310463f6b64deefa7a8b3af52f18456e2e",
+      "bytes": 1408941,
+      "sha256": "af815eb99d53985ee5f180f89667b8ebb0bd607b9302549fdfb670150c007327",
       "width": 1024,
       "height": 1024,
       "mode": "RGBA",
@@ -108,8 +107,8 @@
     {
       "file": "assets/icons/app/crow-signal-app-rounded-256.png",
       "kind": "icon",
-      "bytes": 94339,
-      "sha256": "29b9f9afe84e51392503bdd18041dd1e2c314f65bcce735da1c1514fedc04bd7",
+      "bytes": 128886,
+      "sha256": "c9a2bfa9bbe3c0b11d76fea3c2064b6570490a107c61bdc7883c3c3d56c048cf",
       "width": 256,
       "height": 256,
       "mode": "RGBA",
@@ -118,8 +117,18 @@
     {
       "file": "assets/icons/app/crow-signal-app-rounded-512.png",
       "kind": "icon",
-      "bytes": 372106,
-      "sha256": "0779dcaf9f723e13e560b59a325de9dadbf8356d5807401f5c3437aee5bf0a42",
+      "bytes": 460833,
+      "sha256": "df2580273e12ee114f1bc1d80fa600e80ca90881c425aa8e8e644e28e42e4096",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/icons/avatars/crow-mascot-avatar-512.png",
+      "kind": "icon",
+      "bytes": 385675,
+      "sha256": "390fd441980b9212b33d495953898436a02b2501f27628eda05d0d234e8ae87e",
       "width": 512,
       "height": 512,
       "mode": "RGBA",
@@ -128,8 +137,8 @@
     {
       "file": "assets/icons/avatars/crow-signal-avatar-512.png",
       "kind": "icon",
-      "bytes": 471123,
-      "sha256": "ce0a32d4a8fd410233548d2ee7f094399a07d326804281fba92ee6ab7cb3d5fe",
+      "bytes": 419493,
+      "sha256": "7f20ac300e16a6f4fa4ff54b2701d2bd11daf104ae410a19f12a8c7c57bd10f7",
       "width": 512,
       "height": 512,
       "mode": "RGB",
@@ -148,8 +157,8 @@
     {
       "file": "assets/icons/contact-sheet.png",
       "kind": "icon",
-      "bytes": 879645,
-      "sha256": "a688dff1772c1610fe79d3e67205aaa4281f607e69b3e61e7f43bdbc290d5317",
+      "bytes": 931665,
+      "sha256": "42fab132538dccc348c70fa3ec5cf6d635c58e2538e4c4e7c6a72c97b01c518b",
       "width": 2400,
       "height": 1760,
       "mode": "RGB",
@@ -158,8 +167,8 @@
     {
       "file": "assets/icons/favicon.ico",
       "kind": "icon",
-      "bytes": 369966,
-      "sha256": "0e2a991721cf2d1f05a7f2d68704656cff8bd574e1fa931b2a19c848f24d8f15",
+      "bytes": 413542,
+      "sha256": "a5df8f2b21727d449aca1cd9e02ea586b67367c4d0b24d1941dae7c8f0666433",
       "width": 256,
       "height": 256,
       "mode": "RGBA",
@@ -168,14 +177,14 @@
     {
       "file": "assets/icons/manifest.json",
       "kind": "icon",
-      "bytes": 15682,
-      "sha256": "b9ce6c2077a1e55d982eef289f278f533754db3f3fc41437859192578db62ec4"
+      "bytes": 25258,
+      "sha256": "eb23a33c6f927ec13d067083b91f618966743c27af562b91fc741ae325a62469"
     },
     {
       "file": "assets/icons/png/crow-signal-1024.png",
       "kind": "icon",
-      "bytes": 1209436,
-      "sha256": "ee65879a2cecd02ef9bb1d386738ef391158c3791ec0c4638cc9d48bf337ea9c",
+      "bytes": 1254662,
+      "sha256": "0d9ce14117fa37393df6d2ff90128c6de30d607ca48f65b53e2432b3f53b6913",
       "width": 1024,
       "height": 1024,
       "mode": "RGB",
@@ -184,8 +193,8 @@
     {
       "file": "assets/icons/png/crow-signal-128.png",
       "kind": "icon",
-      "bytes": 34542,
-      "sha256": "ff6bbdff613acc55f7f004171fa67215b6b49b618b02bf5d3a88d48c780e8f18",
+      "bytes": 38967,
+      "sha256": "ff7ddcda86737a287adbbdf12eeb112e608c9694bd4be1d7ffd8aa8f0d2f18b9",
       "width": 128,
       "height": 128,
       "mode": "RGB",
@@ -194,8 +203,8 @@
     {
       "file": "assets/icons/png/crow-signal-16.png",
       "kind": "icon",
-      "bytes": 705,
-      "sha256": "dac2f1f115473d8f63fa02ec848fb29b3c040d2a1b8a6fbde4ebb59720d36426",
+      "bytes": 794,
+      "sha256": "aafe680e4f7fcfceb8fd9728c7e385c317530aa93b1052bcb6ac11310c6cfd05",
       "width": 16,
       "height": 16,
       "mode": "RGB",
@@ -204,8 +213,8 @@
     {
       "file": "assets/icons/png/crow-signal-180.png",
       "kind": "icon",
-      "bytes": 66979,
-      "sha256": "75ade137a7af57043a7ce42b3cac8e63e9720dd5dada0fb47c4afe5ffb13467d",
+      "bytes": 73582,
+      "sha256": "d3593a87a7458a95bc1b22299efc9c7ee15e26dd31aaf426a5ef454b45c8ab96",
       "width": 180,
       "height": 180,
       "mode": "RGB",
@@ -214,8 +223,8 @@
     {
       "file": "assets/icons/png/crow-signal-192.png",
       "kind": "icon",
-      "bytes": 75773,
-      "sha256": "705da099cde24a21c5ba471b5ac67af338cf9b6ca4a938901cf9f908f25caad3",
+      "bytes": 83151,
+      "sha256": "d193a4837c41be75da1edeb024eaa0ecf18920d6e74ea9cdf3a47ec958daa897",
       "width": 192,
       "height": 192,
       "mode": "RGB",
@@ -224,8 +233,8 @@
     {
       "file": "assets/icons/png/crow-signal-20.png",
       "kind": "icon",
-      "bytes": 1033,
-      "sha256": "157731bbef2553c9c6e2131083a0b01b2e04a721fe68b8c59943fd5f04d27dc4",
+      "bytes": 1177,
+      "sha256": "2a8ebf90b94ae85c1a2b181b739f7195117567d9e2540efdb03a226f3e4ef095",
       "width": 20,
       "height": 20,
       "mode": "RGB",
@@ -234,8 +243,8 @@
     {
       "file": "assets/icons/png/crow-signal-24.png",
       "kind": "icon",
-      "bytes": 1416,
-      "sha256": "8e0776e8bb5a8af341d84342f269970d8c30dce454be46905837355dd462f446",
+      "bytes": 1673,
+      "sha256": "89e37a2c4ae0636672edcba1717f989b9e59389df7bf22db72df96a57deebccc",
       "width": 24,
       "height": 24,
       "mode": "RGB",
@@ -244,8 +253,8 @@
     {
       "file": "assets/icons/png/crow-signal-256.png",
       "kind": "icon",
-      "bytes": 103405,
-      "sha256": "dea4da2edead995b0ccb431ce9c2fd20777fe9e7d72896aead334a2e8cadaace",
+      "bytes": 122217,
+      "sha256": "326f4c667be037d0dbe8a1e8fdfb10315b78b333777164ce626222d6f9dedda7",
       "width": 256,
       "height": 256,
       "mode": "RGB",
@@ -254,8 +263,8 @@
     {
       "file": "assets/icons/png/crow-signal-32.png",
       "kind": "icon",
-      "bytes": 2416,
-      "sha256": "2730f713c165441b106718f607b54a4caf5c68fad90adba722ab2c57f3b6a83b",
+      "bytes": 2862,
+      "sha256": "f74ac743cff7eb924d72f38ebbae7bda934656bff8fee60f5298459d7c020830",
       "width": 32,
       "height": 32,
       "mode": "RGB",
@@ -264,8 +273,8 @@
     {
       "file": "assets/icons/png/crow-signal-40.png",
       "kind": "icon",
-      "bytes": 3765,
-      "sha256": "cffaaefea91f67d509c7cb109ef70ef7922eb7ffb2c84512edd8ace70c1220db",
+      "bytes": 4390,
+      "sha256": "26ba57970275298b54e087ad93ac03524604a23d92753c0748065bba78817ebd",
       "width": 40,
       "height": 40,
       "mode": "RGB",
@@ -274,8 +283,8 @@
     {
       "file": "assets/icons/png/crow-signal-48.png",
       "kind": "icon",
-      "bytes": 5363,
-      "sha256": "36f4504b03589787790f66d8d899146f642a64c6ff780a4600fde03a84e73662",
+      "bytes": 6223,
+      "sha256": "566939181812cef5452625ec2107f4a5933f08ef56b537b66c6446f167745cf1",
       "width": 48,
       "height": 48,
       "mode": "RGB",
@@ -284,8 +293,8 @@
     {
       "file": "assets/icons/png/crow-signal-512.png",
       "kind": "icon",
-      "bytes": 319308,
-      "sha256": "830b53da8581ef50cec9d759cab8a5e282b5241140b27e0d395b27e8670e21cd",
+      "bytes": 396519,
+      "sha256": "c1e82083dae43ad7e1904afb98f9d71ef6616e80fddee1d170d29562f6eb0e67",
       "width": 512,
       "height": 512,
       "mode": "RGB",
@@ -294,8 +303,8 @@
     {
       "file": "assets/icons/png/crow-signal-64.png",
       "kind": "icon",
-      "bytes": 9137,
-      "sha256": "9897e280a67383144d5b341b61b06e92ca009bdbfb84888c533e2a55c35c145e",
+      "bytes": 10346,
+      "sha256": "2aa9a2ff64821aa7a5ce848e8e9cf5ba216f757c2f253767daac6aee4204cd48",
       "width": 64,
       "height": 64,
       "mode": "RGB",
@@ -304,26 +313,236 @@
     {
       "file": "assets/icons/png/crow-signal-96.png",
       "kind": "icon",
-      "bytes": 19806,
-      "sha256": "b6e269acf3fac811d99a17b711eb69d4d929881de4814fa274722ef5b87baf0b",
+      "bytes": 22460,
+      "sha256": "880589c22957476165ed933e9ed78612d5d79c183451c19700f192ca8aace9b0",
       "width": 96,
       "height": 96,
       "mode": "RGB",
       "format": "PNG"
     },
     {
+      "file": "assets/icons/runtime/app/crow-signal-app-rounded-1024.avif",
+      "kind": "icon",
+      "bytes": 116786,
+      "sha256": "6e4342ccb0639bc71b3ef15bce482362e04536ab175964ddb2a295d2a0955551",
+      "width": 1024,
+      "height": 1024,
+      "mode": "RGBA",
+      "format": "AVIF"
+    },
+    {
+      "file": "assets/icons/runtime/app/crow-signal-app-rounded-1024.webp",
+      "kind": "icon",
+      "bytes": 155830,
+      "sha256": "e960369e9761bbed9a52443da698209eff0307d593baa4b1bf80ea19a3a0e0c7",
+      "width": 1024,
+      "height": 1024,
+      "mode": "RGBA",
+      "format": "WEBP"
+    },
+    {
+      "file": "assets/icons/runtime/app/crow-signal-app-rounded-256.avif",
+      "kind": "icon",
+      "bytes": 19523,
+      "sha256": "bb0847c4bdd96764795f409e65d7f55154800d34fd81138f16d6931fbe195c2f",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "format": "AVIF"
+    },
+    {
+      "file": "assets/icons/runtime/app/crow-signal-app-rounded-256.webp",
+      "kind": "icon",
+      "bytes": 23534,
+      "sha256": "0a13edfe845775f08f4446dfc3b5886425e057cfb70af947411368fd00ea3fa3",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "format": "WEBP"
+    },
+    {
+      "file": "assets/icons/runtime/app/crow-signal-app-rounded-512.avif",
+      "kind": "icon",
+      "bytes": 63274,
+      "sha256": "f2195e4ff942bc2a1b7ffca2c42635aec9b88a8fb9a2cbe590747524a9fd9c35",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "format": "AVIF"
+    },
+    {
+      "file": "assets/icons/runtime/app/crow-signal-app-rounded-512.webp",
+      "kind": "icon",
+      "bytes": 78966,
+      "sha256": "11d33b7d437754d222aa1d4dc012303ce9f9d5846480c0010725ee08c93f8fec",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "format": "WEBP"
+    },
+    {
+      "file": "assets/icons/runtime/avatars/crow-mascot-avatar-512.avif",
+      "kind": "icon",
+      "bytes": 59765,
+      "sha256": "dd705a6255171aea6601fe24f702e7e30ca3f8a2773df50e25d821639dbbb17f",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "format": "AVIF"
+    },
+    {
+      "file": "assets/icons/runtime/avatars/crow-mascot-avatar-512.webp",
+      "kind": "icon",
+      "bytes": 76102,
+      "sha256": "e372571041c0a1183d747c2f8926b556e7d7ab56501c7a09be6f87018c9b03e4",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "format": "WEBP"
+    },
+    {
+      "file": "assets/icons/runtime/avatars/crow-signal-avatar-512.avif",
+      "kind": "icon",
+      "bytes": 59277,
+      "sha256": "63c7aa4525f939e1727e45fa4783e349a095cfb3fe7b34b503db2dbe02050ab9",
+      "width": 512,
+      "height": 512,
+      "mode": "RGB",
+      "format": "AVIF"
+    },
+    {
+      "file": "assets/icons/runtime/avatars/crow-signal-avatar-512.webp",
+      "kind": "icon",
+      "bytes": 77682,
+      "sha256": "8a6c813ec1300fa3a09661948c1a12eec46c1326cb895a0f4c11ff7fdd868f04",
+      "width": 512,
+      "height": 512,
+      "mode": "RGB",
+      "format": "WEBP"
+    },
+    {
+      "file": "assets/icons/runtime/square/crow-signal-1024.avif",
+      "kind": "icon",
+      "bytes": 113890,
+      "sha256": "b7f621d7fdee9e63bb77f0cd13c1ef591b6fdc1b658490d2b9f5624a96f65f0a",
+      "width": 1024,
+      "height": 1024,
+      "mode": "RGB",
+      "format": "AVIF"
+    },
+    {
+      "file": "assets/icons/runtime/square/crow-signal-1024.webp",
+      "kind": "icon",
+      "bytes": 154816,
+      "sha256": "a3a8f2b2d50577ffbb6aa0b67bbeb855dcaeb3cc6d6d14d3b8b0a8f886e02cfb",
+      "width": 1024,
+      "height": 1024,
+      "mode": "RGB",
+      "format": "WEBP"
+    },
+    {
+      "file": "assets/icons/runtime/square/crow-signal-192.avif",
+      "kind": "icon",
+      "bytes": 14895,
+      "sha256": "6947ab30904a6879c2f3e1d03d44629d5f317f66eca62a7214df7bde4da08f37",
+      "width": 192,
+      "height": 192,
+      "mode": "RGB",
+      "format": "AVIF"
+    },
+    {
+      "file": "assets/icons/runtime/square/crow-signal-192.webp",
+      "kind": "icon",
+      "bytes": 18562,
+      "sha256": "f8cd7d117dfa9a7cbc10d4a8734dd7974d21fcbdf0253af1ff57e58fe9687103",
+      "width": 192,
+      "height": 192,
+      "mode": "RGB",
+      "format": "WEBP"
+    },
+    {
+      "file": "assets/icons/runtime/square/crow-signal-512.avif",
+      "kind": "icon",
+      "bytes": 52706,
+      "sha256": "2ffeca5ce670cfcd952449c9fd86c864d8e21f68122d103625b4e62cfe1c8098",
+      "width": 512,
+      "height": 512,
+      "mode": "RGB",
+      "format": "AVIF"
+    },
+    {
+      "file": "assets/icons/runtime/square/crow-signal-512.webp",
+      "kind": "icon",
+      "bytes": 67590,
+      "sha256": "5a7d4b6552c2a8b49185f409433999d83ee07b23c64de13117a15dfe496134fa",
+      "width": 512,
+      "height": 512,
+      "mode": "RGB",
+      "format": "WEBP"
+    },
+    {
       "file": "assets/marks/crow-signal-master.png",
-      "kind": "project",
-      "bytes": 1796036,
-      "sha256": "de3b381e21c29c1d87d69554daa474c9a4d11c146eaea44dd4c843d9b197f472",
-      "width": 1254,
-      "height": 1254,
+      "kind": "brand-mark",
+      "bytes": 1254662,
+      "sha256": "0d9ce14117fa37393df6d2ff90128c6de30d607ca48f65b53e2432b3f53b6913",
+      "width": 1024,
+      "height": 1024,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/marks/runtime/crow-signal-master-1024.avif",
+      "kind": "brand-mark",
+      "bytes": 113890,
+      "sha256": "b7f621d7fdee9e63bb77f0cd13c1ef591b6fdc1b658490d2b9f5624a96f65f0a",
+      "width": 1024,
+      "height": 1024,
+      "mode": "RGB",
+      "format": "AVIF"
+    },
+    {
+      "file": "assets/marks/runtime/crow-signal-master-1024.webp",
+      "kind": "brand-mark",
+      "bytes": 154816,
+      "sha256": "a3a8f2b2d50577ffbb6aa0b67bbeb855dcaeb3cc6d6d14d3b8b0a8f886e02cfb",
+      "width": 1024,
+      "height": 1024,
+      "mode": "RGB",
+      "format": "WEBP"
+    },
+    {
+      "file": "assets/marks/runtime/crow-signal-master-512.avif",
+      "kind": "brand-mark",
+      "bytes": 52706,
+      "sha256": "2ffeca5ce670cfcd952449c9fd86c864d8e21f68122d103625b4e62cfe1c8098",
+      "width": 512,
+      "height": 512,
+      "mode": "RGB",
+      "format": "AVIF"
+    },
+    {
+      "file": "assets/marks/runtime/crow-signal-master-512.webp",
+      "kind": "brand-mark",
+      "bytes": 67590,
+      "sha256": "5a7d4b6552c2a8b49185f409433999d83ee07b23c64de13117a15dfe496134fa",
+      "width": 512,
+      "height": 512,
+      "mode": "RGB",
+      "format": "WEBP"
+    },
+    {
+      "file": "assets/mascots/masters/core-architect-v2.png",
+      "kind": "legacy-mascot-master",
+      "bytes": 2110116,
+      "sha256": "ae8f4d34b6007f9fa3826962053fd2863247b00bb29965bb0c1e67dd61efeeb5",
+      "width": 951,
+      "height": 1654,
       "mode": "RGB",
       "format": "PNG"
     },
     {
       "file": "assets/mascots/masters/core-architect.png",
-      "kind": "approved-mascot-master",
+      "kind": "legacy-mascot-master",
       "bytes": 2170779,
       "sha256": "7d368291269cf02b5c968245a0f29b63a6cb008f3fa741a8530630bb6fc6062d",
       "width": 951,
@@ -332,8 +551,38 @@
       "format": "PNG"
     },
     {
-      "file": "assets/mascots/masters/field-operator.png",
+      "file": "assets/mascots/masters/crow-head-identity-v2.png",
+      "kind": "legacy-mascot-master",
+      "bytes": 2422923,
+      "sha256": "6c4e61900f85f1e22f139872d56467c48fcaf8eb2b0c2e6494fda35b9c9f186d",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/mascots/masters/crow-mascot-v3.png",
       "kind": "approved-mascot-master",
+      "bytes": 1392212,
+      "sha256": "d640ce9685aca512375be5cb66600ebfdf3a4bccbb5f32479798a6ef3917b319",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/mascots/masters/field-operator-v2.png",
+      "kind": "legacy-mascot-master",
+      "bytes": 2775983,
+      "sha256": "8c72399944b940f7f048763859401730590999327d32e5fff46808f9f63b3b56",
+      "width": 1024,
+      "height": 1536,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/mascots/masters/field-operator.png",
+      "kind": "legacy-mascot-master",
       "bytes": 2750287,
       "sha256": "ef682df20a92e22ce3c3c3623dd6e790856e7385bb917b931ed78784afbeb2ce",
       "width": 1024,
@@ -342,8 +591,18 @@
       "format": "PNG"
     },
     {
+      "file": "assets/mascots/masters/glitch-ascendant-v2.png",
+      "kind": "legacy-mascot-master",
+      "bytes": 2798606,
+      "sha256": "3dd6b5da68d1ab31033e4ec3132104d971754cebc1254b92a3b69d188549ef32",
+      "width": 1024,
+      "height": 1536,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
       "file": "assets/mascots/masters/glitch-ascendant.png",
-      "kind": "approved-mascot-master",
+      "kind": "legacy-mascot-master",
       "bytes": 3236779,
       "sha256": "a16ba71249f78001fb2e5b4ad48fc5573d41a7e63cdd3d2fef8a6ea227c9bcfd",
       "width": 1024,
@@ -352,8 +611,18 @@
       "format": "PNG"
     },
     {
+      "file": "assets/mascots/masters/pet-companion-v2.png",
+      "kind": "legacy-mascot-master",
+      "bytes": 1630797,
+      "sha256": "b7ced030fd04aeb34978cd824faa202f375fc8e640a8a218af5113fc960da3f2",
+      "width": 1268,
+      "height": 1240,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
       "file": "assets/mascots/masters/pet-companion.png",
-      "kind": "approved-mascot-master",
+      "kind": "legacy-mascot-master",
       "bytes": 1971520,
       "sha256": "644a121117370fcc01babbd4e30682a768a9e723e99ad2b3e40d404f0575d1c0",
       "width": 1024,
@@ -382,206 +651,596 @@
       "format": "PNG"
     },
     {
+      "file": "assets/mascots/references/crow-mascot-v3-chroma.png",
+      "kind": "identity-reference",
+      "bytes": 1938343,
+      "sha256": "19f3922170b2417b403edc18b026d8bad7c6640bca59c8517e76c1285d866a68",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/mascots/runtime/crow-mascot-v3.avif",
+      "kind": "runtime-mascot",
+      "bytes": 165821,
+      "sha256": "3688238614c81413161b3af4da9f17ab8eea816096991e2adc5408d2526be58e",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "format": "AVIF"
+    },
+    {
+      "file": "assets/mascots/runtime/crow-mascot-v3.webp",
+      "kind": "runtime-mascot",
+      "bytes": 204412,
+      "sha256": "250afe65beb335ae431303e5e68bc0e473b2db3f4c1582a95b26a9b90cc6c883",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "format": "WEBP"
+    },
+    {
       "file": "assets/product-variants/crow-godmod3-hero.png",
       "kind": "product-artwork",
-      "bytes": 2262636,
-      "sha256": "581194e8fd09ebbfbc30943e8636c97ebd362758c1ed0400b69ac219bb58fe8c",
-      "width": 1672,
-      "height": 941,
+      "bytes": 3398856,
+      "sha256": "001a647438b935c562567dda97ce766d5f60e8f542efddbc0737ffc8fb8f6a11",
+      "width": 2400,
+      "height": 1350,
       "mode": "RGB",
       "format": "PNG"
     },
     {
       "file": "assets/product-variants/crowclaw-hero.png",
       "kind": "product-artwork",
-      "bytes": 1932620,
-      "sha256": "643336b0e838b3f0bc630cee275890977d315946bad529028f8978654d9644d2",
-      "width": 1672,
-      "height": 941,
+      "bytes": 3398015,
+      "sha256": "2226064da837f4b0d86d1e39310454ffa0a8cd55b4607ae2e9dc15a69d9934c6",
+      "width": 2400,
+      "height": 1350,
       "mode": "RGB",
       "format": "PNG"
     },
     {
       "file": "assets/product-variants/crowflix-hero.png",
       "kind": "product-artwork",
-      "bytes": 2192412,
-      "sha256": "2366f71a0808b3c38de9d9edbeb65f325e7a0c105963889ddbbad53aba196864",
-      "width": 1672,
-      "height": 941,
+      "bytes": 3401964,
+      "sha256": "be45984056704749e7a9e4fd8c57d596988da9f69f6ad58aa81ce538a8ecf249",
+      "width": 2400,
+      "height": 1350,
       "mode": "RGB",
       "format": "PNG"
     },
     {
       "file": "assets/product-variants/crowmemory-hero.png",
       "kind": "product-artwork",
-      "bytes": 2110505,
-      "sha256": "445e0756a04c86ed9c29404f726d89bfb3746fc7ffc5d995e47225cb51e1f256",
-      "width": 1672,
-      "height": 941,
+      "bytes": 3397453,
+      "sha256": "4f5408de870c8e4596926e9e94deddc1a7428b6774f5f3b18404e7c1337632f0",
+      "width": 2400,
+      "height": 1350,
       "mode": "RGB",
       "format": "PNG"
     },
     {
       "file": "assets/product-variants/crownest-hero.png",
       "kind": "product-artwork",
-      "bytes": 1899295,
-      "sha256": "4cd90c1b03b80cdf247d24641d70da48926ac30b8f6036ddae8f016a28521dfc",
-      "width": 1672,
-      "height": 941,
+      "bytes": 3395208,
+      "sha256": "658b338ed617956eb45beb8da4a9d4a75d3fda8e5b6a4f1b6679770536ee262e",
+      "width": 2400,
+      "height": 1350,
       "mode": "RGB",
       "format": "PNG"
     },
     {
       "file": "assets/product-variants/crowquant-hero.png",
       "kind": "product-artwork",
-      "bytes": 2225177,
-      "sha256": "053ede22d87eb92f1687015a8497d17ca7b45c58424cf1a86d8113ccb9a9e2f2",
-      "width": 1672,
-      "height": 941,
+      "bytes": 3393711,
+      "sha256": "09c549772bfa50dce691d8e0e56c952cab600fd5e6cd0b85e777dc3714b22ffe",
+      "width": 2400,
+      "height": 1350,
       "mode": "RGB",
       "format": "PNG"
+    },
+    {
+      "file": "assets/product-variants/exports/crow-godmod3-1200x630.avif",
+      "kind": "product-artwork",
+      "bytes": 78694,
+      "sha256": "24c379285135d8b90bc2cf64909386b65e1090679bc4c38642333f96583a8b50",
+      "width": 1200,
+      "height": 630,
+      "mode": "RGB",
+      "format": "AVIF"
     },
     {
       "file": "assets/product-variants/exports/crow-godmod3-1200x630.png",
       "kind": "product-artwork",
-      "bytes": 1154027,
-      "sha256": "bc6480c6896f5ebce5346f0216eb6d4cedaa78c84b25372c4e1a09bf40691ff8",
+      "bytes": 983253,
+      "sha256": "017856d400d9560eb54b051c7acaa8b960c53ea1364859958908239d36b63e46",
       "width": 1200,
       "height": 630,
       "mode": "RGB",
       "format": "PNG"
+    },
+    {
+      "file": "assets/product-variants/exports/crow-godmod3-1200x630.webp",
+      "kind": "product-artwork",
+      "bytes": 93866,
+      "sha256": "9651e21bd858af74de8c3ca77381e157fd86dd878370ca200308614a1eaffd69",
+      "width": 1200,
+      "height": 630,
+      "mode": "RGB",
+      "format": "WEBP"
+    },
+    {
+      "file": "assets/product-variants/exports/crow-godmod3-1920x1080.avif",
+      "kind": "product-artwork",
+      "bytes": 167324,
+      "sha256": "88382271ccc26ff7b6b53f93ad12d360a2f41ea6c45b86910d5e832c0880fad8",
+      "width": 1920,
+      "height": 1080,
+      "mode": "RGB",
+      "format": "AVIF"
     },
     {
       "file": "assets/product-variants/exports/crow-godmod3-1920x1080.png",
       "kind": "product-artwork",
-      "bytes": 2725968,
-      "sha256": "a5bcb2488664a56384c50e57982164adf42510655d8f5e395c4f4b4d6e74fa58",
+      "bytes": 2402188,
+      "sha256": "aa3568a0e63ab90d6f83c30c0d4da133365d474f9907dc31fcf67f4f46cf38bf",
       "width": 1920,
       "height": 1080,
       "mode": "RGB",
       "format": "PNG"
+    },
+    {
+      "file": "assets/product-variants/exports/crow-godmod3-1920x1080.webp",
+      "kind": "product-artwork",
+      "bytes": 207624,
+      "sha256": "a1fa7e939776cc0d1429a68de22164a03f53927b42d5683578acedbe83f2cd12",
+      "width": 1920,
+      "height": 1080,
+      "mode": "RGB",
+      "format": "WEBP"
+    },
+    {
+      "file": "assets/product-variants/exports/crowclaw-1200x630.avif",
+      "kind": "product-artwork",
+      "bytes": 79159,
+      "sha256": "17e584a703c6d6e6490885387e4a04198eda6bb4bcb59ea0a7e0f95092c29589",
+      "width": 1200,
+      "height": 630,
+      "mode": "RGB",
+      "format": "AVIF"
     },
     {
       "file": "assets/product-variants/exports/crowclaw-1200x630.png",
       "kind": "product-artwork",
-      "bytes": 968477,
-      "sha256": "984b22e2eda4640059ed979b5fb50c1a381a0fef4bedd98c5047871a4ed11e8d",
+      "bytes": 983174,
+      "sha256": "cc40f9680e1b055bd3d4f61dc42634ca8d6e94fe19cc7edf73851359944b5985",
       "width": 1200,
       "height": 630,
       "mode": "RGB",
       "format": "PNG"
+    },
+    {
+      "file": "assets/product-variants/exports/crowclaw-1200x630.webp",
+      "kind": "product-artwork",
+      "bytes": 94444,
+      "sha256": "2acfdb0e3ccd7c54d3df057869b4235960b9fe173982bce6f1c295e717d09444",
+      "width": 1200,
+      "height": 630,
+      "mode": "RGB",
+      "format": "WEBP"
+    },
+    {
+      "file": "assets/product-variants/exports/crowclaw-1920x1080.avif",
+      "kind": "product-artwork",
+      "bytes": 168185,
+      "sha256": "2e70dbd1b0cc37d2f4edb119507c78d0a5fcbc7ce5e8ad6647c5b90be6039cea",
+      "width": 1920,
+      "height": 1080,
+      "mode": "RGB",
+      "format": "AVIF"
     },
     {
       "file": "assets/product-variants/exports/crowclaw-1920x1080.png",
       "kind": "product-artwork",
-      "bytes": 2273666,
-      "sha256": "58c548c63074a3ef9fa50f47f0900c55842e59fd3d8a808717cdfcfaecaa5fc4",
+      "bytes": 2402654,
+      "sha256": "36a5380a2eadf356e7adb8b504b9cd6a1feea654c693eb659818571e257cd9fe",
       "width": 1920,
       "height": 1080,
       "mode": "RGB",
       "format": "PNG"
+    },
+    {
+      "file": "assets/product-variants/exports/crowclaw-1920x1080.webp",
+      "kind": "product-artwork",
+      "bytes": 207880,
+      "sha256": "d5ec5a382a0b9df2acdd8c6e2f003c1e0e3a71b93e6f73ac24308d102fef8b28",
+      "width": 1920,
+      "height": 1080,
+      "mode": "RGB",
+      "format": "WEBP"
+    },
+    {
+      "file": "assets/product-variants/exports/crowflix-1200x630.avif",
+      "kind": "product-artwork",
+      "bytes": 78907,
+      "sha256": "3640c67e52c8cd5259b83e40c22f3ea71401ae604981c074ca99b7045f4b950e",
+      "width": 1200,
+      "height": 630,
+      "mode": "RGB",
+      "format": "AVIF"
     },
     {
       "file": "assets/product-variants/exports/crowflix-1200x630.png",
       "kind": "product-artwork",
-      "bytes": 1083165,
-      "sha256": "39067eacb2602bb9510db744c4604aef068f511d3f77d95bce6f740170f499ab",
+      "bytes": 984258,
+      "sha256": "af1da136295ebdbb726dc87cf2cc05bac6ea87fe497b07d6a30e3a9bea1681c3",
       "width": 1200,
       "height": 630,
       "mode": "RGB",
       "format": "PNG"
+    },
+    {
+      "file": "assets/product-variants/exports/crowflix-1200x630.webp",
+      "kind": "product-artwork",
+      "bytes": 93770,
+      "sha256": "90e3ee673bd23344f1368b54cee95fe7735236368478a89c5cf50d2084b36e7e",
+      "width": 1200,
+      "height": 630,
+      "mode": "RGB",
+      "format": "WEBP"
+    },
+    {
+      "file": "assets/product-variants/exports/crowflix-1920x1080.avif",
+      "kind": "product-artwork",
+      "bytes": 167476,
+      "sha256": "ca3d51e611a1674a24beb6e717f5ce85e0055aa13d3a5a4e7f0784fbd24ea370",
+      "width": 1920,
+      "height": 1080,
+      "mode": "RGB",
+      "format": "AVIF"
     },
     {
       "file": "assets/product-variants/exports/crowflix-1920x1080.png",
       "kind": "product-artwork",
-      "bytes": 2616720,
-      "sha256": "ace58830615200a94d1811b633e1e0d1b8c06cff41a40a9670d48b400c039826",
+      "bytes": 2405207,
+      "sha256": "8cd9c4c6ff9f832419276e52f75c77ff0767bc37fa74cbd41c17b6a8327c3285",
       "width": 1920,
       "height": 1080,
       "mode": "RGB",
       "format": "PNG"
+    },
+    {
+      "file": "assets/product-variants/exports/crowflix-1920x1080.webp",
+      "kind": "product-artwork",
+      "bytes": 206684,
+      "sha256": "03deb929ef313dc22eb060859d233372ce7bbd6656540009eeb013a01640ded2",
+      "width": 1920,
+      "height": 1080,
+      "mode": "RGB",
+      "format": "WEBP"
+    },
+    {
+      "file": "assets/product-variants/exports/crowmemory-1200x630.avif",
+      "kind": "product-artwork",
+      "bytes": 78702,
+      "sha256": "89146bcdc46688edbab330517055375c2dad8f78f9ab271a0fc731e7a73b3479",
+      "width": 1200,
+      "height": 630,
+      "mode": "RGB",
+      "format": "AVIF"
     },
     {
       "file": "assets/product-variants/exports/crowmemory-1200x630.png",
       "kind": "product-artwork",
-      "bytes": 1049901,
-      "sha256": "4d20a456d80d1a958045a39762113e23d0b2ba6410fe740e82f135f854044b73",
+      "bytes": 982817,
+      "sha256": "ed6775a4db68d089f78f11990d75cef8208e9f7b98d41bdd4b7a7a1db79df32c",
       "width": 1200,
       "height": 630,
       "mode": "RGB",
       "format": "PNG"
+    },
+    {
+      "file": "assets/product-variants/exports/crowmemory-1200x630.webp",
+      "kind": "product-artwork",
+      "bytes": 93786,
+      "sha256": "c9d9db6a70ec7fa2a51519fa67e4630836cecce585cbbfb9bb28b075bf39f24a",
+      "width": 1200,
+      "height": 630,
+      "mode": "RGB",
+      "format": "WEBP"
+    },
+    {
+      "file": "assets/product-variants/exports/crowmemory-1920x1080.avif",
+      "kind": "product-artwork",
+      "bytes": 167302,
+      "sha256": "5f47bcb9ca0c11cdf61be76397b8f35080e6e22a5b231152475a2b6ab1ecf9a8",
+      "width": 1920,
+      "height": 1080,
+      "mode": "RGB",
+      "format": "AVIF"
     },
     {
       "file": "assets/product-variants/exports/crowmemory-1920x1080.png",
       "kind": "product-artwork",
-      "bytes": 2521615,
-      "sha256": "e262f51bf8d29f6ccf9401aea96ce4e14eed0efeb4b50b3b8a51fe67be2d4ef1",
+      "bytes": 2401142,
+      "sha256": "2aa331572a73ff50592aaf71d8cd37814b97ed59c50cfcffb02732c74d9caa8c",
       "width": 1920,
       "height": 1080,
       "mode": "RGB",
       "format": "PNG"
+    },
+    {
+      "file": "assets/product-variants/exports/crowmemory-1920x1080.webp",
+      "kind": "product-artwork",
+      "bytes": 206710,
+      "sha256": "3cb37a82e49d3bf32ebe59eb1676fab971737b7d391ddfcdb9fefc26c58595ee",
+      "width": 1920,
+      "height": 1080,
+      "mode": "RGB",
+      "format": "WEBP"
+    },
+    {
+      "file": "assets/product-variants/exports/crownest-1200x630.avif",
+      "kind": "product-artwork",
+      "bytes": 78862,
+      "sha256": "16a373d9087b71a756b811d78a7ff29eaefbad94fe82b67a2d451ff97b8e9d2f",
+      "width": 1200,
+      "height": 630,
+      "mode": "RGB",
+      "format": "AVIF"
     },
     {
       "file": "assets/product-variants/exports/crownest-1200x630.png",
       "kind": "product-artwork",
-      "bytes": 952773,
-      "sha256": "de7c796f9cccbfa21948a754a0a9b0d4ef76ab133055eb1a4de357bd6cfb23e0",
+      "bytes": 982279,
+      "sha256": "8210bb3ecc127b0b6f818631d72d37d15e78b7453ab1794445579894aba74e20",
       "width": 1200,
       "height": 630,
       "mode": "RGB",
       "format": "PNG"
+    },
+    {
+      "file": "assets/product-variants/exports/crownest-1200x630.webp",
+      "kind": "product-artwork",
+      "bytes": 94286,
+      "sha256": "3b93300dfc8c8ef70caf034065612673f636ff81a76d595ce917bbf592d08170",
+      "width": 1200,
+      "height": 630,
+      "mode": "RGB",
+      "format": "WEBP"
+    },
+    {
+      "file": "assets/product-variants/exports/crownest-1920x1080.avif",
+      "kind": "product-artwork",
+      "bytes": 167843,
+      "sha256": "9833d145e076ec56df4aa5a1fd84a2e2d71de4d1fca074909d20a1767b27166a",
+      "width": 1920,
+      "height": 1080,
+      "mode": "RGB",
+      "format": "AVIF"
     },
     {
       "file": "assets/product-variants/exports/crownest-1920x1080.png",
       "kind": "product-artwork",
-      "bytes": 2238367,
-      "sha256": "d05422b4c8a4bc3396ad38019bc31a4bf1649489c376a840272cda65b9e21f55",
+      "bytes": 2399935,
+      "sha256": "fd4a049b95ad2b6a5cc3a6040c9705c605022084066240e1aa49ee892f078fcf",
       "width": 1920,
       "height": 1080,
       "mode": "RGB",
       "format": "PNG"
     },
     {
+      "file": "assets/product-variants/exports/crownest-1920x1080.webp",
+      "kind": "product-artwork",
+      "bytes": 207212,
+      "sha256": "c7b532533862c1b82a56ff65c207660c3b805b0191b1308e6c3908e7058748f8",
+      "width": 1920,
+      "height": 1080,
+      "mode": "RGB",
+      "format": "WEBP"
+    },
+    {
+      "file": "assets/product-variants/exports/crowquant-1200x630.avif",
+      "kind": "product-artwork",
+      "bytes": 79210,
+      "sha256": "6d69dedc87eed6a96cf5b0a87a4a51e9c242bf26cded4c1197b9b72fc478c849",
+      "width": 1200,
+      "height": 630,
+      "mode": "RGB",
+      "format": "AVIF"
+    },
+    {
       "file": "assets/product-variants/exports/crowquant-1200x630.png",
       "kind": "product-artwork",
-      "bytes": 1113746,
-      "sha256": "b4adae9bcb48c4a1aa08ed545d1579270dc090500804ef4f748f807bde0d5c92",
+      "bytes": 981935,
+      "sha256": "af5787d4a5b0eca3f490a202bd82113e7ffd9a16686b11d254f08f954cacaf82",
       "width": 1200,
       "height": 630,
       "mode": "RGB",
       "format": "PNG"
     },
     {
+      "file": "assets/product-variants/exports/crowquant-1200x630.webp",
+      "kind": "product-artwork",
+      "bytes": 94532,
+      "sha256": "4d9fe13283d1540f8506bc234caeae6512353137da7a3c6724f0d00dc3023ff6",
+      "width": 1200,
+      "height": 630,
+      "mode": "RGB",
+      "format": "WEBP"
+    },
+    {
+      "file": "assets/product-variants/exports/crowquant-1920x1080.avif",
+      "kind": "product-artwork",
+      "bytes": 167769,
+      "sha256": "6a5592777174ac61a8d3782ffc303735cab75ae0fbdf42eccf27ea56b5ddf298",
+      "width": 1920,
+      "height": 1080,
+      "mode": "RGB",
+      "format": "AVIF"
+    },
+    {
       "file": "assets/product-variants/exports/crowquant-1920x1080.png",
       "kind": "product-artwork",
-      "bytes": 2688920,
-      "sha256": "07d2bfa5c1411a1f96579b7e7d28df5267dc4e59a0ca09c7cbeb25d755a23cdf",
+      "bytes": 2398681,
+      "sha256": "62b1d95a299e5c6a8e503b7e01606e82e461a8883a3e66f991b08e942efe36cc",
       "width": 1920,
       "height": 1080,
       "mode": "RGB",
       "format": "PNG"
     },
     {
+      "file": "assets/product-variants/exports/crowquant-1920x1080.webp",
+      "kind": "product-artwork",
+      "bytes": 207618,
+      "sha256": "3d555e5edd02adc184e13e28e7d1895ded1c443fff690cd2bb42f2151886a2b4",
+      "width": 1920,
+      "height": 1080,
+      "mode": "RGB",
+      "format": "WEBP"
+    },
+    {
+      "file": "assets/product-variants/runtime/crow-godmod3-hero.avif",
+      "kind": "product-artwork",
+      "bytes": 222684,
+      "sha256": "b3a876d9b91f4ffcb92e7db3991e74eb91ec82c4f645a490453920c75d99bcb8",
+      "width": 2400,
+      "height": 1350,
+      "mode": "RGB",
+      "format": "AVIF"
+    },
+    {
+      "file": "assets/product-variants/runtime/crow-godmod3-hero.webp",
+      "kind": "product-artwork",
+      "bytes": 281418,
+      "sha256": "a7a89ea9314f680a060919ea9cf0945be2af9e6481c95713c0cce35d9b8b97a0",
+      "width": 2400,
+      "height": 1350,
+      "mode": "RGB",
+      "format": "WEBP"
+    },
+    {
+      "file": "assets/product-variants/runtime/crowclaw-hero.avif",
+      "kind": "product-artwork",
+      "bytes": 223311,
+      "sha256": "67bb5ad4a002fcc396ddf06fa9c620dd616a9069c88af523f0dca1c1f4f94ecd",
+      "width": 2400,
+      "height": 1350,
+      "mode": "RGB",
+      "format": "AVIF"
+    },
+    {
+      "file": "assets/product-variants/runtime/crowclaw-hero.webp",
+      "kind": "product-artwork",
+      "bytes": 282988,
+      "sha256": "eab3f8cd08cb7c02701a773ca5b8adac0b734fd12a159c307656a89b3ac74bec",
+      "width": 2400,
+      "height": 1350,
+      "mode": "RGB",
+      "format": "WEBP"
+    },
+    {
+      "file": "assets/product-variants/runtime/crowflix-hero.avif",
+      "kind": "product-artwork",
+      "bytes": 222846,
+      "sha256": "892c0f2b353af7e0fcf83c578e520858d0732d6e58fd1e007ac3c5e8248f2edf",
+      "width": 2400,
+      "height": 1350,
+      "mode": "RGB",
+      "format": "AVIF"
+    },
+    {
+      "file": "assets/product-variants/runtime/crowflix-hero.webp",
+      "kind": "product-artwork",
+      "bytes": 281476,
+      "sha256": "7d9243707abd880d2e6532fee3c267e24d4918b14b740574525a8e73f1e76982",
+      "width": 2400,
+      "height": 1350,
+      "mode": "RGB",
+      "format": "WEBP"
+    },
+    {
+      "file": "assets/product-variants/runtime/crowmemory-hero.avif",
+      "kind": "product-artwork",
+      "bytes": 222722,
+      "sha256": "11cda3ec284db972d5cad30d4e6e4ef55ccae7cb9c9ebc7cf288709a46179e6e",
+      "width": 2400,
+      "height": 1350,
+      "mode": "RGB",
+      "format": "AVIF"
+    },
+    {
+      "file": "assets/product-variants/runtime/crowmemory-hero.webp",
+      "kind": "product-artwork",
+      "bytes": 281328,
+      "sha256": "d6c814c924e02b2478f49609c44120c230cdcdf6e82ecb433a95b9fc5254defc",
+      "width": 2400,
+      "height": 1350,
+      "mode": "RGB",
+      "format": "WEBP"
+    },
+    {
+      "file": "assets/product-variants/runtime/crownest-hero.avif",
+      "kind": "product-artwork",
+      "bytes": 223352,
+      "sha256": "c937ecea612fb158b66d66fe64780442f119b4681538c7b2a58db7128284cbb8",
+      "width": 2400,
+      "height": 1350,
+      "mode": "RGB",
+      "format": "AVIF"
+    },
+    {
+      "file": "assets/product-variants/runtime/crownest-hero.webp",
+      "kind": "product-artwork",
+      "bytes": 282742,
+      "sha256": "ddfee3a8ec041469595002f3d2358e6299f165d778185d47b0f81cc3a65925ac",
+      "width": 2400,
+      "height": 1350,
+      "mode": "RGB",
+      "format": "WEBP"
+    },
+    {
+      "file": "assets/product-variants/runtime/crowquant-hero.avif",
+      "kind": "product-artwork",
+      "bytes": 223553,
+      "sha256": "a889343610c9451dad60dcc64358c8fc5389fddd24d09a626f47a24e8e1b0f5e",
+      "width": 2400,
+      "height": 1350,
+      "mode": "RGB",
+      "format": "AVIF"
+    },
+    {
+      "file": "assets/product-variants/runtime/crowquant-hero.webp",
+      "kind": "product-artwork",
+      "bytes": 282820,
+      "sha256": "baef156b3824d2a482ba78a437f111a0dd7f61f43d54c26aca4c0fad6baeb203",
+      "width": 2400,
+      "height": 1350,
+      "mode": "RGB",
+      "format": "WEBP"
+    },
+    {
       "file": "assets/raster-manifest.json",
       "kind": "project",
-      "bytes": 4427,
-      "sha256": "92ff121ed729a4a831e678ed00afcf6ce7214dba2002c648b71071f0b1d87c79"
+      "bytes": 21481,
+      "sha256": "032aa699c428dc1d41aa7bcbee864a15aa591571af714da9432ace6c8b9e5344"
     },
     {
       "file": "assets/social/crow-family-banner.png",
       "kind": "social",
-      "bytes": 1839555,
-      "sha256": "cd63d5a0c5993090e78eaea71fd9395e4af089b2d5386ec65ac4bd37b32a650b",
-      "width": 1774,
-      "height": 887,
+      "bytes": 3003656,
+      "sha256": "01ae9d50254a99714f29909a2ec9d91213a2249f20c2b2282674179dd00c4f14",
+      "width": 2400,
+      "height": 1200,
       "mode": "RGB",
       "format": "PNG"
     },
     {
       "file": "assets/social/exports/crow-family-github-1280x640.png",
       "kind": "social",
-      "bytes": 971319,
-      "sha256": "b7fb8261764007494fa6a6fb4c2098c7753fbee0fd1084b487249f7f23777279",
+      "bytes": 1017181,
+      "sha256": "a582880e4ace9b1f354ab183f32c88e21e48e25c3feb83b773ca602998e506d7",
       "width": 1280,
       "height": 640,
       "mode": "RGB",
@@ -590,8 +1249,8 @@
     {
       "file": "assets/social/exports/crow-family-open-graph-1200x630.png",
       "kind": "social",
-      "bytes": 916959,
-      "sha256": "1b331cd8f6f674c4d32b4d9189518fefd76a5ab8ae3a5df05324b6098753707e",
+      "bytes": 947820,
+      "sha256": "4cd22efec4741f363958093142e5c37493cc41ca790d29cefda12a285eae3efd",
       "width": 1200,
       "height": 630,
       "mode": "RGB",
@@ -600,8 +1259,8 @@
     {
       "file": "assets/social/exports/crow-family-post-1080x1080.png",
       "kind": "social",
-      "bytes": 1568140,
-      "sha256": "145e9946ccc8bdeb01d9a5cb97e2fdbaa4c973c8376f1aa103158de176a3fad3",
+      "bytes": 1018962,
+      "sha256": "7b7cea9e7a76f315eadb833a2d249dafd00f651c00818c6ee1dff8390e320ad3",
       "width": 1080,
       "height": 1080,
       "mode": "RGB",
@@ -610,8 +1269,8 @@
     {
       "file": "assets/social/exports/crow-family-story-1080x1920.png",
       "kind": "social",
-      "bytes": 1837633,
-      "sha256": "db10174b9fd391c1f037e07da56968bcec5024115fec5d1b9bcb55bcf52bf255",
+      "bytes": 1447105,
+      "sha256": "6c94a18857b8d19e24adb0d2d458502f072fb865b22b7503284077521ed0ef4e",
       "width": 1080,
       "height": 1920,
       "mode": "RGB",
@@ -620,12 +1279,132 @@
     {
       "file": "assets/social/exports/crow-family-wide-1500x500.png",
       "kind": "social",
-      "bytes": 896628,
-      "sha256": "28df092a7d94e5a41e9e24a0c05206a8afb92238ac4379786fa886433a92d657",
+      "bytes": 951980,
+      "sha256": "74fe885471fa339e64ed0ed51661452cb6dec2408c4d4ebf2a6a058de272e2e6",
       "width": 1500,
       "height": 500,
       "mode": "RGB",
       "format": "PNG"
+    },
+    {
+      "file": "assets/social/exports/crow-godmod3-open-graph-1200x630.avif",
+      "kind": "social",
+      "bytes": 78694,
+      "sha256": "24c379285135d8b90bc2cf64909386b65e1090679bc4c38642333f96583a8b50",
+      "width": 1200,
+      "height": 630,
+      "mode": "RGB",
+      "format": "AVIF"
+    },
+    {
+      "file": "assets/social/exports/crow-godmod3-open-graph-1200x630.png",
+      "kind": "social",
+      "bytes": 983253,
+      "sha256": "017856d400d9560eb54b051c7acaa8b960c53ea1364859958908239d36b63e46",
+      "width": 1200,
+      "height": 630,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/social/exports/crow-godmod3-open-graph-1200x630.webp",
+      "kind": "social",
+      "bytes": 93866,
+      "sha256": "9651e21bd858af74de8c3ca77381e157fd86dd878370ca200308614a1eaffd69",
+      "width": 1200,
+      "height": 630,
+      "mode": "RGB",
+      "format": "WEBP"
+    },
+    {
+      "file": "assets/social/exports/crow-godmod3-post-1080x1080.avif",
+      "kind": "social",
+      "bytes": 131286,
+      "sha256": "01ae28568704bb1c607cffdb6906be5f4854ee0bb1b63839dc65f878a3f9665b",
+      "width": 1080,
+      "height": 1080,
+      "mode": "RGB",
+      "format": "AVIF"
+    },
+    {
+      "file": "assets/social/exports/crow-godmod3-post-1080x1080.png",
+      "kind": "social",
+      "bytes": 1526825,
+      "sha256": "bc6c43da75484c21431c3e899a1179e9100b7b00d1d4fc949654208f103c7c9f",
+      "width": 1080,
+      "height": 1080,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/social/exports/crow-godmod3-post-1080x1080.webp",
+      "kind": "social",
+      "bytes": 165830,
+      "sha256": "41797c270232f1314df896399d045342e4f87ebe5ab6b15049767fea16a2e092",
+      "width": 1080,
+      "height": 1080,
+      "mode": "RGB",
+      "format": "WEBP"
+    },
+    {
+      "file": "assets/social/exports/crow-godmod3-story-1080x1920.avif",
+      "kind": "social",
+      "bytes": 154655,
+      "sha256": "37857190a5b76d4fef5b9ea2e0f4840d7213f18de56092ebdba1678f8d431890",
+      "width": 1080,
+      "height": 1920,
+      "mode": "RGB",
+      "format": "AVIF"
+    },
+    {
+      "file": "assets/social/exports/crow-godmod3-story-1080x1920.png",
+      "kind": "social",
+      "bytes": 2217908,
+      "sha256": "7a4498189bec12dc25346cdb0643465baf1973891b220b4d6aa2f2617f5e176e",
+      "width": 1080,
+      "height": 1920,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/social/exports/crow-godmod3-story-1080x1920.webp",
+      "kind": "social",
+      "bytes": 193956,
+      "sha256": "d119367f80eede311a078cfc979c4cf658c3bb7370a32636d6bcf013446aebf4",
+      "width": 1080,
+      "height": 1920,
+      "mode": "RGB",
+      "format": "WEBP"
+    },
+    {
+      "file": "assets/social/exports/crow-godmod3-wide-1500x500.avif",
+      "kind": "social",
+      "bytes": 77765,
+      "sha256": "ac8d71392882de60ac430ba9f39f20b585d5dcd6fe3b8eedf6f46b703d00fe21",
+      "width": 1500,
+      "height": 500,
+      "mode": "RGB",
+      "format": "AVIF"
+    },
+    {
+      "file": "assets/social/exports/crow-godmod3-wide-1500x500.png",
+      "kind": "social",
+      "bytes": 985466,
+      "sha256": "b7a569ed7b1a7e11b2306ff0e42bf829d4a71163f84e4740d7f02919728eac4b",
+      "width": 1500,
+      "height": 500,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "assets/social/exports/crow-godmod3-wide-1500x500.webp",
+      "kind": "social",
+      "bytes": 94954,
+      "sha256": "456033052c548d9f90a23f01c24dbc72fb3897a0cc9829dc306d5fa38a206edd",
+      "width": 1500,
+      "height": 500,
+      "mode": "RGB",
+      "format": "WEBP"
     },
     {
       "file": "assets/source/3EyedCrow-reference.jpg",
@@ -638,50 +1417,508 @@
       "format": "JPEG"
     },
     {
+      "file": "assets/visual-identity-v3-manifest.json",
+      "kind": "project",
+      "bytes": 10117,
+      "sha256": "bcbedf029af235c0c5f23cbac92ed5a4267e640b66d992fdb11495324ca58b17"
+    },
+    {
       "file": "build.ps1",
       "kind": "project",
-      "bytes": 651,
-      "sha256": "dcb95f3310cb5d32fe3b14f576c28290b9e86892fee12a0654e0dc067138e0f8"
+      "bytes": 680,
+      "sha256": "0fb7c43b37de86ef9102f612717b8cbf3fc4873110d951c0b91f9727ce3884b2"
     },
     {
       "file": "CHANGELOG.md",
       "kind": "project",
-      "bytes": 945,
-      "sha256": "a8643b12809347129b4cd837d7fbb0bee0907586a42a849bd591e3e75afa84ba"
+      "bytes": 2959,
+      "sha256": "c8cffa63d9a2ff02a6bf9a6458e34b216dead68958c20a0f62640d3136f59848"
+    },
+    {
+      "file": "cursors/concepts/crow-claw-pointer-32-concept-v0.1.png",
+      "kind": "project",
+      "bytes": 569,
+      "sha256": "900ab0098d114d9c10fefc8464268e8c70c4d69c289692f42912454f1ac88103",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/concepts/crow-claw-pointer-32-concept-v0.2.png",
+      "kind": "project",
+      "bytes": 581,
+      "sha256": "0d487deef52568549a6331d2a5f00da882a026c2d6673a5ffedb24242d055e7a",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/concepts/crow-claw-pointer-48-concept-v0.1.png",
+      "kind": "project",
+      "bytes": 846,
+      "sha256": "339f88e26a97ef6b6aa5b00cc8d8b9e09162bf8e1f3503bf63ebf34ebcff9675",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/concepts/crow-claw-pointer-48-concept-v0.2.png",
+      "kind": "project",
+      "bytes": 845,
+      "sha256": "69c4076b594415ad091584adaa69164b99e4b3930c5efd5ce0bc151a27bfbca2",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/concepts/crow-claw-pointer-concept-v0.1.png",
+      "kind": "project",
+      "bytes": 968251,
+      "sha256": "98cbcf836b89982d1e7119b21a79bce6fb088054849e5bc8c898d2a065823236",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/concepts/crow-claw-pointer-proof-v0.1.png",
+      "kind": "project",
+      "bytes": 51963,
+      "sha256": "e27a14a4a05b73d0abdcd5c2596c961d58e85dda6e1be3c72675995fd280d3eb",
+      "width": 1800,
+      "height": 1120,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/concepts/crow-claw-pointer-proof-v0.2.png",
+      "kind": "project",
+      "bytes": 51847,
+      "sha256": "f2b193ad15129acc70a4b88c350cefc8b7e85948335c5e3fc92e5c24a07de1bd",
+      "width": 1800,
+      "height": 1120,
+      "mode": "RGB",
+      "format": "PNG"
     },
     {
       "file": "cursors/Crow-Talon.inf",
       "kind": "project",
-      "bytes": 1640,
-      "sha256": "29b1e48209a1b0df5eefd8d010180ca9af52586c939c2ce392bf03ff73e4e265"
+      "bytes": 1650,
+      "sha256": "dc802713b1ff8b6bb4bad4f67a6e94f7d4bf776c47eb497234eed496111f9de4"
     },
     {
       "file": "cursors/install.ps1",
       "kind": "project",
-      "bytes": 3000,
-      "sha256": "a8cd48b129930b1cba0c7dd5ee8426ba3462979715886bf3c5862519de85b2d0"
+      "bytes": 3305,
+      "sha256": "72d96ae275434093dd08a9c1bbef80e33559a3b82ea40bf46a0490cdcce3a1f0"
     },
     {
       "file": "cursors/manifest.json",
       "kind": "project",
-      "bytes": 13921,
-      "sha256": "feeb2c7198b6b8b0272b358fe7031df461f9ab61dfdad7fd008b0d142e9f5af2"
+      "bytes": 35835,
+      "sha256": "58f97674f7ec7e72433d0c0b1650e1bdc6cb6200ed0b008fa6def56c34245bec"
+    },
+    {
+      "file": "cursors/masters/crow-claw-hand-master-v0.5-chroma.png",
+      "kind": "project",
+      "bytes": 1565621,
+      "sha256": "53d48e7e59c5aab947458213d33f4bc7f3e698ee475aabbc5f8439493206f5cb",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/masters/crow-claw-hand-master-v0.5.png",
+      "kind": "project",
+      "bytes": 822420,
+      "sha256": "78547f5935c54630c89f0bf0a03bf72c19ddc9e62cb093ae49493d4c91e183c4",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/masters/crow-talon-master-v0.4-chroma.png",
+      "kind": "project",
+      "bytes": 1630436,
+      "sha256": "682b2c3f7ec9625f1812e0df4a086ec4de629663b0dea5b5c733479301316b66",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/masters/crow-talon-master-v0.4.png",
+      "kind": "project",
+      "bytes": 949888,
+      "sha256": "4b11093bc111889d1d4c719addfd8849669a70a7983e1edeae32ba21185458ac",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/package-files.sha256",
+      "kind": "project",
+      "bytes": 6081,
+      "sha256": "bf6b90d99763e0ba940906f5a5bcdaab281091bef158829be59d3c550b5b2692"
     },
     {
       "file": "cursors/preview.png",
       "kind": "project",
-      "bytes": 100535,
-      "sha256": "4a72f8f9683039ec3cfead50852dc1d93d419a8374e43def1b24475447950c09",
-      "width": 1100,
-      "height": 540,
+      "bytes": 75777,
+      "sha256": "48884ffdd1c2d923c75f6b93859e07984b8ff5f46c796577de0d45695548fd9c",
+      "width": 1600,
+      "height": 1010,
       "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/previews/animation-frames.png",
+      "kind": "project",
+      "bytes": 23428,
+      "sha256": "31ac005955a2195c42aeb667a34b916eb89b4f920944ca6b58dd903a0175fc55",
+      "width": 1600,
+      "height": 350,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/previews/master-alpha-proof-v0.4.png",
+      "kind": "project",
+      "bytes": 466111,
+      "sha256": "e660904193b8b53f8ae2ab7ebf8a1dda6682e542c4e1deacf202efaeb190c74d",
+      "width": 1200,
+      "height": 1200,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/previews/native-size-proof.png",
+      "kind": "project",
+      "bytes": 35578,
+      "sha256": "2c0586d777c39aa581b54aecf8b93d5591ef135b8d25020606b9c88d76537de3",
+      "width": 1600,
+      "height": 282,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/README.md",
+      "kind": "project",
+      "bytes": 2132,
+      "sha256": "fe3bb0a3972586af32d791f27f06c4784cc97593c95f3b4e6deb2252de02fa42"
+    },
+    {
+      "file": "cursors/src/32/alternate.png",
+      "kind": "project",
+      "bytes": 432,
+      "sha256": "230368da8a4f3cc9b2f4855489f2c4b5a2f966af38f64d7372cb27418dd7749b",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/32/busy.png",
+      "kind": "project",
+      "bytes": 687,
+      "sha256": "0dc0bbe7f58fd836904278fa7e9996842b5a6922a07d2aa56b003854d8f4c387",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/32/handwriting.png",
+      "kind": "project",
+      "bytes": 396,
+      "sha256": "5b970d82415139acce5e2dfe276bb1071330019e2fdd5e609aa388f6b60aa875",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/32/help.png",
+      "kind": "project",
+      "bytes": 938,
+      "sha256": "c33aa488dfaf45081213b5527bc8cca9f5ace232c5808246d0b638e5e0fd4a03",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/32/link.png",
+      "kind": "project",
+      "bytes": 894,
+      "sha256": "b1e6cf4c8dcd13d609e7878e595b4d900843f15c4068ea6615fdfb06530faa4f",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/32/move.png",
+      "kind": "project",
+      "bytes": 512,
+      "sha256": "4cc080275b8a1bfaeada9a5bf492b352bbd9b06e0214009718ee2702b1e0b96b",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/32/normal.png",
+      "kind": "project",
+      "bytes": 860,
+      "sha256": "fb63e28aba35b7a17fc77227c5b72612c4a2cf12d200963cc2e9d4b03fffddea",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/32/precision.png",
+      "kind": "project",
+      "bytes": 274,
+      "sha256": "0716db52b15deceb76109798f65ce857ae87eaa71773bc3cc0e306dec8c3b5da",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/32/resize-d1.png",
+      "kind": "project",
+      "bytes": 371,
+      "sha256": "3b4b2dcb092dd03a7be955e792997505f988067a717ddec4e459e1755ca56f26",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/32/resize-d2.png",
+      "kind": "project",
+      "bytes": 358,
+      "sha256": "11a214a9eead77c6b33dc5093e6471e3302f5b32da3d227a0893831be7d7fb12",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/32/resize-h.png",
+      "kind": "project",
+      "bytes": 358,
+      "sha256": "4228c995770b1f97de1ac7fcefd204c9da65165abe12518e938aaab31e88e7ce",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/32/resize-v.png",
+      "kind": "project",
+      "bytes": 368,
+      "sha256": "3aa59b03699ba52fe3ec748822d4989bea07989b91c99d8bfa5f968bb58057e9",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/32/text.png",
+      "kind": "project",
+      "bytes": 253,
+      "sha256": "e003135008d9ea2142c2e393215c327249fce5c5c8bdccf1a0c04f6f2ae2dead",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/32/unavailable.png",
+      "kind": "project",
+      "bytes": 570,
+      "sha256": "e6ce96c7f23ec9b1fb3a5c39286d762bab84ee8039f89450b700f76d09d8bf7c",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/32/working.png",
+      "kind": "project",
+      "bytes": 853,
+      "sha256": "adba3c748a158f507c5e885837ab3ad7c27ebefc1f726b5ddf65e6672e322583",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/48/alternate.png",
+      "kind": "project",
+      "bytes": 554,
+      "sha256": "24d761b798a7084fda9709588c8329e39ee1827067c1faa4f38fa9322d7ba976",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/48/busy.png",
+      "kind": "project",
+      "bytes": 1066,
+      "sha256": "ba1256c21efffa08e2d41c29e05f18bf524fc4860811b2f7ad2cea3ae08ccb61",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/48/handwriting.png",
+      "kind": "project",
+      "bytes": 553,
+      "sha256": "88ce93e604b4237f5a621bfcaa572a51b97a812384da5ab4fd9eceddd46c2f1b",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/48/help.png",
+      "kind": "project",
+      "bytes": 1185,
+      "sha256": "4180f788c0f3e7578deaaeb9814a40c1710e0bd4f89cbe7b118b9d22eafb0268",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/48/link.png",
+      "kind": "project",
+      "bytes": 1127,
+      "sha256": "7ffae57c594db52b32af513b83cac80fed9c5722c5fd47796dcf1d2e40bd18bb",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/48/move.png",
+      "kind": "project",
+      "bytes": 705,
+      "sha256": "bea213530e07784fb9a2e3f0d2a5f79f6fea9b5a0611371dc19d2a13d7ca4bf0",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/48/normal.png",
+      "kind": "project",
+      "bytes": 1110,
+      "sha256": "50686c46009e77088da96d97ece83a337c5a3441d489ef4f7e2c10626c513749",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/48/precision.png",
+      "kind": "project",
+      "bytes": 332,
+      "sha256": "a54468debd75f700adbff508cb7341cfb2dad1395f3406ac6f42448f9ac1a879",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/48/resize-d1.png",
+      "kind": "project",
+      "bytes": 499,
+      "sha256": "87f8943292d5b1ae7553d823a6bddcc834e7da3014c87e4a924b86c6fb67338e",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/48/resize-d2.png",
+      "kind": "project",
+      "bytes": 458,
+      "sha256": "0c3e4931d0091e091be3d05bca3331c136a880ae2663aee674b516a0c80b2875",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/48/resize-h.png",
+      "kind": "project",
+      "bytes": 452,
+      "sha256": "473892292a61721b079f210ef1a08d953e52431e48cb6287df4c6e6c3c661e4b",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/48/resize-v.png",
+      "kind": "project",
+      "bytes": 497,
+      "sha256": "c9a826af2dbdf7e332880b5eff36c708ae6df0622bdd998bb3115edbcd923906",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/48/text.png",
+      "kind": "project",
+      "bytes": 371,
+      "sha256": "a53683f82302832ce09dcf2f1bab5f47d0ad13f50ace8c97e5e6d1a712dace0a",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/48/unavailable.png",
+      "kind": "project",
+      "bytes": 713,
+      "sha256": "95e71b769750d9fae9c1baf024680c0ee7960775b7d841dc41159f9e2cba863c",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/src/48/working.png",
+      "kind": "project",
+      "bytes": 1121,
+      "sha256": "7f3083a8787a21021c24627b2357b26184ff655cc5d22f62fd9b66a567d033fe",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
       "format": "PNG"
     },
     {
       "file": "cursors/src/alternate.png",
       "kind": "project",
-      "bytes": 18527,
-      "sha256": "d5092a834e558711be1eb2ebaaa50aaae41490a8980a14210b79db3024c25205",
+      "bytes": 2375,
+      "sha256": "2f9f92c601b85adae76183685e426c70a89cf229248d975bd5fe5bfe84861e01",
       "width": 256,
       "height": 256,
       "mode": "RGBA",
@@ -690,8 +1927,8 @@
     {
       "file": "cursors/src/busy.png",
       "kind": "project",
-      "bytes": 28349,
-      "sha256": "e20d224e894366ac20d1a14c71d01f3daf2cdd0462abaa0eb2457ff843846f44",
+      "bytes": 5368,
+      "sha256": "3124ad00d3331ffc128ab959e2b035ac45e6a79517feea575c234aff5a8a0e70",
       "width": 256,
       "height": 256,
       "mode": "RGBA",
@@ -700,8 +1937,8 @@
     {
       "file": "cursors/src/handwriting.png",
       "kind": "project",
-      "bytes": 24500,
-      "sha256": "475e9140fc92fc54e5457675232f5b32d65550c1f2f620dd85ad08a5c7da8bfb",
+      "bytes": 2354,
+      "sha256": "c1c79e0f9106d681f0f6cce5b654f8d94c571edd57b49d3e466947a2b09d6e08",
       "width": 256,
       "height": 256,
       "mode": "RGBA",
@@ -710,8 +1947,8 @@
     {
       "file": "cursors/src/help.png",
       "kind": "project",
-      "bytes": 39519,
-      "sha256": "72f419e13e6f20c8b99996f7cf99948fc45c145170980a24ed526564b6faf5f4",
+      "bytes": 5176,
+      "sha256": "63bceacc50c9a5b6b12d3e1e31da04342a75f27ffe4a57fa1f1ea4c1dda4680e",
       "width": 256,
       "height": 256,
       "mode": "RGBA",
@@ -720,8 +1957,8 @@
     {
       "file": "cursors/src/link.png",
       "kind": "project",
-      "bytes": 14770,
-      "sha256": "ed74765b5c5b903013585eb35616c77e47a616292d26ff33ab70841284315619",
+      "bytes": 5345,
+      "sha256": "713e4f760a0558c6d406b633d12c6ac1e1f2efe63661139bb9d2a205b13ca5d3",
       "width": 256,
       "height": 256,
       "mode": "RGBA",
@@ -730,8 +1967,8 @@
     {
       "file": "cursors/src/move.png",
       "kind": "project",
-      "bytes": 13538,
-      "sha256": "c81e48e69e1f9d9bec19135498d1de97394af5ec4094c7f2e23135f30ff3c621",
+      "bytes": 3073,
+      "sha256": "5031d45427ea4b932b61e56750581bf6fc96c225bbd47121db035aa97af539ae",
       "width": 256,
       "height": 256,
       "mode": "RGBA",
@@ -740,8 +1977,8 @@
     {
       "file": "cursors/src/normal.png",
       "kind": "project",
-      "bytes": 28746,
-      "sha256": "10138f37f54dcc92205ebfc91a34861e3c320a18edbee8df74764f139b95f5a9",
+      "bytes": 5229,
+      "sha256": "679577c55c8c30fe8eb9682c0c6de8ca0343180c78b1721dc621eff31e510bd2",
       "width": 256,
       "height": 256,
       "mode": "RGBA",
@@ -750,8 +1987,8 @@
     {
       "file": "cursors/src/precision.png",
       "kind": "project",
-      "bytes": 24951,
-      "sha256": "e3d6b0d0ecc227e0c66b25dc82aa8057fe725749fe67d6b26c94686b80b1df03",
+      "bytes": 1397,
+      "sha256": "5a0b05e2b3971db6f612b7344d7b01ff59a9c7f1311f7eaaee6120231a34b4af",
       "width": 256,
       "height": 256,
       "mode": "RGBA",
@@ -760,8 +1997,8 @@
     {
       "file": "cursors/src/resize-d1.png",
       "kind": "project",
-      "bytes": 10299,
-      "sha256": "3e4b82f32639596bc499afd6399c037b2597ae143bd9f4adc38cf00473c8081c",
+      "bytes": 2156,
+      "sha256": "806ea91c9e33e7d721ca741e4b39ea07a9e2c47eb2a28de0f5fe9e892d51b1ac",
       "width": 256,
       "height": 256,
       "mode": "RGBA",
@@ -770,8 +2007,8 @@
     {
       "file": "cursors/src/resize-d2.png",
       "kind": "project",
-      "bytes": 10253,
-      "sha256": "51224cbd2bc6d0644b12d77b8e5c6e328a05537bc145b1a7deb6b2dbae91e9d9",
+      "bytes": 2037,
+      "sha256": "853baea88f8f3171ee6a23fbfa1194e049517a79440df028c06dbf20cdfce43b",
       "width": 256,
       "height": 256,
       "mode": "RGBA",
@@ -780,8 +2017,8 @@
     {
       "file": "cursors/src/resize-h.png",
       "kind": "project",
-      "bytes": 9006,
-      "sha256": "fe4a8abc5f6ebdbdfd27ccc42de9253104c2447cb1a2a5578f3ce97f4bf2da1f",
+      "bytes": 1846,
+      "sha256": "62f391bb74b18349947d960940aa45803275cb3bc9a689b2a39ffe82430e504e",
       "width": 256,
       "height": 256,
       "mode": "RGBA",
@@ -790,8 +2027,8 @@
     {
       "file": "cursors/src/resize-v.png",
       "kind": "project",
-      "bytes": 8453,
-      "sha256": "026113a19ed056c15ab957ca2bf49ec964e41a3d5c85bf3b888732dfdf2d98e2",
+      "bytes": 2137,
+      "sha256": "faf543771e3dd5595fd6404168c60e3ed5f50c355956a4c4f264bfc1c100c764",
       "width": 256,
       "height": 256,
       "mode": "RGBA",
@@ -800,8 +2037,8 @@
     {
       "file": "cursors/src/text.png",
       "kind": "project",
-      "bytes": 8822,
-      "sha256": "cb058b46ad766cf0304679c5e70f6e508d7e927b14f0c3e849da77be50f9acf1",
+      "bytes": 1374,
+      "sha256": "6b3c2aaede5295934947ce652bff7993b1490cd3d0d43a836846ffefe16db15f",
       "width": 256,
       "height": 256,
       "mode": "RGBA",
@@ -810,8 +2047,8 @@
     {
       "file": "cursors/src/unavailable.png",
       "kind": "project",
-      "bytes": 21321,
-      "sha256": "5f104170440ff563f55fd16bc05d1f4980406c78025bf1d02f6525806028ce4e",
+      "bytes": 3305,
+      "sha256": "65d2ed4c19a1e3ef5271d0e4d3b2c630e377be1503e81e378dafbe70650fe010",
       "width": 256,
       "height": 256,
       "mode": "RGBA",
@@ -820,8 +2057,8 @@
     {
       "file": "cursors/src/working.png",
       "kind": "project",
-      "bytes": 37375,
-      "sha256": "5614fa7ad1bc5cab5c05b516c93f2e330cdbf0c670e21cbb68a97b7ae76cd2f1",
+      "bytes": 4664,
+      "sha256": "5b14534e1b633f7f8ec92f9e029cc136edea5484ab5baebc62e19890db604d09",
       "width": 256,
       "height": 256,
       "mode": "RGBA",
@@ -830,140 +2067,1874 @@
     {
       "file": "cursors/uninstall.ps1",
       "kind": "project",
-      "bytes": 1850,
-      "sha256": "ece4474f3e5642a56b9a2fc7e0dbc7e7e56d4ef4e12e0a62ce0cb9cceb5c9e38"
+      "bytes": 1980,
+      "sha256": "161ea8d340e22f93f9b8997ae027931daa2088b2e403418e97159c4b442aabb4"
+    },
+    {
+      "file": "cursors/v0.4/Crow-Talon.inf",
+      "kind": "project",
+      "bytes": 1696,
+      "sha256": "b01d6f4d154d2ba8357da38b759f6bee3fd62bad2c8772ab7c5674a30a92f57b"
+    },
+    {
+      "file": "cursors/v0.4/install.ps1",
+      "kind": "project",
+      "bytes": 3315,
+      "sha256": "d8f5c191a2ebd7301d3f4045d91d8d01ab40c35aaf783c6d545cba024519bb1d"
+    },
+    {
+      "file": "cursors/v0.4/LICENSE.md",
+      "kind": "project",
+      "bytes": 784,
+      "sha256": "5e1ca97e5d420cb5a4efab018a92ecd16d0a1d3b5068b5d6244b73fe91433e52"
+    },
+    {
+      "file": "cursors/v0.4/manifest.json",
+      "kind": "project",
+      "bytes": 37505,
+      "sha256": "7c20b459a5a46fac55f5c4ce15dd68c55cce4ad83a52636d19c3a4784895a0b5"
+    },
+    {
+      "file": "cursors/v0.4/package-files.sha256",
+      "kind": "project",
+      "bytes": 7505,
+      "sha256": "e43baffc5df2081e651e2d3cbb82c23aa03b7b4d76b5ef716a6889142743d0ad"
+    },
+    {
+      "file": "cursors/v0.4/previews/animation-frames.png",
+      "kind": "project",
+      "bytes": 67698,
+      "sha256": "03efeecac721ea6c53046bb063d09563eb22f09c1c478c28647b379ed36d54c3",
+      "width": 1390,
+      "height": 520,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/previews/antialias-edge-proof.png",
+      "kind": "project",
+      "bytes": 155817,
+      "sha256": "f9e19d19a2d58a9a2b33f9a217721d319dfa4ad4b002e8ea8cc361bc4e639aa9",
+      "width": 1260,
+      "height": 1324,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/previews/crow-talon-v0.4-preview.png",
+      "kind": "project",
+      "bytes": 830967,
+      "sha256": "7aebea21fc76c8a0342389ef9e44eda0f43e2f42959fcf1d9ba0e8fd29df7f97",
+      "width": 1370,
+      "height": 1886,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/previews/normal-native-proof.png",
+      "kind": "project",
+      "bytes": 124627,
+      "sha256": "f40576c83eff74187ddc44fb1ae7a44f2db5d7cee96c5331ea03a372c0ace263",
+      "width": 1500,
+      "height": 820,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/README.md",
+      "kind": "project",
+      "bytes": 1791,
+      "sha256": "fc7e2b6d72d0c8e64e478a4119380278a75aeab0d6550240bd686c291f818dce"
+    },
+    {
+      "file": "cursors/v0.4/src/32/alternate.png",
+      "kind": "project",
+      "bytes": 1390,
+      "sha256": "89d99486f23aa49cf2372c3e88259d253b5230e4a98706f18f5a4b3a7492239d",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/32/busy.png",
+      "kind": "project",
+      "bytes": 2340,
+      "sha256": "a56e3115c39537b096d8cbf5f7c1432daba223b97f2ae2780c200c38d0297aa6",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/32/handwriting.png",
+      "kind": "project",
+      "bytes": 1442,
+      "sha256": "e9b95ad6b615af174a09bd6b83b037d139d7d4b5bd3324982e41891890f43efa",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/32/help.png",
+      "kind": "project",
+      "bytes": 2479,
+      "sha256": "5a69e39d94533cbf1ea19267c82014a3e44784721860fa1ae096e30fa93f76c6",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/32/link.png",
+      "kind": "project",
+      "bytes": 2706,
+      "sha256": "752925999289ced083f69fa30354893c9e5a6367099af95dcfd1e780d7bf3536",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/32/move.png",
+      "kind": "project",
+      "bytes": 1420,
+      "sha256": "bbd41f79a2fd8a4b24a135b6097970f48f3633ab255216211021eb0b6006254d",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/32/normal.png",
+      "kind": "project",
+      "bytes": 2293,
+      "sha256": "e15c6041ef543d1297bff38123ddb53176bba593009099c52998b8562308ba25",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/32/precision.png",
+      "kind": "project",
+      "bytes": 2082,
+      "sha256": "94a935c2bc61237622fad6e0d143ae645e5a5d849d663d936794b2bafac42261",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/32/resize-d1.png",
+      "kind": "project",
+      "bytes": 1145,
+      "sha256": "04a1f7ca20b3764b282af916cedf94a684c06f15bcbfcff32f242b4dbcaba3e4",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/32/resize-d2.png",
+      "kind": "project",
+      "bytes": 1138,
+      "sha256": "e3eb5548a17fa9775d3b5dd1ed70101273e45d3674cd353266503e96eb309a67",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/32/resize-h.png",
+      "kind": "project",
+      "bytes": 1004,
+      "sha256": "2b963b6e65152ee9d2e32512f20495844f37b263c1c06696dcc68ed722948d13",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/32/resize-v.png",
+      "kind": "project",
+      "bytes": 1043,
+      "sha256": "18a011575ef6ad7a0d4b6db6766e51c59038b0f3261bdc29110a57c2353a39ed",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/32/text.png",
+      "kind": "project",
+      "bytes": 1627,
+      "sha256": "519cdebc4a4eff48832a2ceed142417491644b3d910bcd5ca84e370c439aaa9e",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/32/unavailable.png",
+      "kind": "project",
+      "bytes": 2454,
+      "sha256": "c450742c824536d9be633c86faed9a83b57404533e1b73761f20fd4b98378ef7",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/32/working.png",
+      "kind": "project",
+      "bytes": 2786,
+      "sha256": "1618c8321fbd961ffe67ac80f6e1ec0ad70521daf6fc4329fccad02d910dc437",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/48/alternate.png",
+      "kind": "project",
+      "bytes": 2449,
+      "sha256": "1ddc57ed0e03e649d224c4c5115ac00424936b6242290ba00b174e8f7998a8ad",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/48/busy.png",
+      "kind": "project",
+      "bytes": 4547,
+      "sha256": "e03d101f5b3b1676e9e39b0c9faac07593def2e8e2c4259a603028eeea72c614",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/48/handwriting.png",
+      "kind": "project",
+      "bytes": 2634,
+      "sha256": "25c814ca2add068db2bd7a8b51c7e117910e116d23a95da48e1f527b62356041",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/48/help.png",
+      "kind": "project",
+      "bytes": 4697,
+      "sha256": "7036163cfc1bd50817634edc87c14f741c2b5a05899134541479530f5eaa069a",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/48/link.png",
+      "kind": "project",
+      "bytes": 5089,
+      "sha256": "87943a2f344aa20c9a7b7d53aa29536e97f0548feed2892c274e22bdcb81d6f7",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/48/move.png",
+      "kind": "project",
+      "bytes": 2502,
+      "sha256": "5d11be4fbad37b6cfb9839aae451e5869897aeb76be098a86b851b709fc83eda",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/48/normal.png",
+      "kind": "project",
+      "bytes": 4102,
+      "sha256": "77c36da0d01fb8404e6d67540094fb68f0898d8e009c9b3ff3e24a42c433c86c",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/48/precision.png",
+      "kind": "project",
+      "bytes": 4046,
+      "sha256": "cbd0c3f9d50d51ca038e5188275d1676bc5d237666a17aaf71da6e06ce84d99e",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/48/resize-d1.png",
+      "kind": "project",
+      "bytes": 2059,
+      "sha256": "dbe7a346ce43cc2b9a417503b1a5dd9b1e1069fcff73f1fbe97548406a7a504e",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/48/resize-d2.png",
+      "kind": "project",
+      "bytes": 2038,
+      "sha256": "9fa55f45043786ac893467cbc6e3336d6a4dc31c5004abc38dd34d2bae1dac97",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/48/resize-h.png",
+      "kind": "project",
+      "bytes": 1757,
+      "sha256": "922a4f79a3e6f4261885abfe79d6ae83f492e884d5cd1b7eb4281d7d000dc4d7",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/48/resize-v.png",
+      "kind": "project",
+      "bytes": 1828,
+      "sha256": "dfe00a987dcd9a5c368f9547609e1af5189904d6bfe53279473da98b92fb2967",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/48/text.png",
+      "kind": "project",
+      "bytes": 2853,
+      "sha256": "1050d167dbb20112c313f77723b476df500bf9285364537aecb9092624f29597",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/48/unavailable.png",
+      "kind": "project",
+      "bytes": 4398,
+      "sha256": "3c4a82e5d1212cb6aa62cbd69e997c4ceddbdfe1b38da4a32fe95e3a1a8b2ac3",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/48/working.png",
+      "kind": "project",
+      "bytes": 5229,
+      "sha256": "b172e4e6dfabd5d5f05214d88f4fee54e1f1af84b64d29d41fa245ba0f7d6c92",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/64/alternate.png",
+      "kind": "project",
+      "bytes": 3820,
+      "sha256": "9188f56606cdada9beb9be8acbc94cd0a14322d8e1ef7f0026b4737018dd556c",
+      "width": 64,
+      "height": 64,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/64/busy.png",
+      "kind": "project",
+      "bytes": 7332,
+      "sha256": "b251a66b9e24b6aefb6f4224ee123d7bd8d4de82ba29da35d34b9719aa7bb6c9",
+      "width": 64,
+      "height": 64,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/64/handwriting.png",
+      "kind": "project",
+      "bytes": 4068,
+      "sha256": "f8f75f68e1d278e4987e0aeaba4cb442e5123f9f60579718d47705453c538bfd",
+      "width": 64,
+      "height": 64,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/64/help.png",
+      "kind": "project",
+      "bytes": 7354,
+      "sha256": "1b7589d45998e366a873913ab09f407dfe2e06bf6847186aa265b8df144a462c",
+      "width": 64,
+      "height": 64,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/64/link.png",
+      "kind": "project",
+      "bytes": 7915,
+      "sha256": "eebb8351ced6446cfa91286dc70c7dfa376a21a8a0e4b65a26d67869b15fc747",
+      "width": 64,
+      "height": 64,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/64/move.png",
+      "kind": "project",
+      "bytes": 3790,
+      "sha256": "e04f50e704a5cf50092fba5cb617fbcbbc5d8d3262212b20c881719699b55262",
+      "width": 64,
+      "height": 64,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/64/normal.png",
+      "kind": "project",
+      "bytes": 6206,
+      "sha256": "2cf7b678f723a8739f9b8ac83c897474b18039e220178f183143e2586adc4db0",
+      "width": 64,
+      "height": 64,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/64/precision.png",
+      "kind": "project",
+      "bytes": 6409,
+      "sha256": "655205e1587096e4a6a8bd693bb591d1e0a4e7b96a6afb2ad2e49a98a5599d69",
+      "width": 64,
+      "height": 64,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/64/resize-d1.png",
+      "kind": "project",
+      "bytes": 3175,
+      "sha256": "037df31df9a16b8c82f9c7ff40b40b0dda1f0e2b40f86d359bc658804e19e8b0",
+      "width": 64,
+      "height": 64,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/64/resize-d2.png",
+      "kind": "project",
+      "bytes": 3141,
+      "sha256": "03200b873507e5c4471ec87fc1181572a813e5155a18216de59979d415dcbc0c",
+      "width": 64,
+      "height": 64,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/64/resize-h.png",
+      "kind": "project",
+      "bytes": 2588,
+      "sha256": "f6d7164f874599851e4da7a09df738369e945086198be1ba60a28c00aad21e09",
+      "width": 64,
+      "height": 64,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/64/resize-v.png",
+      "kind": "project",
+      "bytes": 2734,
+      "sha256": "691ce23e0bb71765ce0e957b18f51c1b8092a84a357facfa32b46cbd408b879f",
+      "width": 64,
+      "height": 64,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/64/text.png",
+      "kind": "project",
+      "bytes": 4276,
+      "sha256": "a355788bbb2491943efe5b1b5a1dc413d0d138eb4146ee8e0171203796cfec2d",
+      "width": 64,
+      "height": 64,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/64/unavailable.png",
+      "kind": "project",
+      "bytes": 6752,
+      "sha256": "92eb83552c796c34a23594fd7488879a308ace4c1133db1498a7f1f8838cf293",
+      "width": 64,
+      "height": 64,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/64/working.png",
+      "kind": "project",
+      "bytes": 8125,
+      "sha256": "ea2ee01275cc34d670b2a651109ec95ea6b65716be585aa672dbc5ae1591d9a3",
+      "width": 64,
+      "height": 64,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/96/alternate.png",
+      "kind": "project",
+      "bytes": 7050,
+      "sha256": "144f6c531074590da316f45e62524a96bf54d8e44ca0f3a5f48a7ced2e17cbfd",
+      "width": 96,
+      "height": 96,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/96/busy.png",
+      "kind": "project",
+      "bytes": 13837,
+      "sha256": "68c56e735317c15ec40549042fc5571e5d3800ec13c76c834cf0058b2ef52b6a",
+      "width": 96,
+      "height": 96,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/96/handwriting.png",
+      "kind": "project",
+      "bytes": 7709,
+      "sha256": "15611562ad8ed3ab4d91e6e87ce4d2d033c53750bc8001cb41beccbf23736664",
+      "width": 96,
+      "height": 96,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/96/help.png",
+      "kind": "project",
+      "bytes": 13485,
+      "sha256": "5b538e9581782df92e210e975708b0332a540a417b225161e079757034d1ee5c",
+      "width": 96,
+      "height": 96,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/96/link.png",
+      "kind": "project",
+      "bytes": 14901,
+      "sha256": "555934b0a4052ed4e1d76b961f9032b28fee5d61b148ccdfcf0d21623889143e",
+      "width": 96,
+      "height": 96,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/96/move.png",
+      "kind": "project",
+      "bytes": 6863,
+      "sha256": "48f49f270487135396f7281adcd56f624650ce45c9011fdd75a1aa1966f4e789",
+      "width": 96,
+      "height": 96,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/96/normal.png",
+      "kind": "project",
+      "bytes": 11364,
+      "sha256": "f9981dce08ac0226e07cf49226a3e22c9360f96b77fef27f7f7313f4642dc888",
+      "width": 96,
+      "height": 96,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/96/precision.png",
+      "kind": "project",
+      "bytes": 11933,
+      "sha256": "9cea31ffbda8dbb82454419786a958b6c801bbdde8ed11eadea7cccbc296333a",
+      "width": 96,
+      "height": 96,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/96/resize-d1.png",
+      "kind": "project",
+      "bytes": 5886,
+      "sha256": "e080fd3b3f04ffb57613c3c586449b23c28e5faf1191c583419b378433a3d003",
+      "width": 96,
+      "height": 96,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/96/resize-d2.png",
+      "kind": "project",
+      "bytes": 5793,
+      "sha256": "ae0a659672578b7ce067c695ab8325e393b5d0e075171a86edfa1901be5fac25",
+      "width": 96,
+      "height": 96,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/96/resize-h.png",
+      "kind": "project",
+      "bytes": 4681,
+      "sha256": "de93d3ad3ec8423ee13c8a1c328f2c4967f645ad8566b48345e10f707904e55c",
+      "width": 96,
+      "height": 96,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/96/resize-v.png",
+      "kind": "project",
+      "bytes": 5074,
+      "sha256": "a0640f7e312fa7dbba1d1e025058ef0437972829ad4fd73e91759ffa5bca25e1",
+      "width": 96,
+      "height": 96,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/96/text.png",
+      "kind": "project",
+      "bytes": 7788,
+      "sha256": "f569629f610cfd73ea8b58f814d68e4df8f92990c7611d5cb706f765ebc3a74d",
+      "width": 96,
+      "height": 96,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/96/unavailable.png",
+      "kind": "project",
+      "bytes": 12103,
+      "sha256": "2ecb956d6bbf251e9c003b5e4973613860eb52c69c98bac94272d790a1b7e320",
+      "width": 96,
+      "height": 96,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/src/96/working.png",
+      "kind": "project",
+      "bytes": 15312,
+      "sha256": "200c18f1e2792f8beebff145358d728e8f57aaa7a643e608e404faa725b32e91",
+      "width": 96,
+      "height": 96,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.4/uninstall.ps1",
+      "kind": "project",
+      "bytes": 1995,
+      "sha256": "b94468a3335c02f674c7ce7e1cbbc94c676aabad970639b4162e68eafdb99e55"
+    },
+    {
+      "file": "cursors/v0.4/windows/alternate.cur",
+      "kind": "windows-cursor",
+      "bytes": 14779,
+      "sha256": "12dfafd75254431db62521e3d95a7269a47998dd3fe42120cab3aa9655ce0334"
+    },
+    {
+      "file": "cursors/v0.4/windows/busy.ani",
+      "kind": "windows-cursor",
+      "bytes": 326346,
+      "sha256": "38e2f6ba74579fe8e6a36f3adc26cd85d68f9559b0647de1a3cf2722454ede76"
+    },
+    {
+      "file": "cursors/v0.4/windows/busy.cur",
+      "kind": "windows-cursor",
+      "bytes": 28126,
+      "sha256": "32c213895d8bad94fa2d0156dcc5f7d9a8bbcf7423b81b2484c7a005ba739b5f"
+    },
+    {
+      "file": "cursors/v0.4/windows/handwriting.cur",
+      "kind": "windows-cursor",
+      "bytes": 15923,
+      "sha256": "34534ca9179ed5b7f37a07d7284b36b0a680e6ef2d4d2f70147ba481e85e5a47"
+    },
+    {
+      "file": "cursors/v0.4/windows/help.cur",
+      "kind": "windows-cursor",
+      "bytes": 28085,
+      "sha256": "e74762b2b1924e316dfd664883565481d8b5e02223cfdeb6fccf13dfcd388b4b"
+    },
+    {
+      "file": "cursors/v0.4/windows/link.cur",
+      "kind": "windows-cursor",
+      "bytes": 30681,
+      "sha256": "cf5d6fe83b9fef627c1f3d9e37942aa6edb28e2b4ac08ce09a301e1acc773f71"
+    },
+    {
+      "file": "cursors/v0.4/windows/move.cur",
+      "kind": "windows-cursor",
+      "bytes": 14645,
+      "sha256": "a47951595ba795dc4d10d66d5b563638f4e74a1638cb05fd776e6595b9caacd4"
+    },
+    {
+      "file": "cursors/v0.4/windows/normal.cur",
+      "kind": "windows-cursor",
+      "bytes": 24035,
+      "sha256": "1289f3fa9234cadc232e1f0538dec50ff38702ec2cdf7d0be75725afd5611ffe"
+    },
+    {
+      "file": "cursors/v0.4/windows/precision.cur",
+      "kind": "windows-cursor",
+      "bytes": 24540,
+      "sha256": "a8bc1ce892ad6355ca2ceb013a418d1fa724a892855fcd5e637753c46510c756"
+    },
+    {
+      "file": "cursors/v0.4/windows/resize-d1.cur",
+      "kind": "windows-cursor",
+      "bytes": 12335,
+      "sha256": "26d4a71f2229e7bda120f1c5b00a80936dfa245fff7924ae377667cb6d89c518"
+    },
+    {
+      "file": "cursors/v0.4/windows/resize-d2.cur",
+      "kind": "windows-cursor",
+      "bytes": 12180,
+      "sha256": "888bb0c559367df81e85b94864bb5c83422045dd160eab9e7396a75a53fe356b"
+    },
+    {
+      "file": "cursors/v0.4/windows/resize-h.cur",
+      "kind": "windows-cursor",
+      "bytes": 10100,
+      "sha256": "30c890883a0314134c707b30ea81de20ba97a9c53a39eaa88f97ad775692650d"
+    },
+    {
+      "file": "cursors/v0.4/windows/resize-v.cur",
+      "kind": "windows-cursor",
+      "bytes": 10749,
+      "sha256": "f47692e8144bec6e0fe6b15d8aa51a4141af445875da5cc25ea9c9afff069613"
+    },
+    {
+      "file": "cursors/v0.4/windows/text.cur",
+      "kind": "windows-cursor",
+      "bytes": 16614,
+      "sha256": "2e1da0dd45f3006d1e717e5d71e8838293fbc0edfe08fc245ed7a45cc4e6f1e3"
+    },
+    {
+      "file": "cursors/v0.4/windows/unavailable.cur",
+      "kind": "windows-cursor",
+      "bytes": 25777,
+      "sha256": "8af68b08dd5bf208267ac5559edd894949426a2964095adb9f8fe02bb1cd0325"
+    },
+    {
+      "file": "cursors/v0.4/windows/working.ani",
+      "kind": "windows-cursor",
+      "bytes": 378120,
+      "sha256": "74e725b799c6fef83e8228de6cd8757c155b964578188321b157ce83dbaa30eb"
+    },
+    {
+      "file": "cursors/v0.4/windows/working.cur",
+      "kind": "windows-cursor",
+      "bytes": 31522,
+      "sha256": "9294155e2c398e34d36fa2a720334080bdbf32105ffc3392ea1b1f11ba32621b"
+    },
+    {
+      "file": "cursors/v0.5/Crow-Talon.inf",
+      "kind": "project",
+      "bytes": 1832,
+      "sha256": "e6eba876d2b85fe5371a8c8779394b1a19438953a6db8a210046334859f78f95"
+    },
+    {
+      "file": "cursors/v0.5/install.ps1",
+      "kind": "project",
+      "bytes": 3315,
+      "sha256": "65f499f9b433de585be5882749bdc83544d555624b51e558b6415fd01da9e002"
+    },
+    {
+      "file": "cursors/v0.5/LICENSE.md",
+      "kind": "project",
+      "bytes": 784,
+      "sha256": "5e1ca97e5d420cb5a4efab018a92ecd16d0a1d3b5068b5d6244b73fe91433e52"
+    },
+    {
+      "file": "cursors/v0.5/manifest.json",
+      "kind": "project",
+      "bytes": 37821,
+      "sha256": "d7d4a7b85933b7f126a5565e29b4c1c909ca202d6cc57a7c5999ba220fdea9cd"
+    },
+    {
+      "file": "cursors/v0.5/package-files.sha256",
+      "kind": "project",
+      "bytes": 8068,
+      "sha256": "1299db02c3abbcdb5789e9ecf00bbe1f1aab79b3d051f8d4e0f1fb9087520a01"
+    },
+    {
+      "file": "cursors/v0.5/previews/animation-frames.png",
+      "kind": "project",
+      "bytes": 66191,
+      "sha256": "3b010e44e604396009c03189d5fd1718ae3806d51c2c3559141e6a3f380bc514",
+      "width": 1390,
+      "height": 520,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/previews/antialias-edge-proof.png",
+      "kind": "project",
+      "bytes": 153498,
+      "sha256": "1c2d51764ac85169ddcc7b0ce3a0474e027d7df99bbef89bbf89c33fa54d5f9a",
+      "width": 1260,
+      "height": 1324,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/previews/crow-talon-v0.5-preview.png",
+      "kind": "project",
+      "bytes": 807727,
+      "sha256": "2e9682c84600e8894e9e870117926f2888276162dcdc6ee1be96698983a34b7c",
+      "width": 1370,
+      "height": 1886,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/previews/normal-native-proof.png",
+      "kind": "project",
+      "bytes": 114587,
+      "sha256": "84944963b42ec29543f4bc5f39497555f9aa31363a9adeeba4b9322568a97930",
+      "width": 1500,
+      "height": 820,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/README.md",
+      "kind": "project",
+      "bytes": 1786,
+      "sha256": "9bdc7dd647ad308b2bb8982654365cf06800c55434d99aacf0598b9d24859fc9"
+    },
+    {
+      "file": "cursors/v0.5/src/32/alternate.png",
+      "kind": "project",
+      "bytes": 1390,
+      "sha256": "89d99486f23aa49cf2372c3e88259d253b5230e4a98706f18f5a4b3a7492239d",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/32/busy.png",
+      "kind": "project",
+      "bytes": 2340,
+      "sha256": "a56e3115c39537b096d8cbf5f7c1432daba223b97f2ae2780c200c38d0297aa6",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/32/handwriting.png",
+      "kind": "project",
+      "bytes": 1442,
+      "sha256": "e9b95ad6b615af174a09bd6b83b037d139d7d4b5bd3324982e41891890f43efa",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/32/help.png",
+      "kind": "project",
+      "bytes": 2607,
+      "sha256": "bd306d052b04d635645d431c0ccdcfb9f6b229304c42ce00002cd9cf32f34e22",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/32/link.png",
+      "kind": "project",
+      "bytes": 2410,
+      "sha256": "2fe6e94bab34152ea8287b09026643f545e17956a2b6fb32132a826c69be3ac6",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/32/move.png",
+      "kind": "project",
+      "bytes": 1420,
+      "sha256": "bbd41f79a2fd8a4b24a135b6097970f48f3633ab255216211021eb0b6006254d",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/32/normal.png",
+      "kind": "project",
+      "bytes": 1939,
+      "sha256": "8a679e7248c22c9b99033217d21ea6602fcf07cfce5e180341f585c57893cba5",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/32/precision.png",
+      "kind": "project",
+      "bytes": 2082,
+      "sha256": "94a935c2bc61237622fad6e0d143ae645e5a5d849d663d936794b2bafac42261",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/32/resize-d1.png",
+      "kind": "project",
+      "bytes": 1145,
+      "sha256": "04a1f7ca20b3764b282af916cedf94a684c06f15bcbfcff32f242b4dbcaba3e4",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/32/resize-d2.png",
+      "kind": "project",
+      "bytes": 1138,
+      "sha256": "e3eb5548a17fa9775d3b5dd1ed70101273e45d3674cd353266503e96eb309a67",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/32/resize-h.png",
+      "kind": "project",
+      "bytes": 1004,
+      "sha256": "2b963b6e65152ee9d2e32512f20495844f37b263c1c06696dcc68ed722948d13",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/32/resize-v.png",
+      "kind": "project",
+      "bytes": 1043,
+      "sha256": "18a011575ef6ad7a0d4b6db6766e51c59038b0f3261bdc29110a57c2353a39ed",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/32/text.png",
+      "kind": "project",
+      "bytes": 1627,
+      "sha256": "519cdebc4a4eff48832a2ceed142417491644b3d910bcd5ca84e370c439aaa9e",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/32/unavailable.png",
+      "kind": "project",
+      "bytes": 2454,
+      "sha256": "c450742c824536d9be633c86faed9a83b57404533e1b73761f20fd4b98378ef7",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/32/working.png",
+      "kind": "project",
+      "bytes": 2278,
+      "sha256": "3431b8f1f550fdff4c03da8945e0ffaad3a1d4560aee26f3c14894fcfd28204d",
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/48/alternate.png",
+      "kind": "project",
+      "bytes": 2449,
+      "sha256": "1ddc57ed0e03e649d224c4c5115ac00424936b6242290ba00b174e8f7998a8ad",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/48/busy.png",
+      "kind": "project",
+      "bytes": 4547,
+      "sha256": "e03d101f5b3b1676e9e39b0c9faac07593def2e8e2c4259a603028eeea72c614",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/48/handwriting.png",
+      "kind": "project",
+      "bytes": 2634,
+      "sha256": "25c814ca2add068db2bd7a8b51c7e117910e116d23a95da48e1f527b62356041",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/48/help.png",
+      "kind": "project",
+      "bytes": 5055,
+      "sha256": "a85113bb2b3c1f8fecf9b8f1e41fd4eb7b92d8c5d3af04ff9cba97a080269131",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/48/link.png",
+      "kind": "project",
+      "bytes": 4573,
+      "sha256": "986eb976aedc5bc9adcd198ca1c235f028f077f6cc4a037239e531353ed5afa7",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/48/move.png",
+      "kind": "project",
+      "bytes": 2502,
+      "sha256": "5d11be4fbad37b6cfb9839aae451e5869897aeb76be098a86b851b709fc83eda",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/48/normal.png",
+      "kind": "project",
+      "bytes": 3575,
+      "sha256": "0f2c65f96ccb944cf7a9c62ae02b9fcbd032fb7db3c4fdad0cc1f33f84fa655a",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/48/precision.png",
+      "kind": "project",
+      "bytes": 4046,
+      "sha256": "cbd0c3f9d50d51ca038e5188275d1676bc5d237666a17aaf71da6e06ce84d99e",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/48/resize-d1.png",
+      "kind": "project",
+      "bytes": 2059,
+      "sha256": "dbe7a346ce43cc2b9a417503b1a5dd9b1e1069fcff73f1fbe97548406a7a504e",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/48/resize-d2.png",
+      "kind": "project",
+      "bytes": 2038,
+      "sha256": "9fa55f45043786ac893467cbc6e3336d6a4dc31c5004abc38dd34d2bae1dac97",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/48/resize-h.png",
+      "kind": "project",
+      "bytes": 1757,
+      "sha256": "922a4f79a3e6f4261885abfe79d6ae83f492e884d5cd1b7eb4281d7d000dc4d7",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/48/resize-v.png",
+      "kind": "project",
+      "bytes": 1828,
+      "sha256": "dfe00a987dcd9a5c368f9547609e1af5189904d6bfe53279473da98b92fb2967",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/48/text.png",
+      "kind": "project",
+      "bytes": 2853,
+      "sha256": "1050d167dbb20112c313f77723b476df500bf9285364537aecb9092624f29597",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/48/unavailable.png",
+      "kind": "project",
+      "bytes": 4398,
+      "sha256": "3c4a82e5d1212cb6aa62cbd69e997c4ceddbdfe1b38da4a32fe95e3a1a8b2ac3",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/48/working.png",
+      "kind": "project",
+      "bytes": 4452,
+      "sha256": "10fed2509345114b6620042de24135ae660d898f2bb33d3d9b7aeb1d8dbb50d5",
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/64/alternate.png",
+      "kind": "project",
+      "bytes": 3820,
+      "sha256": "9188f56606cdada9beb9be8acbc94cd0a14322d8e1ef7f0026b4737018dd556c",
+      "width": 64,
+      "height": 64,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/64/busy.png",
+      "kind": "project",
+      "bytes": 7332,
+      "sha256": "b251a66b9e24b6aefb6f4224ee123d7bd8d4de82ba29da35d34b9719aa7bb6c9",
+      "width": 64,
+      "height": 64,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/64/handwriting.png",
+      "kind": "project",
+      "bytes": 4068,
+      "sha256": "f8f75f68e1d278e4987e0aeaba4cb442e5123f9f60579718d47705453c538bfd",
+      "width": 64,
+      "height": 64,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/64/help.png",
+      "kind": "project",
+      "bytes": 7760,
+      "sha256": "db5f9cd5128474b655a1b37066ec90170d7dc4ead8dc782eac2eb24beac2d2c8",
+      "width": 64,
+      "height": 64,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/64/link.png",
+      "kind": "project",
+      "bytes": 7190,
+      "sha256": "a41337ce811e7a33da43aab5ecfda079d731624589c8492a35ed9e1624546713",
+      "width": 64,
+      "height": 64,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/64/move.png",
+      "kind": "project",
+      "bytes": 3790,
+      "sha256": "e04f50e704a5cf50092fba5cb617fbcbbc5d8d3262212b20c881719699b55262",
+      "width": 64,
+      "height": 64,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/64/normal.png",
+      "kind": "project",
+      "bytes": 5430,
+      "sha256": "2894fcf6b34e40ea18425f1ed649ea62fd5fb8c09b3f1f7b9df955d7ab391eda",
+      "width": 64,
+      "height": 64,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/64/precision.png",
+      "kind": "project",
+      "bytes": 6409,
+      "sha256": "655205e1587096e4a6a8bd693bb591d1e0a4e7b96a6afb2ad2e49a98a5599d69",
+      "width": 64,
+      "height": 64,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/64/resize-d1.png",
+      "kind": "project",
+      "bytes": 3175,
+      "sha256": "037df31df9a16b8c82f9c7ff40b40b0dda1f0e2b40f86d359bc658804e19e8b0",
+      "width": 64,
+      "height": 64,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/64/resize-d2.png",
+      "kind": "project",
+      "bytes": 3141,
+      "sha256": "03200b873507e5c4471ec87fc1181572a813e5155a18216de59979d415dcbc0c",
+      "width": 64,
+      "height": 64,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/64/resize-h.png",
+      "kind": "project",
+      "bytes": 2588,
+      "sha256": "f6d7164f874599851e4da7a09df738369e945086198be1ba60a28c00aad21e09",
+      "width": 64,
+      "height": 64,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/64/resize-v.png",
+      "kind": "project",
+      "bytes": 2734,
+      "sha256": "691ce23e0bb71765ce0e957b18f51c1b8092a84a357facfa32b46cbd408b879f",
+      "width": 64,
+      "height": 64,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/64/text.png",
+      "kind": "project",
+      "bytes": 4276,
+      "sha256": "a355788bbb2491943efe5b1b5a1dc413d0d138eb4146ee8e0171203796cfec2d",
+      "width": 64,
+      "height": 64,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/64/unavailable.png",
+      "kind": "project",
+      "bytes": 6752,
+      "sha256": "92eb83552c796c34a23594fd7488879a308ace4c1133db1498a7f1f8838cf293",
+      "width": 64,
+      "height": 64,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/64/working.png",
+      "kind": "project",
+      "bytes": 7049,
+      "sha256": "8b4cd536de4792345c470456f1d5f9b59c611ebb9f3ea1b8de083f17704833c5",
+      "width": 64,
+      "height": 64,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/96/alternate.png",
+      "kind": "project",
+      "bytes": 7050,
+      "sha256": "144f6c531074590da316f45e62524a96bf54d8e44ca0f3a5f48a7ced2e17cbfd",
+      "width": 96,
+      "height": 96,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/96/busy.png",
+      "kind": "project",
+      "bytes": 13837,
+      "sha256": "68c56e735317c15ec40549042fc5571e5d3800ec13c76c834cf0058b2ef52b6a",
+      "width": 96,
+      "height": 96,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/96/handwriting.png",
+      "kind": "project",
+      "bytes": 7709,
+      "sha256": "15611562ad8ed3ab4d91e6e87ce4d2d033c53750bc8001cb41beccbf23736664",
+      "width": 96,
+      "height": 96,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/96/help.png",
+      "kind": "project",
+      "bytes": 14554,
+      "sha256": "39b8a596484a3df1b98dc218adbd582b132dbb9c0861033bf074285e36d303df",
+      "width": 96,
+      "height": 96,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/96/link.png",
+      "kind": "project",
+      "bytes": 13641,
+      "sha256": "fd87456ef84692e1300a2ae208a6c72351714b3772a2701b7dd8709095a67aad",
+      "width": 96,
+      "height": 96,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/96/move.png",
+      "kind": "project",
+      "bytes": 6863,
+      "sha256": "48f49f270487135396f7281adcd56f624650ce45c9011fdd75a1aa1966f4e789",
+      "width": 96,
+      "height": 96,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/96/normal.png",
+      "kind": "project",
+      "bytes": 10123,
+      "sha256": "1aba042a11d8e14767030d40fba39339e437e157275b888f34188ce81deb3e9c",
+      "width": 96,
+      "height": 96,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/96/precision.png",
+      "kind": "project",
+      "bytes": 11933,
+      "sha256": "9cea31ffbda8dbb82454419786a958b6c801bbdde8ed11eadea7cccbc296333a",
+      "width": 96,
+      "height": 96,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/96/resize-d1.png",
+      "kind": "project",
+      "bytes": 5886,
+      "sha256": "e080fd3b3f04ffb57613c3c586449b23c28e5faf1191c583419b378433a3d003",
+      "width": 96,
+      "height": 96,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/96/resize-d2.png",
+      "kind": "project",
+      "bytes": 5793,
+      "sha256": "ae0a659672578b7ce067c695ab8325e393b5d0e075171a86edfa1901be5fac25",
+      "width": 96,
+      "height": 96,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/96/resize-h.png",
+      "kind": "project",
+      "bytes": 4681,
+      "sha256": "de93d3ad3ec8423ee13c8a1c328f2c4967f645ad8566b48345e10f707904e55c",
+      "width": 96,
+      "height": 96,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/96/resize-v.png",
+      "kind": "project",
+      "bytes": 5074,
+      "sha256": "a0640f7e312fa7dbba1d1e025058ef0437972829ad4fd73e91759ffa5bca25e1",
+      "width": 96,
+      "height": 96,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/96/text.png",
+      "kind": "project",
+      "bytes": 7788,
+      "sha256": "f569629f610cfd73ea8b58f814d68e4df8f92990c7611d5cb706f765ebc3a74d",
+      "width": 96,
+      "height": 96,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/96/unavailable.png",
+      "kind": "project",
+      "bytes": 12103,
+      "sha256": "2ecb956d6bbf251e9c003b5e4973613860eb52c69c98bac94272d790a1b7e320",
+      "width": 96,
+      "height": 96,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/src/96/working.png",
+      "kind": "project",
+      "bytes": 13529,
+      "sha256": "e7adb1cfe1f788fea96678344f8849ab8f1afe647154485e417f53bba7555625",
+      "width": 96,
+      "height": 96,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "file": "cursors/v0.5/uninstall.ps1",
+      "kind": "project",
+      "bytes": 1995,
+      "sha256": "0a1874d1d50c59f43e428d79677c2dfc9ef10be485d031e37496d5e9bb44943d"
+    },
+    {
+      "file": "cursors/v0.5/windows/alternate.cur",
+      "kind": "windows-cursor",
+      "bytes": 14779,
+      "sha256": "12dfafd75254431db62521e3d95a7269a47998dd3fe42120cab3aa9655ce0334"
+    },
+    {
+      "file": "cursors/v0.5/windows/busy.ani",
+      "kind": "windows-cursor",
+      "bytes": 326346,
+      "sha256": "b9c8ab8cdaab290eb7c51ed0e3ad0d90b9379189c44b58b94db3a92b25f703ff"
+    },
+    {
+      "file": "cursors/v0.5/windows/busy.cur",
+      "kind": "windows-cursor",
+      "bytes": 28126,
+      "sha256": "32c213895d8bad94fa2d0156dcc5f7d9a8bbcf7423b81b2484c7a005ba739b5f"
+    },
+    {
+      "file": "cursors/v0.5/windows/handwriting.cur",
+      "kind": "windows-cursor",
+      "bytes": 15923,
+      "sha256": "34534ca9179ed5b7f37a07d7284b36b0a680e6ef2d4d2f70147ba481e85e5a47"
+    },
+    {
+      "file": "cursors/v0.5/windows/help.cur",
+      "kind": "windows-cursor",
+      "bytes": 30046,
+      "sha256": "92b867e4e8a82269a93921e987567008f378976dcf2dcf46c2ce2bf445e2de17"
+    },
+    {
+      "file": "cursors/v0.5/windows/link.cur",
+      "kind": "windows-cursor",
+      "bytes": 27884,
+      "sha256": "3db391a4e036bc1c6677b4b0e3bf1f9190e1962f4068586ce180848c2c6d4b0e"
+    },
+    {
+      "file": "cursors/v0.5/windows/move.cur",
+      "kind": "windows-cursor",
+      "bytes": 14645,
+      "sha256": "a47951595ba795dc4d10d66d5b563638f4e74a1638cb05fd776e6595b9caacd4"
+    },
+    {
+      "file": "cursors/v0.5/windows/normal.cur",
+      "kind": "windows-cursor",
+      "bytes": 21137,
+      "sha256": "460c7b3dad867573f609a37c9116f53d3fb8d7c4935eaa3500cf5ca5f570b504"
+    },
+    {
+      "file": "cursors/v0.5/windows/precision.cur",
+      "kind": "windows-cursor",
+      "bytes": 24540,
+      "sha256": "a8bc1ce892ad6355ca2ceb013a418d1fa724a892855fcd5e637753c46510c756"
+    },
+    {
+      "file": "cursors/v0.5/windows/resize-d1.cur",
+      "kind": "windows-cursor",
+      "bytes": 12335,
+      "sha256": "26d4a71f2229e7bda120f1c5b00a80936dfa245fff7924ae377667cb6d89c518"
+    },
+    {
+      "file": "cursors/v0.5/windows/resize-d2.cur",
+      "kind": "windows-cursor",
+      "bytes": 12180,
+      "sha256": "888bb0c559367df81e85b94864bb5c83422045dd160eab9e7396a75a53fe356b"
+    },
+    {
+      "file": "cursors/v0.5/windows/resize-h.cur",
+      "kind": "windows-cursor",
+      "bytes": 10100,
+      "sha256": "30c890883a0314134c707b30ea81de20ba97a9c53a39eaa88f97ad775692650d"
+    },
+    {
+      "file": "cursors/v0.5/windows/resize-v.cur",
+      "kind": "windows-cursor",
+      "bytes": 10749,
+      "sha256": "f47692e8144bec6e0fe6b15d8aa51a4141af445875da5cc25ea9c9afff069613"
+    },
+    {
+      "file": "cursors/v0.5/windows/text.cur",
+      "kind": "windows-cursor",
+      "bytes": 16614,
+      "sha256": "2e1da0dd45f3006d1e717e5d71e8838293fbc0edfe08fc245ed7a45cc4e6f1e3"
+    },
+    {
+      "file": "cursors/v0.5/windows/unavailable.cur",
+      "kind": "windows-cursor",
+      "bytes": 25777,
+      "sha256": "8af68b08dd5bf208267ac5559edd894949426a2964095adb9f8fe02bb1cd0325"
+    },
+    {
+      "file": "cursors/v0.5/windows/working.ani",
+      "kind": "windows-cursor",
+      "bytes": 328648,
+      "sha256": "fa008bb775bfa0ed594cf97eac77bc29fcac86d59705adce64d6ec8c1a8e34ce"
+    },
+    {
+      "file": "cursors/v0.5/windows/working.cur",
+      "kind": "windows-cursor",
+      "bytes": 27378,
+      "sha256": "ea666a39777625a9cbe8dad5d47d5faf64a8f679b54750e5e5cbefe3a4463128"
     },
     {
       "file": "cursors/windows/alternate.cur",
       "kind": "windows-cursor",
-      "bytes": 12351,
-      "sha256": "3e200fefde565114f44b833fa6421d4375a379446cc35bdacfdea987cf4d2ad6"
+      "bytes": 2677,
+      "sha256": "461a3932d6b6f252d434f1ab3a5168322dd348ffdb1df3447d6528e8ee590dff"
     },
     {
       "file": "cursors/windows/busy.ani",
       "kind": "windows-cursor",
-      "bytes": 235998,
-      "sha256": "7534d39dcce306d85f6dfa9db61178638df372d6f4f76440bc6348075d79f07e"
+      "bytes": 62548,
+      "sha256": "130987862f10f512201bf856c269daa2818851cfea9dc3c59516d159d51482aa"
     },
     {
       "file": "cursors/windows/busy.cur",
       "kind": "windows-cursor",
-      "bytes": 19536,
-      "sha256": "b5348a685cd8572d9016d8c2ff075e12b90d9f162433601de2102178c5bcb3ac"
+      "bytes": 5231,
+      "sha256": "6297e205c76abbbfe57909f4704ae630ad5ad238cfcba33f33ca5144b42164ae"
     },
     {
       "file": "cursors/windows/handwriting.cur",
       "kind": "windows-cursor",
-      "bytes": 16213,
-      "sha256": "ee15b9c10b15b9f9e263913aaef755d9d978d4c816ea6e0e1691b7351cca00aa"
+      "bytes": 2712,
+      "sha256": "db6d330a412c6b83de171c238b6bcc16cc5644f38e1b0d6fa4b5a55a8cdf93bb"
     },
     {
       "file": "cursors/windows/help.cur",
       "kind": "windows-cursor",
-      "bytes": 27445,
-      "sha256": "e2023a4ddfed009c88fcb458337af27df8cdf9b4184682482b2d9869fac5c82c"
+      "bytes": 5821,
+      "sha256": "7e8a0ddaf8c6f0831b56e7a9d70aa302e2c2549a7fb48b71e5a2d7eea2c7b9b7"
     },
     {
       "file": "cursors/windows/link.cur",
       "kind": "windows-cursor",
-      "bytes": 14068,
-      "sha256": "a9906b08242bea989b96f9b25d393316d9b4f39ef884d1491e96673ad2e09073"
+      "bytes": 5678,
+      "sha256": "9686f256be1d97d3c4512ce5d7e785456cb182e74b8a07ebbd87bbea4922b9c5"
     },
     {
       "file": "cursors/windows/move.cur",
       "kind": "windows-cursor",
-      "bytes": 10778,
-      "sha256": "73676a1123c05af219883099420497007d33adce1d28210f0651ed976496ade3"
+      "bytes": 3445,
+      "sha256": "8ecd3cfe35ce29ad76543c0054ab8e1af5d1f3d7df9ccba3a26d604a9d0cbd13"
     },
     {
       "file": "cursors/windows/normal.cur",
       "kind": "windows-cursor",
-      "bytes": 20621,
-      "sha256": "98d6182631b1e0ba56525a9f39d6e41c2cf1a5832ac4ec104793d52ec51171c9"
+      "bytes": 5517,
+      "sha256": "c2c826004d8281239ef2bd5d1a8eebd24c596a7eed7037eeb96f34aa3d4325cc"
     },
     {
       "file": "cursors/windows/precision.cur",
       "kind": "windows-cursor",
-      "bytes": 19530,
-      "sha256": "52008acb71ea5ad1c1536b3e9f8cb87e1d685aa663b0054c6a031bf9d34fd325"
+      "bytes": 1633,
+      "sha256": "b376e78aa659dca00a483af2899c571d6b1b6820250f8a21fd583700c4a75092"
     },
     {
       "file": "cursors/windows/resize-d1.cur",
       "kind": "windows-cursor",
-      "bytes": 8140,
-      "sha256": "96a4d417f69fa084bf533713b65e1321a39122fa6981923a65c2d14ac7999934"
+      "bytes": 2498,
+      "sha256": "8838df7090db9ae36acbb009c5b85ed70e4e88fa9f5bb7ebc3ae34eb5f79990a"
     },
     {
       "file": "cursors/windows/resize-d2.cur",
       "kind": "windows-cursor",
-      "bytes": 8248,
-      "sha256": "254dfd91a1ad8622f03cb39bcd0a51cdc8a5dcf73cd4cc8ff5486e1d1a110141"
+      "bytes": 2398,
+      "sha256": "f31e680f4a10196c71bccbf65ef7a78fd235d6026298f585871b5025186698dc"
     },
     {
       "file": "cursors/windows/resize-h.cur",
       "kind": "windows-cursor",
-      "bytes": 6778,
-      "sha256": "5eefdbea244b039871d0ed071dbe77ebc4f1bd784ee63b2692cded0e7cef9748"
+      "bytes": 2316,
+      "sha256": "460daca70f7a6fe893b1e701f425de55092f89f36d79c0a5dd9d76a5e2d89d79"
     },
     {
       "file": "cursors/windows/resize-v.cur",
       "kind": "windows-cursor",
-      "bytes": 7527,
-      "sha256": "51bab086a63de67925477601e0fcf710b67293be2a89034e1e6f76f0376789e1"
+      "bytes": 2454,
+      "sha256": "adf42960fbe83af8465ee728b2f920cd96ebca3321a0d2218c46a88953719fbc"
     },
     {
       "file": "cursors/windows/text.cur",
       "kind": "windows-cursor",
-      "bytes": 8163,
-      "sha256": "6c35432537b1f7dacd711b82f5f9216cf74c00ff86f9c1821654b6cd79186598"
+      "bytes": 1747,
+      "sha256": "08aafbad188fdb55a160c6bfd9a8a5b3e7bdc6f6db92ccfefaed03520f53f86e"
     },
     {
       "file": "cursors/windows/unavailable.cur",
       "kind": "windows-cursor",
-      "bytes": 19061,
-      "sha256": "4d6b80b54a7c48f375adb5a62ce99d7fcc8752bd3da705c810a4724110ed2a69"
+      "bytes": 3542,
+      "sha256": "061d8ecd46dc73f78005989d92931df11124afb2951d45e20df03362f7a4be5c"
     },
     {
       "file": "cursors/windows/working.ani",
       "kind": "windows-cursor",
-      "bytes": 307898,
-      "sha256": "49ceb16f7395081b129943b44d845cfcae102df254afda9b226db7864a755fa6"
+      "bytes": 65546,
+      "sha256": "d9c0eca42c2459c41dbf157a0238b0cdd15bf9a1ef331b04e53f511d842687e3"
     },
     {
       "file": "cursors/windows/working.cur",
       "kind": "windows-cursor",
-      "bytes": 25589,
-      "sha256": "3f9bbe0070ef48dfe85cf4da5cb712ae56d6a0bae136851b08eb04ed7c08fa44"
+      "bytes": 5435,
+      "sha256": "2b15f145fdaea0030dcbc8490856b604d102cb3f9c3a9d925235bab9bbeb24f8"
     },
     {
       "file": "docs/BRAND-GUIDE.md",
       "kind": "documentation",
-      "bytes": 7153,
-      "sha256": "4e7c38d8549c238182bcbecd1db457671f8da5bf314f8358639d2c571ec5bb00"
+      "bytes": 8702,
+      "sha256": "14b04996b141354475396da161018937bfa61b1c785df9567a5b0ec0563bc840"
     },
     {
       "file": "docs/MASCOT-GUIDE.md",
       "kind": "documentation",
-      "bytes": 7271,
-      "sha256": "a7d758dd30b5b716cd337cc5d6b6d2fe5584ed54256cc0ade01da968178bde95"
+      "bytes": 6124,
+      "sha256": "4a203830276507b6bdf6bf728d06de5b02bff8b3d7c6aff28d401b86744cf5e1"
+    },
+    {
+      "file": "downloads/Crow-Bitfeather-Windows-v0.3.0.sha256",
+      "kind": "distribution",
+      "bytes": 101,
+      "sha256": "01904fdcb8f4de26cd93efdb65e5127edf8d2808032e7859208e3e740f7ccaee"
+    },
+    {
+      "file": "downloads/Crow-Bitfeather-Windows-v0.3.0.zip",
+      "kind": "distribution",
+      "bytes": 289798,
+      "sha256": "59dc92dad1c9e9995ab49b2fa2ba5526c967b2ec61512f9caa4efe8134b08222"
     },
     {
       "file": "downloads/Crow-Signal-Windows-v0.1.0.zip",
-      "kind": "project",
+      "kind": "distribution",
       "bytes": 97365,
       "sha256": "53dd2e8763815ad2adecf0815b31788c0683d13bedca23ac14ed6398f23a06ce"
     },
     {
+      "file": "downloads/Crow-Signal-Windows-v0.2.0.sha256",
+      "kind": "distribution",
+      "bytes": 97,
+      "sha256": "104dd8ee6d7625805077139a4318951c66a89e23a8ae028207e2891f5c7d7540"
+    },
+    {
+      "file": "downloads/Crow-Signal-Windows-v0.2.0.zip",
+      "kind": "distribution",
+      "bytes": 79713,
+      "sha256": "78adcce796c3781cb1211af127a5de9fb13274280bdcbd807d8e2a2afa8887ef"
+    },
+    {
       "file": "downloads/Crow-Talon-Windows-v0.1.0.zip",
-      "kind": "project",
+      "kind": "distribution",
       "bytes": 1166176,
       "sha256": "070515558a5e5eb0f4bd4f0a2ae1b08242134b2cdbfa4630a143b956a85a69a4"
     },
     {
+      "file": "downloads/Crow-Talon-Windows-v0.2.0.sha256",
+      "kind": "distribution",
+      "bytes": 96,
+      "sha256": "54213a5d3b0448ee43080dd3d55637dc3f6a327ad34f160ac3611a9f464f3f63"
+    },
+    {
+      "file": "downloads/Crow-Talon-Windows-v0.2.0.zip",
+      "kind": "distribution",
+      "bytes": 136079,
+      "sha256": "51c6cb1bf869dd24a647996465cfa37cea1dd240230976c8046bc0f972d44f47"
+    },
+    {
+      "file": "downloads/Crow-Talon-Windows-v0.3.0.sha256",
+      "kind": "distribution",
+      "bytes": 96,
+      "sha256": "c7196e475ce4e3b4e76f1be3603219e7b8cd9a338f75d14cf62aa2bc25d533cc"
+    },
+    {
+      "file": "downloads/Crow-Talon-Windows-v0.3.0.zip",
+      "kind": "distribution",
+      "bytes": 395694,
+      "sha256": "1dede15b2bbe4790d05845f2375aa1fe1ff84fed1cfe3aecc78f4c587bfbcc16"
+    },
+    {
+      "file": "downloads/Crow-Talon-Windows-v0.4.0.sha256",
+      "kind": "distribution",
+      "bytes": 96,
+      "sha256": "317fb1a661325c694baf3179176a6ace0334f40439a477866234a70a95744a8a"
+    },
+    {
+      "file": "downloads/Crow-Talon-Windows-v0.4.0.zip",
+      "kind": "distribution",
+      "bytes": 2500286,
+      "sha256": "878e3f0f49b3b12cd3d9e36d02d30fc70c6f9e4d999a62ae927e3897842bbd6d"
+    },
+    {
+      "file": "downloads/Crow-Talon-Windows-v0.5.0.sha256",
+      "kind": "distribution",
+      "bytes": 96,
+      "sha256": "d860f6016a459dfba2fe11c58ce7224ad01e9a1436a51a295a7008c17fc5f382"
+    },
+    {
+      "file": "downloads/Crow-Talon-Windows-v0.5.0.zip",
+      "kind": "distribution",
+      "bytes": 3236748,
+      "sha256": "cb81f4ccb7484d92ac0cca9346614fb613a9f90e919e926a5130de1dcfae035c"
+    },
+    {
+      "file": "fonts/bitfeather/crow-bitfeather.css",
+      "kind": "project",
+      "bytes": 850,
+      "sha256": "d0986a446b9ef87c5dc3811c3110eece489034b2620aeeee1a19d2c06ec11dd5"
+    },
+    {
+      "file": "fonts/bitfeather/install.ps1",
+      "kind": "project",
+      "bytes": 5463,
+      "sha256": "a8fd851accf9877e91486221004d5b3fbea8386e182769fc95ad942b7a6f0e7f"
+    },
+    {
+      "file": "fonts/bitfeather/manifest.json",
+      "kind": "project",
+      "bytes": 5178,
+      "sha256": "bab97374d9a3472dfe218af7e5fe8c0982d0237c9c1717a786370cb6234dbbfb"
+    },
+    {
+      "file": "fonts/bitfeather/package-files.sha256",
+      "kind": "project",
+      "bytes": 1693,
+      "sha256": "13439549ae020aef77a904ebbeb895f89e770ac22c8da17c100fd23aeb610918"
+    },
+    {
+      "file": "fonts/bitfeather/README.md",
+      "kind": "project",
+      "bytes": 920,
+      "sha256": "91b445fc9fd4a0ad71a7664b4bb6f396845b52d06a48a7ee84c9764014f77cd8"
+    },
+    {
+      "file": "fonts/bitfeather/specimens/crow-bitfeather-v0.3.0.png",
+      "kind": "project",
+      "bytes": 178218,
+      "sha256": "69412cfd35370a301865570c3ee7188ba3b6d76975ec88840063e0350341503d",
+      "width": 2400,
+      "height": 1860,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "fonts/bitfeather/ttf/CrowBitfeatherDisplay-Bold.ttf",
+      "kind": "font",
+      "bytes": 58044,
+      "sha256": "cf87605a19bb4121714ff0c79760e50a0e933972331e304d51c3957fe36e7db3"
+    },
+    {
+      "file": "fonts/bitfeather/ttf/CrowBitfeatherDisplay-Regular.ttf",
+      "kind": "font",
+      "bytes": 57804,
+      "sha256": "6d594a7c213535258f5294524c74509299a065be0f0f8f08e7fd7d85ca36e776"
+    },
+    {
+      "file": "fonts/bitfeather/ttf/CrowBitfeatherMono-Bold.ttf",
+      "kind": "font",
+      "bytes": 57800,
+      "sha256": "2cbbdee64b8c50df7321a4de584933ecb32374af9f59d9d32d2f76274f1f42cd"
+    },
+    {
+      "file": "fonts/bitfeather/ttf/CrowBitfeatherMono-Regular.ttf",
+      "kind": "font",
+      "bytes": 57560,
+      "sha256": "7d0382677f3c28367187156209c1b468c19037eb88084e365b7a3e8e627c4395"
+    },
+    {
+      "file": "fonts/bitfeather/uninstall.ps1",
+      "kind": "project",
+      "bytes": 5607,
+      "sha256": "d86cdbd353c3ede3db4d791a96a55d52e0ef11feec5fe7653f68a6ed6a38cd48"
+    },
+    {
+      "file": "fonts/bitfeather/woff2/CrowBitfeatherDisplay-Bold.woff2",
+      "kind": "font",
+      "bytes": 10324,
+      "sha256": "620595684feb9faf562f9b8ecdb1239a6a041b69d9dc2441dabcb81219d74588"
+    },
+    {
+      "file": "fonts/bitfeather/woff2/CrowBitfeatherDisplay-Regular.woff2",
+      "kind": "font",
+      "bytes": 10360,
+      "sha256": "32acc84b70db3aec0670f0f5ec4d82444d62b1efac9dcb580ff9f038678f8d93"
+    },
+    {
+      "file": "fonts/bitfeather/woff2/CrowBitfeatherMono-Bold.woff2",
+      "kind": "font",
+      "bytes": 10284,
+      "sha256": "0e07a9afb8f6a06fd7420432c770cc5ea71bce6b5d33519e08f34adbb580ecf2"
+    },
+    {
+      "file": "fonts/bitfeather/woff2/CrowBitfeatherMono-Regular.woff2",
+      "kind": "font",
+      "bytes": 10260,
+      "sha256": "f6e188dfc90ce3b38805b503d53c1738b7356550658e0c19f5f2f6d9249fcec5"
+    },
+    {
       "file": "fonts/crow-signal.css",
       "kind": "project",
-      "bytes": 948,
-      "sha256": "7eaf8e5842cdb3e0ba9e4f543c078e84c4dcd69eac66313cc2291b68aa6d2113"
+      "bytes": 956,
+      "sha256": "7dd31e9dd4cc73051e0f690f3b738f5940d70b2d5b4c8c441eb280731a543ecb"
     },
     {
       "file": "fonts/install.ps1",
@@ -974,14 +3945,20 @@
     {
       "file": "fonts/manifest.json",
       "kind": "project",
-      "bytes": 4379,
-      "sha256": "1e006393e05b128a9071c64177ddd769b59d38030ec24e8a3b9f7e343dd4ad00"
+      "bytes": 4851,
+      "sha256": "a4e2d5e497c3bd824e76e790ed1a81f9dc44d252e0dfd526f8e8ec6d7bd82422"
+    },
+    {
+      "file": "fonts/package-files.sha256",
+      "kind": "project",
+      "bytes": 1451,
+      "sha256": "2e506b9cc2500703065b4973c745f730ff9e38b81ea28d44437c6696e1ba28ff"
     },
     {
       "file": "fonts/README.md",
       "kind": "project",
-      "bytes": 1882,
-      "sha256": "4814746e51cff39c6c79ba4cabfe0032f5824f76cde6790a411b40156f0f791e"
+      "bytes": 2949,
+      "sha256": "a2882afb6e0fb4c607a368df5bc47f3f65be7280babbf63409b06493a0fa9d8a"
     },
     {
       "file": "fonts/specimens/crow-signal-v0.1.png",
@@ -994,28 +3971,78 @@
       "format": "PNG"
     },
     {
+      "file": "fonts/specimens/crow-signal-v0.2.png",
+      "kind": "project",
+      "bytes": 45092,
+      "sha256": "126064b0826e075e0f511ad7dcb9c63081de0f89a1e2a6a637f529d9cf5fa056",
+      "width": 2400,
+      "height": 1760,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "fonts/specimens/crow-type-audition-v0.3.png",
+      "kind": "project",
+      "bytes": 546396,
+      "sha256": "824fcfaded19438b56f7fe324278714e9a4c098c810e0d8c043ad9e24395e440",
+      "width": 3200,
+      "height": 1800,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "fonts/specimens/crow-type-audition-v0.4.png",
+      "kind": "project",
+      "bytes": 505122,
+      "sha256": "0a1c4bd335daf68995239beb67f3604d65996509d4745b8ba34a3942d3db2e6e",
+      "width": 3000,
+      "height": 1860,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "fonts/specimens/crow-type-audition-v0.5.png",
+      "kind": "project",
+      "bytes": 526766,
+      "sha256": "be77e785411afa19efaa362ac585a0af5bc0cb6ac8b16168b5009ea6c24721c0",
+      "width": 3000,
+      "height": 1860,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "file": "fonts/specimens/crow-type-audition-v0.6.png",
+      "kind": "project",
+      "bytes": 533467,
+      "sha256": "478564040bb00b5a554b869da0b2f35d026f0fb962f3d700ac8421d0dd1d7a5d",
+      "width": 3000,
+      "height": 1860,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
       "file": "fonts/ttf/CrowSignalDisplay-Bold.ttf",
       "kind": "font",
-      "bytes": 40972,
-      "sha256": "9237eb65df51167bb77ef0d226d4e860c38a9c9a6bbc9757e30724c96183ae96"
+      "bytes": 16024,
+      "sha256": "7e11d91fd4fd5df545b9540e12ec5450d07bdf284df9c222f628b3e3cc85b373"
     },
     {
       "file": "fonts/ttf/CrowSignalDisplay-Regular.ttf",
       "kind": "font",
-      "bytes": 41008,
-      "sha256": "06be80fd542316bf11e89c646aee6265d55c4c4da25001a3acc127c910408ea6"
+      "bytes": 16068,
+      "sha256": "b5df8d99507f8037255ac4fe38c8ac30811bc7c92f78e4335b7c06d4fd60e3ac"
     },
     {
       "file": "fonts/ttf/CrowSignalMono-Bold.ttf",
       "kind": "font",
-      "bytes": 40700,
-      "sha256": "fd61fd7ee18fba3448544d23a7aae69ad9156896c531c75a2d042baa2a584e2d"
+      "bytes": 15964,
+      "sha256": "8c1ac7e6f639fc6f3d272f13f8c82976115204729213adaebf9f7513fdbdc272"
     },
     {
       "file": "fonts/ttf/CrowSignalMono-Regular.ttf",
       "kind": "font",
-      "bytes": 40736,
-      "sha256": "7f084346b7d810d17d335e7508734da7303e64ea077386e8ef64f94823850201"
+      "bytes": 16024,
+      "sha256": "31c005f893c06002e7d8696c9648776415b2c40180dec57520e2b2b0f7ca88cc"
     },
     {
       "file": "fonts/uninstall.ps1",
@@ -1026,26 +4053,26 @@
     {
       "file": "fonts/woff2/CrowSignalDisplay-Bold.woff2",
       "kind": "font",
-      "bytes": 3616,
-      "sha256": "08cfd468fcf4e9db5f0a65f27fdf95de9c47568e2eba86e4b453470ee97f0ef9"
+      "bytes": 3104,
+      "sha256": "915de7eda5ba9c5ef99be05efed90f80ec2eed5aed17d64c4008b1500fe8ab71"
     },
     {
       "file": "fonts/woff2/CrowSignalDisplay-Regular.woff2",
       "kind": "font",
-      "bytes": 3664,
-      "sha256": "40b23fde9dc50031497d0b046fded7540cc203945c77f6e4b6c9604acbd330f5"
+      "bytes": 3044,
+      "sha256": "30f1135ef8d906b829cafe1cf88d403c4773a5031c295c45ce6b3c829a6d4ea4"
     },
     {
       "file": "fonts/woff2/CrowSignalMono-Bold.woff2",
       "kind": "font",
-      "bytes": 3752,
-      "sha256": "9e7d9a9456e6c5ee532269488409b8753d32b5a5ca0ab4d93bc7aaf6d5ccdc8c"
+      "bytes": 3012,
+      "sha256": "fc7ad99dbe921ba25a2231676c7598cd427b96c6ab9360e7d37dad5e8520022c"
     },
     {
       "file": "fonts/woff2/CrowSignalMono-Regular.woff2",
       "kind": "font",
-      "bytes": 3840,
-      "sha256": "965d08be3aac2c132c76d72a5479da02dfda3ce324690fae021953f95a2d1873"
+      "bytes": 3012,
+      "sha256": "6bcc6e092e6f57c349997663be388e822340a6362c1f9ef9bf5302480486ded0"
     },
     {
       "file": "LICENSE.md",
@@ -1056,26 +4083,26 @@
     {
       "file": "prompts/asset-generation.md",
       "kind": "documentation",
-      "bytes": 1797,
-      "sha256": "dae2406264c0db2f1e1bb7e60d061bcc07d89e6ef96e16ddcaedd3d02030057e"
+      "bytes": 2611,
+      "sha256": "f34c33132e1cd25edb795ef7bbaaa7e13cbe7baff11f78d419a74cab1c5c03de"
     },
     {
       "file": "prompts/mascot-consistency.md",
       "kind": "documentation",
-      "bytes": 4404,
-      "sha256": "86bcc7a34d784d9634c5acc288b29658ef6007f345f0870424207a7c53a48459"
+      "bytes": 4318,
+      "sha256": "4e98b0049b99719c1141f6b783dd8b83cce9d5cbfe2258284b76f288632e1178"
     },
     {
       "file": "provenance/SOURCES.md",
       "kind": "project",
-      "bytes": 1411,
-      "sha256": "6f046851ba494e06d4b8fb238e9e915be4c6623355c41a7ad4d2887ca1bb2f83"
+      "bytes": 10587,
+      "sha256": "6e76386924f0081a935af4db0bc1db6663b364f056280b4d732e97df8438456e"
     },
     {
       "file": "README.md",
       "kind": "project",
-      "bytes": 4262,
-      "sha256": "eefb128bec6d49fa312653bd5ebb8c8c710523a383e44b3ad24a769528a353ff"
+      "bytes": 5078,
+      "sha256": "b78123774e32349a67bbf523cc87fc12cd3c57432231dd50e177aa0c4b532956"
     },
     {
       "file": "requirements.txt",
@@ -1084,40 +4111,82 @@
       "sha256": "5ba6394abed3229d9e09dc82de27b7389fcf272afcf3038f879674d91e13fc5a"
     },
     {
+      "file": "scripts/build_bitfeather_fonts.py",
+      "kind": "build-source",
+      "bytes": 38780,
+      "sha256": "4f73a4c59aef8e757859302738e43a1b74c0c0c59d1191d50fd1e4b9cd1d09d1"
+    },
+    {
+      "file": "scripts/build_cursor_approval_proof_v3.py",
+      "kind": "build-source",
+      "bytes": 12015,
+      "sha256": "f515b363a0de9f5ec7944416b25d67b62f9d5c8e7e521fa4e9f50caf7302f62d"
+    },
+    {
       "file": "scripts/build_cursors.py",
       "kind": "build-source",
-      "bytes": 35865,
-      "sha256": "611115e82d2ced3639c26f715baad084c935dcce22084458b7a4f4e75d2155f2"
+      "bytes": 70535,
+      "sha256": "c909e4123a6df80073622326e75a8727375b2bcc86fc452bbc41b5de51fd4d65"
+    },
+    {
+      "file": "scripts/build_cursors_v04.py",
+      "kind": "build-source",
+      "bytes": 70483,
+      "sha256": "c1b3293c8dd4d8d2c318c739a0cd8d976539f31c0b18376d8a224d3679b31622"
+    },
+    {
+      "file": "scripts/build_cursors_v05.py",
+      "kind": "build-source",
+      "bytes": 76167,
+      "sha256": "ffc07a6bfd34a938dabee549256496ae697b571dfcc728566a3ce707ecf65ef4"
+    },
+    {
+      "file": "scripts/build_font_audition.py",
+      "kind": "build-source",
+      "bytes": 17345,
+      "sha256": "7b8e886669ef60b870655e5b20fe9efe6f57ecb28e243805e100ffbd6e2cfbcc"
+    },
+    {
+      "file": "scripts/build_font_audition_v2.py",
+      "kind": "build-source",
+      "bytes": 25420,
+      "sha256": "7471afb80ed0ee29d50186e491fadc00ac4bee59fc053f2ffa1a9c53d19169ca"
     },
     {
       "file": "scripts/build_fonts.py",
       "kind": "build-source",
-      "bytes": 26720,
-      "sha256": "f7197de8463486744b2b205e26286abb35d47c564d02f9dd00ac5199840f5ea8"
+      "bytes": 34676,
+      "sha256": "bd0dad01ba1f76edcaefe968c78d6b3673a9dfa87ae7ed18f7be02f3632737ee"
     },
     {
       "file": "scripts/build_icons.py",
       "kind": "build-source",
-      "bytes": 16665,
-      "sha256": "4d457ceb31c6fd7bd31d522bced168c5a23a3e15475a3bdf4af93e8605d2f504"
+      "bytes": 19008,
+      "sha256": "1cb55389a339046c8b66d2c445477f25bc23be32494dc2db70c95a8964d3f73a"
     },
     {
       "file": "scripts/build_manifest.py",
       "kind": "build-source",
-      "bytes": 3809,
-      "sha256": "a65f518285ae3f94eea9dd9ea9d05d901a3c7a3ce8e5469efa3ebaeb6d46dc55"
+      "bytes": 4532,
+      "sha256": "d94da31270e3f2c0b7033c79e74b28a0aa34ca6aec809b78d05b542267890545"
     },
     {
       "file": "scripts/build_raster_exports.py",
       "kind": "build-source",
-      "bytes": 3900,
-      "sha256": "7dd78f9197bf0afc4c3fe8cb5788e889efcd3c5645b960de7dfd54c03ac8e5c3"
+      "bytes": 6095,
+      "sha256": "29e288611979d4bc2c01b93ba083212f3ac496595fd0da6b5099248bf02e5b0a"
+    },
+    {
+      "file": "scripts/build_visual_assets.py",
+      "kind": "build-source",
+      "bytes": 8692,
+      "sha256": "d5136f41a568e54252bece0f97b287859d3f7e80bc2aac5abfe06cb50e17262c"
     },
     {
       "file": "scripts/validate_pack.py",
       "kind": "build-source",
-      "bytes": 7648,
-      "sha256": "3853ab1804fed5bfb37a575a81b83ed6ae080df28e8cb3aee5512c39a42fd38c"
+      "bytes": 10132,
+      "sha256": "378bf8033a3224e08c1ff35755bc7165005371e42e821a93be4d1cc10d691d63"
     },
     {
       "file": "setup.ps1",
@@ -1128,26 +4197,26 @@
     {
       "file": "tokens/crow-theme.css",
       "kind": "design-token",
-      "bytes": 7021,
-      "sha256": "76a0409dc91eb01f3f97250e45798e60ba690a7d35cc99c03b5854b5828ca084"
+      "bytes": 8606,
+      "sha256": "278d958c5b2cb77dd5d32715e930981f669e60460c0a25f27858cb60d51f9148"
     },
     {
       "file": "tokens/crow-theme.json",
       "kind": "design-token",
-      "bytes": 8405,
-      "sha256": "46b6166d1b9b5a1bdbceb86bcc544027f8231752a05e524dc0e63a8dd396d71c"
+      "bytes": 11651,
+      "sha256": "32beddc2ff367b122c052078e16f4cd602411afa2f0ae10732cab03f9e7e044d"
     },
     {
       "file": "tokens/crow-theme.ts",
       "kind": "design-token",
-      "bytes": 7697,
-      "sha256": "577ade79fc7b83420b11480021072b1966e8e92a4541dfbe88542f385e1b21ba"
+      "bytes": 11500,
+      "sha256": "6c885e2b5b1f74922cdbfb5196696b38efbe0094d6687ebeae93bd9963ffad3c"
     },
     {
       "file": "VERSION",
       "kind": "project",
-      "bytes": 7,
-      "sha256": "9ca90d4ac8fbe86d8aca4aa37a80e0f984c01df281f25f62c779e784fd155a21"
+      "bytes": 6,
+      "sha256": "1f930dd1f133c1f97a94fe3acb8db34372cf4c01ffdb2b3ff4ca72f9494121e9"
     }
   ]
 }

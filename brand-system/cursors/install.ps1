@@ -1,10 +1,11 @@
-# Crow Talon per-user cursor scheme installer.
+# Crow Talon v0.3 per-user cursor scheme installer.
 # Running this script registers the scheme. It only activates it with -Activate.
 [CmdletBinding(SupportsShouldProcess)]
 param([switch]$Activate)
 
 $ErrorActionPreference = 'Stop'
 $schemeName = 'Crow Talon'
+$packageVersion = '0.3.0'
 $source = Join-Path $PSScriptRoot 'windows'
 $destination = Join-Path $env:LOCALAPPDATA 'Crow\Cursors\Crow-Talon'
 $schemesKey = 'HKCU:\Control Panel\Cursors\Schemes'
@@ -27,11 +28,12 @@ $roles = [ordered]@{
     UpArrow     = 'alternate.cur'
     Hand        = 'link.cur'
 }
+$registered = $false
 
 foreach ($file in $roles.Values) {
     $candidate = Join-Path $source $file
     if (-not (Test-Path -LiteralPath $candidate -PathType Leaf)) {
-        throw "Missing cursor payload: $candidate"
+        throw "Incomplete Crow Talon v$packageVersion package. Extract the entire ZIP before running install.ps1. Missing: $candidate"
     }
 }
 
@@ -48,6 +50,7 @@ if ($PSCmdlet.ShouldProcess($destination, 'Install Crow Talon cursor files')) {
     $schemePaths = foreach ($file in $roles.Values) { Join-Path $destination $file }
     New-ItemProperty -Path $schemesKey -Name $schemeName -Value ($schemePaths -join ',') `
         -PropertyType String -Force | Out-Null
+    $registered = $true
 }
 
 if ($Activate -and $PSCmdlet.ShouldProcess($schemeName, 'Activate cursor scheme')) {
@@ -72,7 +75,11 @@ public static class CrowCursorRefresh {
     }
 }
 
-Write-Host "Crow Talon is registered for this Windows account."
-if (-not $Activate) {
+if ($registered) {
+    Write-Host "Crow Talon v$packageVersion is registered for this Windows account."
+} else {
+    Write-Host "Crow Talon v$packageVersion registration was not performed."
+}
+if ($registered -and -not $Activate) {
     Write-Host "Select it in Mouse Properties > Pointers, or rerun with -Activate."
 }

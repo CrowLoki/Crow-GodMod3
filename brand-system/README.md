@@ -3,76 +3,88 @@
 The canonical visual system for CrowClaw, Crow-GodMod3, CrowQuant, CrowNest,
 CrowMemory, CrowFlix, and future Crow products.
 
-Version `0.1.0` is the Crow-GodMod3 integration preview. It contains the approved mascot family,
-original Crow Signal fonts, original Crow Talon Windows cursors, cross-product
-design tokens, application icons, reusable backgrounds, social exports, and
-text-safe hero artwork for six products.
+Version `0.2.0` is the Crow-GodMod3 integration release. Its current interface
+components are Crow Bitfeather v0.3.0 and Crow Talon v0.5.0, alongside the
+approved mascot, cross-product design tokens, application icons, reusable
+backgrounds, social exports, and text-safe hero artwork for six products.
 
-![Crow family](assets/social/crow-family-banner.png)
+![Canonical Crow](assets/social/crow-family-banner.png)
 
-## Approved character family
+## Approved character
 
-| Form | Role | Master |
+[`crow-mascot-v3.png`](assets/mascots/masters/crow-mascot-v3.png) is the sole
+active Crow mascot across every current and future Crow product.
+
+| Identity | Role | Master |
 | --- | --- | --- |
-| Core Architect | Canonical flagship intelligence | [`core-architect.png`](assets/mascots/masters/core-architect.png) |
-| Field Operator | Grounded builder and researcher | [`field-operator.png`](assets/mascots/masters/field-operator.png) |
-| Glitch Ascendant | Controlled transformed state | [`glitch-ascendant.png`](assets/mascots/masters/glitch-ascendant.png) |
-| Pet Companion | Small non-humanoid companion | [`pet-companion.png`](assets/mascots/masters/pet-companion.png) |
+| Canonical Crow v3 | Sole mascot for full, compact, icon, hero and editorial use | [`crow-mascot-v3.png`](assets/mascots/masters/crow-mascot-v3.png) |
 
-Every form has exactly three eyes: two physical eyes and one forehead eye. The
-head remains an elongated crow head with a tapered beak. Orange, amber, yellow,
+The mascot is a naturally proportioned adult crow with exactly three eyes: two
+physical eyes and one forehead eye. Its tapered corvid beak, dominant feather
+mass and integrated biomechanical anatomy remain fixed. Orange, amber, yellow,
 and gold are not Crow Theme colours.
+
+Earlier head, humanoid and companion masters remain in
+`assets/mascots/masters/` as inactive legacy/reference records. They are
+preserved for provenance and must not be used as active product identities.
 
 ## Original type
 
-Crow Signal is generated from original, hand-authored modular geometry. No
-third-party font file or outline is consumed.
+Crow Bitfeather is generated from original, hand-authored stepped-pixel
+geometry. No third-party font file or outline is consumed. Version 0.3.0
+slightly thickens the approved BITFEATHER direction so the feather-and-talon
+character remains clear at practical interface sizes.
 
-- Crow Signal Display Regular and Bold
-- Crow Signal Mono Regular and Bold
+- Crow Bitfeather Display Regular and Bold
+- Crow Bitfeather Mono Regular and Bold
 - Desktop `.ttf` and web `.woff2`
 - Printable Basic Latin plus useful arrows, operators, and signal glyphs
 
-![Crow Signal specimen](fonts/specimens/crow-signal-v0.1.png)
+![Crow Bitfeather specimen](fonts/bitfeather/specimens/crow-bitfeather-v0.3.0.png)
 
 The fonts are not installed automatically. To install them for the current
 Windows user:
 
 ```powershell
-.\fonts\install.ps1
+.\fonts\bitfeather\install.ps1
 ```
 
-Use `.\fonts\uninstall.ps1` to remove them.
+Use `.\fonts\bitfeather\uninstall.ps1` to remove them. The earlier Crow Signal
+files remain as legacy/reference material and are not the active site typeface.
 
 ## Original Windows pointers
 
 Crow Talon is an original pointer scheme drawn and built by
-[`scripts/build_cursors.py`](scripts/build_cursors.py). It includes 15 static
+[`scripts/build_cursors_v05.py`](scripts/build_cursors_v05.py). Version 0.5.0
+uses the approved compact cybernetic crow-claw hand and includes 15 static
 multi-resolution cursor roles, animated Working and Busy states, explicit
-hotspots, a preview, and per-user installation scripts.
+hotspots, visual proofs, and per-user installation scripts.
 
-![Crow Talon preview](cursors/preview.png)
+![Crow Talon v0.5 preview](cursors/v0.5/previews/crow-talon-v0.5-preview.png)
 
 The cursor scheme is not installed automatically. To install it for the
 current Windows user:
 
 ```powershell
-.\cursors\install.ps1
+.\cursors\v0.5\install.ps1
 ```
 
-Use `.\cursors\uninstall.ps1` to restore the previous scheme.
+Use `.\cursors\v0.5\uninstall.ps1` to remove only v0.5. The live website uses
+the compact 32px PNG sources directly and does not install anything on the
+visitor's computer.
 
 ## Icons and artwork
 
 - [`assets/marks/crow-signal-master.png`](assets/marks/crow-signal-master.png)
-  is the master square signal artwork.
+  is a square signal crop derived from the canonical Crow.
 - [`assets/icons/`](assets/icons/) contains 16–1024 px icons, rounded app
   icons, avatars, and a multi-resolution ICO.
 - [`assets/backgrounds/`](assets/backgrounds/) contains the neutral void-grid
   system and practical wallpaper exports.
 - [`assets/product-variants/`](assets/product-variants/) contains text-safe
-  hero artwork for the six current Crow products.
-- [`assets/social/`](assets/social/) contains family banners, Open Graph,
+  hero artwork for the six current Crow products. Each uses the same mascot;
+  only crop, background and accent emphasis vary.
+- [`assets/social/`](assets/social/) contains Crow banners, Open Graph,
   repository, square-post, and story formats.
 
 ![Icon family](assets/icons/contact-sheet.png)
@@ -82,7 +94,7 @@ Use `.\cursors\uninstall.ps1` to restore the previous scheme.
 Import the original fonts and theme tokens:
 
 ```css
-@import "./fonts/crow-signal.css";
+@import "./fonts/bitfeather/crow-bitfeather.css";
 @import "./tokens/crow-theme.css";
 ```
 
@@ -112,6 +124,7 @@ The individual build stages are:
 ```powershell
 .\.venv\Scripts\python.exe .\scripts\build_fonts.py
 .\.venv\Scripts\python.exe .\scripts\build_cursors.py
+.\.venv\Scripts\python.exe .\scripts\build_visual_assets.py
 .\.venv\Scripts\python.exe .\scripts\build_icons.py
 .\.venv\Scripts\python.exe .\scripts\build_raster_exports.py
 .\.venv\Scripts\python.exe .\scripts\build_manifest.py

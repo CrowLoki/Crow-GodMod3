@@ -1,116 +1,598 @@
 {
-  "version": "0.1.0",
+  "version": "0.2.0",
+  "identity_version": "v3",
   "generator": "scripts/build_raster_exports.py",
+  "runtime_encodings": {
+    "webp": {
+      "quality": 88,
+      "method": 6,
+      "exact": true
+    },
+    "avif": {
+      "quality": 72,
+      "speed": 6
+    }
+  },
   "outputs": [
     {
       "file": "assets/social/exports/crow-family-open-graph-1200x630.png",
-      "bytes": 916959,
-      "sha256": "1b331cd8f6f674c4d32b4d9189518fefd76a5ab8ae3a5df05324b6098753707e"
+      "source": "assets/social/crow-family-banner.png",
+      "operation": "cover",
+      "format": "PNG",
+      "width": 1200,
+      "height": 630,
+      "bytes": 947820,
+      "sha256": "4cd22efec4741f363958093142e5c37493cc41ca790d29cefda12a285eae3efd"
     },
     {
       "file": "assets/social/exports/crow-family-github-1280x640.png",
-      "bytes": 971319,
-      "sha256": "b7fb8261764007494fa6a6fb4c2098c7753fbee0fd1084b487249f7f23777279"
+      "source": "assets/social/crow-family-banner.png",
+      "operation": "cover",
+      "format": "PNG",
+      "width": 1280,
+      "height": 640,
+      "bytes": 1017181,
+      "sha256": "a582880e4ace9b1f354ab183f32c88e21e48e25c3feb83b773ca602998e506d7"
     },
     {
       "file": "assets/social/exports/crow-family-wide-1500x500.png",
-      "bytes": 896628,
-      "sha256": "28df092a7d94e5a41e9e24a0c05206a8afb92238ac4379786fa886433a92d657"
+      "source": "assets/social/crow-family-banner.png",
+      "operation": "cover",
+      "format": "PNG",
+      "width": 1500,
+      "height": 500,
+      "bytes": 951980,
+      "sha256": "74fe885471fa339e64ed0ed51661452cb6dec2408c4d4ebf2a6a058de272e2e6"
     },
     {
       "file": "assets/social/exports/crow-family-post-1080x1080.png",
-      "bytes": 1568140,
-      "sha256": "145e9946ccc8bdeb01d9a5cb97e2fdbaa4c973c8376f1aa103158de176a3fad3"
+      "source": "assets/social/crow-family-banner.png",
+      "operation": "cover",
+      "format": "PNG",
+      "width": 1080,
+      "height": 1080,
+      "bytes": 1018962,
+      "sha256": "7b7cea9e7a76f315eadb833a2d249dafd00f651c00818c6ee1dff8390e320ad3"
     },
     {
       "file": "assets/social/exports/crow-family-story-1080x1920.png",
-      "bytes": 1837633,
-      "sha256": "db10174b9fd391c1f037e07da56968bcec5024115fec5d1b9bcb55bcf52bf255"
+      "source": "assets/social/crow-family-banner.png",
+      "operation": "cover",
+      "format": "PNG",
+      "width": 1080,
+      "height": 1920,
+      "bytes": 1447105,
+      "sha256": "6c94a18857b8d19e24adb0d2d458502f072fb865b22b7503284077521ed0ef4e"
     },
     {
       "file": "assets/backgrounds/exports/void-grid-1920x1080.png",
+      "source": "assets/backgrounds/void-grid-neutral.png",
+      "operation": "contain",
+      "format": "PNG",
+      "width": 1920,
+      "height": 1080,
       "bytes": 2117035,
       "sha256": "53eea5e6609be075c5980b4cc58c54a6a4546a0c31ee1e9142122d1d474dda14"
     },
     {
       "file": "assets/backgrounds/exports/void-grid-2560x1440.png",
+      "source": "assets/backgrounds/void-grid-neutral.png",
+      "operation": "contain",
+      "format": "PNG",
+      "width": 2560,
+      "height": 1440,
       "bytes": 3180260,
       "sha256": "1bd8b1a61c6a5637fd2fd5724221d0f35954c2cb9c2c541842e456a61381eb0b"
     },
     {
       "file": "assets/backgrounds/exports/void-grid-3440x1440.png",
+      "source": "assets/backgrounds/void-grid-neutral.png",
+      "operation": "contain",
+      "format": "PNG",
+      "width": 3440,
+      "height": 1440,
       "bytes": 3265850,
       "sha256": "fab716ce65311a80569c98854f596ceefafd62096076009a300898a0c18ca581"
     },
     {
       "file": "assets/backgrounds/exports/void-grid-mobile-1440x2560.png",
+      "source": "assets/backgrounds/void-grid-neutral.png",
+      "operation": "contain",
+      "format": "PNG",
+      "width": 1440,
+      "height": 2560,
       "bytes": 1325594,
       "sha256": "9d2ee0618a297dc96cbee388be938164ec903164584b48c7a144fa63fb5d418d"
     },
     {
       "file": "assets/backgrounds/exports/void-grid-square-2048x2048.png",
+      "source": "assets/backgrounds/void-grid-neutral.png",
+      "operation": "contain",
+      "format": "PNG",
+      "width": 2048,
+      "height": 2048,
       "bytes": 2341968,
       "sha256": "1f7f07cc27d96b22c6611ad9918ad3d765882679cc8905b8d40da7e917334582"
     },
     {
       "file": "assets/product-variants/exports/crow-godmod3-1920x1080.png",
-      "bytes": 2725968,
-      "sha256": "a5bcb2488664a56384c50e57982164adf42510655d8f5e395c4f4b4d6e74fa58"
+      "source": "assets/product-variants/crow-godmod3-hero.png",
+      "operation": "cover",
+      "format": "PNG",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 2402188,
+      "sha256": "aa3568a0e63ab90d6f83c30c0d4da133365d474f9907dc31fcf67f4f46cf38bf"
+    },
+    {
+      "file": "assets/product-variants/exports/crow-godmod3-1920x1080.webp",
+      "source": "assets/product-variants/crow-godmod3-hero.png",
+      "operation": "cover-runtime",
+      "format": "WEBP",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 207624,
+      "sha256": "a1fa7e939776cc0d1429a68de22164a03f53927b42d5683578acedbe83f2cd12"
+    },
+    {
+      "file": "assets/product-variants/exports/crow-godmod3-1920x1080.avif",
+      "source": "assets/product-variants/crow-godmod3-hero.png",
+      "operation": "cover-runtime",
+      "format": "AVIF",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 167324,
+      "sha256": "88382271ccc26ff7b6b53f93ad12d360a2f41ea6c45b86910d5e832c0880fad8"
     },
     {
       "file": "assets/product-variants/exports/crow-godmod3-1200x630.png",
-      "bytes": 1154027,
-      "sha256": "bc6480c6896f5ebce5346f0216eb6d4cedaa78c84b25372c4e1a09bf40691ff8"
+      "source": "assets/product-variants/crow-godmod3-hero.png",
+      "operation": "cover",
+      "format": "PNG",
+      "width": 1200,
+      "height": 630,
+      "bytes": 983253,
+      "sha256": "017856d400d9560eb54b051c7acaa8b960c53ea1364859958908239d36b63e46"
+    },
+    {
+      "file": "assets/product-variants/exports/crow-godmod3-1200x630.webp",
+      "source": "assets/product-variants/crow-godmod3-hero.png",
+      "operation": "cover-runtime",
+      "format": "WEBP",
+      "width": 1200,
+      "height": 630,
+      "bytes": 93866,
+      "sha256": "9651e21bd858af74de8c3ca77381e157fd86dd878370ca200308614a1eaffd69"
+    },
+    {
+      "file": "assets/product-variants/exports/crow-godmod3-1200x630.avif",
+      "source": "assets/product-variants/crow-godmod3-hero.png",
+      "operation": "cover-runtime",
+      "format": "AVIF",
+      "width": 1200,
+      "height": 630,
+      "bytes": 78694,
+      "sha256": "24c379285135d8b90bc2cf64909386b65e1090679bc4c38642333f96583a8b50"
     },
     {
       "file": "assets/product-variants/exports/crowclaw-1920x1080.png",
-      "bytes": 2273666,
-      "sha256": "58c548c63074a3ef9fa50f47f0900c55842e59fd3d8a808717cdfcfaecaa5fc4"
+      "source": "assets/product-variants/crowclaw-hero.png",
+      "operation": "cover",
+      "format": "PNG",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 2402654,
+      "sha256": "36a5380a2eadf356e7adb8b504b9cd6a1feea654c693eb659818571e257cd9fe"
+    },
+    {
+      "file": "assets/product-variants/exports/crowclaw-1920x1080.webp",
+      "source": "assets/product-variants/crowclaw-hero.png",
+      "operation": "cover-runtime",
+      "format": "WEBP",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 207880,
+      "sha256": "d5ec5a382a0b9df2acdd8c6e2f003c1e0e3a71b93e6f73ac24308d102fef8b28"
+    },
+    {
+      "file": "assets/product-variants/exports/crowclaw-1920x1080.avif",
+      "source": "assets/product-variants/crowclaw-hero.png",
+      "operation": "cover-runtime",
+      "format": "AVIF",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 168185,
+      "sha256": "2e70dbd1b0cc37d2f4edb119507c78d0a5fcbc7ce5e8ad6647c5b90be6039cea"
     },
     {
       "file": "assets/product-variants/exports/crowclaw-1200x630.png",
-      "bytes": 968477,
-      "sha256": "984b22e2eda4640059ed979b5fb50c1a381a0fef4bedd98c5047871a4ed11e8d"
+      "source": "assets/product-variants/crowclaw-hero.png",
+      "operation": "cover",
+      "format": "PNG",
+      "width": 1200,
+      "height": 630,
+      "bytes": 983174,
+      "sha256": "cc40f9680e1b055bd3d4f61dc42634ca8d6e94fe19cc7edf73851359944b5985"
+    },
+    {
+      "file": "assets/product-variants/exports/crowclaw-1200x630.webp",
+      "source": "assets/product-variants/crowclaw-hero.png",
+      "operation": "cover-runtime",
+      "format": "WEBP",
+      "width": 1200,
+      "height": 630,
+      "bytes": 94444,
+      "sha256": "2acfdb0e3ccd7c54d3df057869b4235960b9fe173982bce6f1c295e717d09444"
+    },
+    {
+      "file": "assets/product-variants/exports/crowclaw-1200x630.avif",
+      "source": "assets/product-variants/crowclaw-hero.png",
+      "operation": "cover-runtime",
+      "format": "AVIF",
+      "width": 1200,
+      "height": 630,
+      "bytes": 79159,
+      "sha256": "17e584a703c6d6e6490885387e4a04198eda6bb4bcb59ea0a7e0f95092c29589"
     },
     {
       "file": "assets/product-variants/exports/crowflix-1920x1080.png",
-      "bytes": 2616720,
-      "sha256": "ace58830615200a94d1811b633e1e0d1b8c06cff41a40a9670d48b400c039826"
+      "source": "assets/product-variants/crowflix-hero.png",
+      "operation": "cover",
+      "format": "PNG",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 2405207,
+      "sha256": "8cd9c4c6ff9f832419276e52f75c77ff0767bc37fa74cbd41c17b6a8327c3285"
+    },
+    {
+      "file": "assets/product-variants/exports/crowflix-1920x1080.webp",
+      "source": "assets/product-variants/crowflix-hero.png",
+      "operation": "cover-runtime",
+      "format": "WEBP",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 206684,
+      "sha256": "03deb929ef313dc22eb060859d233372ce7bbd6656540009eeb013a01640ded2"
+    },
+    {
+      "file": "assets/product-variants/exports/crowflix-1920x1080.avif",
+      "source": "assets/product-variants/crowflix-hero.png",
+      "operation": "cover-runtime",
+      "format": "AVIF",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 167476,
+      "sha256": "ca3d51e611a1674a24beb6e717f5ce85e0055aa13d3a5a4e7f0784fbd24ea370"
     },
     {
       "file": "assets/product-variants/exports/crowflix-1200x630.png",
-      "bytes": 1083165,
-      "sha256": "39067eacb2602bb9510db744c4604aef068f511d3f77d95bce6f740170f499ab"
+      "source": "assets/product-variants/crowflix-hero.png",
+      "operation": "cover",
+      "format": "PNG",
+      "width": 1200,
+      "height": 630,
+      "bytes": 984258,
+      "sha256": "af1da136295ebdbb726dc87cf2cc05bac6ea87fe497b07d6a30e3a9bea1681c3"
+    },
+    {
+      "file": "assets/product-variants/exports/crowflix-1200x630.webp",
+      "source": "assets/product-variants/crowflix-hero.png",
+      "operation": "cover-runtime",
+      "format": "WEBP",
+      "width": 1200,
+      "height": 630,
+      "bytes": 93770,
+      "sha256": "90e3ee673bd23344f1368b54cee95fe7735236368478a89c5cf50d2084b36e7e"
+    },
+    {
+      "file": "assets/product-variants/exports/crowflix-1200x630.avif",
+      "source": "assets/product-variants/crowflix-hero.png",
+      "operation": "cover-runtime",
+      "format": "AVIF",
+      "width": 1200,
+      "height": 630,
+      "bytes": 78907,
+      "sha256": "3640c67e52c8cd5259b83e40c22f3ea71401ae604981c074ca99b7045f4b950e"
     },
     {
       "file": "assets/product-variants/exports/crowmemory-1920x1080.png",
-      "bytes": 2521615,
-      "sha256": "e262f51bf8d29f6ccf9401aea96ce4e14eed0efeb4b50b3b8a51fe67be2d4ef1"
+      "source": "assets/product-variants/crowmemory-hero.png",
+      "operation": "cover",
+      "format": "PNG",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 2401142,
+      "sha256": "2aa331572a73ff50592aaf71d8cd37814b97ed59c50cfcffb02732c74d9caa8c"
+    },
+    {
+      "file": "assets/product-variants/exports/crowmemory-1920x1080.webp",
+      "source": "assets/product-variants/crowmemory-hero.png",
+      "operation": "cover-runtime",
+      "format": "WEBP",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 206710,
+      "sha256": "3cb37a82e49d3bf32ebe59eb1676fab971737b7d391ddfcdb9fefc26c58595ee"
+    },
+    {
+      "file": "assets/product-variants/exports/crowmemory-1920x1080.avif",
+      "source": "assets/product-variants/crowmemory-hero.png",
+      "operation": "cover-runtime",
+      "format": "AVIF",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 167302,
+      "sha256": "5f47bcb9ca0c11cdf61be76397b8f35080e6e22a5b231152475a2b6ab1ecf9a8"
     },
     {
       "file": "assets/product-variants/exports/crowmemory-1200x630.png",
-      "bytes": 1049901,
-      "sha256": "4d20a456d80d1a958045a39762113e23d0b2ba6410fe740e82f135f854044b73"
+      "source": "assets/product-variants/crowmemory-hero.png",
+      "operation": "cover",
+      "format": "PNG",
+      "width": 1200,
+      "height": 630,
+      "bytes": 982817,
+      "sha256": "ed6775a4db68d089f78f11990d75cef8208e9f7b98d41bdd4b7a7a1db79df32c"
+    },
+    {
+      "file": "assets/product-variants/exports/crowmemory-1200x630.webp",
+      "source": "assets/product-variants/crowmemory-hero.png",
+      "operation": "cover-runtime",
+      "format": "WEBP",
+      "width": 1200,
+      "height": 630,
+      "bytes": 93786,
+      "sha256": "c9d9db6a70ec7fa2a51519fa67e4630836cecce585cbbfb9bb28b075bf39f24a"
+    },
+    {
+      "file": "assets/product-variants/exports/crowmemory-1200x630.avif",
+      "source": "assets/product-variants/crowmemory-hero.png",
+      "operation": "cover-runtime",
+      "format": "AVIF",
+      "width": 1200,
+      "height": 630,
+      "bytes": 78702,
+      "sha256": "89146bcdc46688edbab330517055375c2dad8f78f9ab271a0fc731e7a73b3479"
     },
     {
       "file": "assets/product-variants/exports/crownest-1920x1080.png",
-      "bytes": 2238367,
-      "sha256": "d05422b4c8a4bc3396ad38019bc31a4bf1649489c376a840272cda65b9e21f55"
+      "source": "assets/product-variants/crownest-hero.png",
+      "operation": "cover",
+      "format": "PNG",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 2399935,
+      "sha256": "fd4a049b95ad2b6a5cc3a6040c9705c605022084066240e1aa49ee892f078fcf"
+    },
+    {
+      "file": "assets/product-variants/exports/crownest-1920x1080.webp",
+      "source": "assets/product-variants/crownest-hero.png",
+      "operation": "cover-runtime",
+      "format": "WEBP",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 207212,
+      "sha256": "c7b532533862c1b82a56ff65c207660c3b805b0191b1308e6c3908e7058748f8"
+    },
+    {
+      "file": "assets/product-variants/exports/crownest-1920x1080.avif",
+      "source": "assets/product-variants/crownest-hero.png",
+      "operation": "cover-runtime",
+      "format": "AVIF",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 167843,
+      "sha256": "9833d145e076ec56df4aa5a1fd84a2e2d71de4d1fca074909d20a1767b27166a"
     },
     {
       "file": "assets/product-variants/exports/crownest-1200x630.png",
-      "bytes": 952773,
-      "sha256": "de7c796f9cccbfa21948a754a0a9b0d4ef76ab133055eb1a4de357bd6cfb23e0"
+      "source": "assets/product-variants/crownest-hero.png",
+      "operation": "cover",
+      "format": "PNG",
+      "width": 1200,
+      "height": 630,
+      "bytes": 982279,
+      "sha256": "8210bb3ecc127b0b6f818631d72d37d15e78b7453ab1794445579894aba74e20"
+    },
+    {
+      "file": "assets/product-variants/exports/crownest-1200x630.webp",
+      "source": "assets/product-variants/crownest-hero.png",
+      "operation": "cover-runtime",
+      "format": "WEBP",
+      "width": 1200,
+      "height": 630,
+      "bytes": 94286,
+      "sha256": "3b93300dfc8c8ef70caf034065612673f636ff81a76d595ce917bbf592d08170"
+    },
+    {
+      "file": "assets/product-variants/exports/crownest-1200x630.avif",
+      "source": "assets/product-variants/crownest-hero.png",
+      "operation": "cover-runtime",
+      "format": "AVIF",
+      "width": 1200,
+      "height": 630,
+      "bytes": 78862,
+      "sha256": "16a373d9087b71a756b811d78a7ff29eaefbad94fe82b67a2d451ff97b8e9d2f"
     },
     {
       "file": "assets/product-variants/exports/crowquant-1920x1080.png",
-      "bytes": 2688920,
-      "sha256": "07d2bfa5c1411a1f96579b7e7d28df5267dc4e59a0ca09c7cbeb25d755a23cdf"
+      "source": "assets/product-variants/crowquant-hero.png",
+      "operation": "cover",
+      "format": "PNG",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 2398681,
+      "sha256": "62b1d95a299e5c6a8e503b7e01606e82e461a8883a3e66f991b08e942efe36cc"
+    },
+    {
+      "file": "assets/product-variants/exports/crowquant-1920x1080.webp",
+      "source": "assets/product-variants/crowquant-hero.png",
+      "operation": "cover-runtime",
+      "format": "WEBP",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 207618,
+      "sha256": "3d555e5edd02adc184e13e28e7d1895ded1c443fff690cd2bb42f2151886a2b4"
+    },
+    {
+      "file": "assets/product-variants/exports/crowquant-1920x1080.avif",
+      "source": "assets/product-variants/crowquant-hero.png",
+      "operation": "cover-runtime",
+      "format": "AVIF",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 167769,
+      "sha256": "6a5592777174ac61a8d3782ffc303735cab75ae0fbdf42eccf27ea56b5ddf298"
     },
     {
       "file": "assets/product-variants/exports/crowquant-1200x630.png",
-      "bytes": 1113746,
-      "sha256": "b4adae9bcb48c4a1aa08ed545d1579270dc090500804ef4f748f807bde0d5c92"
+      "source": "assets/product-variants/crowquant-hero.png",
+      "operation": "cover",
+      "format": "PNG",
+      "width": 1200,
+      "height": 630,
+      "bytes": 981935,
+      "sha256": "af5787d4a5b0eca3f490a202bd82113e7ffd9a16686b11d254f08f954cacaf82"
+    },
+    {
+      "file": "assets/product-variants/exports/crowquant-1200x630.webp",
+      "source": "assets/product-variants/crowquant-hero.png",
+      "operation": "cover-runtime",
+      "format": "WEBP",
+      "width": 1200,
+      "height": 630,
+      "bytes": 94532,
+      "sha256": "4d9fe13283d1540f8506bc234caeae6512353137da7a3c6724f0d00dc3023ff6"
+    },
+    {
+      "file": "assets/product-variants/exports/crowquant-1200x630.avif",
+      "source": "assets/product-variants/crowquant-hero.png",
+      "operation": "cover-runtime",
+      "format": "AVIF",
+      "width": 1200,
+      "height": 630,
+      "bytes": 79210,
+      "sha256": "6d69dedc87eed6a96cf5b0a87a4a51e9c242bf26cded4c1197b9b72fc478c849"
+    },
+    {
+      "file": "assets/social/exports/crow-godmod3-open-graph-1200x630.png",
+      "source": "assets/product-variants/crow-godmod3-hero.png",
+      "operation": "right-focus-cover",
+      "format": "PNG",
+      "width": 1200,
+      "height": 630,
+      "bytes": 983253,
+      "sha256": "017856d400d9560eb54b051c7acaa8b960c53ea1364859958908239d36b63e46"
+    },
+    {
+      "file": "assets/social/exports/crow-godmod3-open-graph-1200x630.webp",
+      "source": "assets/product-variants/crow-godmod3-hero.png",
+      "operation": "right-focus-cover-runtime",
+      "format": "WEBP",
+      "width": 1200,
+      "height": 630,
+      "bytes": 93866,
+      "sha256": "9651e21bd858af74de8c3ca77381e157fd86dd878370ca200308614a1eaffd69"
+    },
+    {
+      "file": "assets/social/exports/crow-godmod3-open-graph-1200x630.avif",
+      "source": "assets/product-variants/crow-godmod3-hero.png",
+      "operation": "right-focus-cover-runtime",
+      "format": "AVIF",
+      "width": 1200,
+      "height": 630,
+      "bytes": 78694,
+      "sha256": "24c379285135d8b90bc2cf64909386b65e1090679bc4c38642333f96583a8b50"
+    },
+    {
+      "file": "assets/social/exports/crow-godmod3-wide-1500x500.png",
+      "source": "assets/product-variants/crow-godmod3-hero.png",
+      "operation": "right-focus-cover",
+      "format": "PNG",
+      "width": 1500,
+      "height": 500,
+      "bytes": 985466,
+      "sha256": "b7a569ed7b1a7e11b2306ff0e42bf829d4a71163f84e4740d7f02919728eac4b"
+    },
+    {
+      "file": "assets/social/exports/crow-godmod3-wide-1500x500.webp",
+      "source": "assets/product-variants/crow-godmod3-hero.png",
+      "operation": "right-focus-cover-runtime",
+      "format": "WEBP",
+      "width": 1500,
+      "height": 500,
+      "bytes": 94954,
+      "sha256": "456033052c548d9f90a23f01c24dbc72fb3897a0cc9829dc306d5fa38a206edd"
+    },
+    {
+      "file": "assets/social/exports/crow-godmod3-wide-1500x500.avif",
+      "source": "assets/product-variants/crow-godmod3-hero.png",
+      "operation": "right-focus-cover-runtime",
+      "format": "AVIF",
+      "width": 1500,
+      "height": 500,
+      "bytes": 77765,
+      "sha256": "ac8d71392882de60ac430ba9f39f20b585d5dcd6fe3b8eedf6f46b703d00fe21"
+    },
+    {
+      "file": "assets/social/exports/crow-godmod3-post-1080x1080.png",
+      "source": "assets/product-variants/crow-godmod3-hero.png",
+      "operation": "right-focus-cover",
+      "format": "PNG",
+      "width": 1080,
+      "height": 1080,
+      "bytes": 1526825,
+      "sha256": "bc6c43da75484c21431c3e899a1179e9100b7b00d1d4fc949654208f103c7c9f"
+    },
+    {
+      "file": "assets/social/exports/crow-godmod3-post-1080x1080.webp",
+      "source": "assets/product-variants/crow-godmod3-hero.png",
+      "operation": "right-focus-cover-runtime",
+      "format": "WEBP",
+      "width": 1080,
+      "height": 1080,
+      "bytes": 165830,
+      "sha256": "41797c270232f1314df896399d045342e4f87ebe5ab6b15049767fea16a2e092"
+    },
+    {
+      "file": "assets/social/exports/crow-godmod3-post-1080x1080.avif",
+      "source": "assets/product-variants/crow-godmod3-hero.png",
+      "operation": "right-focus-cover-runtime",
+      "format": "AVIF",
+      "width": 1080,
+      "height": 1080,
+      "bytes": 131286,
+      "sha256": "01ae28568704bb1c607cffdb6906be5f4854ee0bb1b63839dc65f878a3f9665b"
+    },
+    {
+      "file": "assets/social/exports/crow-godmod3-story-1080x1920.png",
+      "source": "assets/product-variants/crow-godmod3-hero.png",
+      "operation": "right-focus-cover",
+      "format": "PNG",
+      "width": 1080,
+      "height": 1920,
+      "bytes": 2217908,
+      "sha256": "7a4498189bec12dc25346cdb0643465baf1973891b220b4d6aa2f2617f5e176e"
+    },
+    {
+      "file": "assets/social/exports/crow-godmod3-story-1080x1920.webp",
+      "source": "assets/product-variants/crow-godmod3-hero.png",
+      "operation": "right-focus-cover-runtime",
+      "format": "WEBP",
+      "width": 1080,
+      "height": 1920,
+      "bytes": 193956,
+      "sha256": "d119367f80eede311a078cfc979c4cf658c3bb7370a32636d6bcf013446aebf4"
+    },
+    {
+      "file": "assets/social/exports/crow-godmod3-story-1080x1920.avif",
+      "source": "assets/product-variants/crow-godmod3-hero.png",
+      "operation": "right-focus-cover-runtime",
+      "format": "AVIF",
+      "width": 1080,
+      "height": 1920,
+      "bytes": 154655,
+      "sha256": "37857190a5b76d4fef5b9ea2e0f4840d7213f18de56092ebdba1678f8d431890"
     }
   ]
 }

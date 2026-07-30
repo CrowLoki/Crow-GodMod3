@@ -1,4 +1,4 @@
-; Crow Talon Windows cursor scheme
+; Crow Talon v0.3 Windows cursor scheme
 ; Right-click this file and choose Install. Administrative rights may be
 ; required because the INF convention stores files under %SystemRoot%\Cursors.
 [Version]
@@ -17,7 +17,7 @@ AddReg=CrowTalon.AddReg
 CrowTalon.CopyFiles=10,"Cursors\Crow-Talon"
 
 [SourceDisksNames]
-1="Crow Talon Cursor Scheme",,,
+1="Crow Talon v0.3 Cursor Scheme",,,
 
 [SourceDisksFiles]
 normal.cur=1

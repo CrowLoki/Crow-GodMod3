@@ -1,11 +1,23 @@
 # Crow Mascot Guide
 
-Status: Crow-GodMod3 integration preview
+Status: single-mascot v3 direction
 
-The Crow mascot is one character expressed through four approved forms. The
-forms change role, scale and energy; they do not change identity or anatomy.
-The approved masters under `assets/mascots/masters/` are the visual source of
-truth and must not be overwritten.
+The Crow mascot is one character with one active visual source of truth:
+
+`assets/mascots/masters/crow-mascot-v3.png`
+
+This master is a naturally proportioned adult biomechanical crow. It is the
+sole active mascot across CrowClaw, Crow-GodMod3, CrowQuant, CrowNest,
+CrowMemory, CrowFlix and future Crow products.
+
+Do not overwrite the active master. A proposed identity revision must use a
+new versioned sibling filename and remains inactive until Crow explicitly
+approves it.
+
+All earlier head-only, humanoid, companion/pet, v1 and v2 files remain
+physically intact as inactive legacy/reference records. They are retained for
+provenance and comparison only. Do not delete, overwrite, silently substitute,
+or reactivate them, and do not use them as identity references for new work.
 
 ## Non-negotiable identity
 
@@ -13,11 +25,14 @@ Every approved Crow depiction must satisfy all of these rules:
 
 1. Exactly three eyes: two physical eyes and one centred forehead eye.
 2. A real elongated crow head with a tapered corvid beak.
-3. Black feather mass with gunmetal, navy, indigo, ultraviolet, electric-blue
+3. A naturally proportioned adult crow body, wings, legs and talons.
+4. Cybernetics integrated through the feathers, face, torso, wings, legs and
+   talons as functional anatomy, not jewellery or surface decoration.
+5. Black feather mass with gunmetal, navy, indigo, ultraviolet, electric-blue
    and cyan structure.
-4. Magenta only as a restrained iris, gem or pulse accent.
-5. A readable corvid silhouette at the intended output size.
-6. No generated words, product names, signatures or slogans in the artwork.
+6. Magenta only as a restrained iris or pulse accent.
+7. A readable adult-corvid silhouette at the intended output size.
+8. No generated words, product names, signatures or slogans in the artwork.
 
 The head must never become a moon, orb, owl, plague mask or human face. Never
 add decorative eye-like gems near the face that can be misread as extra eyes.
@@ -27,93 +42,23 @@ part of one eye.
 Beaks are graphite, black steel or cool blue-black. Do not make the beak
 bronze, brass or a warm metallic focal point.
 
-## Approved forms
+## Allowed product variants
 
-### Core Architect
+Every product uses `crow-mascot-v3.png`. A derivative may alter only its crop,
+background or surrounding scene, and emphasis among approved cool accents.
 
-Master: `assets/mascots/masters/core-architect.png`
-
-The flagship intelligence and system architect. This is a tall humanoid
-corvid in a structured long coat with articulated talons, controlled circuitry
-and precise data geometry. The pose is composed and authoritative rather than
-aggressive.
-
-Use for:
-
-- architecture, orchestration and research;
-- flagship product art;
-- analytical, network and system-scale concepts;
-- CrowClaw, CrowNest and CrowMemory primary imagery;
-- compact Crow-GodMod3 imagery when the transformed form would be too intense.
-
-Avoid random weapons, medieval armour, fantasy robes or excessive floating
-symbols.
-
-### Field Operator
-
-Master: `assets/mascots/masters/field-operator.png`
-
-The grounded builder, hacker and local operator. This humanoid form wears
-practical dark field clothing and belongs in workshops, local systems, rain,
-infrastructure and hands-on tool contexts. It is competent and present, not a
-generic cyberpunk mercenary.
-
-Use for:
-
-- CrowQuant and CrowFlix primary imagery;
-- implementation, repair, local action and connected-tool scenes;
-- practical tutorials and operator-facing release art.
-
-Keep equipment purposeful. A data shard, console or articulated hand is
-appropriate; unexplained tactical gear is not.
-
-### Glitch Ascendant
-
-Master: `assets/mascots/masters/glitch-ascendant.png`
-
-The rare transformed state for recursion, high power and controlled reality
-distortion. The familiar humanoid anatomy remains intact while feather energy,
-data fragments and space expand around it. Glitch is environmental and
-directional, not a filter that destroys the face.
-
-Use for:
-
-- Crow-GodMod3 primary hero imagery;
-- exceptional Crow-GodMod3 promotional imagery;
-- recursive systems, transformation and major release moments.
-
-Do not use as a routine empty-state mascot. Do not duplicate limbs, eyes or
-beaks in the distortion. Keep the face and three-eye pattern sharply readable.
-
-### Pet Companion
-
-Master: `assets/mascots/masters/pet-companion.png`
-
-The small, non-humanoid companion. It has a natural crow body, expressive
-three-eye face, restrained cybernetic details and a stable perch stance. It is
-friendly without becoming a round cartoon bird, owl or toy.
-
-Use for:
-
-- chat avatars, compact assistants, empty states and onboarding guidance;
-- compact marks and friendly companion scenes across every Crow product.
-
-Do not give it human arms, a humanoid torso or clothing intended for the full
-forms. Preserve the long beak and feathered crow proportions.
-
-## Product binding
-
-| Product | Primary form | Compact form | Direction |
+| Product | Suggested crop | Background direction | Accent emphasis |
 | --- | --- | --- | --- |
-| CrowClaw | Core Architect | Pet Companion | Local intelligence, permission and capable assistance |
-| Crow-GodMod3 | Glitch Ascendant | Core Architect | Recursion and high power under control |
-| CrowQuant | Field Operator | Pet Companion | Analytical precision and data light |
-| CrowNest | Core Architect | Pet Companion | Networks, societies and system stewardship |
-| CrowMemory | Core Architect | Pet Companion | Familiar persistence and protected recall |
-| CrowFlix | Field Operator | Pet Companion | Cinematic energy with a grounded operator identity |
+| CrowClaw | Full crow or close portrait | Local systems, permission and capable assistance | Cyan, ultraviolet, electric blue |
+| Crow-GodMod3 | Full crow | Controlled recursion and data-space distortion | Ultraviolet, cyan, restrained magenta |
+| CrowQuant | Full crow or wing-and-head crop | Analytical lattice and precise data light | Electric blue, cyan, success teal |
+| CrowNest | Full crow | Networks, linked nodes and system stewardship | Bright indigo, cyan, violet |
+| CrowMemory | Portrait or full crow | Protected archive and persistent recall | Violet, cyan, electric blue |
+| CrowFlix | Full crow or cinematic portrait | Projection, framing and signal flow | Electric blue, violet, restrained magenta |
 
-Product binding does not forbid another form in editorial storytelling. It
-defines the default identity and prevents random form selection in routine UI.
+These bindings do not permit anatomy, body plan, proportions, posture language,
+costume or character changes. The same adult biomechanical crow must remain
+immediately recognisable in every product.
 
 ## Eyes and expression
 
@@ -129,14 +74,14 @@ defines the default identity and prevents random form selection in routine UI.
 
 ## Cropping and scale
 
-- Full-form hero: preserve the full head, beak, forehead eye and enough
-  silhouette to identify the selected form.
-- Bust: crop below the shoulders or breast. Never crop through the forehead
-  eye or beak tip.
+- Full-crow hero: preserve the complete adult-crow silhouette, including both
+  feet and the tail/wing feather mass where the layout permits.
+- Portrait: crop below the breast or upper wing. Never crop through the
+  forehead eye or beak tip.
 - Avatar: use a dedicated close crop with all three eyes readable; do not
-  shrink a full-body scene into a tiny circle.
+  shrink a full-crow scene into a tiny circle.
 - App icon or favicon: use an approved simplified mark, not a photographic
-  full-body crop.
+  full-crow crop.
 - Place clear space around the beak and crown feathers equal to at least one
   physical eye width.
 
@@ -157,7 +102,8 @@ Mascot motion is deliberate:
 - head turn, blink or forehead-eye pulse;
 - feather settling;
 - data geometry assembling;
-- short controlled glitch transition for Glitch Ascendant.
+- short controlled environmental glitch transition that does not alter the
+  crow's anatomy.
 
 Never use constant twitching, rapid eye flashing, continuous camera shake or
 parallax that interferes with reading. Under reduced motion, use a static frame
@@ -170,13 +116,17 @@ Before approving any derivative, answer yes to every item:
 
 - Exactly three eyes are present and anatomically clear.
 - The head reads as a crow, not an owl, mask, moon, orb or human.
-- The selected form matches the intended product and context.
+- The body reads as a naturally proportioned adult crow, not a humanoid, pet,
+  chick, toy or bobblehead.
+- The depicted character matches `crow-mascot-v3.png`.
 - The beak is elongated, tapered and cool-toned.
+- Cybernetics are integrated functional anatomy, not jewellery.
 - Black, navy, blue, cyan and ultraviolet dominate.
 - Magenta is restrained.
 - No warm brand accent has entered the composition.
 - No extra limbs, duplicate beaks or eye-like facial ornaments appear.
 - No text is baked into the artwork.
 - The silhouette and eyes survive the intended crop and display size.
+- Only crop, background and accent emphasis differ from the active master.
 - The source master, prompt, generator, date, dimensions and checksum can be
   recorded in provenance.

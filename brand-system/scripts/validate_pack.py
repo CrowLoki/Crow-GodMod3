@@ -16,6 +16,19 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
 SIZES = {32, 48, 64, 96}
+RELEASE_VERSION = "0.2.0"
+CANONICAL_MASCOT = "assets/mascots/masters/crow-mascot-v3.png"
+LEGACY_MASTERS = {
+    "crowHeadIdentityV2": "assets/mascots/masters/crow-head-identity-v2.png",
+    "coreArchitectV2": "assets/mascots/masters/core-architect-v2.png",
+    "fieldOperatorV2": "assets/mascots/masters/field-operator-v2.png",
+    "glitchAscendantV2": "assets/mascots/masters/glitch-ascendant-v2.png",
+    "petCompanionV2": "assets/mascots/masters/pet-companion-v2.png",
+    "coreArchitectV1": "assets/mascots/masters/core-architect.png",
+    "fieldOperatorV1": "assets/mascots/masters/field-operator.png",
+    "glitchAscendantV1": "assets/mascots/masters/glitch-ascendant.png",
+    "petCompanionV1": "assets/mascots/masters/pet-companion.png",
+}
 
 
 def check(condition: bool, message: str) -> None:
@@ -33,15 +46,13 @@ def sha256(path: Path) -> str:
 
 def validate_required() -> None:
     required = [
-        "assets/mascots/masters/core-architect.png",
-        "assets/mascots/masters/field-operator.png",
-        "assets/mascots/masters/glitch-ascendant.png",
-        "assets/mascots/masters/pet-companion.png",
+        CANONICAL_MASCOT,
+        *LEGACY_MASTERS.values(),
         "assets/marks/crow-signal-master.png",
         "assets/icons/favicon.ico",
         "assets/backgrounds/void-grid-neutral.png",
         "assets/social/crow-family-banner.png",
-        "fonts/specimens/crow-signal-v0.1.png",
+        "fonts/specimens/crow-signal-v0.2.png",
         "cursors/preview.png",
         "tokens/crow-theme.json",
         "brand-manifest.json",
@@ -53,10 +64,39 @@ def validate_required() -> None:
 
 def validate_tokens() -> None:
     tokens = json.loads((ROOT / "tokens/crow-theme.json").read_text(encoding="utf-8"))
-    check(tokens["version"] == "0.1.0", "Unexpected token version")
+    check(tokens["version"] == RELEASE_VERSION, "Unexpected token version")
+    check(tokens["typography"]["release"] == "Crow Signal v0.2", "Unexpected font release")
+    check(tokens["cursor"]["release"] == "Crow Talon v0.2", "Unexpected cursor release")
     check(tokens["mascot"]["invariants"]["eyes"] == 3, "Three-eye rule missing")
-    check(len(tokens["mascot"]["forms"]) == 4, "Expected four mascot forms")
+    check(len(tokens["mascot"]["forms"]) == 1, "Expected one active mascot")
     check(len(tokens["products"]) == 6, "Expected six product bindings")
+    check(
+        tokens["mascot"]["identityAnchor"] == CANONICAL_MASCOT,
+        "Canonical mascot identity anchor mismatch",
+    )
+
+    current_masters = {
+        name: record["master"] for name, record in tokens["mascot"]["forms"].items()
+    }
+    check(
+        current_masters == {"canonicalCrow": CANONICAL_MASCOT},
+        "Current mascot master set mismatch",
+    )
+
+    legacy = tokens["mascot"]["legacyMasters"]
+    legacy_masters = {name: legacy[name] for name in LEGACY_MASTERS}
+    check(legacy_masters == LEGACY_MASTERS, "Immutable v1 master set mismatch")
+    check("physically intact" in legacy["preservation"], "Legacy preservation rule missing")
+
+    canonical = tokens["mascot"]["forms"]["canonicalCrow"]
+    check(canonical["id"] == "crow-mascot-v3", "Canonical mascot ID mismatch")
+    check(canonical["bodyPlan"] == "adult crow", "Canonical mascot body plan mismatch")
+    for product, binding in tokens["products"].items():
+        check(
+            binding["mascot"] == "crow-mascot-v3"
+            and binding["compactMascot"] == "crow-mascot-v3",
+            f"{product} must bind both mascot roles to crow-mascot-v3",
+        )
 
     for name, value in tokens["color"]["primitive"].items():
         if not isinstance(value, str) or not value.startswith("#") or len(value) != 7:
@@ -148,7 +188,7 @@ def validate_artwork() -> None:
         "assets/icons/png/crow-signal-16.png": (16, 16),
         "assets/icons/png/crow-signal-1024.png": (1024, 1024),
         "assets/icons/avatars/crow-signal-avatar-512.png": (512, 512),
-        "assets/icons/avatars/pet-companion-avatar-512.png": (512, 512),
+        "assets/icons/avatars/crow-mascot-avatar-512.png": (512, 512),
         "assets/social/exports/crow-family-open-graph-1200x630.png": (1200, 630),
         "assets/backgrounds/exports/void-grid-1920x1080.png": (1920, 1080),
     }
@@ -174,8 +214,18 @@ def validate_artwork() -> None:
 
 def validate_manifest() -> None:
     manifest = json.loads((ROOT / "brand-manifest.json").read_text(encoding="utf-8"))
-    check(manifest["version"] == "0.1.0", "Unexpected manifest version")
-    check(len(manifest["approved_forms"]) == 4, "Manifest form count mismatch")
+    check(manifest["version"] == RELEASE_VERSION, "Unexpected manifest version")
+    check(
+        manifest["approved_mascots"] == ["crow-mascot-v3"],
+        "Manifest active mascot mismatch",
+    )
+    check(manifest["canonical_mascot"] == CANONICAL_MASCOT, "Manifest anchor mismatch")
+    manifest_files = {record["file"] for record in manifest["files"]}
+    required_masters = {CANONICAL_MASCOT, *LEGACY_MASTERS.values()}
+    check(
+        required_masters <= manifest_files,
+        "Manifest must include the canonical mascot and all preserved legacy masters",
+    )
     for record in manifest["files"]:
         path = ROOT / record["file"]
         check(path.is_file(), f"Manifest file missing: {record['file']}")
@@ -191,7 +241,8 @@ def main() -> None:
     validate_artwork()
     validate_manifest()
     print("Crow Brand System validation passed.")
-    print("  4 approved mascot forms")
+    print("  crow-mascot-v3 is the sole active mascot for all 6 products")
+    print(f"  {len(LEGACY_MASTERS)} prior mascot files preserved as legacy records")
     print("  8 font binaries")
     print("  15 static and 2 animated Windows cursors")
     print("  6 product bindings")

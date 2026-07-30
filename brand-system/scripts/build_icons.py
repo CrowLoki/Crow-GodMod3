@@ -18,35 +18,37 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 ROOT = Path(__file__).resolve().parents[1]
 SIGNAL_SOURCE = ROOT / "assets" / "marks" / "crow-signal-master.png"
-PET_SOURCE = ROOT / "assets" / "mascots" / "masters" / "pet-companion.png"
+MASCOT_SOURCE = ROOT / "assets" / "mascots" / "masters" / "crow-mascot-v3.png"
 ICON_ROOT = ROOT / "assets" / "icons"
 PNG_DIR = ICON_ROOT / "png"
 APP_DIR = ICON_ROOT / "app"
 AVATAR_DIR = ICON_ROOT / "avatars"
+RUNTIME_DIR = ICON_ROOT / "runtime"
 
-VERSION = "0.1.0"
+VERSION = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
 SQUARE_SIZES = (16, 20, 24, 32, 40, 48, 64, 96, 128, 180, 192, 256, 512, 1024)
 APP_SIZES = (256, 512, 1024)
 ICO_SIZES = (16, 20, 24, 32, 40, 48, 64, 96, 128, 180, 192, 256)
+RUNTIME_SQUARE_SIZES = (192, 512, 1024)
 
 # Fractional crop boxes are square and intentionally keep the three eyes and
 # beak large enough to survive the corresponding optical tier.
 SIGNAL_CROPS = {
-    "micro": (0.245, 0.175, 0.755, 0.685),
-    "compact": (0.18, 0.08, 0.82, 0.72),
-    "standard": (0.07, 0.00, 0.93, 0.86),
+    "micro": (0.245, 0.18, 0.755, 0.69),
+    "compact": (0.18, 0.10, 0.82, 0.74),
+    "standard": (0.08, 0.02, 0.92, 0.86),
     "full": (0.00, 0.00, 1.00, 1.00),
-    "avatar": (0.14, 0.06, 0.86, 0.78),
+    "avatar": (0.06, 0.00, 0.94, 0.88),
 }
 
-PET_AVATAR_CROP = (0.21, 0.05, 0.91, 0.5166666667)
+MASCOT_AVATAR_CROP = (0.19, 0.02, 0.91, 0.74)
 
 # Approximate eye centres in the approved signal master, expressed as source
 # fractions. These are used only for visibility validation, never for drawing.
 SIGNAL_EYES = (
-    (0.402, 0.427),
-    (0.600, 0.427),
-    (0.500, 0.360),
+    (0.340, 0.290),
+    (0.640, 0.290),
+    (0.490, 0.185),
 )
 
 
@@ -116,6 +118,15 @@ def save_png(image: Image.Image, path: Path) -> None:
     image.save(path, "PNG", optimize=True, compress_level=9)
 
 
+def save_runtime(image: Image.Image, stem: Path) -> list[Path]:
+    stem.parent.mkdir(parents=True, exist_ok=True)
+    webp = stem.with_suffix(".webp")
+    avif = stem.with_suffix(".avif")
+    image.save(webp, "WEBP", quality=88, method=6, exact=True)
+    image.save(avif, "AVIF", quality=72, speed=6)
+    return [webp, avif]
+
+
 def record_for(
     path: Path,
     *,
@@ -140,6 +151,16 @@ def record_for(
     if extra:
         record.update(extra)
     return record
+
+
+def source_record(path: Path) -> dict[str, object]:
+    with Image.open(path) as image:
+        return {
+            "file": path.relative_to(ROOT).as_posix(),
+            "width": image.width,
+            "height": image.height,
+            "sha256": sha256(path),
+        }
 
 
 def eye_signal_score(
@@ -234,7 +255,7 @@ def build_contact_sheet(
     square_paths: list[Path],
     app_paths: list[Path],
     signal_avatar: Path,
-    pet_avatar: Path,
+    mascot_avatar: Path,
 ) -> Path:
     canvas = Image.new("RGB", (2400, 1760), "#050711")
     draw = ImageDraw.Draw(canvas)
@@ -249,10 +270,15 @@ def build_contact_sheet(
         outline="#29345F",
         width=3,
     )
-    draw.text((120, 95), "CROW SIGNAL ICON FAMILY / V0.1", font=title_font, fill="#F2F7FF")
+    draw.text(
+        (120, 95),
+        f"CROW SIGNAL ICON FAMILY / {VERSION.upper()} / IDENTITY V3",
+        font=title_font,
+        fill="#F2F7FF",
+    )
     draw.text(
         (120, 160),
-        "Optical crops preserve the approved three-eye geometry at every size.",
+        "Every crop comes from the sole approved Crow mascot v3 master.",
         font=label,
         fill="#8B6CFF",
     )
@@ -298,7 +324,7 @@ def build_contact_sheet(
 
     draw.text((1060, section_y), "AVATARS", font=label, fill="#32DFFF")
     for index, (name, path) in enumerate(
-        (("Signal", signal_avatar), ("Pet Companion", pet_avatar))
+        (("Signal crop", signal_avatar), ("Canonical Crow", mascot_avatar))
     ):
         with Image.open(path) as source:
             preview = source.convert("RGB").resize((330, 330), Image.Resampling.LANCZOS)
@@ -344,11 +370,11 @@ def validate_ico(path: Path, expected_sizes: tuple[int, ...]) -> list[list[int]]
 
 
 def build() -> None:
-    for directory in (PNG_DIR, APP_DIR, AVATAR_DIR):
+    for directory in (PNG_DIR, APP_DIR, AVATAR_DIR, RUNTIME_DIR):
         directory.mkdir(parents=True, exist_ok=True)
 
     signal = Image.open(SIGNAL_SOURCE).convert("RGB")
-    pet = Image.open(PET_SOURCE).convert("RGB")
+    mascot = Image.open(MASCOT_SOURCE).convert("RGBA")
     if signal.width != signal.height:
         raise RuntimeError(f"Signal master must be square, got {signal.size}")
 
@@ -384,6 +410,20 @@ def build() -> None:
                 extra={"optical_tier": tier, "eye_scores": eye_scores},
             )
         )
+        if size in RUNTIME_SQUARE_SIZES:
+            for runtime_path in save_runtime(
+                image,
+                RUNTIME_DIR / "square" / f"crow-signal-{size}",
+            ):
+                records.append(
+                    record_for(
+                        runtime_path,
+                        kind="runtime-square-icon",
+                        source_path=SIGNAL_SOURCE,
+                        crop_box=crop_box,
+                        extra={"optical_tier": tier, "eye_scores": eye_scores},
+                    )
+                )
 
     # Use the exact optical exports as ICO frames instead of asking the ICO
     # encoder to shrink one generic source.
@@ -428,6 +468,19 @@ def build() -> None:
                 extra={"corner_radius_ratio": 0.22},
             )
         )
+        for runtime_path in save_runtime(
+            rounded,
+            RUNTIME_DIR / "app" / f"crow-signal-app-rounded-{size}",
+        ):
+            records.append(
+                record_for(
+                    runtime_path,
+                    kind="runtime-rounded-app-icon",
+                    source_path=SIGNAL_SOURCE,
+                    crop_box=crop_box,
+                    extra={"corner_radius_ratio": 0.22},
+                )
+            )
 
     signal_avatar_image, signal_avatar_crop = render_crop(
         signal,
@@ -445,29 +498,53 @@ def build() -> None:
             crop_box=signal_avatar_crop,
         )
     )
+    for runtime_path in save_runtime(
+        signal_avatar_image,
+        RUNTIME_DIR / "avatars" / "crow-signal-avatar-512",
+    ):
+        records.append(
+            record_for(
+                runtime_path,
+                kind="runtime-avatar",
+                source_path=SIGNAL_SOURCE,
+                crop_box=signal_avatar_crop,
+            )
+        )
 
-    pet_avatar_image, pet_avatar_crop = render_crop(
-        pet,
+    mascot_avatar_image, mascot_avatar_crop = render_crop(
+        mascot,
         512,
-        PET_AVATAR_CROP,
+        MASCOT_AVATAR_CROP,
         sharpen=True,
     )
-    pet_avatar = AVATAR_DIR / "pet-companion-avatar-512.png"
-    save_png(pet_avatar_image, pet_avatar)
+    mascot_avatar = AVATAR_DIR / "crow-mascot-avatar-512.png"
+    save_png(mascot_avatar_image, mascot_avatar)
     records.append(
         record_for(
-            pet_avatar,
-            kind="pet-avatar",
-            source_path=PET_SOURCE,
-            crop_box=pet_avatar_crop,
+            mascot_avatar,
+            kind="canonical-mascot-avatar",
+            source_path=MASCOT_SOURCE,
+            crop_box=mascot_avatar_crop,
         )
     )
+    for runtime_path in save_runtime(
+        mascot_avatar_image,
+        RUNTIME_DIR / "avatars" / "crow-mascot-avatar-512",
+    ):
+        records.append(
+            record_for(
+                runtime_path,
+                kind="runtime-canonical-mascot-avatar",
+                source_path=MASCOT_SOURCE,
+                crop_box=mascot_avatar_crop,
+            )
+        )
 
     contact_sheet = build_contact_sheet(
         square_paths,
         app_paths,
         signal_avatar,
-        pet_avatar,
+        mascot_avatar,
     )
     records.append(
         record_for(
@@ -475,7 +552,7 @@ def build() -> None:
             kind="contact-sheet",
             source_path=SIGNAL_SOURCE,
             extra={
-                "secondary_source": PET_SOURCE.relative_to(ROOT).as_posix(),
+                "secondary_source": MASCOT_SOURCE.relative_to(ROOT).as_posix(),
             },
         )
     )
@@ -483,24 +560,15 @@ def build() -> None:
     manifest = {
         "name": "Crow Signal Icon Family",
         "version": VERSION,
+        "identity_version": "v3",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "source_policy": (
             "Derived only by crop, Lanczos resampling, restrained sharpening, "
             "and rounded alpha masking. No source artwork was redrawn."
         ),
         "sources": [
-            {
-                "file": SIGNAL_SOURCE.relative_to(ROOT).as_posix(),
-                "width": signal.width,
-                "height": signal.height,
-                "sha256": sha256(SIGNAL_SOURCE),
-            },
-            {
-                "file": PET_SOURCE.relative_to(ROOT).as_posix(),
-                "width": pet.width,
-                "height": pet.height,
-                "sha256": sha256(PET_SOURCE),
-            },
+            source_record(source)
+            for source in (SIGNAL_SOURCE, MASCOT_SOURCE)
         ],
         "square_sizes": list(SQUARE_SIZES),
         "app_sizes": list(APP_SIZES),
@@ -517,7 +585,10 @@ def build() -> None:
     print(f"Built {len(square_paths)} square Crow Signal PNGs.")
     print(f"Built {len(app_paths)} rounded app icons.")
     print(f"Built {len(ICO_SIZES)} ICO entries.")
-    print(f"Built 2 avatars and {contact_sheet.relative_to(ROOT).as_posix()}.")
+    print(
+        "Built 2 active avatars and "
+        f"{contact_sheet.relative_to(ROOT).as_posix()}."
+    )
     print(f"Wrote {manifest_path.relative_to(ROOT).as_posix()}.")
 
 
