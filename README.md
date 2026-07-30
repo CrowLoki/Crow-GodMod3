@@ -30,6 +30,9 @@ This repository is an ongoing project.
   `public/crow-godmod3.html`; there is no iframe or imitation shell.
 - Application telemetry is disabled. Provider requests still go to the
   provider or local endpoint configured by the user.
+- Local runtime presets connect directly to Ollama, LM Studio, Docker Model
+  Runner, vLLM, llama.cpp, or another OpenAI-compatible loopback server. See
+  the [local-model setup guide](docs/LOCAL_MODELS.md).
 
 ## CrowClaw styling
 
