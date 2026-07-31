@@ -198,15 +198,30 @@ Crow-GodMod3 deployment.
 
 1. Use a current Chrome, Edge, or another browser with WebGPU enabled.
 2. On a fresh browser, leave the header picker on **Automatic** and send a
-   message to use the single Qwen3.5 0.8B demo.
+   message to use the single Qwen3.5 0.8B demo. Before anything downloads, the
+   site displays a first-use notice and requires the visitor to choose
+   **Download & run locally**.
 3. To choose a different compatible model, open **Settings → API Keys →
    WebLLM · In-Browser Demo**, then click **Discover Browser Models**. This loads only the
    pinned WebLLM library and its model catalogue; it does not download model
    weights.
 4. Select the discovered WebLLM model from the header picker for the desired mode.
 5. Send a message. The browser downloads and caches that model on first use,
-   then generates locally. Loading progress appears in the WebLLM settings
-   status.
+   then generates locally. Visible loading progress remains above the message
+   composer while the model is prepared.
+
+The WebLLM inference path does not send the prompt or generated answer to
+Crow-GodMod3, its owner, Vercel, Hugging Face, or a model API. The browser does
+make ordinary network requests to load the website, WebLLM runtime, and model
+files, so those services can receive normal connection metadata.
+
+The in-memory engine is reused for every answer while the page remains open,
+and the downloaded model cache is reused on later visits. Crow-GodMod3 asks the
+browser for persistent storage after first-use consent, but the browser can
+deny that request or later evict cached files. Deleting chats removes only the
+conversation history. To remove the model files, clear Crow-GodMod3's browser
+site data; private browsing, storage cleanup, or changing browser/device can
+require a later re-download.
 
 WebLLM models use MLC model artifacts plus a compatible WebAssembly model
 library. Ordinary GGUF, Safetensors, Ollama, and LM Studio downloads cannot be

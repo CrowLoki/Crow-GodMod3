@@ -490,11 +490,13 @@ const runtimeWebLlmConfig = `    // Optional in-browser inference through WebLLM
     // that browser's cache and never pass through the Crow-GodMod3 host.
     const WEBLLM_MODULE_URL = 'https://esm.run/@mlc-ai/web-llm@0.2.84';
     const WEBLLM_DEMO_MODEL = 'Qwen3.5-0.8B-q4f16_1-MLC';
-    const WEBLLM_DEMO_VERSION = 1;
+    const WEBLLM_DEMO_VERSION = 2;
+    const WEBLLM_CONSENT_KEY = 'crow-godmod3-webllm-consent-v1';
     let _webLlmModulePromise = null;
     let _webLlmEngine = null;
     let _webLlmLoadedModel = '';
     let _webLlmGenerationQueue = Promise.resolve();
+    let _webLlmConsentResolver = null;
 
     function getWebLlmModels() {
       return parseLocalModelIds(state.webLlmModels);
@@ -509,9 +511,63 @@ const runtimeWebLlmConfig = `    // Optional in-browser inference through WebLLM
 
     function setWebLlmStatus(message, color = 'var(--text-dim)') {
       const status = document.getElementById('webLlmStatus');
-      if (!status) return;
-      status.textContent = message;
-      status.style.color = color;
+      if (status) {
+        status.textContent = message;
+        status.style.color = color;
+      }
+      const runtimeStatus = document.getElementById('webLlmRuntimeStatus');
+      if (runtimeStatus) {
+        runtimeStatus.textContent = message;
+        runtimeStatus.style.color = color;
+        runtimeStatus.hidden = !message;
+      }
+    }
+
+    function hasWebLlmConsent() {
+      return localStorage.getItem(WEBLLM_CONSENT_KEY) === 'accepted';
+    }
+
+    async function requestPersistentWebLlmStorage() {
+      if (!navigator.storage?.persist) return false;
+      try {
+        if (await navigator.storage.persisted?.()) return true;
+        return await navigator.storage.persist();
+      } catch (_) {
+        return false;
+      }
+    }
+
+    function requestWebLlmConsent(modeTarget) {
+      if (modeTarget?.provider !== 'webllm' || hasWebLlmConsent()) {
+        return Promise.resolve(true);
+      }
+      const modelLabel = document.getElementById('webLlmConsentModel');
+      if (modelLabel) modelLabel.textContent = modeTarget.model || WEBLLM_DEMO_MODEL;
+      document.getElementById('webLlmConsentModal')?.classList.add('open');
+      return new Promise(resolve => {
+        _webLlmConsentResolver = resolve;
+      });
+    }
+
+    function finishWebLlmConsent(accepted) {
+      if (accepted) {
+        localStorage.setItem(WEBLLM_CONSENT_KEY, 'accepted');
+        // Best effort: browsers remain free to deny or later evict storage,
+        // but persistence reduces needless model re-downloads.
+        void requestPersistentWebLlmStorage();
+      }
+      document.getElementById('webLlmConsentModal')?.classList.remove('open');
+      const resolve = _webLlmConsentResolver;
+      _webLlmConsentResolver = null;
+      resolve?.(accepted);
+    }
+
+    function acceptWebLlmConsent() {
+      finishWebLlmConsent(true);
+    }
+
+    function declineWebLlmConsent() {
+      finishWebLlmConsent(false);
     }
 
     async function loadWebLlmModule() {
@@ -552,12 +608,14 @@ const runtimeWebLlmConfig = `    // Optional in-browser inference through WebLLM
     }
 
     async function getWebLlmEngine(model) {
+      setWebLlmStatus(\`Preparing the private browser model \${model}…\`);
       const webllm = await loadWebLlmModule();
       const onProgress = progress => {
         const percent = Number.isFinite(progress?.progress)
           ? \` \${Math.round(progress.progress * 100)}%\`
           : '';
-        setWebLlmStatus(progress?.text || \`Preparing \${model}…\${percent}\`);
+        const detail = progress?.text || \`Preparing \${model}…\`;
+        setWebLlmStatus(\`\${detail}\${percent}\`);
       };
       if (!_webLlmEngine) {
         _webLlmEngine = await webllm.CreateMLCEngine(model, {
@@ -925,8 +983,14 @@ const runtimeModeModelConfig = `    // Each mode keeps its own explicit provider
       const automaticLocalModel = Array.isArray(selection?.localModels)
         ? selection.localModels[0]
         : '';
-      return automaticLocalModel
-        ? Object.freeze({ provider: 'local', model: automaticLocalModel })
+      if (automaticLocalModel) {
+        return Object.freeze({ provider: 'local', model: automaticLocalModel });
+      }
+      const browserModel = getWebLlmModels()[0] || '';
+      const browserIsAutomaticProvider = hasWebLlmProvider()
+        && (state.localOnly || (!state.apiKey && !state.veniceApiKey));
+      return browserIsAutomaticProvider
+        ? Object.freeze({ provider: 'webllm', model: browserModel })
         : null;
     }
 
@@ -1106,6 +1170,44 @@ const runtimeModeModelConfig = `    // Each mode keeps its own explicit provider
       buildTierSelect();
       saveState();
     }`;
+
+replaceRequired(
+  `      <div class="input-area">`,
+  `      <div id="webLlmRuntimeStatus" role="status" aria-live="polite" hidden style="margin:0 16px 10px;padding:10px 12px;border:1px solid rgba(69,231,255,0.28);border-radius:8px;background:rgba(69,231,255,0.07);color:var(--cyan);font-size:11px;line-height:1.5;overflow-wrap:anywhere;"></div>
+      <div class="input-area">`,
+);
+
+replaceRequired(
+  `  <!-- Settings Modal -->`,
+  `  <!-- WebLLM first-use consent. The model does not begin downloading until accepted. -->
+  <div class="modal-overlay" id="webLlmConsentModal" style="z-index:10000;">
+    <div class="modal" style="max-width:560px;">
+      <div class="modal-header">
+        <h3>Run a private model in this browser?</h3>
+      </div>
+      <div class="modal-body" style="line-height:1.65;">
+        <p style="color:var(--cyan);font-weight:700;margin-bottom:12px;">
+          First use downloads roughly 450 MB for <span id="webLlmConsentModel">Qwen3.5-0.8B-q4f16_1-MLC</span>.
+        </p>
+        <ul style="margin:0 0 16px 20px;color:var(--text);">
+          <li style="margin-bottom:8px;">The model files are downloaded automatically from Hugging Face into this browser's cache. You do not install an application.</li>
+          <li style="margin-bottom:8px;">Generation runs on this device through WebGPU. This may take several minutes the first time.</li>
+          <li style="margin-bottom:8px;"><strong>The model stays loaded while this page is open, and its cached files are reused on later visits. It is not downloaded again for every answer.</strong></li>
+          <li style="margin-bottom:8px;"><strong>Your prompt and generated answer are not sent to Crow-GodMod3, its owner, Vercel, Hugging Face, or a model API by this WebLLM inference path.</strong></li>
+          <li style="margin-bottom:8px;">The browser still makes ordinary network requests to load the website, WebLLM runtime, and model files. Those services can receive normal connection metadata.</li>
+          <li style="margin-bottom:8px;">Deleting chats removes conversation history only; it does not remove the cached model.</li>
+          <li>To remove the model, clear Crow-GodMod3's browser/site data. Private browsing, storage cleanup or eviction, and changing browsers/devices may require downloading it again.</li>
+        </ul>
+        <div style="display:flex;gap:12px;justify-content:flex-end;flex-wrap:wrap;">
+          <button onclick="declineWebLlmConsent()" style="padding:10px 20px;background:transparent;border:1px solid var(--border);color:var(--text-dim);border-radius:8px;cursor:pointer;font-size:14px;">Not now</button>
+          <button onclick="acceptWebLlmConsent()" style="padding:10px 24px;background:var(--primary);color:var(--bg);border:none;border-radius:8px;cursor:pointer;font-weight:700;font-size:14px;">Download &amp; run locally</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->`,
+);
 
 replaceRequired(
   "    // State\n    let state = {",
@@ -3173,7 +3275,10 @@ replaceRequired(
     }
 
     function hasLocalUltraplinianRaceEntry(raceEntries) {
-      return raceEntries.some(({ provider }) => provider === 'local');
+      // Browser inference has the same unbounded first-load characteristic as
+      // a loopback runtime. A cloud-style 45s timeout aborts the first answer
+      // immediately after a multi-minute model download.
+      return raceEntries.some(({ provider }) => ['local', 'webllm'].includes(provider));
     }
 
     function getUltraplinianRaceTimeoutMs(raceEntries) {
@@ -3291,6 +3396,38 @@ replaceRequired(
   "getQueryClassification(userQuery)",
   "getQueryClassification(userQuery, executionTarget)",
   2,
+);
+replaceRequired(
+  `      if (!hasAnyChatProvider()) {
+        openSettings();
+        return;
+      }
+
+      // Create conv if needed
+      if (!state.currentId) {
+        newChat();
+      }
+
+      const conv = getCurrentConv();
+      const executionMode = getCurrentMode();
+      const executionSelection = getModeExecutionSelection(executionMode);
+      const executionTarget = getModeAuxiliaryTarget(executionSelection);`,
+  `      if (!hasAnyChatProvider()) {
+        openSettings();
+        return;
+      }
+
+      const executionMode = getCurrentMode();
+      const executionSelection = getModeExecutionSelection(executionMode);
+      const executionTarget = getModeAuxiliaryTarget(executionSelection);
+      if (!(await requestWebLlmConsent(executionTarget))) return;
+
+      // Create conv only after any first-use browser-model consent.
+      if (!state.currentId) {
+        newChat();
+      }
+
+      const conv = getCurrentConv();`,
 );
 replaceRequired(
   "generateSmartPrefill(userQuery, null)",

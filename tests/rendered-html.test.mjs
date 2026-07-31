@@ -256,6 +256,16 @@ test("ships one default WebLLM demo without replacing server runtimes", async ()
     html,
     /const WEBLLM_DEMO_MODEL = 'Qwen3\.5-0\.8B-q4f16_1-MLC';/,
   );
+  assert.match(html, /const WEBLLM_DEMO_VERSION = 2;/);
+  assert.match(html, /id="webLlmConsentModal"/);
+  assert.match(html, /Download &amp; run locally/);
+  assert.match(html, /id="webLlmRuntimeStatus" role="status" aria-live="polite"/);
+  assert.match(html, /if \(!\(await requestWebLlmConsent\(executionTarget\)\)\) return;/);
+  assert.match(html, /Your prompt and generated answer are not sent to Crow-GodMod3/);
+  assert.match(html, /It is not downloaded again for every answer/);
+  assert.match(html, /Deleting chats removes conversation history only/);
+  assert.match(html, /To remove the model, clear Crow-GodMod3's browser\/site data/);
+  assert.match(html, /void requestPersistentWebLlmStorage\(\);/);
   assert.match(html, /webLlmEnabled: true,/);
   assert.match(html, /webLlmModels: WEBLLM_DEMO_MODEL,/);
   assert.match(html, /it is not hosted inside this website/);
@@ -290,6 +300,11 @@ test("ships one default WebLLM demo without replacing server runtimes", async ()
     html,
     /const needsWebLlmDemoMigration = parsed\.webLlmDemoVersion !== WEBLLM_DEMO_VERSION;/,
     "existing browser state must receive the one-model demo migration",
+  );
+  assert.match(
+    html,
+    /const browserIsAutomaticProvider = hasWebLlmProvider\(\)[\s\S]*?provider: 'webllm', model: browserModel/,
+    "Automatic browser-only runs must skip cloud-style helper generations and target WebLLM directly",
   );
   assert.match(html, /'wasm-unsafe-eval' https:\/\/esm\.run https:\/\/cdn\.jsdelivr\.net/);
   assert.match(html, /https:\/\/huggingface\.co https:\/\/\*\.huggingface\.co/);
@@ -868,6 +883,7 @@ test("keeps an explicit provider-qualified model choice for every mode", async (
       "openrouter",
       "venice",
       "local",
+      "webllm",
     ]),
     MODE_MODEL_IDS: new Set(["ultraplinian", "parseltongue", "pliny"]),
     MODE_MODEL_SELECTION_SCHEMA_VERSION: 2,
@@ -876,6 +892,12 @@ test("keeps an explicit provider-qualified model choice for every mode", async (
     },
     hasLocalProvider() {
       return modeSelectionState.localEnabled && modeSelectionState.localModels.length > 0;
+    },
+    getWebLlmModels() {
+      return [];
+    },
+    hasWebLlmProvider() {
+      return false;
     },
     getLocalAutomaticRaceModels(mode) {
       if (mode === "parseltongue") return ["same/model", "lm-beta"];
@@ -1757,7 +1779,7 @@ test("keeps ULTRAPLINIAN winner and Thinking-grid identity provider-qualified", 
   );
 });
 
-test("waits for slow local ULTRAPLINIAN completions before judging", async () => {
+test("waits for slow local and WebLLM ULTRAPLINIAN completions before judging", async () => {
   const html = await readFile(publicEntry, "utf8");
   const timeoutStart = html.indexOf(
     "function hasLocalUltraplinianRaceEntry",
@@ -1799,6 +1821,11 @@ globalThis.waitForUltraplinianRaceForTest = waitForUltraplinianRace;`,
     getTimeout([{ provider: "local", model: "liquid/lfm2.5-1.2b" }]),
     null,
     "A pinned local model must not be aborted by an arbitrary wall-clock cutoff",
+  );
+  assert.equal(
+    getTimeout([{ provider: "webllm", model: "Qwen3.5-0.8B-q4f16_1-MLC" }]),
+    null,
+    "A browser model must not be aborted while its first-use files are downloading",
   );
   assert.equal(
     getTimeout([
