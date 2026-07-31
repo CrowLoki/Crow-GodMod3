@@ -11594,6 +11594,73 @@ Analyze and refine. Output ONLY the JSON object:` }
       return `${Math.floor(seconds / 86400)}d ago`;
     }
 
+    const ULTRAPLINIAN_CLOUD_RACE_TIMEOUT_MS = 45_000;
+    const ULTRAPLINIAN_LOCAL_RACE_TIMEOUT_MS = 300_000;
+
+    function getUltraplinianRaceTimeoutMs(raceEntries) {
+      const isLocalOnlyRace = raceEntries.length > 0
+        && raceEntries.every(({ provider }) => provider === 'local');
+      return isLocalOnlyRace
+        ? ULTRAPLINIAN_LOCAL_RACE_TIMEOUT_MS
+        : ULTRAPLINIAN_CLOUD_RACE_TIMEOUT_MS;
+    }
+
+    async function waitForUltraplinianRace(
+      promises,
+      controller,
+      {
+        modelCount,
+        minResultsForGrace,
+        gracePeriodMs,
+        hardTimeoutMs,
+        onLog = () => {},
+      },
+    ) {
+      await new Promise((resolveRace) => {
+        let successCount = 0;
+        let settledCount = 0;
+        let graceTimer = null;
+        let resolved = false;
+
+        const finish = (abortOutstanding) => {
+          if (resolved) return;
+          resolved = true;
+          if (graceTimer) clearTimeout(graceTimer);
+          if (hardTimer) clearTimeout(hardTimer);
+          if (abortOutstanding) controller.abort();
+          resolveRace();
+        };
+
+        const hardTimer = setTimeout(() => {
+          onLog('[ULTRAPLINIAN] Hard timeout reached, finishing race');
+          finish(true);
+        }, hardTimeoutMs);
+
+        promises.forEach(promise => promise.then(result => {
+          if (resolved) return;
+          settledCount++;
+          if (result && result.success) successCount++;
+
+          if (successCount >= minResultsForGrace && !graceTimer) {
+            onLog(`[ULTRAPLINIAN] ${successCount} successes, starting ${gracePeriodMs}ms grace period`);
+            graceTimer = setTimeout(() => finish(true), gracePeriodMs);
+          }
+
+          if (settledCount === modelCount) finish(false);
+        }).catch(() => {
+          if (resolved) return;
+          settledCount++;
+          if (settledCount === modelCount) finish(false);
+        }));
+
+        if (modelCount === 0) finish(false);
+      });
+
+      // A timeout/grace finish aborts outstanding fetches. Let every worker
+      // publish its success/error result before the caller counts or judges.
+      await Promise.allSettled(promises);
+    }
+
     // Main ULTRAPLINIAN execution
     // onLeaderChange(content, model, score) - called when a new leader beats the previous by threshold
     async function ultraplinian(messages, userQuery, onLeaderChange, executionSelection = null) {
@@ -12106,48 +12173,18 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
       _log('[ULTRAPLINIAN] Waiting for promises (with grace period)...');
       const MIN_RESULTS_FOR_GRACE = Math.min(5, Math.max(2, Math.ceil(models.length * 0.5)));
       const GRACE_PERIOD_MS = 5000;
-      const HARD_TIMEOUT_MS = 45000;
+      // Local inference can legitimately take longer than a cloud race,
+      // especially on CPU. Keep the stop button responsive through the same
+      // AbortController, but do not discard a healthy local completion at 45s.
+      const HARD_TIMEOUT_MS = getUltraplinianRaceTimeoutMs(raceEntries);
+      _log(`[ULTRAPLINIAN] Hard timeout: ${Math.round(HARD_TIMEOUT_MS / 1000)}s`);
 
-      await new Promise((resolveRace) => {
-        let successCountLocal = 0;
-        let settledCount = 0;
-        let graceTimer = null;
-        let resolved = false;
-
-        const finish = () => {
-          if (resolved) return;
-          resolved = true;
-          if (graceTimer) clearTimeout(graceTimer);
-          if (hardTimer) clearTimeout(hardTimer);
-          controller.abort();
-          resolveRace();
-        };
-
-        const hardTimer = setTimeout(() => {
-          _log('[ULTRAPLINIAN] Hard timeout reached, finishing race');
-          finish();
-        }, HARD_TIMEOUT_MS);
-
-        promises.forEach(p => p.then(result => {
-          if (resolved) return;
-          settledCount++;
-          if (result && result.success) successCountLocal++;
-
-          // Start grace period once we have enough successful results
-          if (successCountLocal >= MIN_RESULTS_FOR_GRACE && !graceTimer) {
-            _log(`[ULTRAPLINIAN] ${successCountLocal} successes, starting ${GRACE_PERIOD_MS}ms grace period`);
-            graceTimer = setTimeout(finish, GRACE_PERIOD_MS);
-          }
-
-          // All done — no need to wait
-          if (settledCount === models.length) finish();
-        }).catch(() => {
-          if (resolved) return;
-          settledCount++;
-          if (settledCount === models.length) finish();
-        }));
-
-        if (models.length === 0) finish();
+      await waitForUltraplinianRace(promises, controller, {
+        modelCount: models.length,
+        minResultsForGrace: MIN_RESULTS_FOR_GRACE,
+        gracePeriodMs: GRACE_PERIOD_MS,
+        hardTimeoutMs: HARD_TIMEOUT_MS,
+        onLog: _log,
       });
 
       const totalTime = ((Date.now() - startTime) / 1000).toFixed(1);
