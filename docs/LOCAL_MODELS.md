@@ -12,7 +12,6 @@ Supported presets:
 - vLLM — `http://localhost:8000/v1`
 - llama.cpp — `http://localhost:8080/v1`
 - Custom OpenAI-compatible loopback server
-- WebLLM — MLC models running directly through WebGPU in the browser
 
 ## Connect from Crow-GodMod3
 
@@ -188,66 +187,11 @@ must expose:
 
 An optional API key is sent as `Authorization: Bearer <key>`.
 
-## WebLLM in browser
-
-WebLLM does not require a local server. Crow-GodMod3 includes one lightweight
-demo selection, `Qwen3.5-0.8B-q4f16_1-MLC`. It downloads roughly 447 MB into
-the current browser's cache only when first used and performs inference through
-WebGPU on that device. The model is not bundled into or served from the
-Crow-GodMod3 deployment.
-
-1. Use a current Chrome, Edge, or another browser with WebGPU enabled.
-2. On a fresh browser, leave the header picker on **Automatic** and send a
-   message to use the single Qwen3.5 0.8B demo. Before anything downloads, the
-   site displays a first-use notice and requires the visitor to choose
-   **Download & run locally**.
-3. To choose a different compatible model, open **Settings → API Keys →
-   WebLLM · In-Browser Demo**, then click **Discover Browser Models**. This loads only the
-   pinned WebLLM library and its model catalogue; it does not download model
-   weights.
-4. Select the discovered WebLLM model from the header picker for the desired mode.
-5. Send a message. The browser downloads and caches that model on first use,
-   then generates locally. Visible loading progress remains above the message
-   composer while the model is prepared.
-
-The WebLLM inference path does not send the prompt or generated answer to
-Crow-GodMod3, its owner, Vercel, Hugging Face, or a model API. The browser does
-make ordinary network requests to load the website, WebLLM runtime, and model
-files, so those services can receive normal connection metadata.
-
-The in-memory engine is reused for every answer while the page remains open,
-and the downloaded model cache is reused on later visits. Crow-GodMod3 asks the
-browser for persistent storage after first-use consent, but the browser can
-deny that request or later evict cached files. Deleting chats removes only the
-conversation history. To remove the model files, clear Crow-GodMod3's browser
-site data; private browsing, storage cleanup, or changing browser/device can
-require a later re-download.
-
-The built-in 0.8B demo caps each visible answer at 512 output tokens so the
-site's shared 4,096-token setting does not turn a small in-browser response into
-a many-minute generation. Models deliberately added through discovery retain
-the configured generation budget.
-
-WebLLM models use MLC model artifacts plus a compatible WebAssembly model
-library. Ordinary GGUF, Safetensors, Ollama, and LM Studio downloads cannot be
-selected directly. A custom model must first be compiled and published in the
-MLC/WebLLM format with both its model URL and matching `model_lib` URL.
-
-Crow-GodMod3 serializes browser generations because one WebGPU engine cannot
-reliably run the site's parallel race requests simultaneously. Other providers
-and modes remain unchanged.
-
-Official documentation:
-[WebLLM](https://github.com/mlc-ai/web-llm) and
-[custom model records](https://webllm.mlc.ai/docs/user/advanced_usage.html).
-
 ## Local-only behavior
 
 Local-only mode:
 
 - excludes OpenRouter and Venice from ULTRAPLINIAN races;
-- permits either an OpenAI-compatible loopback runtime or an explicitly
-  selected WebLLM browser model;
 - uses lightweight local checks for classification/refusal detection and the
   first selected model in the active mode's frozen pool for remaining judge,
   coaching, accuracy, and Liquid calls;
@@ -274,5 +218,3 @@ runtime may keep its own request logs.
   from API-key, connection, and account failures.
 - **Slow races or out-of-memory errors:** use fewer model IDs, reduce Max
   Tokens, or disable additional coaching and Liquid refinement passes.
-- **WebLLM unavailable:** use HTTPS or localhost and verify WebGPU is enabled.
-  Browser models cannot be loaded from ordinary GGUF files.

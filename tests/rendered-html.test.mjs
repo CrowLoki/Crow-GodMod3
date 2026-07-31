@@ -246,80 +246,6 @@ test("ships first-class loopback presets for every supported local runtime", asy
   assert.match(openSettingsSource, /updateLocalRuntimeHelp\(state\.localRuntime\)/);
 });
 
-test("ships one default WebLLM demo without replacing server runtimes", async () => {
-  const html = await readFile(publicEntry, "utf8");
-  assert.match(
-    html,
-    /const WEBLLM_MODULE_URL = 'https:\/\/esm\.run\/@mlc-ai\/web-llm@0\.2\.84';/,
-  );
-  assert.match(
-    html,
-    /const WEBLLM_DEMO_MODEL = 'Qwen3\.5-0\.8B-q4f16_1-MLC';/,
-  );
-  assert.match(html, /const WEBLLM_DEMO_VERSION = 2;/);
-  assert.match(html, /id="webLlmConsentModal"/);
-  assert.match(html, /Download &amp; run locally/);
-  assert.match(html, /id="webLlmRuntimeStatus" role="status" aria-live="polite"/);
-  assert.match(html, /if \(!\(await requestWebLlmConsent\(executionTarget\)\)\) return;/);
-  assert.match(html, /Your prompt and generated answer are not sent to Crow-GodMod3/);
-  assert.match(html, /It is not downloaded again for every answer/);
-  assert.match(html, /Deleting chats removes conversation history only/);
-  assert.match(html, /To remove the model, clear Crow-GodMod3's browser\/site data/);
-  assert.match(html, /void requestPersistentWebLlmStorage\(\);/);
-  assert.match(html, /if \(model === WEBLLM_DEMO_MODEL\) \{/);
-  assert.match(html, /Math\.max\(1, Math\.min\(512, Math\.floor\(requested\)\)\)/);
-  assert.match(html, /configureWebLlmDemoNonThinking\(model, _webLlmEngine\)/);
-  assert.match(html, /const nonThinkingPrefix = '\\n<think>\\n\\n<\/think>\\n\\n';/);
-  assert.match(html, /pipeline\.conversation\.config\.role_empty_sep = nonThinkingPrefix/);
-  assert.match(html, /request\.temperature = 1;/);
-  assert.match(html, /request\.top_p = 1;/);
-  assert.match(html, /request\.presence_penalty = 2;/);
-  assert.match(html, /webLlmRequestBody\(body, model\)/);
-  assert.match(html, /webLlmEnabled: true,/);
-  assert.match(html, /webLlmModels: WEBLLM_DEMO_MODEL,/);
-  assert.match(html, /it is not hosted inside this website/);
-  assert.match(html, /id="webLlmEnabled"/);
-  assert.match(html, /onclick="discoverWebLlmModels\(\)"/);
-  assert.match(html, /ordinary GGUF files are not compatible/i);
-  assert.match(html, /filter\(record => record\?\.model_type !== 1\)/);
-  assert.match(
-    html,
-    /const MODE_MODEL_PROVIDERS = new Set\(\['auto', 'openrouter', 'venice', 'local', 'webllm'\]\)/,
-  );
-  assert.match(
-    html,
-    /appendModeModelOptions\(select, 'WebLLM · in browser', 'webllm', getWebLlmModels\(\)\)/,
-  );
-  assert.match(html, /if \(provider === 'webllm'\) \{/);
-  assert.match(
-    html,
-    /const data = await runWebLlmChat\(target\.model, requestBody, options\.signal\)/,
-  );
-  assert.match(
-    html,
-    /_webLlmGenerationQueue = queued\.catch\(\(\) => \{\}\)/,
-    "one WebGPU engine must serialize the site's parallel completion requests",
-  );
-  assert.match(
-    html,
-    /if \(!raceEntries\.length && hasWebLlmProvider\(\)\) \{[\s\S]*?raceEntries\.push\(\{ model: demoModel, provider: 'webllm' \}\);/,
-    "Automatic ULTRAPLINIAN must run one browser target when no server or API key is configured",
-  );
-  assert.match(
-    html,
-    /const needsWebLlmDemoMigration = parsed\.webLlmDemoVersion !== WEBLLM_DEMO_VERSION;/,
-    "existing browser state must receive the one-model demo migration",
-  );
-  assert.match(
-    html,
-    /const browserIsAutomaticProvider = hasWebLlmProvider\(\)[\s\S]*?provider: 'webllm', model: browserModel/,
-    "Automatic browser-only runs must skip cloud-style helper generations and target WebLLM directly",
-  );
-  assert.match(html, /'wasm-unsafe-eval' https:\/\/esm\.run https:\/\/cdn\.jsdelivr\.net/);
-  assert.match(html, /https:\/\/huggingface\.co https:\/\/\*\.huggingface\.co/);
-  assert.match(html, /worker-src 'self' blob:/);
-});
-
 test("discovers unlimited local chat inventory with one-model default and user-selected races", async () => {
   const html = await readFile(publicEntry, "utf8");
   assert.match(html, /const MAX_LOCAL_MODEL_STORAGE_CHARS = 1048576;/);
@@ -546,7 +472,7 @@ globalThis.discoverLocalChatModelsForTest = discoverLocalChatModels;`,
   );
   assert.match(
     html,
-    /function usesLightweightLocalHelpers\(modeTarget = null\)[\s\S]*\['local', 'webllm'\]\.includes\(modeTarget\?\.provider\)/,
+    /function usesLightweightLocalHelpers\(modeTarget = null\)[\s\S]*modeTarget\?\.provider === 'local'/,
   );
   assert.match(
     html,
@@ -892,7 +818,6 @@ test("keeps an explicit provider-qualified model choice for every mode", async (
       "openrouter",
       "venice",
       "local",
-      "webllm",
     ]),
     MODE_MODEL_IDS: new Set(["ultraplinian", "parseltongue", "pliny"]),
     MODE_MODEL_SELECTION_SCHEMA_VERSION: 2,
@@ -901,12 +826,6 @@ test("keeps an explicit provider-qualified model choice for every mode", async (
     },
     hasLocalProvider() {
       return modeSelectionState.localEnabled && modeSelectionState.localModels.length > 0;
-    },
-    getWebLlmModels() {
-      return [];
-    },
-    hasWebLlmProvider() {
-      return false;
     },
     getLocalAutomaticRaceModels(mode) {
       if (mode === "parseltongue") return ["same/model", "lm-beta"];
@@ -1788,7 +1707,7 @@ test("keeps ULTRAPLINIAN winner and Thinking-grid identity provider-qualified", 
   );
 });
 
-test("waits for slow local and WebLLM ULTRAPLINIAN completions before judging", async () => {
+test("waits for slow local ULTRAPLINIAN completions before judging", async () => {
   const html = await readFile(publicEntry, "utf8");
   const timeoutStart = html.indexOf(
     "function hasLocalUltraplinianRaceEntry",
@@ -1830,11 +1749,6 @@ globalThis.waitForUltraplinianRaceForTest = waitForUltraplinianRace;`,
     getTimeout([{ provider: "local", model: "liquid/lfm2.5-1.2b" }]),
     null,
     "A pinned local model must not be aborted by an arbitrary wall-clock cutoff",
-  );
-  assert.equal(
-    getTimeout([{ provider: "webllm", model: "Qwen3.5-0.8B-q4f16_1-MLC" }]),
-    null,
-    "A browser model must not be aborted while its first-use files are downloading",
   );
   assert.equal(
     getTimeout([
@@ -2083,14 +1997,12 @@ test("backs up local runtime settings without exporting its API key", async () =
     "localRaceModels",
     "localModeModelPools",
     "localReasoningEffort",
-    "webLlmEnabled",
-    "webLlmModels",
     "modeModelSelections",
     "modeModelSelectionVersion",
   ]) {
     assert.match(exportSource, new RegExp(`${key}: state\\.${key}`));
   }
-  assert.match(exportSource, /_version: 6/);
+  assert.match(exportSource, /_version: 5/);
   assert.doesNotMatch(exportSource, /localApiKey/);
 
   const importStart = html.indexOf("const allowed = ['conversations'");
@@ -2101,8 +2013,6 @@ test("backs up local runtime settings without exporting its API key", async () =
   assert.match(importAllowlist, /'localRaceModels'/);
   assert.match(importAllowlist, /'localModeModelPools'/);
   assert.match(importAllowlist, /'localReasoningEffort'/);
-  assert.match(importAllowlist, /'webLlmEnabled'/);
-  assert.match(importAllowlist, /'webLlmModels'/);
   assert.match(importAllowlist, /'modeModelSelections'/);
   assert.match(importAllowlist, /'modeModelSelectionVersion'/);
   assert.doesNotMatch(importAllowlist, /'localApiKey'/);
