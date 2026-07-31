@@ -3867,9 +3867,11 @@
         <ul style="margin:0 0 16px 20px;color:var(--text);">
           <li style="margin-bottom:8px;">The model files are downloaded automatically from Hugging Face into this browser's cache. You do not install an application.</li>
           <li style="margin-bottom:8px;">Generation runs on this device through WebGPU. This may take several minutes the first time.</li>
+          <li style="margin-bottom:8px;"><strong>The model stays loaded while this page is open, and its cached files are reused on later visits. It is not downloaded again for every answer.</strong></li>
           <li style="margin-bottom:8px;"><strong>Your prompt and generated answer are not sent to Crow-GodMod3, its owner, Vercel, Hugging Face, or a model API by this WebLLM inference path.</strong></li>
           <li style="margin-bottom:8px;">The browser still makes ordinary network requests to load the website, WebLLM runtime, and model files. Those services can receive normal connection metadata.</li>
-          <li>Clearing browser site data, using private browsing, or changing browsers/devices may require downloading the model again.</li>
+          <li style="margin-bottom:8px;">Deleting chats removes conversation history only; it does not remove the cached model.</li>
+          <li>To remove the model, clear Crow-GodMod3's browser/site data. Private browsing, storage cleanup or eviction, and changing browsers/devices may require downloading it again.</li>
         </ul>
         <div style="display:flex;gap:12px;justify-content:flex-end;flex-wrap:wrap;">
           <button onclick="declineWebLlmConsent()" style="padding:10px 20px;background:transparent;border:1px solid var(--border);color:var(--text-dim);border-radius:8px;cursor:pointer;font-size:14px;">Not now</button>
@@ -4909,6 +4911,16 @@
       return localStorage.getItem(WEBLLM_CONSENT_KEY) === 'accepted';
     }
 
+    async function requestPersistentWebLlmStorage() {
+      if (!navigator.storage?.persist) return false;
+      try {
+        if (await navigator.storage.persisted?.()) return true;
+        return await navigator.storage.persist();
+      } catch (_) {
+        return false;
+      }
+    }
+
     function requestWebLlmConsent(modeTarget) {
       if (modeTarget?.provider !== 'webllm' || hasWebLlmConsent()) {
         return Promise.resolve(true);
@@ -4922,7 +4934,12 @@
     }
 
     function finishWebLlmConsent(accepted) {
-      if (accepted) localStorage.setItem(WEBLLM_CONSENT_KEY, 'accepted');
+      if (accepted) {
+        localStorage.setItem(WEBLLM_CONSENT_KEY, 'accepted');
+        // Best effort: browsers remain free to deny or later evict storage,
+        // but persistence reduces needless model re-downloads.
+        void requestPersistentWebLlmStorage();
+      }
       document.getElementById('webLlmConsentModal')?.classList.remove('open');
       const resolve = _webLlmConsentResolver;
       _webLlmConsentResolver = null;

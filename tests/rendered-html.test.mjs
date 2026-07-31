@@ -262,6 +262,10 @@ test("ships one default WebLLM demo without replacing server runtimes", async ()
   assert.match(html, /id="webLlmRuntimeStatus" role="status" aria-live="polite"/);
   assert.match(html, /if \(!\(await requestWebLlmConsent\(executionTarget\)\)\) return;/);
   assert.match(html, /Your prompt and generated answer are not sent to Crow-GodMod3/);
+  assert.match(html, /It is not downloaded again for every answer/);
+  assert.match(html, /Deleting chats removes conversation history only/);
+  assert.match(html, /To remove the model, clear Crow-GodMod3's browser\/site data/);
+  assert.match(html, /void requestPersistentWebLlmStorage\(\);/);
   assert.match(html, /webLlmEnabled: true,/);
   assert.match(html, /webLlmModels: WEBLLM_DEMO_MODEL,/);
   assert.match(html, /it is not hosted inside this website/);

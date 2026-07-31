@@ -215,6 +215,14 @@ Crow-GodMod3, its owner, Vercel, Hugging Face, or a model API. The browser does
 make ordinary network requests to load the website, WebLLM runtime, and model
 files, so those services can receive normal connection metadata.
 
+The in-memory engine is reused for every answer while the page remains open,
+and the downloaded model cache is reused on later visits. Crow-GodMod3 asks the
+browser for persistent storage after first-use consent, but the browser can
+deny that request or later evict cached files. Deleting chats removes only the
+conversation history. To remove the model files, clear Crow-GodMod3's browser
+site data; private browsing, storage cleanup, or changing browser/device can
+require a later re-download.
+
 WebLLM models use MLC model artifacts plus a compatible WebAssembly model
 library. Ordinary GGUF, Safetensors, Ollama, and LM Studio downloads cannot be
 selected directly. A custom model must first be compiled and published in the
