@@ -682,6 +682,143 @@ test("keeps ULTRAPLINIAN winner identity provider-qualified", async () => {
   );
 });
 
+test("waits for slow local ULTRAPLINIAN completions before judging", async () => {
+  const html = await readFile(publicEntry, "utf8");
+  const timeoutStart = html.indexOf(
+    "function getUltraplinianRaceTimeoutMs",
+  );
+  const timeoutEnd = html.indexOf(
+    "\n\n    // Main ULTRAPLINIAN execution",
+    timeoutStart,
+  );
+  assert.ok(timeoutStart > 0 && timeoutEnd > timeoutStart);
+
+  const timeoutConstants = html.match(
+    /const ULTRAPLINIAN_CLOUD_RACE_TIMEOUT_MS = ([^;]+);\s+const ULTRAPLINIAN_LOCAL_RACE_TIMEOUT_MS = ([^;]+);/,
+  );
+  assert.ok(timeoutConstants, "Missing ULTRAPLINIAN timeout constants");
+
+  const timeoutContext = vm.createContext({
+    AbortController,
+    clearTimeout,
+    queueMicrotask,
+    setTimeout,
+  });
+  vm.runInContext(
+    `const ULTRAPLINIAN_CLOUD_RACE_TIMEOUT_MS = ${timeoutConstants[1]};
+const ULTRAPLINIAN_LOCAL_RACE_TIMEOUT_MS = ${timeoutConstants[2]};
+${html.slice(timeoutStart, timeoutEnd)}
+globalThis.getUltraplinianRaceTimeoutMsForTest = getUltraplinianRaceTimeoutMs;
+globalThis.waitForUltraplinianRaceForTest = waitForUltraplinianRace;`,
+    timeoutContext,
+  );
+  const getTimeout =
+    timeoutContext.getUltraplinianRaceTimeoutMsForTest;
+  const waitForRace =
+    timeoutContext.waitForUltraplinianRaceForTest;
+
+  assert.equal(
+    getTimeout([{ provider: "local", model: "liquid/lfm2.5-1.2b" }]),
+    300_000,
+    "A pinned local model must not be aborted by the 45-second cloud cutoff",
+  );
+  assert.equal(
+    getTimeout([
+      { provider: "local", model: "local-model" },
+      { provider: "local", model: "second-local-model" },
+    ]),
+    300_000,
+  );
+  assert.equal(
+    getTimeout([{ provider: "openrouter", model: "cloud-model" }]),
+    45_000,
+  );
+  assert.equal(
+    getTimeout([
+      { provider: "local", model: "local-model" },
+      { provider: "openrouter", model: "cloud-model" },
+    ]),
+    45_000,
+    "Mixed provider races should retain the bounded cloud race timeout",
+  );
+
+  const timeoutEvents = [];
+  const timedOutResults = [];
+  const timeoutController = new AbortController();
+  const deferredWorker = new Promise((resolve) => {
+    timeoutController.signal.addEventListener("abort", () => {
+      timeoutEvents.push("abort");
+      queueMicrotask(() => {
+        timedOutResults.push({
+          provider: "local",
+          model: "liquid/lfm2.5-1.2b",
+          success: false,
+          error: "aborted",
+        });
+        timeoutEvents.push("worker-published");
+        resolve(timedOutResults[0]);
+      });
+    });
+  });
+
+  await waitForRace([deferredWorker], timeoutController, {
+    modelCount: 1,
+    minResultsForGrace: 2,
+    gracePeriodMs: 50,
+    hardTimeoutMs: 5,
+    onLog(message) {
+      if (message.includes("Hard timeout")) timeoutEvents.push("timeout");
+    },
+  });
+  timeoutEvents.push(`judge-saw-${timedOutResults.length}`);
+
+  assert.deepEqual(timeoutEvents, [
+    "timeout",
+    "abort",
+    "worker-published",
+    "judge-saw-1",
+  ]);
+  assert.equal(
+    timedOutResults.length,
+    1,
+    "Judging must not observe an empty race before abort handlers settle",
+  );
+
+  const completedResults = [];
+  const completionController = new AbortController();
+  const completedWorker = Promise.resolve().then(() => {
+    const result = {
+      provider: "local",
+      model: "liquid/lfm2.5-1.2b",
+      success: true,
+      content: "```python\nprint('render me')\n```",
+    };
+    completedResults.push(result);
+    return result;
+  });
+
+  await waitForRace([completedWorker], completionController, {
+    modelCount: 1,
+    minResultsForGrace: 2,
+    gracePeriodMs: 50,
+    hardTimeoutMs: 100,
+  });
+  assert.equal(completedResults.length, 1);
+  assert.equal(completionController.signal.aborted, false);
+
+  const ultraStart = html.indexOf("async function ultraplinian");
+  const ultraEnd = html.indexOf("async function consortium", ultraStart);
+  const ultraSource = html.slice(ultraStart, ultraEnd);
+  assert.match(
+    ultraSource,
+    /const HARD_TIMEOUT_MS = getUltraplinianRaceTimeoutMs\(raceEntries\);/,
+  );
+  assert.match(
+    ultraSource,
+    /await waitForUltraplinianRace\(promises, controller,/,
+  );
+});
+
 test("normalizes each local runtime endpoint without broadening loopback access", async () => {
   const html = await readFile(publicEntry, "utf8");
   const functionStart = html.indexOf("function normalizeLocalBaseUrl");
