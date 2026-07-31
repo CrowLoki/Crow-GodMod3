@@ -190,16 +190,20 @@ An optional API key is sent as `Authorization: Bearer <key>`.
 
 ## WebLLM in browser
 
-WebLLM does not require a local server. It downloads a compatible quantized
-model into the current browser's cache and performs inference through WebGPU on
-that device.
+WebLLM does not require a local server. Crow-GodMod3 includes one lightweight
+demo selection, `Qwen3.5-0.8B-q4f16_1-MLC`. It downloads roughly 447 MB into
+the current browser's cache only when first used and performs inference through
+WebGPU on that device. The model is not bundled into or served from the
+Crow-GodMod3 deployment.
 
 1. Use a current Chrome, Edge, or another browser with WebGPU enabled.
-2. Open **Settings → API Keys → WebLLM · In-Browser Models**.
-3. Enable WebLLM and click **Discover Browser Models**. This loads only the
+2. On a fresh browser, leave the header picker on **Automatic** and send a
+   message to use the single Qwen3.5 0.8B demo.
+3. To choose a different compatible model, open **Settings → API Keys →
+   WebLLM · In-Browser Demo**, then click **Discover Browser Models**. This loads only the
    pinned WebLLM library and its model catalogue; it does not download model
    weights.
-4. Select a WebLLM model from the header model picker for the desired mode.
+4. Select the discovered WebLLM model from the header picker for the desired mode.
 5. Send a message. The browser downloads and caches that model on first use,
    then generates locally. Loading progress appears in the WebLLM settings
    status.
