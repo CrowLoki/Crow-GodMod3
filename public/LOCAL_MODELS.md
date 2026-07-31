@@ -21,12 +21,40 @@ Supported presets:
    port.
 4. Add the optional bearer token only when the local server requires one.
 5. Click **Test & Discover Models**. Crow-GodMod3 reads the exact IDs returned
-   by the runtime's `/models` endpoint.
+   by the runtime and excludes models that are explicitly identified as
+   embedding or reranking models. LM Studio uses its native capability metadata;
+   other OpenAI-compatible runtimes retain unknown IDs so unusual chat models
+   are not guessed away.
 6. Enable **Local-only mode** if all model inference should stay on the local
    runtime instead of using OpenRouter or Venice.
 
-Multiple model IDs can race together. The first discovered/configured ID also
-handles helper and judge calls, so put the strongest local model first.
+The full discovered inventory remains available in the model controls. Under
+**Settings → Strategies → Local models per question, by mode**, ULTRAPLINIAN,
+PARSELTONGUE, and CLASSIC each have an independent pool. Every pool defaults to
+the first local model. Users can tick any number of models, including the full
+discovered inventory; Crow-GodMod3 applies no fixed model-count limit. The
+runtime and the user's hardware determine how much work is practical.
+
+With the header picker set to **Automatic**:
+
+- ULTRAPLINIAN adds its selected local pool to its configured OpenRouter and
+  Venice speed tier.
+- PARSELTONGUE keeps its selected 11, 22, or 33 text techniques and runs those
+  techniques across every model in its selected local pool.
+- Crow-GodMod3 CLASSIC keeps its enabled prompt-strategy count and runs those
+  strategies across every model in its selected local pool. FAST keeps its
+  direct streaming path when there is exactly one target; with multiple
+  targets it joins the scored prompt/model matrix so none of the selected
+  models is silently omitted.
+
+When a cloud provider is also configured, each mode preserves its native cloud
+target or tier alongside its local pool. Pinning one provider-qualified model
+in the header overrides that mode's Automatic pool and runs exactly that model.
+
+Within each mode's selected pool, put the preferred helper model first. The app
+freezes that pool when a question starts; its first selected model handles
+automatic helper and judge calls while every selected model still participates
+in that mode's main matrix.
 
 ## Browser permission and CORS
 
@@ -55,6 +83,14 @@ below with the origin shown in the Local Model Runtimes settings panel.
 
 LM Studio authentication is off by default. If you enable it, paste the LM
 Studio API token into the optional API Key field.
+
+Crow-GodMod3 defaults **LM Studio reasoning** to **Final answers only**. This
+asks models whose discovered capabilities allow reasoning to be disabled to
+return visible final text instead of using the entire Max Tokens budget on
+hidden reasoning. Models that require reasoning are left at their supported
+setting. Select **Use each model's default reasoning** when you deliberately
+want native reasoning mode. This control is sent only to LM Studio; other local
+runtime presets are left unchanged.
 
 Official documentation:
 [OpenAI compatibility](https://lmstudio.ai/docs/developer/openai-compat) and
@@ -156,8 +192,9 @@ An optional API key is sent as `Authorization: Bearer <key>`.
 Local-only mode:
 
 - excludes OpenRouter and Venice from ULTRAPLINIAN races;
-- uses the first local model for classification, judging, coaching, accuracy
-  checks, and Liquid refinement;
+- uses lightweight local checks for classification/refusal detection and the
+  first selected model in the active mode's frozen pool for remaining judge,
+  coaching, accuracy, and Liquid calls;
 - keeps conversations, settings, and keys in browser storage;
 - does not stop ordinary page-hosting or browser traffic.
 
@@ -176,5 +213,8 @@ runtime may keep its own request logs.
 - **Chat errors after discovery:** model discovery does not prove that the
   selected model has a valid chat template. Load a chat/instruct model or
   configure the runtime's chat-template option.
+- **No final text after internal reasoning:** increase Model Max Tokens or, for
+  LM Studio, choose **Final answers only**. Crow-GodMod3 reports this separately
+  from API-key, connection, and account failures.
 - **Slow races or out-of-memory errors:** use fewer model IDs, reduce Max
   Tokens, or disable additional coaching and Liquid refinement passes.

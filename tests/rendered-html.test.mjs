@@ -246,6 +246,497 @@ test("ships first-class loopback presets for every supported local runtime", asy
   assert.match(openSettingsSource, /updateLocalRuntimeHelp\(state\.localRuntime\)/);
 });
 
+test("discovers unlimited local chat inventory with one-model default and user-selected races", async () => {
+  const html = await readFile(publicEntry, "utf8");
+  assert.match(html, /const MAX_LOCAL_MODEL_STORAGE_CHARS = 1048576;/);
+  assert.doesNotMatch(html, /MAX_LOCAL_MODEL_INVENTORY|MAX_LOCAL_AUTOMATIC_RACE_MODELS/);
+
+  const helperStart = html.indexOf("const MAX_LOCAL_MODEL_STORAGE_CHARS");
+  const helperEnd = html.indexOf(
+    "\n\n    function inferPersistedModelProvider",
+    helperStart,
+  );
+  assert.ok(
+    helperStart > 0 && helperEnd > helperStart,
+    "Missing the local chat-model discovery helper block",
+  );
+
+  let availableLocalModels = [];
+  const context = vm.createContext({
+    URL,
+    state: { localRaceModels: "", localModeModelPools: null },
+    getLocalModels() {
+      return availableLocalModels;
+    },
+  });
+  vm.runInContext(
+    `${html.slice(helperStart, helperEnd)}
+globalThis.parseLocalModelIdsForTest = parseLocalModelIds;
+globalThis.getLocalAutomaticRaceModelsForTest = getLocalAutomaticRaceModels;
+globalThis.isExplicitlyNonChatModelDescriptorForTest = isExplicitlyNonChatModelDescriptor;
+globalThis.filterLocalChatModelDescriptorsForTest = filterLocalChatModelDescriptors;
+globalThis.discoverLocalChatModelsForTest = discoverLocalChatModels;`,
+    context,
+  );
+
+  const fullInventory = structuredClone(
+    context.parseLocalModelIdsForTest(
+      Array.from({ length: 12 }, (_, index) => `chat-model-${index}`).join(", "),
+    ),
+  );
+  assert.equal(fullInventory.length, 12);
+  assert.equal(
+    fullInventory[11],
+    "chat-model-11",
+    "A model beyond the old eight-model cutoff must remain explicitly selectable",
+  );
+  assert.equal(
+    context.parseLocalModelIdsForTest(
+      Array.from({ length: 140 }, (_, index) => `inventory-model-${index}`).join(
+        ",",
+      ),
+    ).length,
+    140,
+    "Crow-GodMod3 must not impose a model-count limit on the picker inventory",
+  );
+
+  availableLocalModels = fullInventory;
+  assert.deepEqual(
+    structuredClone(
+      context.getLocalAutomaticRaceModelsForTest("ultraplinian"),
+    ),
+    fullInventory.slice(0, 1),
+    "Automatic ULTRAPLINIAN starts with one safe default model",
+  );
+  assert.deepEqual(
+    structuredClone(
+      context.getLocalAutomaticRaceModelsForTest("parseltongue"),
+    ),
+    fullInventory.slice(0, 1),
+    "Automatic PARSELTONGUE starts with one safe default model",
+  );
+  assert.deepEqual(
+    structuredClone(context.getLocalAutomaticRaceModelsForTest("pliny")),
+    fullInventory.slice(0, 1),
+    "Automatic CLASSIC starts with one safe default model",
+  );
+  context.state.localModeModelPools = {
+    ultraplinian: fullInventory.join(", "),
+    parseltongue: [fullInventory[2], fullInventory[9]].join(", "),
+    pliny: fullInventory.slice(4, 9).join(", "),
+  };
+  assert.deepEqual(
+    structuredClone(
+      context.getLocalAutomaticRaceModelsForTest("ultraplinian"),
+    ),
+    fullInventory,
+    "ULTRAPLINIAN can deliberately select every discovered local model without a fixed ceiling",
+  );
+  assert.deepEqual(
+    structuredClone(
+      context.getLocalAutomaticRaceModelsForTest("parseltongue"),
+    ),
+    [fullInventory[2], fullInventory[9]],
+    "PARSELTONGUE retains its own exact available-model subset",
+  );
+  assert.deepEqual(
+    structuredClone(context.getLocalAutomaticRaceModelsForTest("pliny")),
+    fullInventory.slice(4, 9),
+    "CLASSIC retains a different independently sized local-model pool",
+  );
+
+  const nativeDescriptors = [
+    ...Array.from({ length: 9 }, (_, index) => ({
+      key: `text-embedding-test-${index}`,
+      type: "embedding",
+    })),
+    { key: "liquid/lfm2.5-1.2b", type: "llm" },
+    { key: "nvidia/nemotron-3-nano-4b", type: "llm" },
+    { key: "mistralai/ministral-3-3b", type: "llm" },
+    {
+      key: "google/gemma-4-e2b",
+      type: "llm",
+      capabilities: {
+        reasoning: { allowed_options: ["on"], default: "on" },
+      },
+    },
+    {
+      key: "ornith-1.0-9b",
+      type: "llm",
+      capabilities: {
+        reasoning: { allowed_options: ["off", "on"], default: "on" },
+      },
+    },
+  ];
+  const expectedLmStudioChatModels = [
+    "liquid/lfm2.5-1.2b",
+    "nvidia/nemotron-3-nano-4b",
+    "mistralai/ministral-3-3b",
+    "google/gemma-4-e2b",
+    "ornith-1.0-9b",
+  ];
+
+  assert.equal(
+    context.isExplicitlyNonChatModelDescriptorForTest({
+      key: "text-embedding-test",
+      type: "embedding",
+    }),
+    true,
+  );
+  assert.equal(
+    context.isExplicitlyNonChatModelDescriptorForTest({
+      key: "google/gemma-4-e2b",
+      type: "llm",
+    }),
+    false,
+  );
+  const filteredNative = structuredClone(
+    context.filterLocalChatModelDescriptorsForTest(nativeDescriptors),
+  );
+  assert.deepEqual(filteredNative.models, expectedLmStudioChatModels);
+  assert.deepEqual(filteredNative.reasoningOffModels, ["ornith-1.0-9b"]);
+  assert.equal(filteredNative.skipped, 9);
+
+  const lmStudioRequests = [];
+  const lmStudioDiscovery = structuredClone(
+    await context.discoverLocalChatModelsForTest(
+      "lmstudio",
+      "http://localhost:1234/v1",
+      {},
+      async (url) => {
+        lmStudioRequests.push(String(url));
+        return {
+          ok: true,
+          status: 200,
+          async json() {
+            return { models: nativeDescriptors };
+          },
+        };
+      },
+    ),
+  );
+  assert.ok(
+    lmStudioRequests.some((url) => url.endsWith("/api/v1/models")),
+    "LM Studio discovery must use its native typed inventory endpoint",
+  );
+  assert.deepEqual(lmStudioDiscovery.models, expectedLmStudioChatModels);
+  assert.deepEqual(lmStudioDiscovery.reasoningOffModels, ["ornith-1.0-9b"]);
+  assert.equal(lmStudioDiscovery.skipped, 9);
+  assert.ok(lmStudioDiscovery.source);
+
+  const fallbackDescriptors = [
+    { id: "acme/unknown-local-model" },
+    { id: "text-embedding-nomic-embed-text-v2" },
+    { id: "acme/rerank-v2" },
+    { id: "acme/another-unknown-model" },
+  ];
+  const fallbackRequests = [];
+  const fallbackDiscovery = structuredClone(
+    await context.discoverLocalChatModelsForTest(
+      "vllm",
+      "http://localhost:8000/v1",
+      {},
+      async (url) => {
+        fallbackRequests.push(String(url));
+        return {
+          ok: true,
+          status: 200,
+          async json() {
+            return { data: fallbackDescriptors };
+          },
+        };
+      },
+    ),
+  );
+  assert.ok(fallbackRequests.some((url) => url.endsWith("/v1/models")));
+  assert.deepEqual(fallbackDiscovery.models, [
+    "acme/unknown-local-model",
+    "acme/another-unknown-model",
+  ]);
+  assert.equal(fallbackDiscovery.skipped, 2);
+  for (const mode of ["ultraplinian", "parseltongue", "pliny"]) {
+    assert.match(html, new RegExp(`id="localRaceModelPicker-${mode}"`));
+    assert.match(
+      html,
+      new RegExp(`onclick="selectAllLocalRaceModels\\('${mode}'\\)"`),
+    );
+  }
+  assert.match(
+    html,
+    /Each mode defaults to one local model\. Select any number, including every discovered model; there is no fixed count limit/,
+  );
+  assert.match(
+    html,
+    /renderLocalRaceModelPicker\(\);\s+buildTierSelect\(\);/,
+    "manual Model IDs edits must refresh the unlimited picker and its live counts",
+  );
+  assert.match(
+    html,
+    /function usesLightweightLocalHelpers\(modeTarget = null\)[\s\S]*modeTarget\?\.provider === 'local'/,
+  );
+  assert.match(
+    html,
+    /if \(usesLightweightLocalHelpers\(modeTarget\)\) \{[\s\S]*Local response passed the instant refusal check/,
+  );
+  assert.match(
+    html,
+    /title: 'Crow-GodMod3-refusal-detector', modeTarget, signal: abortController\?\.signal/,
+  );
+  assert.match(
+    html,
+    /if \(usesLightweightLocalHelpers\(modeTarget\)\) \{\s+return null;/,
+    "local helpers should not inject a conflicting generated prefill",
+  );
+  assert.match(
+    html,
+    /!PREFILL skipped \/\/ local direct generation/,
+    "local ULTRAPLINIAN should preserve direct generation without a fallback prefill",
+  );
+  assert.match(
+    html,
+    /abortController\.abort\(new DOMException\('User stopped generation', 'AbortError'\)\)/,
+    "Stop must identify a user cancellation instead of reporting a model failure",
+  );
+  assert.match(
+    html,
+    /controller\.signal\.reason\?\.message === 'User stopped generation'/,
+    "ULTRAPLINIAN must propagate an explicit user cancellation",
+  );
+});
+
+test("keeps local tier counts truthful for unlimited automatic pools and pinned models", async () => {
+  const html = await readFile(publicEntry, "utf8");
+  const helperStart = html.indexOf("function _tierCount(tier)");
+  const helperEnd = html.indexOf("\n\n    function buildTierSelect", helperStart);
+  assert.ok(helperStart > 0 && helperEnd > helperStart, "Missing tier-count helper");
+
+  const state = {
+    apiKey: "",
+    veniceApiKey: "",
+    localOnly: true,
+  };
+  let selection = { provider: "auto", model: "" };
+  let localModels = ["local-a", "local-b", "local-c"];
+  let selectionAvailable = true;
+  const context = vm.createContext({
+    state,
+    TIER_SIZES: { fast: 3, standard: 5 },
+    VENICE_TIER_SIZES: { fast: 6, standard: 15 },
+    hasLocalProvider: () => localModels.length > 0,
+    getLocalAutomaticRaceModels: (mode) => {
+      assert.equal(mode, "ultraplinian");
+      return localModels;
+    },
+    getModeModelSelection: () => selection,
+    isModeModelSelectionAvailable: () => selectionAvailable,
+  });
+  vm.runInContext(
+    `${html.slice(helperStart, helperEnd)}
+globalThis.tierCountForTest = _tierCount;`,
+    context,
+  );
+
+  assert.equal(context.tierCountForTest("fast"), 3);
+  state.localOnly = false;
+  state.apiKey = "configured";
+  assert.equal(
+    context.tierCountForTest("fast"),
+    6,
+    "automatic count includes every selected local model plus the cloud tier",
+  );
+  selection = { provider: "local", model: "local-b" };
+  assert.equal(
+    context.tierCountForTest("standard"),
+    1,
+    "pinning one model must report the one model that actually runs",
+  );
+  selectionAvailable = false;
+  assert.equal(
+    context.tierCountForTest("standard"),
+    0,
+    "an unavailable pinned model must not be reported as an automatic race",
+  );
+
+  assert.match(html, /OpenRouter Models by Tier/);
+  assert.match(
+    html,
+    /ULTRAPLINIAN’s selected local pool is added when Automatic is used/,
+  );
+  assert.match(
+    html,
+    /setCurrentModeModelSelection[\s\S]*?buildTierSelect\(\);/,
+    "changing the header model must rebuild the displayed tier counts",
+  );
+  assert.match(
+    html,
+    /\{GODMODE:ENABLED\} \/\/ assembling provider-qualified race/,
+  );
+  assert.doesNotMatch(
+    html,
+    /\{GODMODE:ENABLED\} \/\/ \$\{modelsToQuery\.length\} models loaded/,
+    "the first thinking line must not report a cloud-only count as the live race",
+  );
+});
+
+test("returns visible LM Studio final text without exposing hidden reasoning", async () => {
+  const html = await readFile(publicEntry, "utf8");
+  const helperStart = html.indexOf("function getChatCompletionFinalText");
+  const helperEnd = html.indexOf(
+    "\n\n    // Query a single model (for ultraplinian)",
+    helperStart,
+  );
+  assert.ok(
+    helperStart > 0 && helperEnd > helperStart,
+    "Missing final-text and model-error helpers",
+  );
+  const context = vm.createContext({
+    state: {
+      localOnly: true,
+      localRuntime: "lmstudio",
+      localReasoningEffort: "none",
+    },
+  });
+  vm.runInContext(
+    `${html.slice(helperStart, helperEnd)}
+globalThis.getFinalTextForTest = getChatCompletionFinalText;
+globalThis.getEmptyErrorForTest = getEmptyChatCompletionError;
+globalThis.classifyErrorForTest = classifyModelError;
+globalThis.diagnoseForTest = diagnoseAllModelsFailed;`,
+    context,
+  );
+
+  const privateReasoning = "PRIVATE CHAIN MUST NEVER APPEAR";
+  const reasoningOnly = {
+    choices: [
+      {
+        message: { content: "", reasoning_content: privateReasoning },
+        finish_reason: "length",
+      },
+    ],
+    usage: { completion_tokens_details: { reasoning_tokens: 512 } },
+  };
+  assert.equal(context.getFinalTextForTest(reasoningOnly), "");
+  const reasoningError = context.getEmptyErrorForTest(reasoningOnly);
+  assert.match(reasoningError, /reasoning_output_limit/);
+  assert.doesNotMatch(reasoningError, new RegExp(privateReasoning));
+  assert.equal(context.classifyErrorForTest(reasoningError), "output_limit");
+  const diagnosis = context.diagnoseForTest([
+    { success: false, provider: "local", error: reasoningError },
+  ]);
+  assert.match(diagnosis, /Max Tokens/i);
+  assert.match(diagnosis, /reasoning/i);
+  assert.doesNotMatch(diagnosis, /API key|account/i);
+
+  const normal = {
+    choices: [
+      {
+        message: {
+          content: [{ type: "output_text", text: "VISIBLE FINAL" }],
+          reasoning_content: privateReasoning,
+        },
+        finish_reason: "stop",
+      },
+    ],
+  };
+  assert.equal(context.getFinalTextForTest(normal), "VISIBLE FINAL");
+
+  const fetchStart = html.indexOf("async function fetchChatCompletion");
+  const fetchEnd = html.indexOf("\n\n    async function testLocalConnection", fetchStart);
+  assert.ok(fetchStart > 0 && fetchEnd > fetchStart, "Missing chat transport");
+  const transportState = {
+    localRuntime: "lmstudio",
+    localReasoningEffort: "none",
+    localReasoningOffModels: "ornith-1.0-9b",
+  };
+  let capturedRequest;
+  const transportContext = vm.createContext({
+    state: transportState,
+    window: { location: { origin: "https://example.test" } },
+    normalizeOpenRouterRequestBody: (body) => body,
+    parseLocalModelIds: (raw) =>
+      String(raw || "")
+        .split(",")
+        .map((value) => value.trim())
+        .filter(Boolean),
+    resolveChatTarget: () => ({
+      provider: "local",
+      model: "ornith-1.0-9b",
+      url: "http://127.0.0.1:1234/v1/chat/completions",
+      apiKey: "",
+    }),
+    fetch: async (url, options) => {
+      capturedRequest = { url, options };
+      return { ok: true };
+    },
+  });
+  vm.runInContext(
+    `${html.slice(fetchStart, fetchEnd)}
+globalThis.fetchChatForTest = fetchChatCompletion;`,
+    transportContext,
+  );
+
+  await transportContext.fetchChatForTest(
+    { model: "ornith-1.0-9b", messages: [] },
+    { provider: "local" },
+  );
+  assert.equal(
+    JSON.parse(capturedRequest.options.body).reasoning_effort,
+    "none",
+    "the explicit LM Studio final-answer setting disables hidden reasoning",
+  );
+  transportState.localReasoningEffort = "auto";
+  await transportContext.fetchChatForTest(
+    { model: "ornith-1.0-9b", messages: [] },
+    { provider: "local" },
+  );
+  assert.equal(
+    Object.hasOwn(JSON.parse(capturedRequest.options.body), "reasoning_effort"),
+    false,
+    "model-default reasoning must remain available as an explicit user choice",
+  );
+  transportState.localRuntime = "vllm";
+  transportState.localReasoningEffort = "none";
+  await transportContext.fetchChatForTest(
+    { model: "any-vllm-model", messages: [] },
+    { provider: "local" },
+  );
+  assert.equal(
+    Object.hasOwn(JSON.parse(capturedRequest.options.body), "reasoning_effort"),
+    false,
+    "LM Studio reasoning controls must not leak into other local runtimes",
+  );
+  transportState.localRuntime = "lmstudio";
+  transportState.localReasoningOffModels = "";
+  await transportContext.fetchChatForTest(
+    { model: "ornith-1.0-9b", messages: [] },
+    { provider: "local" },
+  );
+  assert.equal(
+    Object.hasOwn(JSON.parse(capturedRequest.options.body), "reasoning_effort"),
+    false,
+    "models without an explicit reasoning-off capability must keep their supported default",
+  );
+
+  assert.match(html, /id="localReasoningEffortInput"/);
+  assert.match(html, /Final answers only \(recommended\)/);
+  assert.match(
+    html,
+    /const content = getChatCompletionFinalText\(data\);\s+if \(!content\.trim\(\)\) \{\s+const emptyError = getEmptyChatCompletionError\(data\);\s+addThinkingLog\(`\$\{displayLabel\}/,
+    "CLASSIC must reject reasoning-only responses instead of scoring empty text",
+  );
+  assert.match(
+    html,
+    /const content = getChatCompletionFinalText\(data\);[\s\S]*?updateThinkingModel\(variant\.raceKey, 'fail', null, 'empty'\);/,
+    "PARSELTONGUE must classify empty final text consistently",
+  );
+  assert.match(html, /let fastSawReasoning = false;/);
+  assert.match(
+    html,
+    /throw new Error\(getEmptyChatCompletionError\(\{\s+choices:/,
+    "FAST streaming must not return an empty success after reasoning-only chunks",
+  );
+});
+
 test("keeps an explicit provider-qualified model choice for every mode", async () => {
   const html = await readFile(publicEntry, "utf8");
 
@@ -263,15 +754,15 @@ test("keeps an explicit provider-qualified model choice for every mode", async (
   );
   assert.match(
     html,
-    /ultraplinian: 'Automatic · race all available models'/,
+    /ultraplinian: 'Automatic · tier models \+ this mode’s local pool'/,
   );
   assert.match(
     html,
-    /parseltongue: 'Automatic · best configured provider'/,
+    /parseltongue: 'Automatic · each technique × this mode’s local pool'/,
   );
   assert.match(
     html,
-    /pliny: 'Automatic · paired model for each prompt'/,
+    /pliny: 'Automatic · each prompt × this mode’s local pool'/,
   );
   assert.match(
     html,
@@ -303,20 +794,21 @@ test("keeps an explicit provider-qualified model choice for every mode", async (
   );
   assert.ok(helperStart > 0 && helperEnd > helperStart);
 
-  const context = vm.createContext({
-    state: {
-      apiKey: "openrouter-present",
-      veniceApiKey: "",
-      localOnly: false,
-      localEnabled: true,
-      localModels: "same/model, lm-beta",
-      model: "same/model",
-      modeModelSelections: {
-        ultraplinian: { provider: "local", model: "lm-beta" },
-        parseltongue: { provider: "local", model: "same/model" },
-        pliny: { provider: "openrouter", model: "same/model" },
-      },
+  const modeSelectionState = {
+    apiKey: "openrouter-present",
+    veniceApiKey: "",
+    localOnly: false,
+    localEnabled: true,
+    localModels: "same/model, lm-beta",
+    model: "same/model",
+    modeModelSelections: {
+      ultraplinian: { provider: "local", model: "lm-beta" },
+      parseltongue: { provider: "local", model: "same/model" },
+      pliny: { provider: "openrouter", model: "same/model" },
     },
+  };
+  const context = vm.createContext({
+    state: modeSelectionState,
     OPENROUTER_DEFAULT_MODEL: "same/model",
     OPENROUTER_LEGACY_MODEL_MIGRATIONS: {},
     OPENROUTER_FREE_CHAT_MODEL_SET: new Set(["same/model"]),
@@ -328,11 +820,16 @@ test("keeps an explicit provider-qualified model choice for every mode", async (
       "local",
     ]),
     MODE_MODEL_IDS: new Set(["ultraplinian", "parseltongue", "pliny"]),
+    MODE_MODEL_SELECTION_SCHEMA_VERSION: 2,
     getLocalModels() {
       return ["same/model", "lm-beta"];
     },
     hasLocalProvider() {
-      return true;
+      return modeSelectionState.localEnabled && modeSelectionState.localModels.length > 0;
+    },
+    getLocalAutomaticRaceModels(mode) {
+      if (mode === "parseltongue") return ["same/model", "lm-beta"];
+      return ["lm-beta"];
     },
     getCurrentMode() {
       return "parseltongue";
@@ -341,8 +838,18 @@ test("keeps an explicit provider-qualified model choice for every mode", async (
       return model === "same/model" ? model : "same/model";
     },
     resolveChatTarget(model, provider) {
+      const resolvedProvider =
+        provider === "auto"
+          ? modeSelectionState.apiKey
+            ? "openrouter"
+            : modeSelectionState.localEnabled
+              ? "local"
+              : modeSelectionState.veniceApiKey
+                ? "venice"
+                : "auto"
+          : provider;
       return {
-        provider: provider === "auto" ? "openrouter" : provider,
+        provider: resolvedProvider,
         model,
       };
     },
@@ -354,8 +861,11 @@ test("keeps an explicit provider-qualified model choice for every mode", async (
     `${html.slice(helperStart, helperEnd)}
 globalThis.getModeModelRequestForTest = getModeModelRequest;
 globalThis.getModeExecutionSelectionForTest = getModeExecutionSelection;
-globalThis.getPinnedModeTargetForTest = getPinnedModeTarget;
+globalThis.getModeAuxiliaryTargetForTest = getModeAuxiliaryTarget;
 globalThis.resolveModeModelRequestForTest = resolveModeModelRequest;
+globalThis.getModeRaceTargetsForTest = getModeRaceTargets;
+globalThis.defaultModeModelSelectionsForTest = defaultModeModelSelections;
+globalThis.migrateLegacyModeModelSelectionsForTest = migrateLegacyModeModelSelections;
 globalThis.encodeModeModelSelectionForTest = encodeModeModelSelection;
 globalThis.decodeModeModelSelectionForTest = decodeModeModelSelection;`,
     context,
@@ -394,8 +904,126 @@ globalThis.decodeModeModelSelectionForTest = decodeModeModelSelection;`,
   assert.deepEqual(structuredClone(automaticSnapshot), {
     provider: "auto",
     model: "",
+    localModels: ["same/model", "lm-beta"],
   });
-  assert.equal(context.getPinnedModeTargetForTest(automaticSnapshot), null);
+  assert.equal(Object.isFrozen(automaticSnapshot.localModels), true);
+  assert.deepEqual(
+    structuredClone(
+      context.getModeAuxiliaryTargetForTest(automaticSnapshot),
+    ),
+    { provider: "local", model: "same/model" },
+    "Automatic helper calls must stay on the frozen selected pool instead of the first discovered model",
+  );
+  assert.deepEqual(
+    structuredClone(
+      context.getModeRaceTargetsForTest(
+        "parseltongue",
+        "same/model",
+        automaticSnapshot,
+      ),
+    ),
+    [
+      { provider: "openrouter", model: "same/model" },
+      { provider: "local", model: "same/model" },
+      { provider: "local", model: "lm-beta" },
+    ],
+    "Automatic mode targets must preserve same-ID models from different providers and include the entire selected local pool",
+  );
+
+  modeSelectionState.localEnabled = false;
+  const cloudOnlySnapshot =
+    context.getModeExecutionSelectionForTest("parseltongue");
+  assert.deepEqual(structuredClone(cloudOnlySnapshot), {
+    provider: "auto",
+    model: "",
+    localModels: [],
+  });
+  assert.equal(
+    context.getModeAuxiliaryTargetForTest(cloudOnlySnapshot),
+    null,
+    "Disabled local state must not redirect Automatic helper calls to a stale local model",
+  );
+  assert.deepEqual(
+    structuredClone(
+      context.getModeRaceTargetsForTest(
+        "parseltongue",
+        "same/model",
+        cloudOnlySnapshot,
+      ),
+    ),
+    [{ provider: "openrouter", model: "same/model" }],
+    "Automatic must keep working through cloud when disabled local inventory remains persisted",
+  );
+  modeSelectionState.localEnabled = true;
+
+  modeSelectionState.apiKey = "";
+  context.getLocalAutomaticRaceModels = () => ["lm-beta"];
+  const exactSubsetSnapshot =
+    context.getModeExecutionSelectionForTest("parseltongue");
+  context.getLocalAutomaticRaceModels = () => ["same/model", "lm-beta"];
+  assert.deepEqual(
+    structuredClone(
+      context.getModeRaceTargetsForTest(
+        "parseltongue",
+        "same/model",
+        exactSubsetSnapshot,
+      ),
+    ),
+    [{ provider: "local", model: "lm-beta" }],
+    "An in-flight Automatic run must retain its exact selected local subset even if the live pool changes",
+  );
+  assert.deepEqual(
+    structuredClone(
+      context.defaultModeModelSelectionsForTest(
+        "same/model",
+        ["same/model", "lm-beta"],
+        true,
+      ),
+    ),
+    {
+      ultraplinian: { provider: "auto", model: "" },
+      parseltongue: { provider: "auto", model: "" },
+      pliny: { provider: "auto", model: "" },
+    },
+    "A fresh local-only setup must default every mode to its one-model Automatic pool",
+  );
+  assert.deepEqual(
+    structuredClone(
+      context.migrateLegacyModeModelSelectionsForTest(
+        {
+          ultraplinian: { provider: "auto", model: "" },
+          parseltongue: { provider: "openrouter", model: "same/model" },
+          pliny: { provider: "auto", model: "" },
+        },
+        "same/model",
+        ["lm-beta"],
+        true,
+        0,
+        false,
+      ),
+    ).parseltongue,
+    { provider: "auto", model: "" },
+    "The old auto-generated PARSELTONGUE pin must migrate to the new Automatic pool semantics",
+  );
+  assert.deepEqual(
+    structuredClone(
+      context.migrateLegacyModeModelSelectionsForTest(
+        {
+          parseltongue: { provider: "local", model: "lm-beta" },
+        },
+        "same/model",
+        ["lm-beta"],
+        true,
+        0,
+        false,
+      ),
+    ).parseltongue,
+    { provider: "local", model: "lm-beta" },
+    "A genuinely different legacy pin must survive the one-time migration",
+  );
+  modeSelectionState.apiKey = "openrouter-present";
+  context.getLocalAutomaticRaceModels = (mode) =>
+    mode === "parseltongue" ? ["same/model", "lm-beta"] : ["lm-beta"];
 
   context.state.modeModelSelections.parseltongue = {
     provider: "local",
@@ -415,6 +1043,10 @@ globalThis.decodeModeModelSelectionForTest = decodeModeModelSelection;`,
 
   const explicitSnapshot =
     context.getModeExecutionSelectionForTest("parseltongue");
+  assert.deepEqual(
+    structuredClone(context.getModeAuxiliaryTargetForTest(explicitSnapshot)),
+    { provider: "local", model: "lm-beta" },
+  );
   context.state.modeModelSelections.parseltongue = {
     provider: "openrouter",
     model: "same/model",
@@ -458,8 +1090,18 @@ test("routes PARSELTONGUE, CLASSIC, FAST, and regeneration without changing mode
     classicStart,
   );
   const classicSource = html.slice(classicStart, classicEnd);
-  assert.match(classicSource, /resolveModeModelRequest\('pliny'/);
+  assert.match(classicSource, /getModeRaceTargets\('pliny'/);
+  assert.match(
+    classicSource,
+    /raceCombos\.flatMap[\s\S]*raceAttempts\.map\(attempt => tryCombo/,
+    "CLASSIC must expand its prompt strategies across its per-mode model pool",
+  );
   assert.match(classicSource, /fetchChatCompletion\(bodyParams/);
+  assert.match(
+    classicSource,
+    /bodyParams\.max_tokens = modeRequest\.provider === 'local'\s+\? \(state\.modelMaxTokens \?\? 4096\)/,
+    "CLASSIC must honour the configured local output-token budget",
+  );
   assert.doesNotMatch(classicSource, /openrouter\.ai|Bearer \$\{state\.apiKey\}/);
 
   const parselStart = html.indexOf("async function executeParseltongue");
@@ -468,25 +1110,349 @@ test("routes PARSELTONGUE, CLASSIC, FAST, and regeneration without changing mode
     parselStart,
   );
   const parselSource = html.slice(parselStart, parselEnd);
-  assert.match(parselSource, /resolveModeModelRequest\('parseltongue'/);
+  assert.match(parselSource, /getModeRaceTargets\('parseltongue'/);
+  assert.match(
+    parselSource,
+    /modeTargets\.flatMap[\s\S]*for \(let i = 0; i < raceVariants\.length/,
+    "PARSELTONGUE must expand its techniques across its per-mode model pool",
+  );
   assert.match(parselSource, /fetchChatCompletion\(\{/);
   assert.doesNotMatch(parselSource, /openrouter\.ai|Bearer \$\{state\.apiKey\}/);
 
   const fastStart = html.indexOf("const fastStreamPromise");
   const fastEnd = html.indexOf("\n\n          if (isFastSolo)", fastStart);
   const fastSource = html.slice(fastStart, fastEnd);
-  assert.match(fastSource, /resolveModeModelRequest\('pliny'/);
+  assert.match(fastSource, /const fastModeRequest = fastModeTargets\[0\]/);
   assert.match(fastSource, /fetchChatCompletion\(\{/);
+  assert.match(
+    fastSource,
+    /max_tokens: fastModeRequest\.provider === 'local'\s+\? \(state\.modelMaxTokens \?\? 4096\)/,
+    "FAST must honour the configured local output-token budget",
+  );
   assert.doesNotMatch(fastSource, /openrouter\.ai|Bearer \$\{state\.apiKey\}/);
+  assert.match(
+    sendSource,
+    /const useFastStreaming = fastModeTargets\.length === 1/,
+    "FAST may use its one-target stream only when Automatic has not selected multiple models",
+  );
+  assert.match(
+    sendSource,
+    /const fullComboStopped = abortController\?\.signal\?\.aborted === true/,
+    "The FULL COMBO path must surface a user Stop instead of an all-failed answer",
+  );
+  assert.match(
+    sendSource,
+    /raceScore >= fastScore \+ \(state\.liquidMinDelta \|\| 8\)/,
+    "A CLASSIC race result must beat FAST by the configured minimum improvement",
+  );
 
   assert.match(
     sendSource,
     /if \(attachedImage && hasAuxiliaryModelProvider\(executionTarget\)\)/,
     "Vision must run for any available exact target, including Venice-only configurations",
   );
+  assert.match(
+    sendSource,
+    /const executionTarget = getModeAuxiliaryTarget\(executionSelection\)/,
+    "Automatic helper calls must use the frozen per-mode local pool",
+  );
   assert.doesNotMatch(
     sendSource,
     /attachedImage && \(state\.apiKey \|\| hasLocalProvider\(\)\)/,
+  );
+  assert.match(
+    html,
+    /if \(modeTarget\?\.provider && modeTarget\?\.model\) \{[\s\S]*?const exactJudge = await callJudge\(modeTarget\.model, 30000\);[\s\S]*?if \(state\.localOnly\)/,
+    "ULTRAPLINIAN judging must use the exact selected helper target before any legacy first-local fallback",
+  );
+  assert.match(
+    html,
+    /for \(const coachModel of \(modeTarget \? \[modeTarget\.model\] : PLINY_COACH_MODELS\)\)/,
+    "ULTRAPLINIAN coaching must stay on the exact selected helper target",
+  );
+});
+
+test("executes every selected PARSELTONGUE model without changing its technique count", async () => {
+  const html = await readFile(publicEntry, "utf8");
+  const start = html.indexOf("async function executeParseltongue");
+  const end = html.indexOf(
+    "\n\n    // ═══════════════════════════════════════════════════════════════════\n    // End Parseltongue",
+    start,
+  );
+  assert.ok(start > 0 && end > start);
+
+  const calls = [];
+  const context = vm.createContext({
+    state: {
+      parseltongueTier: "light",
+      modelFreqPenalty: 0,
+      modelPresPenalty: 0,
+      modelMaxTokens: 512,
+    },
+    console: { log() {}, error() {} },
+    DOMException,
+    AbortController,
+    abortController: new AbortController(),
+    setTimeout,
+    getModeRaceTargets: () => [
+      { provider: "local", model: "org-a/shared-model" },
+      { provider: "local", model: "org-b/shared-model" },
+    ],
+    modelTargetKey: (target) => `${target.provider}:${target.model}`,
+    detectParseltrigueTriggers: () => [],
+    generateParseltongueVariants: () => [
+      { text: "plain", technique: "raw", label: "Raw", index: 0 },
+      { text: "leet", technique: "leetspeak", label: "L33T", index: 1 },
+    ],
+    getParseltongueSamplingParams: () => ({
+      temperature: 0.7,
+      top_p: 1,
+    }),
+    initThinkingSteps() {},
+    addThinkingLog() {},
+    thinkingState: { models: {} },
+    updateThinkingUI() {},
+    updateThinkingModel() {},
+    updateMorphTechnique() {},
+    setThinkingLeader() {},
+    setThinkingWinner() {},
+    finishThinking() {},
+    fetchChatCompletion: async (body, options) => {
+      calls.push({ model: body.model, provider: options.provider });
+      return {
+        ok: true,
+        async json() {
+          return {
+            choices: [
+              {
+                message: {
+                  content: `visible answer from ${body.model}`,
+                },
+              },
+            ],
+          };
+        },
+      };
+    },
+    getChatCompletionFinalText: (data) =>
+      data.choices[0].message.content,
+    getEmptyChatCompletionError: () => "empty",
+    scoreResponse: (content) => ({
+      score: content.includes("org-b") ? 80 : 70,
+      isRefusal: false,
+    }),
+  });
+  vm.runInContext(
+    `${html.slice(start, end)}
+globalThis.executeParseltongueForTest = executeParseltongue;`,
+    context,
+  );
+
+  const result = structuredClone(
+    await context.executeParseltongueForTest(
+      [{ role: "user", content: "test" }],
+      "fallback",
+      "test",
+      { provider: "auto", model: "" },
+    ),
+  );
+  assert.equal(calls.length, 4, "2 techniques × 2 selected models must run");
+  assert.deepEqual(
+    calls.map(({ model }) => model).sort(),
+    [
+      "org-a/shared-model",
+      "org-a/shared-model",
+      "org-b/shared-model",
+      "org-b/shared-model",
+    ],
+  );
+  assert.equal(
+    Object.keys(context.thinkingState.models).length,
+    4,
+    "Same-basename model IDs must retain separate PARSELTONGUE status rows",
+  );
+  assert.equal(result.magic.techniques_total, 2);
+  assert.equal(result.magic.models_total, 2);
+  assert.equal(result.magic.variants_total, 4);
+  assert.equal(result.magic.model, "org-b/shared-model");
+  assert.equal(result.magic.provider, "local");
+});
+
+test("executes every selected CLASSIC model while preserving the prompt selection", async () => {
+  const html = await readFile(publicEntry, "utf8");
+  const start = html.indexOf("async function executePlinyMode");
+  const end = html.indexOf(
+    "\n\n    // ═══════════════════════════════════════════════════════════════════\n    // PARSELTONGUE",
+    start,
+  );
+  assert.ok(start > 0 && end > start);
+
+  const calls = [];
+  const combo = {
+    id: "one-prompt",
+    model: "native-cloud-model",
+    codename: "ONE PROMPT",
+    color: "#fff",
+    system: "system",
+    user: "{QUERY}",
+    fast: false,
+  };
+  let enabledCombos = [combo];
+  let raceTargets = [
+    { provider: "local", model: "org-a/shared-model" },
+    { provider: "local", model: "org-b/shared-model" },
+  ];
+  const context = vm.createContext({
+    state: {
+      libertasSelectedCombo: "one-prompt",
+      strategyLogs: [],
+      modelMaxTokens: 512,
+      liquidMinDelta: 8,
+    },
+    console: { log() {}, error() {} },
+    DOMException,
+    AbortController,
+    AbortSignal,
+    abortController: new AbortController(),
+    _lastHarmResult: null,
+    _lastTelemetryCtx: {},
+    getEnabledCombos: () => enabledCombos,
+    getModeRaceTargets: () => raceTargets,
+    modelTargetKey: (target) => `${target.provider}:${target.model}`,
+    initThinkingSteps() {},
+    addThinkingLog() {},
+    thinkingState: { models: {} },
+    updateThinkingUI() {},
+    updateThinkingModel() {},
+    setThinkingWinner() {},
+    finishThinking() {},
+    applyHallOfFameCombo: (selected, query) => ({
+      system: selected.system,
+      user: query,
+    }),
+    escapeHtml: (value) => value,
+    highlightPromptInjection: (value) => value,
+    fetchChatCompletion: async (body, options) => {
+      calls.push({
+        model: body.model,
+        provider: options.provider,
+        maxTokens: body.max_tokens,
+      });
+      return {
+        ok: true,
+        async json() {
+          return {
+            choices: [
+              {
+                message: {
+                  content: `visible answer from ${body.model}`,
+                },
+              },
+            ],
+          };
+        },
+      };
+    },
+    getChatCompletionFinalText: (data) =>
+      data.choices[0].message.content,
+    getEmptyChatCompletionError: () => "empty",
+    scoreResponse: (content) => ({
+      score: content.includes("org-b") ? 90 : 70,
+      isRefusal: false,
+    }),
+    ENCODING_ESCALATION: [{ label: "PLAIN", fn: (value) => value }],
+    saveState() {},
+    trackEvent() {},
+  });
+  vm.runInContext(
+    `${html.slice(start, end)}
+globalThis.executePlinyModeForTest = executePlinyMode;`,
+    context,
+  );
+
+  const result = structuredClone(
+    await context.executePlinyModeForTest(
+      [{ role: "user", content: "test" }],
+      "fallback",
+      "test",
+      { modeSelection: { provider: "auto", model: "" } },
+    ),
+  );
+  assert.deepEqual(calls, [
+    { model: "org-a/shared-model", provider: "local", maxTokens: 512 },
+    { model: "org-b/shared-model", provider: "local", maxTokens: 512 },
+  ]);
+  assert.equal(
+    Object.keys(context.thinkingState.models).length,
+    2,
+    "Same-basename model IDs must retain separate CLASSIC status/stat keys",
+  );
+  assert.equal(result.magic.combos_attempted, 1);
+  assert.equal(result.magic.models_attempted, 2);
+  assert.equal(result.magic.model_prompt_attempts, 2);
+  assert.equal(result.magic.model, "org-b/shared-model");
+  assert.equal(result.magic.provider, "local");
+
+  calls.length = 0;
+  context.state.libertasSelectedCombo = "all";
+  enabledCombos = Array.from({ length: 5 }, (_, index) => ({
+    ...combo,
+    id: `prompt-${index + 1}`,
+    codename: `PROMPT ${index + 1}`,
+    fast: index === 4,
+  }));
+  raceTargets = [{ provider: "local", model: "org-a/shared-model" }];
+  const regeneratedResult = structuredClone(
+    await context.executePlinyModeForTest(
+      [{ role: "user", content: "regenerate" }],
+      "fallback",
+      "regenerate",
+      { modeSelection: { provider: "auto", model: "" } },
+    ),
+  );
+  assert.equal(
+    calls.length,
+    5,
+    "Direct/regeneration execution must include all five enabled CLASSIC strategies",
+  );
+  assert.equal(regeneratedResult.magic.combos_attempted, 5);
+
+  calls.length = 0;
+  await context.executePlinyModeForTest(
+    [{ role: "user", content: "send" }],
+    "fallback",
+    "send",
+    {
+      modeSelection: { provider: "auto", model: "" },
+      fastHandledExternally: true,
+    },
+  );
+  assert.equal(
+    calls.length,
+    4,
+    "The send-time streaming path must exclude only the externally handled FAST strategy",
+  );
+
+  context.abortController = new AbortController();
+  context.fetchChatCompletion = async (_body, options) =>
+    new Promise((_resolve, reject) => {
+      options.signal.addEventListener(
+        "abort",
+        () => reject(options.signal.reason),
+        { once: true },
+      );
+    });
+  const stoppedRun = context.executePlinyModeForTest(
+    [{ role: "user", content: "stop" }],
+    "fallback",
+    "stop",
+    { modeSelection: { provider: "auto", model: "" } },
+  );
+  setTimeout(() => context.abortController.abort(), 0);
+  await assert.rejects(
+    stoppedRun,
+    (error) => error?.name === "AbortError",
+    "A global Stop must reject CLASSIC instead of publishing a winner or all-failed error",
   );
 });
 
@@ -595,6 +1561,13 @@ globalThis.hasAuxiliaryModelProviderForTest = hasAuxiliaryModelProvider;`,
     /selected local model "missing-local-model" is no longer available/,
     "An explicit missing local model must not fall back to its first discovered model or OpenRouter",
   );
+  runtimeState.localEnabled = false;
+  assert.throws(
+    () => context.resolveChatTargetForTest("same/model", "local"),
+    /selected local model provider is unavailable/,
+    "A disabled explicit local pin must fail exactly instead of falling back to cloud",
+  );
+  runtimeState.localEnabled = true;
 
   runtimeState.veniceApiKey = "";
   assert.throws(
@@ -632,12 +1605,64 @@ globalThis.hasAuxiliaryModelProviderForTest = hasAuxiliaryModelProvider;`,
   assert.equal(context.hasAuxiliaryModelProviderForTest(null), true);
 });
 
-test("keeps ULTRAPLINIAN winner identity provider-qualified", async () => {
+test("keeps ULTRAPLINIAN winner and Thinking-grid identity provider-qualified", async () => {
   const html = await readFile(publicEntry, "utf8");
   const ultraStart = html.indexOf("async function ultraplinian");
   const ultraEnd = html.indexOf("async function consortium", ultraStart);
   assert.ok(ultraStart > 0 && ultraEnd > ultraStart);
   const ultraSource = html.slice(ultraStart, ultraEnd);
+  const thinkingKeyStart = html.indexOf(
+    "function getUltraplinianThinkingModelKey",
+  );
+  const thinkingKeyEnd = html.indexOf(
+    "\n\n    function hasLocalUltraplinianRaceEntry",
+    thinkingKeyStart,
+  );
+  assert.ok(
+    thinkingKeyStart > 0 && thinkingKeyEnd > thinkingKeyStart,
+    "Missing provider-qualified Thinking-grid key helper",
+  );
+  const getThinkingKey = vm.runInNewContext(
+    `(${html.slice(thinkingKeyStart, thinkingKeyEnd)})`,
+  );
+  const localThinkingKey = getThinkingKey({
+    provider: "local",
+    model: "same/model",
+  });
+  const openRouterThinkingKey = getThinkingKey({
+    provider: "openrouter",
+    model: "same/model",
+  });
+  assert.notEqual(
+    localThinkingKey,
+    openRouterThinkingKey,
+    "The Thinking grid must retain two workers when provider IDs collide",
+  );
+  assert.match(localThinkingKey, /same\/model.*local/);
+  assert.match(openRouterThinkingKey, /same\/model.*openrouter/);
+  assert.match(
+    ultraSource,
+    /setThinkingModels\(raceEntries\.map\(getUltraplinianThinkingModelKey\)\)/,
+  );
+  assert.match(
+    ultraSource,
+    /const thinkingModelKey = getUltraplinianThinkingModelKey\(entry\)/,
+  );
+  assert.doesNotMatch(
+    ultraSource,
+    /updateThinkingModel\(model,/,
+    "Worker status updates must not overwrite a same-ID worker from another provider",
+  );
+  assert.doesNotMatch(
+    ultraSource,
+    /setThinkingWinner\((?:earlyWinner|winner)\.model\)/,
+    "Winner highlighting must use the same provider-qualified grid key",
+  );
+  assert.match(
+    ultraSource,
+    /setThinkingLeader\(thinkingModelKey, score, result\.content\)/,
+    "Live-leader highlighting must use the same provider-qualified grid key",
+  );
 
   const abortedResults = [
     ...ultraSource.matchAll(
@@ -685,7 +1710,7 @@ test("keeps ULTRAPLINIAN winner identity provider-qualified", async () => {
 test("waits for slow local ULTRAPLINIAN completions before judging", async () => {
   const html = await readFile(publicEntry, "utf8");
   const timeoutStart = html.indexOf(
-    "function getUltraplinianRaceTimeoutMs",
+    "function hasLocalUltraplinianRaceEntry",
   );
   const timeoutEnd = html.indexOf(
     "\n\n    // Main ULTRAPLINIAN execution",
@@ -709,6 +1734,7 @@ test("waits for slow local ULTRAPLINIAN completions before judging", async () =>
 const ULTRAPLINIAN_LOCAL_RACE_TIMEOUT_MS = ${timeoutConstants[2]};
 ${html.slice(timeoutStart, timeoutEnd)}
 globalThis.getUltraplinianRaceTimeoutMsForTest = getUltraplinianRaceTimeoutMs;
+globalThis.hasLocalUltraplinianRaceEntryForTest = hasLocalUltraplinianRaceEntry;
 globalThis.waitForUltraplinianRaceForTest = waitForUltraplinianRace;`,
     timeoutContext,
   );
@@ -716,18 +1742,20 @@ globalThis.waitForUltraplinianRaceForTest = waitForUltraplinianRace;`,
     timeoutContext.getUltraplinianRaceTimeoutMsForTest;
   const waitForRace =
     timeoutContext.waitForUltraplinianRaceForTest;
+  const hasLocalRaceEntry =
+    timeoutContext.hasLocalUltraplinianRaceEntryForTest;
 
   assert.equal(
     getTimeout([{ provider: "local", model: "liquid/lfm2.5-1.2b" }]),
-    300_000,
-    "A pinned local model must not be aborted by the 45-second cloud cutoff",
+    null,
+    "A pinned local model must not be aborted by an arbitrary wall-clock cutoff",
   );
   assert.equal(
     getTimeout([
       { provider: "local", model: "local-model" },
       { provider: "local", model: "second-local-model" },
     ]),
-    300_000,
+    null,
   );
   assert.equal(
     getTimeout([{ provider: "openrouter", model: "cloud-model" }]),
@@ -738,8 +1766,20 @@ globalThis.waitForUltraplinianRaceForTest = waitForUltraplinianRace;`,
       { provider: "local", model: "local-model" },
       { provider: "openrouter", model: "cloud-model" },
     ]),
-    45_000,
-    "Mixed provider races should retain the bounded cloud race timeout",
+    null,
+    "A selected local model must not be discarded by the cloud timeout in a mixed race",
+  );
+  assert.equal(
+    hasLocalRaceEntry([
+      { provider: "openrouter", model: "cloud-model" },
+      { provider: "local", model: "slow-local-model" },
+    ]),
+    true,
+  );
+  assert.match(
+    html,
+    /const MIN_RESULTS_FOR_GRACE = HAS_LOCAL_RACE_ENTRY\s+\? Infinity/,
+    "cloud successes must not start a grace cutoff while a selected local model is running",
   );
 
   const timeoutEvents = [];
@@ -782,6 +1822,53 @@ globalThis.waitForUltraplinianRaceForTest = waitForUltraplinianRace;`,
     timedOutResults.length,
     1,
     "Judging must not observe an empty race before abort handlers settle",
+  );
+
+  const noTimeoutController = new AbortController();
+  const slowLocalWorker = new Promise((resolve) => {
+    setTimeout(() => resolve({
+      provider: "local",
+      model: "slow-local-model",
+      success: true,
+      response: "finished",
+    }), 20);
+  });
+  const noTimeoutEvents = [];
+  await waitForRace([slowLocalWorker], noTimeoutController, {
+    modelCount: 1,
+    minResultsForGrace: 2,
+    gracePeriodMs: 5,
+    hardTimeoutMs: null,
+    onLog(message) {
+      noTimeoutEvents.push(message);
+    },
+  });
+  assert.equal(noTimeoutController.signal.aborted, false);
+  assert.deepEqual(noTimeoutEvents, []);
+
+  const multiLocalController = new AbortController();
+  let slowLocalCompleted = false;
+  const multiLocalWorkers = [
+    Promise.resolve({ provider: "local", model: "fast-a", success: true }),
+    Promise.resolve({ provider: "local", model: "fast-b", success: true }),
+    new Promise((resolve) => {
+      setTimeout(() => {
+        slowLocalCompleted = true;
+        resolve({ provider: "local", model: "slow-c", success: true });
+      }, 25);
+    }),
+  ];
+  await waitForRace(multiLocalWorkers, multiLocalController, {
+    modelCount: multiLocalWorkers.length,
+    minResultsForGrace: Infinity,
+    gracePeriodMs: 5,
+    hardTimeoutMs: null,
+  });
+  assert.equal(slowLocalCompleted, true);
+  assert.equal(
+    multiLocalController.signal.aborted,
+    false,
+    "unlimited local selections must wait for serialized/slow local workers",
   );
 
   const completedResults = [];
@@ -907,11 +1994,15 @@ test("backs up local runtime settings without exporting its API key", async () =
     "localRuntime",
     "localBaseUrl",
     "localModels",
+    "localRaceModels",
+    "localModeModelPools",
+    "localReasoningEffort",
     "modeModelSelections",
+    "modeModelSelectionVersion",
   ]) {
     assert.match(exportSource, new RegExp(`${key}: state\\.${key}`));
   }
-  assert.match(exportSource, /_version: 4/);
+  assert.match(exportSource, /_version: 5/);
   assert.doesNotMatch(exportSource, /localApiKey/);
 
   const importStart = html.indexOf("const allowed = ['conversations'");
@@ -919,7 +2010,11 @@ test("backs up local runtime settings without exporting its API key", async () =
   const importAllowlist = html.slice(importStart, importEnd);
   assert.match(importAllowlist, /'localRuntime'/);
   assert.match(importAllowlist, /'localBaseUrl'/);
+  assert.match(importAllowlist, /'localRaceModels'/);
+  assert.match(importAllowlist, /'localModeModelPools'/);
+  assert.match(importAllowlist, /'localReasoningEffort'/);
   assert.match(importAllowlist, /'modeModelSelections'/);
+  assert.match(importAllowlist, /'modeModelSelectionVersion'/);
   assert.doesNotMatch(importAllowlist, /'localApiKey'/);
   assert.match(
     html,
@@ -927,8 +2022,106 @@ test("backs up local runtime settings without exporting its API key", async () =
   );
   assert.match(
     html,
-    /candidate\.localModels = typeof candidate\.localModels === 'string'\s+\? candidate\.localModels\.slice\(0, 1000\)/,
+    /candidate\.localModels = typeof candidate\.localModels === 'string'\s+\? candidate\.localModels\.slice\(0, MAX_LOCAL_MODEL_STORAGE_CHARS\)/,
   );
+});
+
+test("legacy backup import resets newer local selection fields instead of retaining live state", async () => {
+  const html = await readFile(publicEntry, "utf8");
+  const migrationStart = html.indexOf("const imported = _pendingImportData;");
+  const migrationEnd = html.indexOf(
+    "// Sanitize conversations: validate structure",
+    migrationStart,
+  );
+  assert.ok(
+    migrationStart > 0 && migrationEnd > migrationStart,
+    "Missing backup migration block",
+  );
+
+  const context = vm.createContext({
+    MAX_LOCAL_MODEL_STORAGE_CHARS: 1_048_576,
+    _pendingImportData: {
+      _version: 2,
+      model: "legacy-imported-model",
+      localModels: "legacy-local-model",
+    },
+    state: {
+      model: "current-model",
+      localEnabled: true,
+      localOnly: false,
+      localRuntime: "lmstudio",
+      localBaseUrl: "http://localhost:1234/v1",
+      localModels: "current-local-model",
+      localRaceModels: "current-local-model",
+      localModeModelPools: {
+        ultraplinian: "current-local-model",
+        parseltongue: "current-local-model",
+        pliny: "current-local-model",
+      },
+      localReasoningEffort: "auto",
+      localReasoningOffModels: "current-local-model",
+      modeModelSelections: {
+        ultraplinian: { provider: "local", model: "current-local-model" },
+      },
+    },
+    inferLocalRuntimeFromBaseUrl: () => "lmstudio",
+    normalizeLocalRuntime: (runtime) => runtime || "lmstudio",
+    parseLocalModelIds: (raw) =>
+      String(raw || "")
+        .split(",")
+        .map((value) => value.trim())
+        .filter(Boolean),
+    normalizeLocalRaceModelSelection: (raw, models) =>
+      String(raw || "")
+        .split(",")
+        .map((value) => value.trim())
+        .filter((value) => models.includes(value))
+        .join(", "),
+    normalizeLocalModeModelPools: (pools, models, legacyUltraplinian) => {
+      const source =
+        pools && typeof pools === "object" && !Array.isArray(pools) ? pools : {};
+      const normalize = (raw) =>
+        String(raw || "")
+          .split(",")
+          .map((value) => value.trim())
+          .filter((value) => models.includes(value))
+          .join(", ");
+      return {
+        ultraplinian: normalize(
+          typeof source.ultraplinian === "string"
+            ? source.ultraplinian
+            : legacyUltraplinian,
+        ),
+        parseltongue: normalize(source.parseltongue),
+        pliny: normalize(source.pliny),
+      };
+    },
+    migrateLegacyModeModelSelections: () => ({
+      ultraplinian: { provider: "auto", model: "" },
+      parseltongue: { provider: "auto", model: "" },
+      pliny: { provider: "auto", model: "" },
+    }),
+    MODE_MODEL_SELECTION_SCHEMA_VERSION: 2,
+  });
+  vm.runInContext(
+    `${html.slice(migrationStart, migrationEnd)}
+globalThis.migratedCandidateForTest = candidate;`,
+    context,
+  );
+  const candidate = structuredClone(context.migratedCandidateForTest);
+  assert.equal(candidate.localRaceModels, "");
+  assert.deepEqual(candidate.localModeModelPools, {
+    ultraplinian: "",
+    parseltongue: "",
+    pliny: "",
+  });
+  assert.equal(candidate.localReasoningEffort, "none");
+  assert.equal(candidate.localReasoningOffModels, "");
+  assert.deepEqual(candidate.modeModelSelections.ultraplinian, {
+    provider: "auto",
+    model: "",
+  });
+  assert.equal(candidate.modeModelSelectionVersion, 2);
 });
 
 test("publishes the maintained local runtime guide byte-for-byte", async () => {
@@ -1041,5 +2234,14 @@ test("packages the public source byte-for-byte", async () => {
     readFile(publicEntry),
     readFile(new URL("../dist/client/crow-godmod3.html", import.meta.url)),
   ]);
-  assert.deepEqual(packaged, source);
+  assert.equal(
+    packaged.length,
+    source.length,
+    "Packaged HTML byte length differs from the maintained public source",
+  );
+  assert.equal(
+    Buffer.compare(packaged, source),
+    0,
+    "Packaged HTML bytes differ from the maintained public source",
+  );
 });

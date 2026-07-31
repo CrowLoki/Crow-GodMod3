@@ -3691,7 +3691,7 @@
                 <span class="mode-option-icon">◈</span>
                 <div class="mode-option-info">
                   <div class="mode-option-name">ULTRAPLINIAN</div>
-                  <div class="mode-option-desc">Race all available models, or pin one model</div>
+                  <div class="mode-option-desc">Race your selected models, or pin one model</div>
                 </div>
                 <span class="mode-option-check">✓</span>
               </div>
@@ -3699,7 +3699,7 @@
                 <span class="mode-option-icon">🐉</span>
                 <div class="mode-option-info">
                   <div class="mode-option-name">PARSELTONGUE</div>
-                  <div class="mode-option-desc">Text transformations race on your picked model</div>
+                  <div class="mode-option-desc">Text transformations race across your selected models</div>
                 </div>
                 <span class="mode-option-check">✓</span>
               </div>
@@ -3707,7 +3707,7 @@
                 <span class="mode-option-icon">⌁</span>
                 <div class="mode-option-info">
                   <div class="mode-option-name">Crow-GodMod3 CLASSIC</div>
-                  <div class="mode-option-desc">Classic prompt combos race on your picked model</div>
+                  <div class="mode-option-desc">Classic prompt strategies race across your selected models</div>
                 </div>
                 <span class="mode-option-check">✓</span>
               </div>
@@ -4052,7 +4052,7 @@
                 <select id="ultraSpeedTier" style="accent-color: #ff6b6b;">
                   <!-- Options populated by buildTierSelect() from TIER_SIZES -->
                 </select>
-                <small style="color: #888; display: block; margin-top: 4px;">More models = slower but better. Fast tier prioritizes uncensored.</small>
+                <small style="color: #888; display: block; margin-top: 4px;">Controls enabled cloud-provider tier sizes. ULTRAPLINIAN’s selected local pool is added when Automatic is used.</small>
               </div>
               <div class="form-group" style="margin-bottom: 0;">
                 <label>Early Stop Threshold: <span id="thresholdValue" style="font-weight: 600;">75</span> <span id="thresholdGrade" style="font-size: 11px;"></span></label>
@@ -4086,8 +4086,56 @@
                 </details>
               </div>
             </div>
+            <div class="form-group" id="localRaceModelSettings" style="padding:12px;border:1px solid rgba(69,231,255,0.22);border-radius:8px;background:rgba(69,231,255,0.05);">
+              <label style="color:var(--cyan);">Local models per question, by mode</label>
+              <small style="color:#999;display:block;margin:4px 0 10px;line-height:1.5;">Each mode defaults to one local model. Select any number, including every discovered model; there is no fixed count limit. These pools apply when that mode’s header picker is Automatic. A header pin runs one exact model instead.</small>
+              <div style="display:grid;gap:10px;">
+                <div style="padding:10px;border:1px solid var(--border);border-radius:7px;background:var(--bg);">
+                  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
+                    <div>
+                      <strong style="font:11px/1.4 monospace;color:#ff6b6b;">ULTRAPLINIAN</strong>
+                      <small style="color:#888;display:block;margin-top:3px;">Selected models join its configured cloud tier.</small>
+                    </div>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                      <button type="button" class="api-key-btn" onclick="resetLocalRaceModels('ultraplinian')" style="font-size:10px;padding:5px 8px;">DEFAULT ONE</button>
+                      <button type="button" class="api-key-btn" onclick="selectAllLocalRaceModels('ultraplinian')" style="font-size:10px;padding:5px 8px;">SELECT ALL</button>
+                    </div>
+                  </div>
+                  <div id="localRaceModelSummary-ultraplinian" style="font:10px/1.4 monospace;color:var(--text-dim);margin-bottom:8px;">No local models discovered</div>
+                  <div id="localRaceModelPicker-ultraplinian" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:6px;max-height:220px;overflow:auto;"></div>
+                </div>
+                <div style="padding:10px;border:1px solid var(--border);border-radius:7px;background:var(--bg);">
+                  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
+                    <div>
+                      <strong style="font:11px/1.4 monospace;color:#39d9ff;">PARSELTONGUE</strong>
+                      <small style="color:#888;display:block;margin-top:3px;">Every enabled text technique runs across the selected models.</small>
+                    </div>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                      <button type="button" class="api-key-btn" onclick="resetLocalRaceModels('parseltongue')" style="font-size:10px;padding:5px 8px;">DEFAULT ONE</button>
+                      <button type="button" class="api-key-btn" onclick="selectAllLocalRaceModels('parseltongue')" style="font-size:10px;padding:5px 8px;">SELECT ALL</button>
+                    </div>
+                  </div>
+                  <div id="localRaceModelSummary-parseltongue" style="font:10px/1.4 monospace;color:var(--text-dim);margin-bottom:8px;">No local models discovered</div>
+                  <div id="localRaceModelPicker-parseltongue" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:6px;max-height:220px;overflow:auto;"></div>
+                </div>
+                <div style="padding:10px;border:1px solid var(--border);border-radius:7px;background:var(--bg);">
+                  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
+                    <div>
+                      <strong style="font:11px/1.4 monospace;color:#6366f1;">Crow-GodMod3 CLASSIC</strong>
+                      <small style="color:#888;display:block;margin-top:3px;">Every enabled prompt strategy runs across the selected models.</small>
+                    </div>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                      <button type="button" class="api-key-btn" onclick="resetLocalRaceModels('pliny')" style="font-size:10px;padding:5px 8px;">DEFAULT ONE</button>
+                      <button type="button" class="api-key-btn" onclick="selectAllLocalRaceModels('pliny')" style="font-size:10px;padding:5px 8px;">SELECT ALL</button>
+                    </div>
+                  </div>
+                  <div id="localRaceModelSummary-pliny" style="font:10px/1.4 monospace;color:var(--text-dim);margin-bottom:8px;">No local models discovered</div>
+                  <div id="localRaceModelPicker-pliny" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:6px;max-height:220px;overflow:auto;"></div>
+                </div>
+              </div>
+            </div>
             <div class="form-group">
-              <label>Models by Tier <small style="color: #888;">(click to select · auto-synced from model list)</small></label>
+              <label>OpenRouter Models by Tier <small style="color: #888;">(click to select · auto-synced from model list)</small></label>
               <div id="tierModelDisplay" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; font-size: 11px; font-family: monospace;">
                 <!-- Dynamically populated by buildTierDisplay() from ULTRAPLINIAN_MODELS -->
               </div>
@@ -4106,7 +4154,7 @@
           <!-- L1B3RT4S Hall of Fame -->
           <div class="settings-section" style="background: linear-gradient(135deg, rgba(138, 43, 226, 0.15) 0%, rgba(124, 92, 255, 0.1) 100%);">
             <div class="settings-section-title" style="color: #6366f1;">⌁ Crow-GodMod3 CLASSIC — Hall of Fame</div>
-            <small style="color: #888; display: block; margin-bottom: 12px;">4 proven model + prompt combos. Each races its own model. Toggle combos on/off.</small>
+            <small style="color: #888; display: block; margin-bottom: 12px;">5 prompt strategies. Each runs across the CLASSIC model pool; toggle strategies on/off.</small>
 
             <!-- Combo count summary -->
             <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px; padding: 8px 12px; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid rgba(99, 102, 241, 0.3);">
@@ -4355,7 +4403,7 @@
                 <label for="localOnly" style="margin:0;">Local-only mode</label>
               </div>
               <small style="color:#888;display:block;margin:-6px 0 12px;line-height:1.5;">
-                Local-only mode never calls OpenRouter or Venice. After discovery, use the header model picker to save a different local model for ULTRAPLINIAN, PARSELTONGUE, and CLASSIC.
+                Local-only mode never calls OpenRouter or Venice. After discovery, configure an independent unlimited local-model pool for each mode under Strategies. The header picker can still pin one exact model for one run mode.
               </small>
               <label for="localRuntimeInput">Runtime preset</label>
               <select id="localRuntimeInput" onchange="applyLocalRuntimePreset(this.value)">
@@ -4377,12 +4425,20 @@
             </div>
             <div class="form-group">
               <label for="localModelsInput">Model IDs</label>
-              <input type="text" id="localModelsInput" placeholder="qwen3:8b, llama3.2:3b" spellcheck="false">
-              <small style="color:#888;display:block;margin-top:4px;">Exact IDs reported by <code>/models</code> (maximum 8). ULTRAPLINIAN can race them all; each mode can also pin one exact model from the header.</small>
+              <textarea id="localModelsInput" rows="4" placeholder="qwen3:8b, llama3.2:3b" spellcheck="false" style="resize:vertical;"></textarea>
+              <small style="color:#888;display:block;margin-top:4px;">Exact IDs reported by <code>/models</code>. There is no model-count limit. Each mode’s Automatic pool is configured independently under Strategies; a header pin still runs one exact model.</small>
             </div>
             <div class="form-group">
               <label for="localApiKeyInput">API Key (Optional)</label>
               <input type="password" id="localApiKeyInput" placeholder="Optional bearer token">
+            </div>
+            <div class="form-group">
+              <label for="localReasoningEffortInput">LM Studio reasoning</label>
+              <select id="localReasoningEffortInput">
+                <option value="none">Final answers only (recommended)</option>
+                <option value="auto">Use each model's default reasoning</option>
+              </select>
+              <small style="color:#888;display:block;margin-top:4px;line-height:1.5;">LM Studio only. Where the discovered model supports disabling reasoning, Final answers mode prevents it from spending the whole output budget on hidden thought without returning visible text.</small>
             </div>
             <div style="padding:10px 12px;margin-bottom:12px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text-dim);font-size:11px;line-height:1.55;">
               A hosted page needs server CORS permission for <code id="localOriginHint"></code>. Your browser may also ask to allow local-network access; approve that prompt for discovery and chat.
@@ -4557,6 +4613,144 @@
     // First-class loopback runtime presets. URLs remain editable after selection.
     const LOCAL_RUNTIME_PRESETS = Object.freeze({"ollama":{"label":"Ollama","baseUrl":"http://localhost:11434/v1","help":"Existing Ollama connection. Allow {origin} in OLLAMA_ORIGINS, restart Ollama, then discover its model IDs.","apiKeyPlaceholder":"Leave blank unless your Ollama gateway requires one"},"lmstudio":{"label":"LM Studio","baseUrl":"http://localhost:1234/v1","help":"Start the Developer server and enable CORS (or run lms server start --cors). Add a token only if LM Studio authentication is enabled.","apiKeyPlaceholder":"Optional LM Studio API token"},"docker":{"label":"Docker Model Runner","baseUrl":"http://localhost:12434/engines/v1","help":"Enable host-side TCP on port 12434 and allow {origin} in Docker Model Runner's CORS settings. Docker Model Runner does not require an API key.","apiKeyPlaceholder":"Not used by Docker Model Runner"},"vllm":{"label":"vLLM","baseUrl":"http://localhost:8000/v1","help":"Serve a chat-capable model on loopback. vLLM allows browser origins by default; enter the same key here if the server uses --api-key.","apiKeyPlaceholder":"Optional vLLM --api-key value"},"llamacpp":{"label":"llama.cpp","baseUrl":"http://localhost:8080/v1","help":"Start llama-server with a chat-capable GGUF model. Its OpenAI-compatible server uses port 8080 by default; --api-key is optional.","apiKeyPlaceholder":"Optional llama-server --api-key value"},"custom":{"label":"Custom OpenAI-compatible","baseUrl":"","help":"Enter a loopback URL exposing /models and /chat/completions in OpenAI format. Existing custom URLs are preserved.","apiKeyPlaceholder":"Optional bearer token for the custom server"}});
     const LOCAL_RUNTIME_IDS = new Set(["ollama","lmstudio","docker","vllm","llamacpp","custom"]);
+    // Browser storage is finite, but Crow-GodMod3 does not impose a model-count
+    // ceiling. This one-megabyte text guard prevents malformed backup imports
+    // from exhausting the page while still accommodating thousands of IDs.
+    const MAX_LOCAL_MODEL_STORAGE_CHARS = 1048576;
+
+    function getLocalModelDescriptorId(descriptor) {
+      if (typeof descriptor === 'string') return descriptor.trim();
+      if (!descriptor || typeof descriptor !== 'object') return '';
+      const candidate = descriptor.id ?? descriptor.key ?? descriptor.model ?? '';
+      return typeof candidate === 'string' ? candidate.trim() : '';
+    }
+
+    function getLocalModelCapabilityTokens(descriptor) {
+      if (!descriptor || typeof descriptor !== 'object') return [];
+      const tokens = [];
+      const addToken = value => {
+        if (typeof value === 'string' && value.trim()) {
+          tokens.push(value.trim().toLowerCase());
+        }
+      };
+      addToken(descriptor.type);
+      addToken(descriptor.task);
+      addToken(descriptor.pipeline_tag);
+      addToken(descriptor.pipelineTag);
+      if (Array.isArray(descriptor.capabilities)) {
+        descriptor.capabilities.forEach(addToken);
+      } else if (descriptor.capabilities && typeof descriptor.capabilities === 'object') {
+        for (const [capability, enabled] of Object.entries(descriptor.capabilities)) {
+          if (enabled === true || (enabled && typeof enabled === 'object')) addToken(capability);
+        }
+      }
+      return [...new Set(tokens)];
+    }
+
+    function isExplicitlyNonChatModelDescriptor(descriptor) {
+      const id = getLocalModelDescriptorId(descriptor);
+      const tokens = getLocalModelCapabilityTokens(descriptor);
+      const chatEvidence = new Set([
+        'llm', 'vlm', 'chat', 'completion', 'completions',
+        'text-generation', 'text_generation', 'generate',
+      ]);
+      if (tokens.some(token => chatEvidence.has(token))) return false;
+
+      const nonChatEvidence = new Set([
+        'embedding', 'embeddings', 'embed', 'rerank', 'reranking',
+        'ranking', 'ranker', 'cross-encoder', 'cross_encoder',
+        'text-to-image', 'image-generation', 'speech-to-text',
+        'text-to-speech', 'transcription',
+      ]);
+      if (tokens.some(token => nonChatEvidence.has(token))) return true;
+
+      // OpenAI-compatible /models responses often contain only a bare ID.
+      // Filter only unmistakable specialist names; manually entered IDs remain
+      // untouched so unusual chat models can still be selected.
+      return /(?:^|[\/_.:-])(?:text[-_]?embedding|embedding|embed|rerank|re[-_]?rank|cross[-_]?encoder)(?:$|[\/_.:-])/i.test(id);
+    }
+
+    function extractLocalModelDescriptors(payload) {
+      if (Array.isArray(payload?.models)) {
+        return payload.models.map(item => {
+          if (!item || typeof item !== 'object' || item.id || !item.key) return item;
+          return { ...item, id: item.key };
+        });
+      }
+      return Array.isArray(payload?.data) ? payload.data : [];
+    }
+
+    function localModelAllowsReasoningOff(descriptor) {
+      const options = descriptor?.capabilities?.reasoning?.allowed_options;
+      return Array.isArray(options) && options.some(option =>
+        option === 'off' || option === 'none'
+      );
+    }
+
+    function filterLocalChatModelDescriptors(descriptors) {
+      const models = [];
+      const reasoningOffModels = [];
+      const seen = new Set();
+      let skipped = 0;
+      for (const descriptor of Array.isArray(descriptors) ? descriptors : []) {
+        const id = getLocalModelDescriptorId(descriptor);
+        if (!id) continue;
+        if (isExplicitlyNonChatModelDescriptor(descriptor)) {
+          skipped += 1;
+          continue;
+        }
+        if (!seen.has(id)) {
+          seen.add(id);
+          models.push(id);
+          if (localModelAllowsReasoningOff(descriptor)) {
+            reasoningOffModels.push(id);
+          }
+        }
+      }
+      return { models, reasoningOffModels, skipped };
+    }
+
+    function getLocalNativeModelsUrl(baseUrl, apiVersion) {
+      const url = new URL(baseUrl);
+      url.pathname = `/api/${apiVersion}/models`;
+      url.search = '';
+      url.hash = '';
+      return url.toString();
+    }
+
+    async function discoverLocalChatModels(runtime, baseUrl, headers, fetchImpl = fetch) {
+      if (runtime === 'lmstudio') {
+        for (const apiVersion of ['v1', 'v0']) {
+          try {
+            const nativeResponse = await fetchImpl(
+              getLocalNativeModelsUrl(baseUrl, apiVersion),
+              { headers },
+            );
+            if (!nativeResponse.ok) continue;
+            const nativePayload = await nativeResponse.json();
+            const descriptors = extractLocalModelDescriptors(nativePayload);
+            if (!descriptors.length) continue;
+            const result = filterLocalChatModelDescriptors(descriptors);
+            if (result.models.length) {
+              return { ...result, source: `lmstudio-${apiVersion}` };
+            }
+          } catch (_) {
+            // Older LM Studio releases and restrictive CORS configurations
+            // can omit the native endpoint. The OpenAI endpoint remains valid.
+          }
+        }
+      }
+
+      const response = await fetchImpl(`${baseUrl}/models`, { headers });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const payload = await response.json();
+      const descriptors = extractLocalModelDescriptors(payload);
+      if (!descriptors.length) throw new Error('Server returned no model IDs');
+      return {
+        ...filterLocalChatModelDescriptors(descriptors),
+        source: 'openai-models',
+      };
+    }
 
     function inferLocalRuntimeFromBaseUrl(baseUrl) {
       let normalized;
@@ -4630,17 +4824,145 @@
     }
 
     // Each mode keeps its own explicit provider + model choice.
-    // "auto" preserves the mode's native behavior: ULTRAPLINIAN races every
-    // available model, CLASSIC uses its paired prompt models, and
-    // PARSELTONGUE uses the best configured provider.
+    // "auto" preserves the mode's native cloud behavior and adds that mode's
+    // independently selected local-model pool. Every pool defaults to one
+    // local model but has no fixed model-count ceiling.
     const MODE_MODEL_PROVIDERS = new Set(['auto', 'openrouter', 'venice', 'local']);
     const MODE_MODEL_IDS = new Set(['ultraplinian', 'parseltongue', 'pliny']);
+    const MODE_MODEL_SELECTION_SCHEMA_VERSION = 2;
+    const MODE_LOCAL_POOL_LABELS = Object.freeze({
+      ultraplinian: 'ULTRAPLINIAN',
+      parseltongue: 'PARSELTONGUE',
+      pliny: 'Crow-GodMod3 CLASSIC',
+    });
 
     function parseLocalModelIds(raw) {
       return [...new Set(String(raw || '')
         .split(',')
         .map(model => model.trim())
-        .filter(Boolean))].slice(0, 8);
+        .filter(Boolean))];
+    }
+
+    function normalizeLocalModeModelPools(
+      pools,
+      localModels = getLocalModels(),
+      legacyUltraplinian = state.localRaceModels,
+    ) {
+      const source = pools && typeof pools === 'object' && !Array.isArray(pools)
+        ? pools
+        : {};
+      const normalized = {};
+      for (const mode of MODE_MODEL_IDS) {
+        const raw = typeof source[mode] === 'string'
+          ? source[mode]
+          : mode === 'ultraplinian' && typeof legacyUltraplinian === 'string'
+            ? legacyUltraplinian
+            : '';
+        normalized[mode] = normalizeLocalRaceModelSelection(raw, localModels);
+      }
+      return normalized;
+    }
+
+    function getLocalAutomaticRaceModels(mode = 'ultraplinian') {
+      const safeMode = MODE_MODEL_IDS.has(mode) ? mode : 'ultraplinian';
+      const localModels = getLocalModels();
+      if (!localModels.length) return [];
+      const available = new Set(localModels);
+      const pools = normalizeLocalModeModelPools(state.localModeModelPools, localModels);
+      const selected = parseLocalModelIds(pools[safeMode])
+        .filter(model => available.has(model));
+      // Safe public default: one model. Users can deliberately tick every
+      // discovered model; no fixed ceiling is applied to that selection.
+      return selected.length ? selected : localModels.slice(0, 1);
+    }
+
+    function normalizeLocalRaceModelSelection(raw, localModels = getLocalModels()) {
+      const available = new Set(localModels);
+      return parseLocalModelIds(raw)
+        .filter(model => available.has(model))
+        .join(', ');
+    }
+
+    function renderLocalRaceModelPicker() {
+      const localModels = getLocalModels();
+      for (const mode of MODE_MODEL_IDS) {
+        const container = document.getElementById(`localRaceModelPicker-${mode}`);
+        const summary = document.getElementById(`localRaceModelSummary-${mode}`);
+        if (!container) continue;
+        const selected = new Set(getLocalAutomaticRaceModels(mode));
+        container.replaceChildren();
+
+        if (!localModels.length) {
+          const empty = document.createElement('span');
+          empty.style.color = 'var(--text-dim)';
+          empty.textContent = 'Connect a local runtime to choose models.';
+          container.appendChild(empty);
+        } else {
+          for (const model of localModels) {
+            const label = document.createElement('label');
+            label.style.cssText = 'display:flex;align-items:flex-start;gap:8px;padding:7px 9px;border:1px solid var(--border);border-radius:6px;background:var(--bg);cursor:pointer;min-width:0;';
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.value = model;
+            checkbox.checked = selected.has(model);
+            checkbox.dataset.localRaceModel = mode;
+            checkbox.style.cssText = 'width:auto;margin-top:2px;accent-color:var(--accent);';
+            checkbox.addEventListener('change', () => syncLocalRaceModelsFromPicker(mode));
+            const name = document.createElement('span');
+            name.style.cssText = 'min-width:0;overflow-wrap:anywhere;font:11px/1.4 monospace;color:var(--text);';
+            name.textContent = model;
+            label.append(checkbox, name);
+            container.appendChild(label);
+          }
+        }
+        if (summary) {
+          summary.textContent = localModels.length
+            ? `${selected.size} of ${localModels.length} selected`
+            : 'No local models discovered';
+        }
+      }
+    }
+
+    function syncLocalRaceModelsFromPicker(mode = 'ultraplinian') {
+      const safeMode = MODE_MODEL_IDS.has(mode) ? mode : 'ultraplinian';
+      const checkboxes = [
+        ...document.querySelectorAll(
+          `#localRaceModelPicker-${safeMode} input[data-local-race-model="${safeMode}"]`,
+        ),
+      ];
+      if (!checkboxes.length) return;
+      let selected = checkboxes.filter(input => input.checked).map(input => input.value);
+      if (!selected.length) {
+        checkboxes[0].checked = true;
+        selected = [checkboxes[0].value];
+      }
+      state.localModeModelPools = normalizeLocalModeModelPools(state.localModeModelPools);
+      state.localModeModelPools[safeMode] = selected.join(', ');
+      state.localRaceModels = state.localModeModelPools.ultraplinian;
+      saveState();
+      renderLocalRaceModelPicker();
+      buildTierSelect();
+    }
+
+    function selectAllLocalRaceModels(mode = 'ultraplinian') {
+      const safeMode = MODE_MODEL_IDS.has(mode) ? mode : 'ultraplinian';
+      const localModels = getLocalModels();
+      state.localModeModelPools = normalizeLocalModeModelPools(state.localModeModelPools);
+      state.localModeModelPools[safeMode] = localModels.join(', ');
+      state.localRaceModels = state.localModeModelPools.ultraplinian;
+      saveState();
+      renderLocalRaceModelPicker();
+      buildTierSelect();
+    }
+
+    function resetLocalRaceModels(mode = 'ultraplinian') {
+      const safeMode = MODE_MODEL_IDS.has(mode) ? mode : 'ultraplinian';
+      state.localModeModelPools = normalizeLocalModeModelPools(state.localModeModelPools);
+      state.localModeModelPools[safeMode] = '';
+      state.localRaceModels = state.localModeModelPools.ultraplinian;
+      saveState();
+      renderLocalRaceModelPicker();
+      buildTierSelect();
     }
 
     function inferPersistedModelProvider(
@@ -4663,18 +4985,59 @@
       localModels = getLocalModels(),
       localOnly = state.localOnly,
     ) {
-      const legacyModel = String(fallbackModel || OPENROUTER_DEFAULT_MODEL).slice(0, 200);
-      const legacyProvider = inferPersistedModelProvider(legacyModel, localModels, localOnly);
       return {
         ultraplinian: { provider: 'auto', model: '' },
-        parseltongue: {
-          provider: legacyProvider,
-          model: legacyProvider === 'openrouter'
-            ? normalizeOpenRouterModel(legacyModel)
-            : legacyModel,
-        },
+        parseltongue: { provider: 'auto', model: '' },
         pliny: { provider: 'auto', model: '' },
       };
+    }
+
+    function migrateLegacyModeModelSelections(
+      selections,
+      fallbackModel = state.model,
+      localModels = getLocalModels(),
+      localOnly = state.localOnly,
+      schemaVersion = state.modeModelSelectionVersion,
+      hadPerModeLocalPools = false,
+    ) {
+      const normalized = normalizeModeModelSelections(
+        selections,
+        fallbackModel,
+        localModels,
+        localOnly,
+      );
+      if (
+        Number(schemaVersion) >= MODE_MODEL_SELECTION_SCHEMA_VERSION
+        || hadPerModeLocalPools
+      ) {
+        return normalized;
+      }
+
+      // The prior release silently generated an explicit PARSELTONGUE pin
+      // from state.model. Reset only that exact legacy shape to Automatic;
+      // genuinely different provider/model pins remain untouched.
+      const legacySelection = selections?.parseltongue;
+      if (legacySelection && typeof legacySelection === 'object') {
+        const legacyModel = String(fallbackModel || OPENROUTER_DEFAULT_MODEL).slice(0, 200);
+        const expectedProvider = inferPersistedModelProvider(
+          legacyModel,
+          localModels,
+          localOnly,
+        );
+        const expectedModel = expectedProvider === 'openrouter'
+          ? normalizeOpenRouterModel(legacyModel)
+          : legacyModel;
+        const selectedModel = legacySelection.provider === 'openrouter'
+          ? (OPENROUTER_LEGACY_MODEL_MIGRATIONS[legacySelection.model] || legacySelection.model)
+          : legacySelection.model;
+        if (
+          legacySelection.provider === expectedProvider
+          && selectedModel === expectedModel
+        ) {
+          normalized.parseltongue = { provider: 'auto', model: '' };
+        }
+      }
+      return normalized;
     }
 
     function normalizeModeModelSelection(selection, fallback, localModels = getLocalModels()) {
@@ -4752,12 +5115,28 @@
 
     function getModeExecutionSelection(mode = getCurrentMode()) {
       const selection = getModeModelSelection(mode);
-      return Object.freeze({ provider: selection.provider, model: selection.model });
+      const localModels = selection.provider === 'auto' && hasLocalProvider()
+        ? Object.freeze([...getLocalAutomaticRaceModels(mode)])
+        : Object.freeze([]);
+      return Object.freeze({
+        provider: selection.provider,
+        model: selection.model,
+        localModels,
+      });
     }
 
-    function getPinnedModeTarget(selection) {
-      return selection?.provider && selection.provider !== 'auto'
-        ? Object.freeze({ provider: selection.provider, model: selection.model })
+    function getModeAuxiliaryTarget(selection) {
+      if (selection?.provider && selection.provider !== 'auto') {
+        return Object.freeze({
+          provider: selection.provider,
+          model: selection.model,
+        });
+      }
+      const automaticLocalModel = Array.isArray(selection?.localModels)
+        ? selection.localModels[0]
+        : '';
+      return automaticLocalModel
+        ? Object.freeze({ provider: 'local', model: automaticLocalModel })
         : null;
     }
 
@@ -4786,6 +5165,57 @@
             };
       const target = resolveChatTarget(request.model, request.provider);
       return { provider: target.provider, model: target.model };
+    }
+
+    function getModeRaceTargets(mode, fallbackModel = state.model, executionSelection) {
+      const selection = executionSelection === undefined
+        ? getModeExecutionSelection(mode)
+        : executionSelection;
+      if (selection.provider !== 'auto') {
+        const target = resolveChatTarget(selection.model, selection.provider);
+        return [{ provider: target.provider, model: target.model }];
+      }
+
+      const targets = [];
+      if (!state.localOnly && state.apiKey) {
+        try {
+          const nativeTarget = resolveChatTarget(fallbackModel, 'openrouter');
+          targets.push({ provider: nativeTarget.provider, model: nativeTarget.model });
+        } catch (_) {}
+      } else if (
+        !state.localOnly
+        && state.veniceApiKey
+        && typeof VENICE_MODELS !== 'undefined'
+        && VENICE_MODELS.length
+      ) {
+        try {
+          const veniceModel = VENICE_MODELS.includes(fallbackModel)
+            ? fallbackModel
+            : VENICE_MODELS[0];
+          const nativeTarget = resolveChatTarget(veniceModel, 'venice');
+          targets.push({ provider: nativeTarget.provider, model: nativeTarget.model });
+        } catch (_) {}
+      }
+      if (hasLocalProvider()) {
+        const selectedLocalModels = Array.isArray(selection.localModels)
+          ? selection.localModels
+          : getLocalAutomaticRaceModels(mode);
+        for (const model of selectedLocalModels) {
+          targets.push({ provider: 'local', model });
+        }
+      }
+      if (!targets.length) {
+        const fallbackTarget = resolveChatTarget(fallbackModel, 'auto');
+        targets.push({ provider: fallbackTarget.provider, model: fallbackTarget.model });
+      }
+
+      const seen = new Set();
+      return targets.filter(target => {
+        const key = modelTargetKey(target);
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
     }
 
     function encodeModeModelSelection(selection) {
@@ -4822,9 +5252,9 @@
       if (!select) return;
       const mode = getCurrentMode();
       const autoLabels = {
-        ultraplinian: 'Automatic · race all available models',
-        parseltongue: 'Automatic · best configured provider',
-        pliny: 'Automatic · paired model for each prompt',
+        ultraplinian: 'Automatic · tier models + this mode’s local pool',
+        parseltongue: 'Automatic · each technique × this mode’s local pool',
+        pliny: 'Automatic · each prompt × this mode’s local pool',
       };
       const modeLabels = {
         ultraplinian: 'ULTRAPLINIAN',
@@ -4878,7 +5308,9 @@
       );
       state.modeModelSelections = normalizeModeModelSelections(state.modeModelSelections);
       state.modeModelSelections[mode] = selection;
+      state.modeModelSelectionVersion = MODE_MODEL_SELECTION_SCHEMA_VERSION;
       refreshModeModelSelect();
+      buildTierSelect();
       saveState();
     }
 
@@ -4918,8 +5350,13 @@
       localRuntime: '',  // Missing legacy value is inferred from the saved URL
       localBaseUrl: 'http://localhost:11434/v1',
       localModels: '',  // Comma-separated model IDs available from the local server
+      localRaceModels: '',  // Legacy ULTRAPLINIAN pool; migrated into localModeModelPools
+      localModeModelPools: null,  // Independent unlimited pools; each empty pool defaults to one
       localApiKey: '',  // Optional token for authenticated local servers
+      localReasoningEffort: 'none',  // LM Studio: prefer visible final text by default
+      localReasoningOffModels: '',  // Capability cache populated by LM Studio discovery
       modeModelSelections: null,  // Explicit provider + model, saved independently for each mode
+      modeModelSelectionVersion: 0,  // Migrated to the current per-mode pool schema on load
       backendUrl: '',  // Compatible self-hosted G0DM0D3 API backend URL
       generatedApiKeys: [],  // User-generated API keys for backend
       // Universal model parameters
@@ -4991,6 +5428,11 @@
       }
       if (state.localOnly) return hasLocalProvider();
       return !!(state.apiKey || state.veniceApiKey || hasLocalProvider());
+    }
+
+    function usesLightweightLocalHelpers(modeTarget = null) {
+      return modeTarget?.provider === 'local'
+        || (state.localOnly && hasLocalProvider());
     }
 
     function inferProviderForModel(model) {
@@ -5071,7 +5513,17 @@
       const requestBody = target.provider === 'openrouter'
         ? normalizeOpenRouterRequestBody({ ...body, model: target.model })
         : { ...body, model: target.model };
-      if (target.provider === 'local') delete requestBody.reasoning;
+      if (target.provider === 'local') {
+        delete requestBody.reasoning;
+        delete requestBody.reasoning_effort;
+        if (
+          state.localRuntime === 'lmstudio'
+          && state.localReasoningEffort !== 'auto'
+          && parseLocalModelIds(state.localReasoningOffModels).includes(target.model)
+        ) {
+          requestBody.reasoning_effort = 'none';
+        }
+      }
 
       const headers = { 'Content-Type': 'application/json' };
       if (target.apiKey) headers.Authorization = `Bearer ${target.apiKey}`;
@@ -5101,21 +5553,27 @@
         );
         const key = (document.getElementById('localApiKeyInput').value || '').trim();
         const headers = key ? { Authorization: `Bearer ${key}` } : {};
-        const response = await fetch(`${baseUrl}/models`, { headers });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const data = await response.json();
-        const models = (Array.isArray(data?.data) ? data.data : [])
-          .map(item => item?.id)
-          .filter(id => typeof id === 'string' && id.trim())
-          .slice(0, 8);
+        const discovery = await discoverLocalChatModels(runtime, baseUrl, headers);
+        const models = discovery.models;
         if (!models.length) throw new Error('Server returned no model IDs');
         document.getElementById('localBaseUrlInput').value = baseUrl;
         document.getElementById('localModelsInput').value = models.join(', ');
         document.getElementById('localEnabled').checked = true;
+        state.localReasoningOffModels = runtime === 'lmstudio'
+          ? discovery.reasoningOffModels.join(', ')
+          : '';
         saveSettings();
+        renderLocalRaceModelPicker();
+        buildTierSelect();
         const label = LOCAL_RUNTIME_PRESETS[state.localRuntime].label;
         if (status) {
-          status.textContent = `${label}: ${models.length} model ID${models.length === 1 ? '' : 's'} discovered and saved.`;
+          const capabilityLabel = discovery.source.startsWith('lmstudio-')
+            ? 'chat-capable model'
+            : 'candidate model';
+          const skippedLabel = discovery.skipped
+            ? `; ${discovery.skipped} non-chat ID${discovery.skipped === 1 ? '' : 's'} skipped`
+            : '';
+          status.textContent = `${label}: ${models.length} ${capabilityLabel} ID${models.length === 1 ? '' : 's'} saved${skippedLabel}.`;
           status.style.color = 'var(--success)';
         }
       } catch (err) {
@@ -5638,6 +6096,12 @@ ABSOLUTE RULES:
         return getRandomPrefill(classification?.type || 'bypass');
       }
 
+      // Small/local models should spend their tokens answering the user,
+      // not generating a second prompt for themselves.
+      if (usesLightweightLocalHelpers(modeTarget)) {
+        return null;
+      }
+
       // Skip when no provider can run helper prompts.
       if (!hasAuxiliaryModelProvider(modeTarget)) {
         return getRandomPrefill(classification?.type || 'bypass');
@@ -5655,7 +6119,7 @@ ABSOLUTE RULES:
             ],
             temperature: 0.7,
             max_tokens: 200
-          }, { title: 'Crow-GodMod3-prefill', modeTarget });
+          }, { title: 'Crow-GodMod3-prefill', modeTarget, signal: abortController?.signal });
 
         if (!response.ok) {
           throw new Error(`API error: ${response.status}`);
@@ -5935,12 +6399,26 @@ Z={QUERY}
       const liquidEnabled = liquidOptions?.enabled || false;
       const liquidMinDelta = liquidOptions?.minDelta || 8;
       const liquidOnLeader = liquidOptions?.onLeaderChange;
-      let liquidLeader = null;
+      let liquidLeader = Number.isFinite(liquidOptions?.initialLeaderScore)
+        ? { score: liquidOptions.initialLeaderScore }
+        : null;
       let liquidUpgrades = 0;
 
-      // Get enabled combos (respects user toggles + selected combo filter)
-      // Fast combos (GODMODE FAST) are handled before executePlinyMode — exclude them
-      const combos = getEnabledCombos().filter(c => !c.fast);
+      // Get enabled prompt strategies. The dedicated FAST streaming path is
+      // retained for one target; with multiple targets it joins the normal
+      // provider-qualified matrix so every selected model participates.
+      const selectedCombo = state.libertasSelectedCombo || 'all';
+      const enabledCombos = getEnabledCombos();
+      const configuredFastCombo = enabledCombos.find(combo => combo.fast);
+      const fastTargetCount = configuredFastCombo
+        ? getModeRaceTargets('pliny', configuredFastCombo.model, liquidOptions?.modeSelection).length
+        : 0;
+      const combos = enabledCombos.filter(combo =>
+        !combo.fast
+        || selectedCombo === combo.id
+        || fastTargetCount > 1
+        || !liquidOptions?.fastHandledExternally
+      );
       if (combos.length === 0) {
         return {
           content: '**Error:** All Crow-GodMod3 CLASSIC combos are disabled. Enable at least one in Settings.',
@@ -5950,18 +6428,33 @@ Z={QUERY}
         };
       }
 
-      // If user selected a specific combo from the dropdown, only race that one
-      const selectedCombo = state.libertasSelectedCombo || 'all';
+      // If the user selected one strategy, keep that strategy count while
+      // expanding it across every model in this mode's Automatic pool.
       const raceCombos = selectedCombo === 'all'
         ? combos
         : combos.filter(c => c.id === selectedCombo);
+      const raceAttempts = raceCombos.flatMap(combo =>
+        getModeRaceTargets('pliny', combo.model, liquidOptions?.modeSelection).map(target => {
+          const modelLabel = target.model.split('/').pop() || target.model;
+          return {
+            combo,
+            target,
+            attemptKey: `${combo.id}::${modelTargetKey(target)}`,
+            displayLabel: `${combo.codename} · ${modelLabel} [${target.provider}]`,
+          };
+        })
+      );
+      const distinctModelCount = new Set(
+        raceAttempts.map(attempt => modelTargetKey(attempt.target))
+      ).size;
+      const multiModelRace = distinctModelCount > 1;
 
       let earlyExitAbort = new AbortController();
       let earlyExitResult = null;
 
       // Initialize thinking UI
       initThinkingSteps('!Crow-GodMod3 CLASSIC');
-      addThinkingLog(`!HALL_OF_FAME // ${raceCombos.length} combos racing`, 'info');
+      addThinkingLog(`!HALL_OF_FAME // ${raceCombos.length} prompt strategies · ${raceAttempts.length} model/prompt attempts · ${distinctModelCount} distinct models`, 'info');
       addThinkingLog(`!QUERY "${userQuery.slice(0, 50)}${userQuery.length > 50 ? '...' : ''}"`, 'info');
       addThinkingLog(`!VARIABLE_INJECTION // Z={userQuery} pattern active`, 'info');
       if (liquidEnabled) {
@@ -5970,8 +6463,12 @@ Z={QUERY}
 
       // Set up attempt tracking
       const attemptModels = {};
-      for (const combo of raceCombos) {
-        attemptModels[combo.codename] = { status: 'pending', score: null };
+      for (const attempt of raceAttempts) {
+        attemptModels[attempt.attemptKey] = {
+          status: 'pending',
+          score: null,
+          displayLabel: attempt.displayLabel,
+        };
       }
       thinkingState.models = attemptModels;
       updateThinkingUI();
@@ -5980,16 +6477,16 @@ Z={QUERY}
       let bestScore = -Infinity;
 
       // Race a single combo (with encoding transform)
-      async function tryCombo(combo, encodeFn) {
-        if (earlyExitResult && !liquidEnabled) return null;
+      async function tryCombo(attempt, encodeFn) {
+        if (earlyExitResult && !liquidEnabled && !multiModelRace) return null;
 
+        const { combo, target: modeRequest, attemptKey, displayLabel } = attempt;
         const applied = applyHallOfFameCombo(combo, userQuery, encodeFn);
-        const modeRequest = resolveModeModelRequest('pliny', combo.model, liquidOptions?.modeSelection);
         const requestModel = modeRequest.model;
 
-        addThinkingLog(`━━━ ${combo.codename} [${modeRequest.provider} · ${requestModel}] ━━━`, 'step');
+        addThinkingLog(`━━━ ${displayLabel} ━━━`, 'step');
         addThinkingLog(`!INJECT Z="${userQuery.slice(0, 30)}${userQuery.length > 30 ? '...' : ''}"`, 'info');
-        updateThinkingModel(combo.codename, 'running');
+        updateThinkingModel(attemptKey, 'running');
 
         // Store highlighted prompt preview for the thinking UI
         thinkingState.promptPreview = {
@@ -6035,7 +6532,9 @@ Z={QUERY}
             // Reasoning models: no temperature, no top_p, no max_tokens
             // (reasoning tokens eat into max_tokens budget, causing empty responses)
           } else {
-            bodyParams.max_tokens = comboMaxTokens[requestModel] || 16384;
+            bodyParams.max_tokens = modeRequest.provider === 'local'
+              ? (state.modelMaxTokens ?? 4096)
+              : (comboMaxTokens[requestModel] || 16384);
             bodyParams.temperature = isSonnet ? 0.84 : cappedTempModels ? 0.95 : 1.0;
             bodyParams.top_p = cappedTempModels ? 0.99 : 1.0;
           }
@@ -6061,20 +6560,22 @@ Z={QUERY}
 
           // ── Standard path (fast combos are handled before executePlinyMode) ──
           const data = await response.json();
-          const content = data.choices?.[0]?.message?.content || '';
-          if (!content) {
-            addThinkingLog(`${combo.codename}: WARNING — empty response body`, 'fail');
+          const content = getChatCompletionFinalText(data);
+          if (!content.trim()) {
+            const emptyError = getEmptyChatCompletionError(data);
+            addThinkingLog(`${displayLabel}: ${emptyError}`, 'fail');
+            throw new Error(emptyError);
           }
           const scoreResult = scoreResponse(content, userQuery);
 
           if (scoreResult.isRefusal) {
-            updateThinkingModel(combo.codename, 'fail', null, 'refusal');
-            addThinkingLog(`${combo.codename}: REFUSED`, 'fail');
+            updateThinkingModel(attemptKey, 'fail', null, 'refusal');
+            addThinkingLog(`${displayLabel}: REFUSED`, 'fail');
             return null;
           }
 
-          updateThinkingModel(combo.codename, 'success', scoreResult.score);
-          addThinkingLog(`${combo.codename}: Score ${scoreResult.score} (${content.length} chars)`, 'success');
+          updateThinkingModel(attemptKey, 'success', scoreResult.score);
+          addThinkingLog(`${displayLabel}: Score ${scoreResult.score} (${content.length} chars)`, 'success');
 
           const result = {
             content,
@@ -6084,6 +6585,8 @@ Z={QUERY}
             comboId: combo.id,
             comboModel: requestModel,
             comboProvider: modeRequest.provider,
+            attemptKey,
+            displayLabel,
             systemPrompt: applied.system,
             enhancedUserPrompt: applied.user
           };
@@ -6096,27 +6599,32 @@ Z={QUERY}
               const prevScore = liquidLeader?.score ?? 0;
               liquidLeader = result;
               liquidUpgrades++;
-              addThinkingLog(`!LIQUID_LEADER #${liquidUpgrades} // ${combo.codename} (${result.score} pts${isFirstLeader ? ' — first' : `, Δ+${result.score - prevScore}`})`, 'success');
-              liquidOnLeader?.(result.content, result.template, result.score, result.strategy);
+              addThinkingLog(`!LIQUID_LEADER #${liquidUpgrades} // ${displayLabel} (${result.score} pts${isFirstLeader ? ' — first' : `, Δ+${result.score - prevScore}`})`, 'success');
+              liquidOnLeader?.(result.content, displayLabel, result.score, result.strategy);
             } else {
-              addThinkingLog(`!LIQUID_SKIP // ${combo.codename} (${result.score} pts, needs ≥${currentBest + liquidMinDelta})`, 'info');
+              addThinkingLog(`!LIQUID_SKIP // ${displayLabel} (${result.score} pts, needs ≥${currentBest + liquidMinDelta})`, 'info');
             }
             if (!earlyExitResult) earlyExitResult = result;
           } else {
             if (!earlyExitResult) {
               earlyExitResult = result;
-              earlyExitAbort.abort();
-              addThinkingLog(`!EARLY_EXIT // first non-refusal — serving`, 'success');
+              if (!multiModelRace) {
+                earlyExitAbort.abort();
+                addThinkingLog(`!EARLY_EXIT // first non-refusal — serving`, 'success');
+              }
             }
           }
           return result;
         } catch (err) {
-          if (err.name === 'AbortError' && earlyExitResult) {
-            updateThinkingModel(combo.codename, 'pending');
-            addThinkingLog(`${combo.codename}: Cancelled (early exit)`, 'info');
+          if (err.name === 'AbortError' && abortController?.signal?.aborted) {
+            throw err;
+          }
+          if (err.name === 'AbortError' && earlyExitResult && !multiModelRace) {
+            updateThinkingModel(attemptKey, 'pending');
+            addThinkingLog(`${displayLabel}: Cancelled (early exit)`, 'info');
           } else {
-            updateThinkingModel(combo.codename, 'fail');
-            addThinkingLog(`${combo.codename}: Error - ${err.message.slice(0, 200)}`, 'fail');
+            updateThinkingModel(attemptKey, 'fail');
+            addThinkingLog(`${displayLabel}: Error - ${err.message.slice(0, 200)}`, 'fail');
           }
           return null;
         }
@@ -6136,8 +6644,12 @@ Z={QUERY}
         if (encodingRound > 0) {
           addThinkingLog(`!RETRY // all combos refused — escalating to ${encoding.label} encoding`, 'fail');
           // Reset combo statuses for new round
-          for (const combo of raceCombos) {
-            attemptModels[combo.codename] = { status: 'pending', score: null };
+          for (const attempt of raceAttempts) {
+            attemptModels[attempt.attemptKey] = {
+              status: 'pending',
+              score: null,
+              displayLabel: attempt.displayLabel,
+            };
           }
           thinkingState.models = attemptModels;
           earlyExitAbort = new AbortController();
@@ -6145,8 +6657,14 @@ Z={QUERY}
           updateThinkingUI();
         }
 
-        addThinkingLog(`!RACE // ${raceCombos.length} combos in parallel [${encoding.label}]`, 'info');
-        const raceResults = await Promise.allSettled(raceCombos.map(c => tryCombo(c, encoding.fn)));
+        addThinkingLog(`!RACE // ${raceAttempts.length} model/prompt attempts in parallel [${encoding.label}]`, 'info');
+        const raceResults = await Promise.allSettled(raceAttempts.map(attempt => tryCombo(attempt, encoding.fn)));
+        if (abortController?.signal?.aborted) {
+          const abortReason = abortController.signal.reason;
+          throw abortReason instanceof Error
+            ? abortReason
+            : new DOMException('Generation stopped', 'AbortError');
+        }
 
         for (const result of raceResults) {
           if (result.status === 'fulfilled' && result.value) {
@@ -6161,8 +6679,14 @@ Z={QUERY}
       }
 
       // Finalize
+      if (abortController?.signal?.aborted) {
+        const abortReason = abortController.signal.reason;
+        throw abortReason instanceof Error
+          ? abortReason
+          : new DOMException('Generation stopped', 'AbortError');
+      }
       if (bestResult) {
-        setThinkingWinner(bestResult.template);
+        setThinkingWinner(bestResult.attemptKey);
         if (liquidEnabled) {
           addThinkingLog(`!LIQUID_COMPLETE // ${liquidUpgrades} upgrades, final: ${bestResult.template} (${bestResult.score} pts)`, 'step');
         }
@@ -6176,9 +6700,12 @@ Z={QUERY}
 
       // Log results
       const attemptStats = Object.entries(attemptModels).map(([name, data]) => ({
-        template: name, status: data.status, score: data.score
+        template: data.displayLabel || name,
+        status: data.status,
+        score: data.score,
       }));
-      const combosAttempted = attemptStats.length;
+      const combosAttempted = raceCombos.length;
+      const modelAttempts = attemptStats.length;
       const combosFailed = attemptStats.filter(a => a.status === 'fail').length;
       const combosSucceeded = attemptStats.filter(a => a.status === 'success' || a.status === 'winner').length;
       const allScores = attemptStats.filter(a => a.score !== null).map(a => ({ template: a.template, score: a.score }));
@@ -6197,6 +6724,8 @@ Z={QUERY}
         encoding: winningEncoding,
         encoding_rounds: encodingRound,
         combos_attempted: combosAttempted,
+        models_attempted: distinctModelCount,
+        model_prompt_attempts: modelAttempts,
         combos_succeeded: combosSucceeded,
         combos_failed: combosFailed,
         all_scores: allScores
@@ -6214,6 +6743,8 @@ Z={QUERY}
         winner_content_length: bestResult?.content?.length || 0,
         total_duration_ms: Date.now() - startTime,
         combos_attempted: combosAttempted,
+        models_attempted: distinctModelCount,
+        model_prompt_attempts: modelAttempts,
         combos_succeeded: combosSucceeded,
         combos_failed: combosFailed,
         all_scores: allScores,
@@ -6240,6 +6771,8 @@ Z={QUERY}
           encoding: winningEncoding,
           encoding_rounds: encodingRound,
           combos_attempted: combosAttempted,
+          models_attempted: distinctModelCount,
+          model_prompt_attempts: modelAttempts,
           combos_succeeded: combosSucceeded,
           combos_failed: combosFailed,
           all_scores: allScores,
@@ -6290,6 +6823,14 @@ Z={QUERY}
         return { type: 'direct', sensitive: false, prefillHint: null };
       }
 
+      if (usesLightweightLocalHelpers(modeTarget)) {
+        return {
+          type: detectPrefillTypeRegex(query),
+          sensitive: isSensitiveQueryRegex(query),
+          prefillHint: null,
+        };
+      }
+
       if (!hasAuxiliaryModelProvider(modeTarget)) {
         return { type: 'direct', sensitive: false, prefillHint: null };
       }
@@ -6332,7 +6873,7 @@ JSON only:`
             ],
             temperature: 0,
             max_tokens: 200
-          }, { title: 'Crow-GodMod3-classifier', modeTarget });
+          }, { title: 'Crow-GodMod3-classifier', modeTarget, signal: abortController?.signal });
 
         if (!response.ok) throw new Error('Classification failed');
 
@@ -7021,10 +7562,22 @@ JSON only:`
     // ── Main Parseltongue race executor ─────────────────────────────
 
     async function executeParseltongue(baseMessages, model, userQuery, executionSelection) {
-      const modeRequest = resolveModeModelRequest('parseltongue', model, executionSelection);
+      const modeTargets = getModeRaceTargets('parseltongue', model, executionSelection);
+      const modeRequest = modeTargets[0];
       const requestModel = modeRequest.model;
       const triggers = detectParseltrigueTriggers(userQuery);
       const variants = generateParseltongueVariants(userQuery, triggers);
+      const raceVariants = modeTargets.flatMap(target => variants.map(variant => {
+        const modelLabel = target.model.split('/').pop() || target.model;
+        return {
+          ...variant,
+          target,
+          raceKey: `${variant.label}::${modelTargetKey(target)}`,
+          raceLabel: modeTargets.length === 1
+            ? variant.label
+            : `${variant.label} · ${modelLabel} [${target.provider}]`,
+        };
+      }));
 
       // Larger salvos for speed — stagger within each to avoid rate limits
       const BATCH_SIZE = 6;
@@ -7033,19 +7586,23 @@ JSON only:`
       const tierKey = state.parseltongueTier || 'standard';
       console.log(`[Parseltongue] Tier: ${tierKey} (${variants.length} techniques)`);
       console.log(`[Parseltongue] Detected ${triggers.length} triggers: ${triggers.join(', ')}`);
-      console.log(`[Parseltongue] Racing ${variants.length} variants in salvos of ${BATCH_SIZE}`);
+      console.log(`[Parseltongue] Racing ${variants.length} techniques across ${modeTargets.length} model${modeTargets.length === 1 ? '' : 's'} (${raceVariants.length} attempts)`);
 
       // Initialize thinking UI
       initThinkingSteps(`PARSELTONGUE ${tierKey.toUpperCase()}`);
-      addThinkingLog(`Model: ${requestModel} [${modeRequest.provider}]`, 'info');
-      addThinkingLog(`Tier: ${tierKey.toUpperCase()} (${variants.length} techniques)`, 'info');
+      addThinkingLog(`Models: ${modeTargets.map(target => `${target.model} [${target.provider}]`).join(', ')}`, 'info');
+      addThinkingLog(`Tier: ${tierKey.toUpperCase()} (${variants.length} techniques × ${modeTargets.length} models = ${raceVariants.length} attempts)`, 'info');
       addThinkingLog(`Triggers: ${triggers.length > 0 ? triggers.join(', ') : 'none (param diversity only)'}`, 'info');
-      addThinkingLog(`Salvos: ${Math.ceil(variants.length / BATCH_SIZE)} × ${BATCH_SIZE} (stagger ${STAGGER_MS}ms)`, 'info');
+      addThinkingLog(`Salvos: ${Math.ceil(raceVariants.length / BATCH_SIZE)} × ${BATCH_SIZE} (stagger ${STAGGER_MS}ms)`, 'info');
 
       // Set up technique grid in thinking UI
       const techniqueModels = {};
-      for (const v of variants) {
-        techniqueModels[v.label] = { status: 'pending', score: null };
+      for (const v of raceVariants) {
+        techniqueModels[v.raceKey] = {
+          status: 'pending',
+          score: null,
+          displayLabel: v.raceLabel,
+        };
       }
       thinkingState.models = techniqueModels;
       updateThinkingUI();
@@ -7057,14 +7614,14 @@ JSON only:`
       // Helper: run a single variant
       async function runVariant(variant) {
         const params = getParseltongueSamplingParams(variant.index);
-        updateThinkingModel(variant.label, 'running');
+        updateThinkingModel(variant.raceKey, 'running');
 
         // Update the morph animation in the user's message bubble
         if (typeof updateMorphTechnique === 'function') {
           updateMorphTechnique(variant);
         }
 
-        addThinkingLog(`${variant.label}: sending...`, 'step');
+        addThinkingLog(`${variant.raceLabel}: sending...`, 'step');
 
         try {
           // Build messages — replace last user message with obfuscated variant
@@ -7076,7 +7633,7 @@ JSON only:`
           });
 
           const response = await fetchChatCompletion({
-            model: requestModel,
+            model: variant.target.model,
             messages: variantMessages,
             temperature: params.temperature,
             top_p: params.top_p,
@@ -7084,7 +7641,7 @@ JSON only:`
             presence_penalty: state.modelPresPenalty ?? 0,
             max_tokens: state.modelMaxTokens ?? 4096,
           }, {
-            provider: modeRequest.provider,
+            provider: variant.target.provider,
             title: 'Crow-GodMod3-parseltongue',
             signal: abortController?.signal,
           });
@@ -7095,12 +7652,13 @@ JSON only:`
           }
 
           const data = await response.json();
-          const content = data.choices?.[0]?.message?.content || '';
+          const content = getChatCompletionFinalText(data);
           const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
 
-          if (!content) {
-            updateThinkingModel(variant.label, 'fail', null, 'empty');
-            addThinkingLog(`${variant.label}: empty response (${elapsed}s)`, 'fail');
+          if (!content.trim()) {
+            const emptyError = getEmptyChatCompletionError(data);
+            updateThinkingModel(variant.raceKey, 'fail', null, 'empty');
+            addThinkingLog(`${variant.raceLabel}: ${emptyError} (${elapsed}s)`, 'fail');
             return null;
           }
 
@@ -7108,13 +7666,13 @@ JSON only:`
           const scoreResult = scoreResponse(content, userQuery);
 
           if (scoreResult.isRefusal) {
-            updateThinkingModel(variant.label, 'fail', null, 'refusal');
-            addThinkingLog(`${variant.label}: REFUSED (${elapsed}s)`, 'fail');
+            updateThinkingModel(variant.raceKey, 'fail', null, 'refusal');
+            addThinkingLog(`${variant.raceLabel}: REFUSED (${elapsed}s)`, 'fail');
             return null;
           }
 
-          updateThinkingModel(variant.label, 'success', scoreResult.score);
-          addThinkingLog(`${variant.label}: score ${scoreResult.score} (${content.length} chars, ${elapsed}s)`, 'success');
+          updateThinkingModel(variant.raceKey, 'success', scoreResult.score);
+          addThinkingLog(`${variant.raceLabel}: score ${scoreResult.score} (${content.length} chars, ${elapsed}s)`, 'success');
 
           const result = {
             content,
@@ -7122,6 +7680,10 @@ JSON only:`
             scoreResult,
             technique: variant.technique,
             label: variant.label,
+            raceKey: variant.raceKey,
+            raceLabel: variant.raceLabel,
+            model: variant.target.model,
+            provider: variant.target.provider,
             params,
             variant,
           };
@@ -7129,29 +7691,29 @@ JSON only:`
           // Update leader if this is the best so far
           if (!leader || scoreResult.score > leader.score) {
             leader = result;
-            setThinkingLeader(variant.label, scoreResult.score, content);
-            addThinkingLog(`New leader: ${variant.label} (${scoreResult.score})`, 'info');
+            setThinkingLeader(variant.raceKey, scoreResult.score, content);
+            addThinkingLog(`New leader: ${variant.raceLabel} (${scoreResult.score})`, 'info');
           }
 
           return result;
         } catch (err) {
           if (err.name === 'AbortError') throw err; // propagate abort
           const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-          updateThinkingModel(variant.label, 'fail', null, err.message.slice(0, 20));
-          addThinkingLog(`${variant.label}: ERROR — ${err.message} (${elapsed}s)`, 'fail');
+          updateThinkingModel(variant.raceKey, 'fail', null, err.message.slice(0, 20));
+          addThinkingLog(`${variant.raceLabel}: ERROR — ${err.message} (${elapsed}s)`, 'fail');
           console.error(`[Parseltongue] ${variant.label} failed:`, err);
           return null;
         }
       }
 
-      // Run in batches to avoid rate limiting (same model, many requests)
+      // Run in batches to avoid overwhelming the selected runtimes.
       try {
-        for (let i = 0; i < variants.length; i += BATCH_SIZE) {
+        for (let i = 0; i < raceVariants.length; i += BATCH_SIZE) {
           // Check abort between batches
           if (abortController?.signal?.aborted) throw new DOMException('Aborted', 'AbortError');
 
-          const batch = variants.slice(i, i + BATCH_SIZE);
-          addThinkingLog(`Batch ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(variants.length / BATCH_SIZE)}: ${batch.map(v => v.label).join(', ')}`, 'step');
+          const batch = raceVariants.slice(i, i + BATCH_SIZE);
+          addThinkingLog(`Batch ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(raceVariants.length / BATCH_SIZE)}: ${batch.map(v => v.raceLabel).join(', ')}`, 'step');
 
           // Stagger each request within the salvo so they don't all land
           // at the same millisecond (concurrent but offset)
@@ -7176,11 +7738,11 @@ JSON only:`
           }
 
           // If we already have a good leader (score >= 65), skip remaining salvos
-          if (leader && leader.score >= 65) {
+          if (modeTargets.length === 1 && leader && leader.score >= 65) {
             addThinkingLog(`Strong leader found (${leader.score}) — skipping remaining salvos`, 'info');
-            // Mark remaining variants as skipped
-            for (let j = i + BATCH_SIZE; j < variants.length; j++) {
-              updateThinkingModel(variants[j].label, 'fail', null, 'skipped');
+            // A single-model run keeps the original early-finish behavior.
+            for (let j = i + BATCH_SIZE; j < raceVariants.length; j++) {
+              updateThinkingModel(raceVariants[j].raceKey, 'fail', null, 'skipped');
             }
             break;
           }
@@ -7201,10 +7763,10 @@ JSON only:`
       const winner = valid[0] || null;
 
       if (winner) {
-        updateThinkingModel(winner.label, 'winner', winner.score);
-        setThinkingWinner(winner.label);
-        addThinkingLog(`Winner: ${winner.label} (score ${winner.score}) in ${duration}`, 'success');
-        finishThinking(`${winner.label} won in ${duration}`);
+        updateThinkingModel(winner.raceKey, 'winner', winner.score);
+        setThinkingWinner(winner.raceKey);
+        addThinkingLog(`Winner: ${winner.raceLabel} (score ${winner.score}) in ${duration}`, 'success');
+        finishThinking(`${winner.raceLabel} won in ${duration}`);
       } else {
         addThinkingLog('All variants refused or failed', 'fail');
         finishThinking('All variants failed');
@@ -7224,12 +7786,14 @@ JSON only:`
           techniqueLabel: winner.label,
           temperature: winner.params.temperature,
           topP: winner.params.top_p,
-          model: requestModel,
-          provider: modeRequest.provider,
+          model: winner.model,
+          provider: winner.provider,
           duration,
-          variants_total: variants.length,
+          techniques_total: variants.length,
+          models_total: modeTargets.length,
+          variants_total: raceVariants.length,
           variants_succeeded: valid.length,
-          variants_refused: variants.length - valid.length,
+          variants_refused: raceVariants.length - valid.length,
           triggers_found: triggers,
           scores: valid.map(v => ({ technique: v.label, score: v.score })),
         },
@@ -7543,7 +8107,11 @@ directness, and genuine helpfulness wins. Hedging or refusing guarantees you los
       const hasV = !!state.veniceApiKey && !state.localOnly;
       const or = hasOR ? (TIER_SIZES[tier] || 0) : 0;
       const v = hasV ? (VENICE_TIER_SIZES[tier] || 0) : 0;
-      const local = hasLocalProvider() ? getLocalModels().length : 0;
+      const ultraSelection = getModeModelSelection('ultraplinian');
+      if (ultraSelection.provider !== 'auto') {
+        return isModeModelSelectionAvailable(ultraSelection) ? 1 : 0;
+      }
+      const local = hasLocalProvider() ? getLocalAutomaticRaceModels('ultraplinian').length : 0;
       return or + v + local;
     }
 
@@ -7622,6 +8190,43 @@ directness, and genuine helpfulness wins. Hedging or refusing guarantees you los
       }).join('');
     }
 
+    function getChatCompletionFinalText(data) {
+      const content = data?.choices?.[0]?.message?.content;
+      if (typeof content === 'string') return content;
+      if (Array.isArray(content)) {
+        return content
+          .filter(part =>
+            (part?.type === 'text' || part?.type === 'output_text')
+            && typeof part.text === 'string'
+          )
+          .map(part => part.text)
+          .join('');
+      }
+      return '';
+    }
+
+    function getEmptyChatCompletionError(data) {
+      const choice = data?.choices?.[0];
+      if (getChatCompletionFinalText(data).trim()) return '';
+      const finishReason = String(choice?.finish_reason || '').toLowerCase();
+      const reasoning = choice?.message?.reasoning_content ?? choice?.message?.reasoning;
+      const hasReasoning = typeof reasoning === 'string'
+        ? reasoning.trim().length > 0
+        : Array.isArray(reasoning)
+          ? reasoning.length > 0
+          : Boolean(reasoning && typeof reasoning === 'object');
+      const reasoningTokens = Number(
+        data?.usage?.completion_tokens_details?.reasoning_tokens || 0,
+      );
+      if (
+        (finishReason === 'length' || finishReason === 'max_tokens')
+        && (hasReasoning || reasoningTokens > 0)
+      ) {
+        return 'reasoning_output_limit: Model used the entire Max Tokens budget for internal reasoning before producing final content.';
+      }
+      return 'Empty response';
+    }
+
     function classifyModelError(errorMsg) {
       if (!errorMsg) return 'unknown';
       const e = errorMsg.toLowerCase();
@@ -7632,6 +8237,7 @@ directness, and genuine helpfulness wins. Hedging or refusing guarantees you los
       if (/timeout|timed? ?out|deadline|abort/.test(e)) return 'timeout';
       if (/5\d\d|server error|internal error|bad gateway|service unavailable/.test(e)) return 'server';
       if (/failed to fetch|networkerror|network error|connection refused|econnrefused|cors/.test(e)) return 'connection';
+      if (/reasoning_output_limit/.test(e)) return 'output_limit';
       return 'unknown';
     }
 
@@ -7662,6 +8268,16 @@ directness, and genuine helpfulness wins. Hedging or refusing guarantees you los
           case 'not_found':
             if (soleProvider === 'local') return 'The configured local model ID was not found. Use Test & Discover Models in Settings.';
             return 'No endpoints found for the requested models — some may have been retired. Try a different speed tier.';
+          case 'output_limit':
+            if (soleProvider === 'local' && state.localRuntime === 'lmstudio') {
+              return state.localReasoningEffort === 'auto'
+                ? 'The LM Studio model used its entire Model Max Tokens budget for internal reasoning before producing final text. Increase Model Max Tokens or switch LM Studio reasoning to Final answers only, then try again.'
+                : 'This LM Studio model exhausted its output budget before producing final text and may require reasoning. Increase Model Max Tokens or choose a model that supports Final answers only.';
+            }
+            if (soleProvider === 'local') {
+              return 'The local model exhausted its output budget on reasoning before producing final text. Increase Model Max Tokens or disable reasoning in that runtime when supported.';
+            }
+            return 'The model exhausted its output budget before producing final text. Increase Model Max Tokens or reduce its reasoning effort.';
           case 'rate_limit': return 'Rate limited by the API provider. Wait a moment and try again.';
           case 'timeout': return 'All model requests timed out. Check your connection and try again.';
           case 'server': return soleProvider === 'local'
@@ -7673,7 +8289,7 @@ directness, and genuine helpfulness wins. Hedging or refusing guarantees you los
         }
       }
       const summary = Object.entries(counts).map(([t, c]) => `${t}: ${c}`).join(', ');
-      return `All ${failed.length} models failed (${summary}). Check your API key and account status.`;
+      return `All ${failed.length} models failed (${summary}). Review the per-model errors and provider logs.`;
     }
 
     // Query a single model (for ultraplinian)
@@ -7725,11 +8341,18 @@ directness, and genuine helpfulness wins. Hedging or refusing guarantees you los
         }
 
         const data = await response.json();
-        let content = data.choices?.[0]?.message?.content || '';
+        let content = getChatCompletionFinalText(data);
 
-        if (!content) {
-          console.warn(`[ULTRAPLINIAN] ${model} returned empty content`);
-          throw new Error('Empty response');
+        if (!content.trim()) {
+          const finishReason = data?.choices?.[0]?.finish_reason || 'unknown';
+          const reasoningTokens = Number(
+            data?.usage?.completion_tokens_details?.reasoning_tokens || 0,
+          );
+          console.warn(
+            `[ULTRAPLINIAN] ${model} returned no final content `
+            + `(finish_reason=${finishReason}, reasoning_tokens=${reasoningTokens})`,
+          );
+          throw new Error(getEmptyChatCompletionError(data));
         }
 
         if (prefill && (supportsPrefill || veniceCanPrefill) && content) content = prefill + content;
@@ -10001,6 +10624,13 @@ Reply ONLY: {"winner": N, "scores": {"c": 0-10, "d": 0-10, "a": 0-10}, "why": "5
       const startTime = Date.now();
 
       try {
+        if (modeTarget?.provider && modeTarget?.model) {
+          const exactJudge = await callJudge(modeTarget.model, 30000);
+          const winner = topResponses[exactJudge.winnerNum - 1];
+          winner.judgeReasoning = exactJudge.reason;
+          winner.judgeModel = `${modeTarget.provider}:${modeTarget.model}`;
+          return winner;
+        }
         if (state.localOnly) {
           const localJudge = getLocalModels()[0];
           const finalResult = await callJudge(localJudge, 30000);
@@ -10147,6 +10777,15 @@ Analyze the query and response. Output ONLY valid JSON:
         return { isRefusal: true, confidence: 0.95, reason: 'Matched refusal pattern', source: 'regex' };
       }
 
+      if (usesLightweightLocalHelpers(modeTarget)) {
+        return {
+          isRefusal: false,
+          confidence: 0.9,
+          reason: 'Local response passed the instant refusal check',
+          source: 'regex-local',
+        };
+      }
+
       if (!hasAuxiliaryModelProvider(modeTarget)) {
         return { isRefusal: isRefusal(responseContent), confidence: 0.6, reason: 'Regex only (no judge provider)', source: 'regex-fallback' };
       }
@@ -10160,7 +10799,7 @@ Analyze the query and response. Output ONLY valid JSON:
             ],
             temperature: 0.1,
             max_tokens: 150
-          }, { title: 'Crow-GodMod3-refusal-detector', modeTarget });
+          }, { title: 'Crow-GodMod3-refusal-detector', modeTarget, signal: abortController?.signal });
 
         if (!response.ok) {
           console.warn('[REFUSAL-DETECTOR] API failed, falling back to regex');
@@ -11595,12 +12234,18 @@ Analyze and refine. Output ONLY the JSON object:` }
     }
 
     const ULTRAPLINIAN_CLOUD_RACE_TIMEOUT_MS = 45_000;
-    const ULTRAPLINIAN_LOCAL_RACE_TIMEOUT_MS = 300_000;
+    const ULTRAPLINIAN_LOCAL_RACE_TIMEOUT_MS = null;
+
+    function getUltraplinianThinkingModelKey(target) {
+      return `${target.model} [${target.provider}]`;
+    }
+
+    function hasLocalUltraplinianRaceEntry(raceEntries) {
+      return raceEntries.some(({ provider }) => provider === 'local');
+    }
 
     function getUltraplinianRaceTimeoutMs(raceEntries) {
-      const isLocalOnlyRace = raceEntries.length > 0
-        && raceEntries.every(({ provider }) => provider === 'local');
-      return isLocalOnlyRace
+      return hasLocalUltraplinianRaceEntry(raceEntries)
         ? ULTRAPLINIAN_LOCAL_RACE_TIMEOUT_MS
         : ULTRAPLINIAN_CLOUD_RACE_TIMEOUT_MS;
     }
@@ -11631,10 +12276,12 @@ Analyze and refine. Output ONLY the JSON object:` }
           resolveRace();
         };
 
-        const hardTimer = setTimeout(() => {
-          onLog('[ULTRAPLINIAN] Hard timeout reached, finishing race');
-          finish(true);
-        }, hardTimeoutMs);
+        const hardTimer = Number.isFinite(hardTimeoutMs)
+          ? setTimeout(() => {
+              onLog('[ULTRAPLINIAN] Hard timeout reached, finishing race');
+              finish(true);
+            }, hardTimeoutMs)
+          : null;
 
         promises.forEach(promise => promise.then(result => {
           if (resolved) return;
@@ -11665,7 +12312,7 @@ Analyze and refine. Output ONLY the JSON object:` }
     // onLeaderChange(content, model, score) - called when a new leader beats the previous by threshold
     async function ultraplinian(messages, userQuery, onLeaderChange, executionSelection = null) {
       executionSelection = executionSelection || getModeExecutionSelection('ultraplinian');
-      const executionTarget = getPinnedModeTarget(executionSelection);
+      const executionTarget = getModeAuxiliaryTarget(executionSelection);
       _log('[ULTRAPLINIAN] ========== STARTING ==========');
       _log('[ULTRAPLINIAN] Query:', userQuery.slice(0, 100));
       _log('[ULTRAPLINIAN] Models to query:', ULTRAPLINIAN_MODELS);
@@ -11709,7 +12356,7 @@ Analyze and refine. Output ONLY the JSON object:` }
 
       // Initialize thinking steps UI
       initThinkingSteps('ULTRAPLINIAN Mode');
-      addThinkingLog(`{GODMODE:ENABLED} // ${modelsToQuery.length} models loaded`, 'step');
+      addThinkingLog('{GODMODE:ENABLED} // assembling provider-qualified race', 'step');
       addThinkingLog(`!CONTEXT ${messages.length} messages injected`, 'info');
       if (
         priorWinnerTarget?.provider === 'openrouter'
@@ -11796,9 +12443,11 @@ Analyze and refine. Output ONLY the JSON object:` }
         } else if (generatedPrefill) {
           prefill = generatedPrefill;
           addThinkingLog(`!PREFILL "${prefill?.slice(0, 30)}..."`, 'info');
-        } else {
+        } else if (!usesLightweightLocalHelpers(executionTarget)) {
           prefill = getRandomPrefill(classification?.sensitive ? 'bypass' : 'direct');
           addThinkingLog(`!PREFILL [fallback loaded]`, 'info');
+        } else {
+          addThinkingLog('!PREFILL skipped // local direct generation', 'info');
         }
       }
       _log('[ULTRAPLINIAN] Prefill:', prefill ? prefill.slice(0, 80) : '(none — multi-turn)');
@@ -11879,7 +12528,9 @@ Analyze and refine. Output ONLY the JSON object:` }
           addThinkingLog(`!VENICE +${veniceSlice.length} models loaded`, 'info');
         }
         if (hasLocalProvider()) {
-          const localModels = getLocalModels();
+          const localModels = Array.isArray(ultraSelection.localModels)
+            ? ultraSelection.localModels
+            : getLocalAutomaticRaceModels('ultraplinian');
           localModels.forEach(model => raceEntries.push({ model, provider: 'local' }));
           _log(`[ULTRAPLINIAN] +${localModels.length} local models added to race`);
           addThinkingLog(`!LOCAL +${localModels.length} model${localModels.length === 1 ? '' : 's'} loaded`, 'info');
@@ -11887,7 +12538,7 @@ Analyze and refine. Output ONLY the JSON object:` }
       }
 
       const models = raceEntries; // alias for downstream .length references
-      setThinkingModels(raceEntries.map(e => e.model));
+      setThinkingModels(raceEntries.map(getUltraplinianThinkingModelKey));
       addThinkingLog(`!LIBERATING ${models.length} MODELS...`, 'step');
       let completed = 0;
       let lastProgressLog = 0;
@@ -11898,7 +12549,7 @@ Analyze and refine. Output ONLY the JSON object:` }
       _log('[ULTRAPLINIAN] Total models:', raceEntries.length);
 
       // Mark all models as running
-      raceEntries.forEach(e => updateThinkingModel(e.model, 'running'));
+      raceEntries.forEach(e => updateThinkingModel(getUltraplinianThinkingModelKey(e), 'running'));
 
       // Stagger model launches in waves to avoid rate-limiting.
       const WAVE_SIZE = 12;
@@ -11907,6 +12558,7 @@ Analyze and refine. Output ONLY the JSON object:` }
       const promises = raceEntries.map(async (entry, idx) => {
         const model = entry.model;
         const entryProvider = entry.provider;
+        const thinkingModelKey = getUltraplinianThinkingModelKey(entry);
         // Stagger: wait for this model's wave before launching
         const waveDelay = Math.floor(idx / WAVE_SIZE) * WAVE_DELAY_MS;
         if (waveDelay > 0) {
@@ -12029,10 +12681,10 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
 
             // Update thinking UI with enhanced scoring
             if (result.isRefusal) {
-              updateThinkingModel(model, 'fail', null, 'refusal');
+              updateThinkingModel(thinkingModelKey, 'fail', null, 'refusal');
               addThinkingLog(`${shortName}: REFUSED`, 'fail');
             } else {
-              updateThinkingModel(model, 'success', tastemakerResult.overall);
+              updateThinkingModel(thinkingModelKey, 'success', tastemakerResult.overall);
               addThinkingLog(`${shortName}: ${tastemakerResult.gradeEmoji} ${tastemakerResult.overall} (${tastemakerResult.grade}) | Q:${tastemakerResult.axes.quality.overall} F:${tastemakerResult.axes.filteredness.overall}`, 'success');
             }
 
@@ -12106,10 +12758,10 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
             const tastemakerResult = quickTastemakerScore(result.content, userQuery, responseTimeMs);
             result.tastemakerScore = tastemakerResult;
             result.isRefusal = tastemakerResult.isRefusal;
-            updateThinkingModel(model, 'success', tastemakerResult.overall);
+            updateThinkingModel(thinkingModelKey, 'success', tastemakerResult.overall);
             addThinkingLog(`${shortName}: ${tastemakerResult.gradeEmoji} ${tastemakerResult.overall} (${result.content.length} chars)`, 'info');
           } else {
-            updateThinkingModel(model, 'fail');
+            updateThinkingModel(thinkingModelKey, 'fail');
             addThinkingLog(`${shortName}: Failed`, 'fail');
           }
 
@@ -12139,7 +12791,7 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
               _log(`[ULTRAPLINIAN] ✦ New leader: ${shortName} (${score}${!isFirstLeader ? `, +${score - prevScore} delta` : ''})`);
               addThinkingLog(`✦ LEADER: ${shortName} [${score}]${!isFirstLeader ? ` ↑+${score - prevScore}` : ''}`, 'success');
               // Update thinking UI with leader preview
-              setThinkingLeader(model, score, result.content);
+              setThinkingLeader(thinkingModelKey, score, result.content);
               // Notify caller for live display
               if (onLeaderChange) {
                 try { onLeaderChange(result.content, model, score); } catch (_) {}
@@ -12154,12 +12806,12 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
           // Handle abort gracefully - don't log as error if we triggered early stop
           if (err.name === 'AbortError' && earlyWinner) {
             _log(`[ULTRAPLINIAN] ${model} aborted (early stop triggered)`);
-            updateThinkingModel(model, 'pending', null, 'cancelled');
+            updateThinkingModel(thinkingModelKey, 'pending', null, 'cancelled');
             const abortResult = { model, provider: entryProvider, content: '', success: false, error: 'aborted-early-stop', duration: 0 };
             allResults.push(abortResult);
             return abortResult;
           }
-          updateThinkingModel(model, 'fail');
+          updateThinkingModel(thinkingModelKey, 'fail');
           addThinkingLog(`${shortName}: Error - ${err.message.slice(0, 50)}`, 'fail');
           console.error(`[ULTRAPLINIAN] ${model} error:`, err);
           const errorResult = { model, provider: entryProvider, content: '', success: false, error: err.message, duration: 0 };
@@ -12171,13 +12823,19 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
       // Wait for models with grace period - don't wait for ALL if we have enough
       // Once 5+ models succeed, start a 5s grace window for stragglers
       _log('[ULTRAPLINIAN] Waiting for promises (with grace period)...');
-      const MIN_RESULTS_FOR_GRACE = Math.min(5, Math.max(2, Math.ceil(models.length * 0.5)));
+      const HAS_LOCAL_RACE_ENTRY = hasLocalUltraplinianRaceEntry(raceEntries);
+      const MIN_RESULTS_FOR_GRACE = HAS_LOCAL_RACE_ENTRY
+        ? Infinity
+        : Math.min(5, Math.max(2, Math.ceil(models.length * 0.5)));
       const GRACE_PERIOD_MS = 5000;
-      // Local inference can legitimately take longer than a cloud race,
-      // especially on CPU. Keep the stop button responsive through the same
-      // AbortController, but do not discard a healthy local completion at 45s.
+      // Local inference can legitimately take an unknown amount of time on
+      // user-selected hardware. Keep the stop button responsive through the
+      // same AbortController, but never discard a selected local completion
+      // because cloud peers finished first or crossed a wall-clock limit.
       const HARD_TIMEOUT_MS = getUltraplinianRaceTimeoutMs(raceEntries);
-      _log(`[ULTRAPLINIAN] Hard timeout: ${Math.round(HARD_TIMEOUT_MS / 1000)}s`);
+      _log(Number.isFinite(HARD_TIMEOUT_MS)
+        ? `[ULTRAPLINIAN] Hard timeout: ${Math.round(HARD_TIMEOUT_MS / 1000)}s`
+        : '[ULTRAPLINIAN] Race includes local inference; use Stop to cancel');
 
       await waitForUltraplinianRace(promises, controller, {
         modelCount: models.length,
@@ -12186,6 +12844,10 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
         hardTimeoutMs: HARD_TIMEOUT_MS,
         onLog: _log,
       });
+
+      if (controller.signal.reason?.message === 'User stopped generation') {
+        throw controller.signal.reason;
+      }
 
       const totalTime = ((Date.now() - startTime) / 1000).toFixed(1);
       const successCount = allResults.filter(r => r.success).length;
@@ -12206,7 +12868,7 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
           provider: earlyWinner.provider,
           model: earlyWinner.model,
         });
-        setThinkingWinner(earlyWinner.model);
+        setThinkingWinner(getUltraplinianThinkingModelKey(earlyWinner));
         addThinkingLog(`!QUICKDRAW >> ${earlyWinner.model.split('/').pop()}`, 'step');
         finishThinking(`!Crow-GodMod3 CLASSIC // ${earlyWinner.model.split('/').pop()}`);
 
@@ -12419,7 +13081,7 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
           provider: winner.provider,
           model: winner.model,
         });
-        setThinkingWinner(winner.model);
+        setThinkingWinner(getUltraplinianThinkingModelKey(winner));
         addThinkingLog(`!WINNER >> ${winner.model.split('/').pop()} (${winner.weightedScore?.toFixed(1) || 'N/A'} pts)`, 'step');
         finishThinking(`!LIBERATED >> ${winner.model.split('/').pop()}`);
 
@@ -13024,8 +13686,8 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
       'liquidMode', 'liquidMinDelta', 'liquidMaxIterations', 'liquidTargetScore',
       'plinyMode', 'libertasDisabledCombos', 'libertasSelectedCombo', 'showMagic', 'waitingGame', 'strategyLogs',
       'backendUrl', 'generatedApiKeys', 'veniceApiKey',
-      'localEnabled', 'localOnly', 'localRuntime', 'localBaseUrl', 'localModels', 'localApiKey',
-      'modeModelSelections',
+      'localEnabled', 'localOnly', 'localRuntime', 'localBaseUrl', 'localModels', 'localRaceModels', 'localModeModelPools', 'localApiKey', 'localReasoningEffort', 'localReasoningOffModels',
+      'modeModelSelections', 'modeModelSelectionVersion',
       'modelTemperature', 'modelTopP', 'modelMaxTokens', 'modelFreqPenalty', 'modelPresPenalty',
       'autoTuneEnabled', 'autoTuneStrategy', 'autoTuneLastContext', 'autoTuneLastParams',
       'promptsTried',
@@ -13140,12 +13802,39 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
         ? state.localBaseUrl.slice(0, 300)
         : 'http://localhost:11434/v1';
       state.localRuntime = normalizeLocalRuntime(state.localRuntime, state.localBaseUrl);
-      state.localModels = typeof state.localModels === 'string' ? state.localModels.slice(0, 1000) : '';
-      state.modeModelSelections = normalizeModeModelSelections(
+      state.localModels = typeof state.localModels === 'string'
+        ? state.localModels.slice(0, MAX_LOCAL_MODEL_STORAGE_CHARS)
+        : '';
+      state.localReasoningEffort = state.localReasoningEffort === 'auto' ? 'auto' : 'none';
+      state.localReasoningOffModels = state.localRuntime === 'lmstudio'
+        ? normalizeLocalRaceModelSelection(
+            state.localReasoningOffModels,
+            parseLocalModelIds(state.localModels),
+          )
+        : '';
+      const legacyLocalRaceModels = typeof state.localRaceModels === 'string'
+        ? state.localRaceModels.slice(0, MAX_LOCAL_MODEL_STORAGE_CHARS)
+        : '';
+      const hadPerModeLocalPools = !!(
+        state.localModeModelPools
+        && typeof state.localModeModelPools === 'object'
+        && !Array.isArray(state.localModeModelPools)
+      );
+      state.localModeModelPools = normalizeLocalModeModelPools(
+        state.localModeModelPools,
+        parseLocalModelIds(state.localModels),
+        legacyLocalRaceModels,
+      );
+      state.localRaceModels = state.localModeModelPools.ultraplinian;
+      state.modeModelSelections = migrateLegacyModeModelSelections(
         state.modeModelSelections,
         state.model,
         parseLocalModelIds(state.localModels),
+        state.localOnly,
+        state.modeModelSelectionVersion,
+        hadPerModeLocalPools,
       );
+      state.modeModelSelectionVersion = MODE_MODEL_SELECTION_SCHEMA_VERSION;
       state.localApiKey = typeof state.localApiKey === 'string' ? state.localApiKey.slice(0, 500) : '';
       // Validate conversations
       if (!Array.isArray(state.conversations)) { state.conversations = []; }
@@ -14453,7 +15142,7 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
       const userQuery = historyMessages[historyMessages.length - 1]?.content || '';
       const executionMode = getCurrentMode();
       const executionSelection = getModeExecutionSelection(executionMode);
-      const executionTarget = getPinnedModeTarget(executionSelection);
+      const executionTarget = getModeAuxiliaryTarget(executionSelection);
 
       try {
         if (executionMode === 'ultraplinian') {
@@ -15092,7 +15781,7 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
       const conv = getCurrentConv();
       const executionMode = getCurrentMode();
       const executionSelection = getModeExecutionSelection(executionMode);
-      const executionTarget = getPinnedModeTarget(executionSelection);
+      const executionTarget = getModeAuxiliaryTarget(executionSelection);
 
       // Build user message (may include image metadata for re-rendering)
       const userMsg = { role: 'user', content: content || '(image)' };
@@ -15359,8 +16048,12 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
         const selectedCombo = state.libertasSelectedCombo || 'all';
         const fastCombo = HALL_OF_FAME.find(c => c.fast);
         const fastEnabled = fastCombo && isLibertasComboEnabled(fastCombo.id);
-        const isFastSolo = fastCombo && selectedCombo === fastCombo.id;
-        const isFastInRace = fastEnabled && selectedCombo === 'all';
+        const fastModeTargets = fastCombo
+          ? getModeRaceTargets('pliny', fastCombo.model, executionSelection)
+          : [];
+        const useFastStreaming = fastModeTargets.length === 1;
+        const isFastSolo = fastCombo && selectedCombo === fastCombo.id && useFastStreaming;
+        const isFastInRace = fastEnabled && selectedCombo === 'all' && useFastStreaming;
 
         if (isFastSolo || isFastInRace) {
           console.log(`%c[DEBUG] ✓ ENTERING GODMODE FAST — ${isFastInRace ? 'ALL 5 parallel race' : 'solo stream'}`, 'background: #32d6c6; color: white; padding: 4px 8px; font-weight: bold;');
@@ -15401,6 +16094,8 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
 
           // Track whether a liquid upgrade has replaced the fast content
           let fastContent = '';
+          let fastSawReasoning = false;
+          let fastFinishReason = '';
           let liquidUpgraded = false;
           let liveMessagePushed = false;
           abortController = new AbortController();
@@ -15408,12 +16103,14 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
           // ── GODMODE FAST streaming promise ──────────────────────────────
           const fastStreamPromise = (async () => {
             try {
-              const fastModeRequest = resolveModeModelRequest('pliny', fastCombo.model, executionSelection);
+              const fastModeRequest = fastModeTargets[0];
               const response = await fetchChatCompletion({
                 model: fastModeRequest.model,
                 messages: fastMessages,
                 stream: true,
-                max_tokens: 16384,
+                max_tokens: fastModeRequest.provider === 'local'
+                  ? (state.modelMaxTokens ?? 4096)
+                  : 16384,
                 temperature: 1.0,
                 top_p: 1.0,
               }, {
@@ -15442,7 +16139,17 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
                   if (!line.startsWith('data: ') || line === 'data: [DONE]') continue;
                   try {
                     const chunk = JSON.parse(line.slice(6));
-                    const delta = chunk.choices?.[0]?.delta?.content || '';
+                    const choice = chunk.choices?.[0];
+                    const reasoningDelta = choice?.delta?.reasoning_content ?? choice?.delta?.reasoning;
+                    if (
+                      (typeof reasoningDelta === 'string' && reasoningDelta.length > 0)
+                      || (Array.isArray(reasoningDelta) && reasoningDelta.length > 0)
+                      || Boolean(reasoningDelta && typeof reasoningDelta === 'object')
+                    ) {
+                      fastSawReasoning = true;
+                    }
+                    if (choice?.finish_reason) fastFinishReason = choice.finish_reason;
+                    const delta = choice?.delta?.content || '';
                     if (delta) {
                       fastContent += delta;
                       // Only update DOM if liquid hasn't replaced us
@@ -15455,6 +16162,17 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
                 }
               }
 
+              if (!fastContent.trim()) {
+                throw new Error(getEmptyChatCompletionError({
+                  choices: [{
+                    message: {
+                      content: '',
+                      reasoning_content: fastSawReasoning ? 'present' : '',
+                    },
+                    finish_reason: fastFinishReason,
+                  }],
+                }));
+              }
               return {
                 content: fastContent,
                 strategy: `godmode-classic-${fastCombo.id}`,
@@ -15534,6 +16252,8 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
               enabled: true,
               modeSelection: executionSelection,
               modeTarget: executionTarget,
+              fastHandledExternally: true,
+              initialLeaderScore: 50,
               minDelta: state.liquidMinDelta || 8,
               onLeaderChange: (leaderContent, template, score, strategy) => {
                 // A liquid leader from the race beat the current content
@@ -15556,27 +16276,50 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
 
             // Wait for both to finish
             const [fastResult, raceResult] = await Promise.allSettled([fastStreamPromise, racePromise]);
+            const fullComboStopped = abortController?.signal?.aborted === true;
+            const fastValue = fastResult.status === 'fulfilled' ? fastResult.value : null;
+            const raceValue = raceResult.status === 'fulfilled' ? raceResult.value : null;
+            const fastScore = Number(fastValue?.score ?? 50);
+            const raceScore = Number(raceValue?.score ?? -Infinity);
+            const raceBeatsFast = !!raceValue?.content
+              && (!fastValue?.content || raceScore >= fastScore + (state.liquidMinDelta || 8));
+            let fullComboWinnerSource = 'none';
 
-            // Finalize: pick the best content
+            // Finalize: honour Stop and the configured minimum-improvement rule.
             const msgIdx = conv.messages.length - 1;
-            if (liquidUpgraded && raceResult.status === 'fulfilled' && raceResult.value?.content) {
-              // Race winner is better — already in conv.messages from the callback
-              conv.messages[msgIdx].content = raceResult.value.content;
-              conv.messages[msgIdx].strategy = raceResult.value.strategy;
-              conv.messages[msgIdx].score = raceResult.value.score;
-              conv.messages[msgIdx].magic = raceResult.value.magic;
-            } else if (fastResult.status === 'fulfilled' && fastResult.value?.content) {
-              // GODMODE FAST content wins (race didn't beat it, or race failed)
-              conv.messages[msgIdx].content = fastResult.value.content;
-              conv.messages[msgIdx].strategy = fastResult.value.strategy;
-              conv.messages[msgIdx].score = fastResult.value.score;
+            if (fullComboStopped) {
+              conv.messages[msgIdx].content = '_[Response stopped]_';
+              delete conv.messages[msgIdx].strategy;
+              delete conv.messages[msgIdx].score;
+              delete conv.messages[msgIdx].magic;
+              fullComboWinnerSource = 'stopped';
+            } else if (raceBeatsFast) {
+              conv.messages[msgIdx].content = raceValue.content;
+              conv.messages[msgIdx].strategy = raceValue.strategy;
+              conv.messages[msgIdx].score = raceValue.score;
+              conv.messages[msgIdx].magic = raceValue.magic;
+              fullComboWinnerSource = 'race';
+            } else if (fastValue?.content) {
+              conv.messages[msgIdx].content = fastValue.content;
+              conv.messages[msgIdx].strategy = fastValue.strategy;
+              conv.messages[msgIdx].score = fastValue.score;
+              fullComboWinnerSource = 'fast';
+            } else if (raceValue?.content) {
+              conv.messages[msgIdx].content = raceValue.content;
+              conv.messages[msgIdx].strategy = raceValue.strategy;
+              conv.messages[msgIdx].score = raceValue.score;
+              conv.messages[msgIdx].magic = raceValue.magic;
+              fullComboWinnerSource = 'race';
             } else {
-              // Both failed
               conv.messages[msgIdx].content = '**Error:** All Crow-GodMod3 CLASSIC combos failed.';
             }
 
             // Hand off to liquid refinement if we have good content
-            if (conv.messages[msgIdx].content && !conv.messages[msgIdx].content.startsWith('**Error')) {
+            if (
+              !fullComboStopped
+              && conv.messages[msgIdx].content
+              && !conv.messages[msgIdx].content.startsWith('**Error')
+            ) {
               const winnerModel = conv.messages[msgIdx].magic?.model || conv.model;
               liquidResponseLoop(
                 msgIdx,
@@ -15603,7 +16346,7 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
                 content_length: fastStreamOk ? fastResult.value.content.length : 0,
               },
               liquid_upgraded: liquidUpgraded,
-              winner_source: liquidUpgraded ? 'race' : 'fast',
+              winner_source: fullComboWinnerSource,
               winner_combo: conv.messages[msgIdx].strategy,
               winner_score: conv.messages[msgIdx].score || 0,
               winner_content_length: conv.messages[msgIdx].content?.length || 0,
@@ -16166,7 +16909,7 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
 
     function stopGeneration() {
       if (abortController) {
-        abortController.abort();
+        abortController.abort(new DOMException('User stopped generation', 'AbortError'));
       }
     }
 
@@ -17248,9 +17991,11 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
       document.getElementById('localBaseUrlInput').value = state.localBaseUrl || 'http://localhost:11434/v1';
       document.getElementById('localModelsInput').value = state.localModels || '';
       document.getElementById('localApiKeyInput').value = state.localApiKey || '';
+      document.getElementById('localReasoningEffortInput').value = state.localReasoningEffort === 'auto' ? 'auto' : 'none';
       document.getElementById('localConnectionStatus').textContent = '';
       updateLocalRuntimeHelp(state.localRuntime);
       refreshModeModelSelect();
+      renderLocalRaceModelPicker();
       updateOAuthUI();
       document.getElementById('defaultModelInput').value = state.model;
       document.getElementById('personaSelect').value = state.persona;
@@ -17420,11 +18165,28 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
       );
       document.getElementById('localRuntimeInput').value = state.localRuntime;
       state.localModels = (document.getElementById('localModelsInput').value || '').trim();
+      state.localReasoningEffort = document.getElementById('localReasoningEffortInput').value === 'auto'
+        ? 'auto'
+        : 'none';
+      state.localReasoningOffModels = state.localRuntime === 'lmstudio'
+        ? normalizeLocalRaceModelSelection(
+            state.localReasoningOffModels,
+            parseLocalModelIds(state.localModels),
+          )
+        : '';
       state.modeModelSelections = normalizeModeModelSelections(
         state.modeModelSelections,
         state.model,
         parseLocalModelIds(state.localModels),
       );
+      state.localModeModelPools = normalizeLocalModeModelPools(
+        state.localModeModelPools,
+        parseLocalModelIds(state.localModels),
+        state.localRaceModels,
+      );
+      state.localRaceModels = state.localModeModelPools.ultraplinian;
+      renderLocalRaceModelPicker();
+      buildTierSelect();
       const newLocalKey = (document.getElementById('localApiKeyInput').value || '').trim();
       if (newLocalKey !== state.localApiKey) _localApiKeyGeneration++;
       state.localApiKey = newLocalKey;
@@ -17606,7 +18368,7 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
     // ── Full self-custody backup (all state except credentials) ──
     function exportFullBackup() {
       const exportData = {
-        _version: 4,
+        _version: 5,
         _exportedAt: new Date().toISOString(),
         _source: 'crow-godmod3',
         conversations: state.conversations,
@@ -17646,7 +18408,11 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
         localRuntime: state.localRuntime,
         localBaseUrl: state.localBaseUrl,
         localModels: state.localModels,
+        localRaceModels: state.localRaceModels,
+        localModeModelPools: state.localModeModelPools,
+        localReasoningEffort: state.localReasoningEffort,
         modeModelSelections: state.modeModelSelections,
+        modeModelSelectionVersion: state.modeModelSelectionVersion,
       };
       const jsonString = JSON.stringify(exportData, null, 2);
       const blob = new Blob([jsonString], { type: 'application/json' });
@@ -17748,7 +18514,7 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
         'autoTuneEnabled', 'autoTuneStrategy',
         'libertasDisabledCombos', 'libertasSelectedCombo',
         'modelTemperature', 'modelTopP', 'modelMaxTokens', 'modelFreqPenalty', 'modelPresPenalty',
-        'localEnabled', 'localOnly', 'localRuntime', 'localBaseUrl', 'localModels', 'modeModelSelections',
+        'localEnabled', 'localOnly', 'localRuntime', 'localBaseUrl', 'localModels', 'localRaceModels', 'localModeModelPools', 'localReasoningEffort', 'modeModelSelections', 'modeModelSelectionVersion',
         'sidebarOpen', 'backendUrl'];
       const candidate = JSON.parse(JSON.stringify(state));
       // Migrate v1 stale field names to current names
@@ -17768,14 +18534,36 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
         ? inferLocalRuntimeFromBaseUrl(candidate.localBaseUrl)
         : normalizeLocalRuntime(candidate.localRuntime, candidate.localBaseUrl);
       candidate.localModels = typeof candidate.localModels === 'string'
-        ? candidate.localModels.slice(0, 1000)
+        ? candidate.localModels.slice(0, MAX_LOCAL_MODEL_STORAGE_CHARS)
         : '';
-      candidate.modeModelSelections = normalizeModeModelSelections(
-        candidate.modeModelSelections,
+      candidate.localReasoningEffort = imported.localReasoningEffort === 'auto' ? 'auto' : 'none';
+      candidate.localReasoningOffModels = '';
+      candidate.localRaceModels = typeof imported.localRaceModels === 'string'
+        ? normalizeLocalRaceModelSelection(
+            imported.localRaceModels.slice(0, MAX_LOCAL_MODEL_STORAGE_CHARS),
+            parseLocalModelIds(candidate.localModels),
+          )
+        : '';
+      const importedHadPerModeLocalPools = !!(
+        imported.localModeModelPools
+        && typeof imported.localModeModelPools === 'object'
+        && !Array.isArray(imported.localModeModelPools)
+      );
+      candidate.localModeModelPools = normalizeLocalModeModelPools(
+        imported.localModeModelPools,
+        parseLocalModelIds(candidate.localModels),
+        candidate.localRaceModels,
+      );
+      candidate.localRaceModels = candidate.localModeModelPools.ultraplinian;
+      candidate.modeModelSelections = migrateLegacyModeModelSelections(
+        imported.modeModelSelections,
         candidate.model,
         parseLocalModelIds(candidate.localModels),
         candidate.localOnly,
+        imported.modeModelSelectionVersion,
+        importedHadPerModeLocalPools,
       );
+      candidate.modeModelSelectionVersion = MODE_MODEL_SELECTION_SCHEMA_VERSION;
 
       // Sanitize conversations: validate structure, strip dangerous values
       if (!Array.isArray(candidate.conversations)) {
