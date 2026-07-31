@@ -626,8 +626,30 @@ const runtimeWebLlmConfig = `    // Optional in-browser inference through WebLLM
         await _webLlmEngine.reload(model);
         _webLlmLoadedModel = model;
       }
+      configureWebLlmDemoNonThinking(model, _webLlmEngine);
       setWebLlmStatus(\`Loaded in this browser: \${model}\`, 'var(--success)');
       return _webLlmEngine;
+    }
+
+    function configureWebLlmDemoNonThinking(model, engine) {
+      if (model !== WEBLLM_DEMO_MODEL || !engine) return;
+      // Qwen3.5's non-thinking chat template starts generation after an empty
+      // <think> block. This MLC conversion currently identifies itself as the
+      // older qwen2 template, so add that generation prefix explicitly. The
+      // engine and cached weights remain loaded; this changes only its prompt
+      // formatting for the bundled browser demo.
+      const nonThinkingPrefix = '\\n<think>\\n\\n</think>\\n\\n';
+      const chatConfig = engine.loadedModelIdToChatConfig?.get?.(model);
+      if (chatConfig?.conv_template) {
+        chatConfig.conv_template.role_empty_sep = nonThinkingPrefix;
+      }
+      const pipeline = engine.loadedModelIdToPipeline?.get?.(model);
+      if (pipeline?.config?.conv_template) {
+        pipeline.config.conv_template.role_empty_sep = nonThinkingPrefix;
+      }
+      if (pipeline?.conversation?.config) {
+        pipeline.conversation.config.role_empty_sep = nonThinkingPrefix;
+      }
     }
 
     function webLlmRequestBody(body, model) {
@@ -647,6 +669,9 @@ const runtimeWebLlmConfig = `    // Optional in-browser inference through WebLLM
         request.max_tokens = Number.isFinite(requested)
           ? Math.max(1, Math.min(512, Math.floor(requested)))
           : 512;
+        request.temperature = 1;
+        request.top_p = 1;
+        request.presence_penalty = 2;
       }
       return request;
     }

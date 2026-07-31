@@ -268,6 +268,12 @@ test("ships one default WebLLM demo without replacing server runtimes", async ()
   assert.match(html, /void requestPersistentWebLlmStorage\(\);/);
   assert.match(html, /if \(model === WEBLLM_DEMO_MODEL\) \{/);
   assert.match(html, /Math\.max\(1, Math\.min\(512, Math\.floor\(requested\)\)\)/);
+  assert.match(html, /configureWebLlmDemoNonThinking\(model, _webLlmEngine\)/);
+  assert.match(html, /const nonThinkingPrefix = '\\n<think>\\n\\n<\/think>\\n\\n';/);
+  assert.match(html, /pipeline\.conversation\.config\.role_empty_sep = nonThinkingPrefix/);
+  assert.match(html, /request\.temperature = 1;/);
+  assert.match(html, /request\.top_p = 1;/);
+  assert.match(html, /request\.presence_penalty = 2;/);
   assert.match(html, /webLlmRequestBody\(body, model\)/);
   assert.match(html, /webLlmEnabled: true,/);
   assert.match(html, /webLlmModels: WEBLLM_DEMO_MODEL,/);
