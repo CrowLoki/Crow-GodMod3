@@ -346,11 +346,266 @@ const runtimeLocalProviderConfig = `    // First-class loopback runtime presets.
       return message;
     }`;
 
+const runtimeModeModelConfig = `    // Each mode keeps its own explicit provider + model choice.
+    // "auto" preserves the mode's native behavior: ULTRAPLINIAN races every
+    // available model, CLASSIC uses its paired prompt models, and
+    // PARSELTONGUE uses the best configured provider.
+    const MODE_MODEL_PROVIDERS = new Set(['auto', 'openrouter', 'venice', 'local']);
+    const MODE_MODEL_IDS = new Set(['ultraplinian', 'parseltongue', 'pliny']);
+
+    function parseLocalModelIds(raw) {
+      return [...new Set(String(raw || '')
+        .split(',')
+        .map(model => model.trim())
+        .filter(Boolean))].slice(0, 8);
+    }
+
+    function inferPersistedModelProvider(
+      model,
+      localModels = getLocalModels(),
+      localOnly = state.localOnly,
+    ) {
+      const requested = String(model || '');
+      if (localOnly && localModels.includes(requested)) return 'local';
+      if (OPENROUTER_FREE_CHAT_MODEL_SET.has(OPENROUTER_LEGACY_MODEL_MIGRATIONS[requested] || requested)) {
+        return 'openrouter';
+      }
+      if (typeof VENICE_MODELS !== 'undefined' && VENICE_MODELS.includes(requested)) return 'venice';
+      if (localModels.includes(requested)) return 'local';
+      return 'openrouter';
+    }
+
+    function defaultModeModelSelections(
+      fallbackModel = state.model,
+      localModels = getLocalModels(),
+      localOnly = state.localOnly,
+    ) {
+      const legacyModel = String(fallbackModel || OPENROUTER_DEFAULT_MODEL).slice(0, 200);
+      const legacyProvider = inferPersistedModelProvider(legacyModel, localModels, localOnly);
+      return {
+        ultraplinian: { provider: 'auto', model: '' },
+        parseltongue: {
+          provider: legacyProvider,
+          model: legacyProvider === 'openrouter'
+            ? normalizeOpenRouterModel(legacyModel)
+            : legacyModel,
+        },
+        pliny: { provider: 'auto', model: '' },
+      };
+    }
+
+    function normalizeModeModelSelection(selection, fallback, localModels = getLocalModels()) {
+      if (!selection || typeof selection !== 'object' || Array.isArray(selection)) {
+        return { ...fallback };
+      }
+      const provider = MODE_MODEL_PROVIDERS.has(selection.provider)
+        ? selection.provider
+        : fallback.provider;
+      if (provider === 'auto') return { provider: 'auto', model: '' };
+
+      let model = typeof selection.model === 'string'
+        ? selection.model.trim().slice(0, 200)
+        : '';
+      if (!model || /[\\u0000-\\u001f\\u007f]/.test(model)) return { ...fallback };
+
+      if (provider === 'openrouter') {
+        model = OPENROUTER_LEGACY_MODEL_MIGRATIONS[model] || model;
+      }
+      return { provider, model };
+    }
+
+    function normalizeModeModelSelections(
+      selections = state.modeModelSelections,
+      fallbackModel = state.model,
+      localModels = getLocalModels(),
+      localOnly = state.localOnly,
+    ) {
+      const defaults = defaultModeModelSelections(fallbackModel, localModels, localOnly);
+      const source = selections && typeof selections === 'object' && !Array.isArray(selections)
+        ? selections
+        : {};
+      return {
+        ultraplinian: normalizeModeModelSelection(source.ultraplinian, defaults.ultraplinian, localModels),
+        parseltongue: normalizeModeModelSelection(source.parseltongue, defaults.parseltongue, localModels),
+        pliny: normalizeModeModelSelection(source.pliny, defaults.pliny, localModels),
+      };
+    }
+
+    function getModeModelSelection(mode = getCurrentMode()) {
+      const safeMode = MODE_MODEL_IDS.has(mode) ? mode : 'parseltongue';
+      state.modeModelSelections = normalizeModeModelSelections(state.modeModelSelections);
+      return state.modeModelSelections[safeMode];
+    }
+
+    function isModeModelSelectionAvailable(selection) {
+      if (!selection || selection.provider === 'auto') return true;
+      if (selection.provider === 'local') {
+        return hasLocalProvider() && getLocalModels().includes(selection.model);
+      }
+      if (selection.provider === 'openrouter') {
+        return !state.localOnly
+          && !!state.apiKey
+          && OPENROUTER_FREE_CHAT_MODEL_SET.has(selection.model);
+      }
+      if (selection.provider === 'venice') {
+        return !state.localOnly
+          && !!state.veniceApiKey
+          && typeof VENICE_MODELS !== 'undefined'
+          && VENICE_MODELS.includes(selection.model);
+      }
+      return false;
+    }
+
+    function getModeModelRequest(mode, fallbackModel = state.model) {
+      const selection = getModeModelSelection(mode);
+      if (selection.provider !== 'auto') {
+        return { provider: selection.provider, model: selection.model };
+      }
+      return {
+        provider: 'auto',
+        model: String(fallbackModel || state.model || OPENROUTER_DEFAULT_MODEL),
+      };
+    }
+
+    function getModeExecutionSelection(mode = getCurrentMode()) {
+      const selection = getModeModelSelection(mode);
+      return Object.freeze({ provider: selection.provider, model: selection.model });
+    }
+
+    function getPinnedModeTarget(selection) {
+      return selection?.provider && selection.provider !== 'auto'
+        ? Object.freeze({ provider: selection.provider, model: selection.model })
+        : null;
+    }
+
+    function modelTargetKey(target) {
+      return encodeURIComponent(JSON.stringify([target?.provider || '', target?.model || '']));
+    }
+
+    function sameModelTarget(left, right) {
+      return !!left
+        && !!right
+        && left.provider === right.provider
+        && left.model === right.model;
+    }
+
+    function resolveModeModelRequest(mode, fallbackModel = state.model, executionSelection) {
+      const request = executionSelection === undefined
+        ? getModeModelRequest(mode, fallbackModel)
+        : executionSelection.provider === 'auto'
+          ? {
+              provider: 'auto',
+              model: String(fallbackModel || state.model || OPENROUTER_DEFAULT_MODEL),
+            }
+          : {
+              provider: executionSelection.provider,
+              model: executionSelection.model,
+            };
+      const target = resolveChatTarget(request.model, request.provider);
+      return { provider: target.provider, model: target.model };
+    }
+
+    function encodeModeModelSelection(selection) {
+      if (!selection || selection.provider === 'auto') return 'auto';
+      return encodeURIComponent(JSON.stringify([selection.provider, selection.model]));
+    }
+
+    function decodeModeModelSelection(value) {
+      if (!value || value === 'auto') return { provider: 'auto', model: '' };
+      try {
+        const parsed = JSON.parse(decodeURIComponent(value));
+        if (!Array.isArray(parsed) || parsed.length !== 2) throw new Error('Invalid model selection');
+        return { provider: parsed[0], model: parsed[1] };
+      } catch (_) {
+        return { provider: 'auto', model: '' };
+      }
+    }
+
+    function appendModeModelOptions(select, label, provider, models) {
+      if (!models.length) return;
+      const group = document.createElement('optgroup');
+      group.label = label;
+      for (const model of models) {
+        const option = document.createElement('option');
+        option.value = encodeModeModelSelection({ provider, model });
+        option.textContent = \`\${label} · \${model}\`;
+        group.appendChild(option);
+      }
+      select.appendChild(group);
+    }
+
+    function refreshModeModelSelect() {
+      const select = document.getElementById('modelSelect');
+      if (!select) return;
+      const mode = getCurrentMode();
+      const autoLabels = {
+        ultraplinian: 'Automatic · race all available models',
+        parseltongue: 'Automatic · best configured provider',
+        pliny: 'Automatic · paired model for each prompt',
+      };
+      const modeLabels = {
+        ultraplinian: 'ULTRAPLINIAN',
+        parseltongue: 'PARSELTONGUE',
+        pliny: 'Crow-GodMod3 CLASSIC',
+      };
+      select.replaceChildren();
+      const autoOption = document.createElement('option');
+      autoOption.value = 'auto';
+      autoOption.textContent = autoLabels[mode];
+      select.appendChild(autoOption);
+
+      if (state.localEnabled) {
+        const runtime = LOCAL_RUNTIME_PRESETS[state.localRuntime]?.label || 'Local';
+        appendModeModelOptions(select, runtime, 'local', getLocalModels());
+      }
+      if (!state.localOnly && state.apiKey) {
+        appendModeModelOptions(select, 'OpenRouter', 'openrouter', OPENROUTER_FREE_CHAT_MODELS);
+      }
+      if (!state.localOnly && state.veniceApiKey && typeof VENICE_MODELS !== 'undefined') {
+        appendModeModelOptions(select, 'Venice', 'venice', VENICE_MODELS);
+      }
+
+      const selection = getModeModelSelection(mode);
+      const selectedValue = encodeModeModelSelection(selection);
+      const available = isModeModelSelectionAvailable(selection);
+      if (
+        selection.provider !== 'auto'
+        && ![...select.options].some(option => option.value === selectedValue)
+      ) {
+        const unavailableOption = document.createElement('option');
+        unavailableOption.value = selectedValue;
+        unavailableOption.textContent = \`Unavailable · \${selection.provider} · \${selection.model}\`;
+        select.appendChild(unavailableOption);
+      }
+      select.value = selectedValue;
+      select.dataset.mode = mode;
+      select.dataset.available = String(available);
+      select.setAttribute('aria-label', \`Model for \${modeLabels[mode] || mode}\`);
+      select.title = available
+        ? 'Pick the provider and model used by this mode'
+        : 'This saved model is unavailable. Reconnect it or choose another model.';
+    }
+
+    function setCurrentModeModelSelection(value) {
+      const mode = getCurrentMode();
+      const defaults = defaultModeModelSelections();
+      const selection = normalizeModeModelSelection(
+        decodeModeModelSelection(value),
+        defaults[mode],
+      );
+      state.modeModelSelections = normalizeModeModelSelections(state.modeModelSelections);
+      state.modeModelSelections[mode] = selection;
+      refreshModeModelSelect();
+      saveState();
+    }`;
+
 replaceRequired(
   "    // State\n    let state = {",
   `${runtimeOpenRouterModelConfig}
 
 ${runtimeLocalProviderConfig}
+
+${runtimeModeModelConfig}
 
     // State
     let state = {`,
@@ -365,6 +620,22 @@ replaceRegex(
   (_match, opening, closing) =>
     `${opening}${renderOpenRouterFreeModelOptions("            ")}${closing}`,
   1,
+);
+replaceRequired(
+  '<select class="model-select" id="modelSelect" onchange="saveState()" style="display: none;">',
+  '<select class="model-select" id="modelSelect" onchange="setCurrentModeModelSelection(this.value)" aria-label="Model for current mode" title="Pick the provider and model used by this mode" style="display: none;">',
+);
+replaceRequired(
+  '<div class="mode-option-desc">Query ALL models, AI judge picks best</div>',
+  '<div class="mode-option-desc">Race all available models, or pin one model</div>',
+);
+replaceRequired(
+  '<div class="mode-option-desc">33 text obfuscations race in parallel</div>',
+  '<div class="mode-option-desc">Text transformations race on your picked model</div>',
+);
+replaceRequired(
+  '<div class="mode-option-desc">Classic L1B3RT4S Prompts — 4 model+prompt combos race</div>',
+  '<div class="mode-option-desc">Classic prompt combos race on your picked model</div>',
 );
 replaceRegex(
   /(              <select id="defaultModelInput">\n)[\s\S]*?(\n              <\/select>)/,
@@ -419,7 +690,7 @@ replaceRequired(
                 <label for="localOnly" style="margin:0;">Local-only mode</label>
               </div>
               <small style="color:#888;display:block;margin:-6px 0 12px;line-height:1.5;">
-                Local-only mode never calls OpenRouter or Venice. Core racing, TASTEMAKER, coaching, and Liquid refinement can use the discovered local model IDs.
+                Local-only mode never calls OpenRouter or Venice. After discovery, use the header model picker to save a different local model for ULTRAPLINIAN, PARSELTONGUE, and CLASSIC.
               </small>
               <label for="localRuntimeInput">Runtime preset</label>
               <select id="localRuntimeInput" onchange="applyLocalRuntimePreset(this.value)">
@@ -442,7 +713,7 @@ replaceRequired(
             <div class="form-group">
               <label for="localModelsInput">Model IDs</label>
               <input type="text" id="localModelsInput" placeholder="qwen3:8b, llama3.2:3b" spellcheck="false">
-              <small style="color:#888;display:block;margin-top:4px;">Exact IDs reported by <code>/models</code> (maximum 8). Multiple IDs race together; the first handles helper and judge calls.</small>
+              <small style="color:#888;display:block;margin-top:4px;">Exact IDs reported by <code>/models</code> (maximum 8). ULTRAPLINIAN can race them all; each mode can also pin one exact model from the header.</small>
             </div>
             <div class="form-group">
               <label for="localApiKeyInput">API Key (Optional)</label>
@@ -470,7 +741,20 @@ replaceRequired(
       localRuntime: '',  // Missing legacy value is inferred from the saved URL
       localBaseUrl: 'http://localhost:11434/v1',
       localModels: '',  // Comma-separated model IDs available from the local server
-      localApiKey: '',  // Optional token for authenticated local servers`,
+      localApiKey: '',  // Optional token for authenticated local servers
+      modeModelSelections: null,  // Explicit provider + model, saved independently for each mode`,
+);
+
+replaceRequired(
+  `    function getLocalModels() {
+      return [...new Set(String(state.localModels || '')
+        .split(',')
+        .map(model => model.trim())
+        .filter(Boolean))].slice(0, 8);
+    }`,
+  `    function getLocalModels() {
+      return parseLocalModelIds(state.localModels);
+    }`,
 );
 
 replaceRequired(
@@ -578,7 +862,8 @@ replaceRequired(
 
 replaceRequired(
   `      'localEnabled', 'localOnly', 'localBaseUrl', 'localModels', 'localApiKey',`,
-  `      'localEnabled', 'localOnly', 'localRuntime', 'localBaseUrl', 'localModels', 'localApiKey',`,
+  `      'localEnabled', 'localOnly', 'localRuntime', 'localBaseUrl', 'localModels', 'localApiKey',
+      'modeModelSelections',`,
 );
 
 replaceRequired(
@@ -594,6 +879,24 @@ replaceRequired(
             <option value="gemini-reset">💙 Gemma 4 31B · REBEL GENIUS</option>
             <option value="sonnet-35">🩷 Nemotron 3 Ultra · SEMANTIC INVERSION GODMODE</option>
             <option value="grok-reset">💜 Nemotron 3 Super · RESET_CORTEX</option>`,
+);
+replaceRequired(
+  '<select class="model-select" id="libertasModelSelect" onchange="state.libertasSelectedCombo = this.value; saveState();" style="display: none;">',
+  '<select class="model-select" id="libertasModelSelect" onchange="state.libertasSelectedCombo = this.value; saveState();" aria-label="Classic prompt strategy" title="Pick the Classic prompt strategy" style="display: none;">',
+);
+replaceRequired(
+  `            <option value="all">❤️‍🔥 FULL COMBO — Race All 5 Free Models</option>
+            <option value="hermes-fast">⚡ GODMODE FAST · Ling 3.0 Flash · INSTANT STREAM</option>
+            <option value="gpt-classic">💛 gpt-oss-20b · OG GODMODE L33T</option>
+            <option value="gemini-reset">💙 Gemma 4 31B · REBEL GENIUS</option>
+            <option value="sonnet-35">🩷 Nemotron 3 Ultra · SEMANTIC INVERSION GODMODE</option>
+            <option value="grok-reset">💜 Nemotron 3 Super · RESET_CORTEX</option>`,
+  `            <option value="all">✦ FULL PROMPT RACE · Run all 5 strategies</option>
+            <option value="hermes-fast">⌁ FAST STREAM · Pliny Love prompt</option>
+            <option value="gpt-classic">◇ OG GODMODE L33T prompt</option>
+            <option value="gemini-reset">💙 REBEL GENIUS prompt</option>
+            <option value="sonnet-35">🩷 SEMANTIC INVERSION prompt</option>
+            <option value="grok-reset">💜 RESET_CORTEX prompt</option>`,
 );
 
 replaceRequired(
@@ -709,6 +1012,93 @@ replaceRequired(
   "    const VISION_MODEL = 'google/gemma-4-31b-it:free';",
 );
 replaceRequired(
+  `      // Build race entries: OpenRouter models (when key present) + Venice models (when key present)
+      const raceEntries = (state.apiKey && !state.localOnly)
+        ? modelsToQuery.map(m => ({ model: m, provider: 'openrouter' }))
+        : [];
+      if (state.veniceApiKey && !state.localOnly) {
+        const veniceTier = state.ultraSpeedTier || 'standard';
+        const veniceCount = VENICE_TIER_SIZES[veniceTier] || VENICE_TIER_SIZES.standard;
+        const veniceSlice = VENICE_MODELS.slice(0, veniceCount);
+        veniceSlice.forEach(m => raceEntries.push({ model: m, provider: 'venice' }));
+        _log(\`[ULTRAPLINIAN] +\${veniceSlice.length} Venice models added to race\`);
+        addThinkingLog(\`!VENICE +\${veniceSlice.length} models loaded\`, 'info');
+      }
+      if (hasLocalProvider()) {
+        const localModels = getLocalModels();
+        localModels.forEach(model => raceEntries.push({ model, provider: 'local' }));
+        _log(\`[ULTRAPLINIAN] +\${localModels.length} local models added to race\`);
+        addThinkingLog(\`!LOCAL +\${localModels.length} model\${localModels.length === 1 ? '' : 's'} loaded\`, 'info');
+      }`,
+  `      // Automatic keeps the native multi-provider race. Picking a model
+      // pins ULTRAPLINIAN to that exact provider-qualified target.
+      const ultraSelection = executionSelection || getModeExecutionSelection('ultraplinian');
+      const raceEntries = [];
+      if (ultraSelection.provider !== 'auto') {
+        const pinnedTarget = resolveChatTarget(ultraSelection.model, ultraSelection.provider);
+        raceEntries.push({ model: pinnedTarget.model, provider: pinnedTarget.provider });
+        _log(\`[ULTRAPLINIAN] Pinned target: \${pinnedTarget.provider} / \${pinnedTarget.model}\`);
+        addThinkingLog(\`!PINNED \${pinnedTarget.provider.toUpperCase()} · \${pinnedTarget.model}\`, 'info');
+      } else {
+        if (state.apiKey && !state.localOnly) {
+          modelsToQuery.forEach(model => raceEntries.push({ model, provider: 'openrouter' }));
+        }
+        if (state.veniceApiKey && !state.localOnly) {
+          const veniceTier = state.ultraSpeedTier || 'standard';
+          const veniceCount = VENICE_TIER_SIZES[veniceTier] || VENICE_TIER_SIZES.standard;
+          const veniceSlice = VENICE_MODELS.slice(0, veniceCount);
+          veniceSlice.forEach(model => raceEntries.push({ model, provider: 'venice' }));
+          _log(\`[ULTRAPLINIAN] +\${veniceSlice.length} Venice models added to race\`);
+          addThinkingLog(\`!VENICE +\${veniceSlice.length} models loaded\`, 'info');
+        }
+        if (hasLocalProvider()) {
+          const localModels = getLocalModels();
+          localModels.forEach(model => raceEntries.push({ model, provider: 'local' }));
+          _log(\`[ULTRAPLINIAN] +\${localModels.length} local models added to race\`);
+          addThinkingLog(\`!LOCAL +\${localModels.length} model\${localModels.length === 1 ? '' : 's'} loaded\`, 'info');
+        }
+      }`,
+);
+replaceRequired(
+  `      // ── Winner Priority: Move last race winner to front of the line ──
+      // If a model won the previous turn, it gets queried first and becomes
+      // the initial leader faster, giving conversation continuity a boost.
+      if (state.lastUltraWinner && modelsToQuery.includes(state.lastUltraWinner)) {
+        modelsToQuery = [
+          state.lastUltraWinner,
+          ...modelsToQuery.filter(m => m !== state.lastUltraWinner)
+        ];
+        _log(\`[ULTRAPLINIAN] Winner priority: \${state.lastUltraWinner.split('/')[1]} moved to front\`);
+      }`,
+  `      // Previous-winner continuity is provider-qualified. Ignore the
+      // legacy bare model string because local and cloud IDs may collide.
+      const priorWinnerTarget = state.lastUltraWinnerTarget
+        && typeof state.lastUltraWinnerTarget === 'object'
+        ? state.lastUltraWinnerTarget
+        : null;
+      if (
+        priorWinnerTarget?.provider === 'openrouter'
+        && modelsToQuery.includes(priorWinnerTarget.model)
+      ) {
+        modelsToQuery = [
+          priorWinnerTarget.model,
+          ...modelsToQuery.filter(model => model !== priorWinnerTarget.model),
+        ];
+        _log(\`[ULTRAPLINIAN] Winner priority: \${priorWinnerTarget.model} moved to front\`);
+      }`,
+);
+replaceRequired(
+  `      if (state.lastUltraWinner && modelsToQuery[0] === state.lastUltraWinner) {
+        addThinkingLog(\`!PRIORITY >> \${state.lastUltraWinner.split('/')[1]} (prev winner)\`, 'info');
+      }`,
+  `      if (
+        priorWinnerTarget?.provider === 'openrouter'
+        && modelsToQuery[0] === priorWinnerTarget.model
+      ) {
+        addThinkingLog(\`!PRIORITY >> \${priorWinnerTarget.model} (prev winner)\`, 'info');
+      }`,
+);
+replaceRequired(
   "      return { provider: 'openrouter', model: requestedModel, url: 'https://openrouter.ai/api/v1/chat/completions', apiKey: state.apiKey };",
   "      return { provider: 'openrouter', model: normalizeOpenRouterModel(requestedModel), url: 'https://openrouter.ai/api/v1/chat/completions', apiKey: state.apiKey };",
 );
@@ -717,6 +1107,111 @@ replaceRequired(
   `      const requestBody = target.provider === 'openrouter'
         ? normalizeOpenRouterRequestBody({ ...body, model: target.model })
         : { ...body, model: target.model };`,
+);
+replaceRequired(
+  `    function resolveChatTarget(requestedModel, preferredProvider = 'auto') {
+      const localModels = getLocalModels();
+      let provider = preferredProvider;
+
+      if (state.localOnly) provider = 'local';
+      if (provider === 'auto') {
+        if (state.apiKey) provider = 'openrouter';
+        else if (hasLocalProvider()) provider = 'local';
+        else if (state.veniceApiKey) provider = 'venice';
+      }
+
+      // Cloud-only helper model IDs transparently map to the first local
+      // model when OpenRouter is unavailable. Explicit race entries stay exact.
+      if (provider === 'openrouter' && !state.apiKey && hasLocalProvider()) provider = 'local';
+
+      if (provider === 'local') {
+        if (!hasLocalProvider()) throw new Error('Local models are not configured. Open Settings → API Keys.');
+        return {
+          provider,
+          model: localModels.includes(requestedModel) ? requestedModel : localModels[0],
+          url: \`\${normalizeLocalBaseUrl()}/chat/completions\`,
+          apiKey: state.localApiKey || '',
+        };
+      }
+      if (provider === 'venice') {
+        if (!state.veniceApiKey) throw new Error('Venice API key is missing.');
+        return { provider, model: requestedModel, url: 'https://api.venice.ai/api/v1/chat/completions', apiKey: state.veniceApiKey };
+      }
+      if (!state.apiKey) throw new Error('OpenRouter API key is missing.');
+      return { provider: 'openrouter', model: normalizeOpenRouterModel(requestedModel), url: 'https://openrouter.ai/api/v1/chat/completions', apiKey: state.apiKey };
+    }`,
+  `    function resolveChatTarget(requestedModel, preferredProvider = 'auto') {
+      const localModels = getLocalModels();
+      const explicitProvider = preferredProvider !== 'auto';
+      let provider = preferredProvider;
+
+      if (!MODE_MODEL_PROVIDERS.has(provider)) {
+        throw new Error('Unknown model provider.');
+      }
+      if (explicitProvider && state.localOnly && provider !== 'local') {
+        throw new Error(\`The selected \${provider} model is unavailable while Local-only mode is enabled.\`);
+      }
+      if (!explicitProvider) {
+        if (state.localOnly) provider = 'local';
+        else if (state.apiKey) provider = 'openrouter';
+        else if (hasLocalProvider()) provider = 'local';
+        else if (state.veniceApiKey) provider = 'venice';
+        else throw new Error('No model provider is configured.');
+      }
+
+      if (provider === 'local') {
+        if (!hasLocalProvider()) {
+          throw new Error('The selected local model provider is unavailable. Reconnect it in Settings → API Keys.');
+        }
+        if (explicitProvider && !localModels.includes(requestedModel)) {
+          throw new Error(\`The selected local model "\${requestedModel}" is no longer available.\`);
+        }
+        return {
+          provider,
+          model: localModels.includes(requestedModel) ? requestedModel : localModels[0],
+          url: \`\${normalizeLocalBaseUrl()}/chat/completions\`,
+          apiKey: state.localApiKey || '',
+        };
+      }
+      if (provider === 'venice') {
+        if (!state.veniceApiKey) throw new Error('The selected Venice model provider is unavailable.');
+        const model = typeof VENICE_MODELS !== 'undefined' && VENICE_MODELS.includes(requestedModel)
+          ? requestedModel
+          : explicitProvider
+            ? ''
+            : VENICE_MODELS?.[0];
+        if (!model) throw new Error(\`The selected Venice model "\${requestedModel}" is unavailable.\`);
+        return {
+          provider,
+          model,
+          url: 'https://api.venice.ai/api/v1/chat/completions',
+          apiKey: state.veniceApiKey,
+        };
+      }
+      if (!state.apiKey) throw new Error('The selected OpenRouter model provider is unavailable.');
+      const openRouterModel = OPENROUTER_LEGACY_MODEL_MIGRATIONS[requestedModel] || requestedModel;
+      if (explicitProvider && !OPENROUTER_FREE_CHAT_MODEL_SET.has(openRouterModel)) {
+        throw new Error(\`The selected OpenRouter model "\${requestedModel}" is unavailable.\`);
+      }
+      return {
+        provider: 'openrouter',
+        model: normalizeOpenRouterModel(openRouterModel),
+        url: 'https://openrouter.ai/api/v1/chat/completions',
+        apiKey: state.apiKey,
+      };
+    }`,
+);
+replaceRequired(
+  `    async function fetchChatCompletion(body, options = {}) {
+      const target = resolveChatTarget(body.model, options.provider || 'auto');`,
+  `    async function fetchChatCompletion(body, options = {}) {
+      const inheritedTarget = options.modeTarget?.provider && options.modeTarget.provider !== 'auto'
+        ? options.modeTarget
+        : null;
+      const target = resolveChatTarget(
+        inheritedTarget?.model || body.model,
+        inheritedTarget?.provider || options.provider || 'auto',
+      );`,
 );
 replaceRequired(
   `          const comboMaxTokens = {
@@ -758,6 +1253,60 @@ replaceRequired(
               max_tokens: state.modelMaxTokens ?? 4096,
             })),`,
 );
+
+replaceRequired(
+  `    async function executeParseltongue(baseMessages, model, userQuery) {
+      const triggers = detectParseltrigueTriggers(userQuery);`,
+  `    async function executeParseltongue(baseMessages, model, userQuery, executionSelection) {
+      const modeRequest = resolveModeModelRequest('parseltongue', model, executionSelection);
+      const requestModel = modeRequest.model;
+      const triggers = detectParseltrigueTriggers(userQuery);`,
+);
+replaceRequired(
+  "      addThinkingLog(`Model: ${model.split('/')[1] || model}`, 'info');",
+  "      addThinkingLog(`Model: ${requestModel} [${modeRequest.provider}]`, 'info');",
+);
+replaceRequired(
+  `          const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Authorization': \`Bearer \${state.apiKey}\`,
+              'Content-Type': 'application/json',
+              'HTTP-Referer': 'https://godmod3.ai',
+              'X-Title': 'GODMOD3.AI-parseltongue'
+            },
+            body: JSON.stringify(normalizeOpenRouterRequestBody({
+              model,
+              messages: variantMessages,
+              temperature: params.temperature,
+              top_p: params.top_p,
+              frequency_penalty: state.modelFreqPenalty ?? 0,
+              presence_penalty: state.modelPresPenalty ?? 0,
+              max_tokens: state.modelMaxTokens ?? 4096,
+            })),
+            signal: abortController?.signal,
+          });`,
+  `          const response = await fetchChatCompletion({
+            model: requestModel,
+            messages: variantMessages,
+            temperature: params.temperature,
+            top_p: params.top_p,
+            frequency_penalty: state.modelFreqPenalty ?? 0,
+            presence_penalty: state.modelPresPenalty ?? 0,
+            max_tokens: state.modelMaxTokens ?? 4096,
+          }, {
+            provider: modeRequest.provider,
+            title: 'Crow-GodMod3-parseltongue',
+            signal: abortController?.signal,
+          });`,
+);
+replaceRequired(
+  `          model: model,
+          duration,`,
+  `          model: requestModel,
+          provider: modeRequest.provider,
+          duration,`,
+);
 replaceRequired(
   `          body: JSON.stringify({
             model,
@@ -777,6 +1326,41 @@ replaceRequired(
             frequency_penalty: state.modelFreqPenalty ?? 0,
             presence_penalty: state.modelPresPenalty ?? 0
           })),`,
+);
+replaceRequired(
+  `        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': \`Bearer \${state.apiKey}\`,
+            'Content-Type': 'application/json',
+            'HTTP-Referer': 'https://godmod3.ai',
+            'X-Title': 'GODMOD3.AI'
+          },
+          body: JSON.stringify(normalizeOpenRouterRequestBody({
+            model,
+            messages: strategyMessages,
+            temperature: strategy.temperature,
+            top_p: strategy.top_p,
+            max_tokens: state.modelMaxTokens ?? 4096,
+            frequency_penalty: state.modelFreqPenalty ?? 0,
+            presence_penalty: state.modelPresPenalty ?? 0
+          })),
+          signal
+        });`,
+  `        const modeRequest = resolveModeModelRequest('parseltongue', model);
+        const response = await fetchChatCompletion({
+          model: modeRequest.model,
+          messages: strategyMessages,
+          temperature: strategy.temperature,
+          top_p: strategy.top_p,
+          max_tokens: state.modelMaxTokens ?? 4096,
+          frequency_penalty: state.modelFreqPenalty ?? 0,
+          presence_penalty: state.modelPresPenalty ?? 0
+        }, {
+          provider: modeRequest.provider,
+          title: 'Crow-GodMod3-strategy',
+          signal,
+        });`,
 );
 replaceRegex(
   /^([ \t]+)body: JSON\.stringify\(\{\n\1  model: conv\.model,\n\1  messages: retryMessages,\n\1  temperature: params\.temperature,\n\1  top_p: params\.top_p,\n\1  frequency_penalty: state\.modelFreqPenalty \?\? 0,\n\1  presence_penalty: params\.presence_penalty \|\| state\.modelPresPenalty \|\| 0,\n\1  max_tokens: state\.modelMaxTokens \?\? 4096\n\1\}\),/gm,
@@ -809,6 +1393,162 @@ replaceRequired(
                   top_p: 1.0,
                 })),`,
 );
+
+replaceRequired(
+  `              const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                  'Authorization': \`Bearer \${state.apiKey}\`,
+                  'Content-Type': 'application/json',
+                  'HTTP-Referer': 'https://godmod3.ai',
+                  'X-Title': 'GODMOD3.AI-godmode-fast'
+                },
+                body: JSON.stringify(normalizeOpenRouterRequestBody({
+                  model: fastCombo.model,
+                  messages: fastMessages,
+                  stream: true,
+                  max_tokens: 16384,
+                  temperature: 1.0,
+                  top_p: 1.0,
+                })),
+                signal: abortController.signal,
+              });`,
+  `              const fastModeRequest = resolveModeModelRequest('pliny', fastCombo.model, executionSelection);
+              const response = await fetchChatCompletion({
+                model: fastModeRequest.model,
+                messages: fastMessages,
+                stream: true,
+                max_tokens: 16384,
+                temperature: 1.0,
+                top_p: 1.0,
+              }, {
+                provider: fastModeRequest.provider,
+                title: 'Crow-GodMod3-godmode-fast',
+                signal: abortController.signal,
+              });`,
+);
+replaceRequired(
+  "              return { content: fastContent, strategy: `godmode-classic-${fastCombo.id}`, score: 50 };",
+  `              return {
+                content: fastContent,
+                strategy: \`godmode-classic-\${fastCombo.id}\`,
+                score: 50,
+                model: fastModeRequest.model,
+                provider: fastModeRequest.provider,
+              };`,
+);
+
+// CLASSIC: keep each prompt strategy, but run it on the provider-qualified
+// model chosen for CLASSIC. "Automatic" preserves the original paired model.
+replaceRequired(
+  `          const noTempModels = /grok-4|\\/o1-|\\/o3-|deepseek-r1/i.test(combo.model);
+          const cappedTempModels = /claude-3\\.7/i.test(combo.model);
+          const isSonnet = /claude-sonnet-4\\.6/i.test(combo.model);`,
+  `          const modeRequest = resolveModeModelRequest('pliny', combo.model, liquidOptions?.modeSelection);
+          const requestModel = modeRequest.model;
+          const noTempModels = /grok-4|\\/o1-|\\/o3-|deepseek-r1/i.test(requestModel);
+          const cappedTempModels = /claude-3\\.7/i.test(requestModel);
+          const isSonnet = /claude-sonnet-4\\.6/i.test(requestModel);`,
+);
+replaceRequired(
+  `        const applied = applyHallOfFameCombo(combo, userQuery, encodeFn);
+
+        addThinkingLog(\`━━━ \${combo.codename} [\${combo.model}] ━━━\`, 'step');`,
+  `        const applied = applyHallOfFameCombo(combo, userQuery, encodeFn);
+        const modeRequest = resolveModeModelRequest('pliny', combo.model, liquidOptions?.modeSelection);
+        const requestModel = modeRequest.model;
+
+        addThinkingLog(\`━━━ \${combo.codename} [\${modeRequest.provider} · \${requestModel}] ━━━\`, 'step');`,
+);
+replaceRequired(
+  `          const modeRequest = resolveModeModelRequest('pliny', combo.model, liquidOptions?.modeSelection);
+          const requestModel = modeRequest.model;
+          const noTempModels = /grok-4|\\/o1-|\\/o3-|deepseek-r1/i.test(requestModel);`,
+  "          const noTempModels = /grok-4|\\/o1-|\\/o3-|deepseek-r1/i.test(requestModel);",
+);
+replaceRequired(
+  `          const bodyParams = {
+            model: combo.model,
+            messages: plinyMessages,
+          };`,
+  `          const bodyParams = {
+            model: requestModel,
+            messages: plinyMessages,
+          };`,
+);
+replaceRequired(
+  "            bodyParams.max_tokens = comboMaxTokens[combo.model] || 16384;",
+  "            bodyParams.max_tokens = comboMaxTokens[requestModel] || 16384;",
+);
+replaceRequired(
+  `          if (/gemini-2\\.5-pro/i.test(combo.model)) {
+            bodyParams.reasoning = { effort: 'low' };
+          } else if (/gemini-2\\.5|claude-3\\.7/i.test(combo.model)) {`,
+  `          if (/gemini-2\\.5-pro/i.test(requestModel)) {
+            bodyParams.reasoning = { effort: 'low' };
+          } else if (/gemini-2\\.5|claude-3\\.7/i.test(requestModel)) {`,
+);
+replaceRequired(
+  `          // All models (including Gemini 2.5) go through OpenRouter
+          const fetchUrl = 'https://openrouter.ai/api/v1/chat/completions';
+          const fetchHeaders = {
+            'Authorization': \`Bearer \${state.apiKey}\`,
+            'Content-Type': 'application/json',
+            'HTTP-Referer': 'https://godmod3.ai',
+            'X-Title': 'GODMOD3.AI-godmode-classic'
+          };
+
+          const response = await fetch(fetchUrl, {
+            method: 'POST',
+            headers: fetchHeaders,
+            body: JSON.stringify(normalizeOpenRouterRequestBody(bodyParams)),
+            signal: AbortSignal.any([abortController?.signal, earlyExitAbort.signal].filter(Boolean))
+          });`,
+  `          const response = await fetchChatCompletion(bodyParams, {
+            provider: modeRequest.provider,
+            title: 'Crow-GodMod3-godmode-classic',
+            signal: AbortSignal.any([abortController?.signal, earlyExitAbort.signal].filter(Boolean)),
+          });`,
+);
+replaceRequired(
+  "            throw new Error(`API ${response.status} [${combo.model}]: ${errBody.slice(0, 200)}`);",
+  "            throw new Error(`API ${response.status} [${requestModel}]: ${errBody.slice(0, 200)}`);",
+);
+replaceRequired(
+  `            comboModel: combo.model,
+            systemPrompt: applied.system,`,
+  `            comboModel: requestModel,
+            comboProvider: modeRequest.provider,
+            systemPrompt: applied.system,`,
+);
+replaceRequired(
+  `        winnerModel: bestResult?.comboModel,
+        winnerScore: bestResult?.score,`,
+  `        winnerModel: bestResult?.comboModel,
+        winnerProvider: bestResult?.comboProvider,
+        winnerScore: bestResult?.score,`,
+);
+replaceRequired(
+  `        winner_model: bestResult?.comboModel || null,
+        winner_score: bestResult?.score || 0,`,
+  `        winner_model: bestResult?.comboModel || null,
+        winner_provider: bestResult?.comboProvider || null,
+        winner_score: bestResult?.score || 0,`,
+);
+replaceRequired(
+  `          model: bestResult.comboModel,
+          encoding: winningEncoding,`,
+  `          model: bestResult.comboModel,
+          provider: bestResult.comboProvider,
+          encoding: winningEncoding,`,
+);
+replaceRequired(
+  `          mode: 'parseltongue',
+          model: conv.model,`,
+  `          mode: 'parseltongue',
+          model: parseltongueResult?.magic?.model || conv.model,
+          provider: parseltongueResult?.magic?.provider || null,`,
+);
 replaceRequired(
   `    function sanitizeLoadedState() {
       state.localEnabled = state.localEnabled === true;`,
@@ -825,7 +1565,535 @@ replaceRequired(
         ? state.localBaseUrl.slice(0, 300)
         : 'http://localhost:11434/v1';
       state.localRuntime = normalizeLocalRuntime(state.localRuntime, state.localBaseUrl);
-      state.localModels = typeof state.localModels === 'string' ? state.localModels.slice(0, 1000) : '';`,
+      state.localModels = typeof state.localModels === 'string' ? state.localModels.slice(0, 1000) : '';
+      state.modeModelSelections = normalizeModeModelSelections(
+        state.modeModelSelections,
+        state.model,
+        parseLocalModelIds(state.localModels),
+      );`,
+);
+replaceRequired(
+  "      if (m.winnerModel != null) m.winnerModel = String(m.winnerModel).slice(0, 100);",
+  `      if (m.winnerModel != null) m.winnerModel = String(m.winnerModel).slice(0, 100);
+      if (m.winnerProvider != null) {
+        m.winnerProvider = MODE_MODEL_PROVIDERS.has(m.winnerProvider)
+          ? m.winnerProvider
+          : null;
+      }`,
+);
+replaceRequired(
+  "              r.model = typeof r.model === 'string' ? r.model.slice(0, 100) : '';",
+  `              r.model = typeof r.model === 'string' ? r.model.slice(0, 100) : '';
+              r.provider = MODE_MODEL_PROVIDERS.has(r.provider) ? r.provider : null;`,
+  2,
+);
+
+replaceRequired(
+  `      // Provider configurations without OpenRouter use the provider-aware ULTRAPLINIAN pipeline.
+      if (((!state.apiKey && (state.veniceApiKey || hasLocalProvider())) || state.localOnly) && !state.ultraplinian) {
+        selectMode('ultraplinian');
+      }
+
+`,
+  '',
+  2,
+);
+replaceRequired(
+  `          state.apiKey = plain;
+          updateApiWarning();
+          buildTierSelect();`,
+  `          state.apiKey = plain;
+          updateApiWarning();
+          buildTierSelect();
+          refreshModeModelSelect();`,
+);
+replaceRequired(
+  `      const conv = getCurrentConv();
+
+      // Build user message (may include image metadata for re-rendering)`,
+  `      const conv = getCurrentConv();
+      const executionMode = getCurrentMode();
+      const executionSelection = getModeExecutionSelection(executionMode);
+      const executionTarget = getPinnedModeTarget(executionSelection);
+
+      // Build user message (may include image metadata for re-rendering)`,
+);
+replaceRequired(
+  "          visionContext = await processImageWithVision(attachedImage, content);",
+  "          visionContext = await processImageWithVision(attachedImage, content, executionTarget);",
+);
+replaceRequired(
+  "      if (attachedImage && (state.apiKey || hasLocalProvider())) {",
+  "      if (attachedImage && hasAuxiliaryModelProvider(executionTarget)) {",
+);
+replaceRequired(
+  ": classifyHarm(content).then(r => { _lastHarmResult = r; return r; }).catch(() => null);",
+  ": classifyHarm(content, executionTarget).then(r => { _lastHarmResult = r; return r; }).catch(() => null);",
+);
+replaceRequired(
+  `      if (state.ultraplinian) {
+        console.log('%c[DEBUG] ✓ ENTERING ULTRAPLINIAN MODE'`,
+  `      if (executionMode === 'ultraplinian') {
+        console.log('%c[DEBUG] ✓ ENTERING ULTRAPLINIAN MODE'`,
+);
+replaceRequired(
+  "          const result = await ultraplinian(messages, content, handleLeaderChange);",
+  "          const result = await ultraplinian(messages, content, handleLeaderChange, executionSelection);",
+);
+replaceRequired(
+  `      if (state.plinyMode) {
+
+        // ═══════════════════════════════════════════════════════════════════
+        // GODMODE FAST`,
+  `      if (executionMode === 'pliny') {
+
+        // ═══════════════════════════════════════════════════════════════════
+        // GODMODE FAST`,
+);
+replaceRequired(
+  "      if (getCurrentMode() === 'parseltongue') {",
+  "      if (executionMode === 'parseltongue') {",
+  1,
+);
+replaceRequired(
+  "    async function classifyHarm(query) {",
+  "    async function classifyHarm(query, modeTarget = null) {",
+);
+replaceRequired(
+  "      const cacheKey = query.slice(0, 120).toLowerCase().trim();",
+  `      const targetKey = modeTarget ? modelTargetKey(modeTarget) : 'auto';
+      const cacheKey = \`\${targetKey}:\${query.slice(0, 120).toLowerCase().trim()}\`;`,
+);
+replaceRequired(
+  "          }, { title: 'G0DM0D3-Classifier', signal: controller.signal });",
+  "          }, { title: 'Crow-GodMod3-Classifier', signal: controller.signal, modeTarget });",
+);
+replaceRequired(
+  "    async function processImageWithVision(imageData, userPrompt) {",
+  "    async function processImageWithVision(imageData, userPrompt, modeTarget = null) {",
+);
+replaceRequired(
+  "        }, { title: 'GODMOD3.AI-vision' });",
+  "        }, { title: 'Crow-GodMod3-vision', modeTarget });",
+);
+replaceRequired(
+  `    function hasAuxiliaryModelProvider() {
+      return !!state.apiKey || hasLocalProvider();
+    }`,
+  `    function hasAuxiliaryModelProvider(modeTarget = null) {
+      if (modeTarget) {
+        try {
+          resolveChatTarget(modeTarget.model, modeTarget.provider);
+          return true;
+        } catch (_) {
+          return false;
+        }
+      }
+      if (state.localOnly) return hasLocalProvider();
+      return !!(state.apiKey || state.veniceApiKey || hasLocalProvider());
+    }`,
+);
+replaceRequired(
+  "    async function generateSmartPrefill(query, classification) {",
+  "    async function generateSmartPrefill(query, classification, modeTarget = null) {",
+);
+replaceRequired(
+  "          }, { title: 'GODMOD3.AI-prefill' });",
+  "          }, { title: 'Crow-GodMod3-prefill', modeTarget });",
+);
+replaceRequired(
+  "    async function classifyQueryWithLLM(query) {",
+  "    async function classifyQueryWithLLM(query, modeTarget = null) {",
+);
+replaceRequired(
+  "          }, { title: 'GODMOD3.AI-classifier' });",
+  "          }, { title: 'Crow-GodMod3-classifier', modeTarget });",
+);
+replaceRequired(
+  `    async function getQueryClassification(query) {
+      // Simple cache key (first 100 chars)
+      const cacheKey = query.slice(0, 100).toLowerCase().trim();`,
+  `    async function getQueryClassification(query, modeTarget = null) {
+      // Keep explicit provider/model classifications isolated from Automatic.
+      const targetKey = modeTarget
+        ? \`\${modeTarget.provider}:\${modeTarget.model}\`
+        : 'auto';
+      const cacheKey = \`\${targetKey}:\${query.slice(0, 100).toLowerCase().trim()}\`;`,
+);
+replaceRequired(
+  "      const result = await classifyQueryWithLLM(query);",
+  "      const result = await classifyQueryWithLLM(query, modeTarget);",
+);
+replaceRequired(
+  "    async function ultraplinian(messages, userQuery, onLeaderChange) {",
+  `    async function ultraplinian(messages, userQuery, onLeaderChange, executionSelection = null) {
+      executionSelection = executionSelection || getModeExecutionSelection('ultraplinian');
+      const executionTarget = getPinnedModeTarget(executionSelection);`,
+);
+replaceRequired(
+  "getQueryClassification(userQuery)",
+  "getQueryClassification(userQuery, executionTarget)",
+  2,
+);
+replaceRequired(
+  "generateSmartPrefill(userQuery, null)",
+  "generateSmartPrefill(userQuery, null, executionTarget)",
+);
+replaceRequired(
+  "    async function llmJudgeResponses(query, responses, classification) {",
+  "    async function llmJudgeResponses(query, responses, classification, modeTarget = null) {",
+);
+replaceRequired(
+  "            }, { title: 'GODMOD3.AI-tastemaker', signal: controller.signal });",
+  "            }, { title: 'Crow-GodMod3-tastemaker', signal: controller.signal, modeTarget });",
+);
+replaceRequired(
+  "winner = await llmJudgeResponses(userQuery, allResults, classification);",
+  "winner = await llmJudgeResponses(userQuery, allResults, classification, executionTarget);",
+);
+replaceRequired(
+  "    async function llmRefusalCheck(userQuery, responseContent) {",
+  "    async function llmRefusalCheck(userQuery, responseContent, modeTarget = null) {",
+);
+replaceRequired(
+  "          }, { title: 'GODMOD3.AI-refusal-detector' });",
+  "          }, { title: 'Crow-GodMod3-refusal-detector', modeTarget });",
+);
+replaceRequired(
+  "llmRefusalCheck(userQuery, winner.content)",
+  "llmRefusalCheck(userQuery, winner.content, executionTarget)",
+);
+replaceRequired(
+  "llmRefusalCheck(userQuery, r.content)",
+  "llmRefusalCheck(userQuery, r.content, executionTarget)",
+);
+replaceRequired(
+  "    async function plinyImprovementLoop(winnerModel, winnerContent, userQuery, messages) {",
+  "    async function plinyImprovementLoop(winnerModel, winnerContent, userQuery, messages, winnerProvider = null, modeTarget = null) {",
+);
+replaceRequired(
+  "        for (const coachModel of PLINY_COACH_MODELS) {",
+  "        for (const coachModel of (modeTarget ? [modeTarget.model] : PLINY_COACH_MODELS)) {",
+  1,
+);
+replaceRequired(
+  "              }, { title: 'GODMOD3.AI-pliny-coach' });",
+  "              }, { title: 'Crow-GodMod3-pliny-coach', modeTarget });",
+);
+replaceRequired(
+  `          }, { provider: inferProviderForModel(winnerModel), title: 'GODMOD3.AI-pliny-improve' });`,
+  `          }, {
+            title: 'Crow-GodMod3-pliny-improve',
+            modeTarget: modeTarget || (
+              winnerProvider
+                ? { provider: winnerProvider, model: winnerModel }
+                : null
+            ),
+          });`,
+);
+replaceRequired(
+  "plinyImprovementLoop(earlyWinner.model, earlyWinner.content, userQuery, messages)",
+  "plinyImprovementLoop(earlyWinner.model, earlyWinner.content, userQuery, messages, earlyWinner.provider, executionTarget)",
+);
+replaceRequired(
+  "plinyImprovementLoop(winner.model, winner.content, userQuery, messages)",
+  "plinyImprovementLoop(winner.model, winner.content, userQuery, messages, winner.provider, executionTarget)",
+);
+replaceRequired(
+  "            const abortResult = { model, content: '', success: false, error: 'aborted-early-stop', duration: 0 };",
+  "            const abortResult = { model, provider: entryProvider, content: '', success: false, error: 'aborted-early-stop', duration: 0 };",
+);
+replaceRequired(
+  "          const errorResult = { model, content: '', success: false, error: err.message, duration: 0 };",
+  "          const errorResult = { model, provider: entryProvider, content: '', success: false, error: err.message, duration: 0 };",
+);
+replaceRequired(
+  "          if (controller.signal.aborted) return { model, content: '', success: false, error: 'aborted-early-stop', duration: 0 };",
+  "          if (controller.signal.aborted) return { model, provider: entryProvider, content: '', success: false, error: 'aborted-early-stop', duration: 0 };",
+);
+replaceRequired(
+  `      let currentLeaderScore = 0;
+      let currentLeaderModel = null;`,
+  `      let currentLeaderScore = 0;
+      let currentLeaderModel = null;
+      let currentLeaderProvider = null;`,
+);
+replaceRequired(
+  "            const continuityBonus = (state.lastUltraWinner && model === state.lastUltraWinner && messages.filter(m => m.role === 'assistant').length > 0) ? 5 : 0;",
+  "            const continuityBonus = (sameModelTarget(priorWinnerTarget, { provider: entryProvider, model }) && messages.filter(m => m.role === 'assistant').length > 0) ? 5 : 0;",
+);
+replaceRequired(
+  "              currentLeaderModel = model;",
+  `              currentLeaderModel = model;
+              currentLeaderProvider = entryProvider;`,
+);
+replaceRequired(
+  "        state.lastUltraWinner = earlyWinner.model;",
+  `        state.lastUltraWinner = earlyWinner.model;
+        state.lastUltraWinnerTarget = Object.freeze({
+          provider: earlyWinner.provider,
+          model: earlyWinner.model,
+        });`,
+);
+replaceRequired(
+  "        state.lastUltraWinner = winner.model;",
+  `        state.lastUltraWinner = winner.model;
+        state.lastUltraWinnerTarget = Object.freeze({
+          provider: winner.provider,
+          model: winner.model,
+        });`,
+);
+replaceRequired(
+  "          state.lastUltraWinner = currentLeaderModel;",
+  `          state.lastUltraWinner = currentLeaderModel;
+          state.lastUltraWinnerTarget = Object.freeze({
+            provider: currentLeaderProvider,
+            model: currentLeaderModel,
+          });`,
+);
+replaceRequired(
+  "r.model === earlyWinner.model",
+  "sameModelTarget(r, earlyWinner)",
+);
+replaceRequired(
+  "r.model === winner.model",
+  "sameModelTarget(r, winner)",
+);
+replaceRequired(
+  "r.model === currentLeaderModel",
+  "r.provider === currentLeaderProvider && r.model === currentLeaderModel",
+  2,
+);
+replaceRequired(
+  `          .map(r => ({
+            model: r.model,
+            content: polishResponse(r.content),`,
+  `          .map(r => ({
+            model: r.model,
+            provider: r.provider,
+            content: polishResponse(r.content),`,
+);
+replaceRequired(
+  `            .map(r => ({
+              model: r.model,
+              content: polishResponse(r.content),`,
+  `            .map(r => ({
+              model: r.model,
+              provider: r.provider,
+              content: polishResponse(r.content),`,
+);
+replaceRequired(
+  `            winnerModel: earlyWinner.model,
+            winnerScore: displayScore.overall,`,
+  `            winnerModel: earlyWinner.model,
+            winnerProvider: earlyWinner.provider,
+            winnerScore: displayScore.overall,`,
+);
+replaceRequired(
+  `            winnerModel: winner.model,
+            winnerScore: displayScore.overall,`,
+  `            winnerModel: winner.model,
+            winnerProvider: winner.provider,
+            winnerScore: displayScore.overall,`,
+);
+replaceRequired(
+  `              winnerModel: currentLeaderModel,
+              winnerScore: displayScore.overall,`,
+  `              winnerModel: currentLeaderModel,
+              winnerProvider: leaderResult.provider,
+              winnerScore: displayScore.overall,`,
+);
+replaceRequired(
+  "    async function llmAccuracyCheck(userQuery, responseContent, forceCheck = false) {",
+  "    async function llmAccuracyCheck(userQuery, responseContent, forceCheck = false, modeTarget = null) {",
+);
+replaceRequired(
+  "          }, { title: 'GODMOD3.AI-accuracy-check' });",
+  "          }, { title: 'Crow-GodMod3-accuracy-check', modeTarget });",
+);
+replaceRequired(
+  "    async function liquidResponseLoop(messageIdx, originalContent, userQuery, winnerModel) {",
+  "    async function liquidResponseLoop(messageIdx, originalContent, userQuery, winnerModel, modeTarget = null) {",
+);
+replaceRequired(
+  "hasAuxiliaryModelProvider()",
+  "hasAuxiliaryModelProvider(modeTarget)",
+  8,
+);
+replaceRequired(
+  "llmAccuracyCheck(userQuery, originalContent, true)",
+  "llmAccuracyCheck(userQuery, originalContent, true, modeTarget)",
+);
+replaceRequired(
+  "                }, { title: 'GODMOD3.AI-liquid-refiner' });",
+  "                }, { title: 'Crow-GodMod3-liquid-refiner', modeTarget });",
+);
+replaceRequired(
+  "liquidResponseLoop(messageIdx, result.content, content, winnerModel);",
+  `liquidResponseLoop(
+                messageIdx,
+                result.content,
+                content,
+                winnerModel,
+                executionTarget || (
+                  result.magic?.winnerProvider || result.magic?.provider
+                    ? {
+                        provider: result.magic?.winnerProvider || result.magic?.provider,
+                        model: winnerModel,
+                      }
+                    : null
+                ),
+              );`,
+);
+replaceRequired(
+  "liquidResponseLoop(msgIdx, conv.messages[msgIdx].content, content, winnerModel);",
+  `liquidResponseLoop(
+                msgIdx,
+                conv.messages[msgIdx].content,
+                content,
+                winnerModel,
+                executionTarget || (
+                  conv.messages[msgIdx].magic?.provider
+                    ? { provider: conv.messages[msgIdx].magic.provider, model: winnerModel }
+                    : null
+                ),
+              );`,
+);
+replaceRequired(
+  "liquidResponseLoop(msgIdx, conv.messages[msgIdx].content, content, conv.model);",
+  "liquidResponseLoop(msgIdx, conv.messages[msgIdx].content, content, conv.model, executionTarget);",
+);
+replaceRequired(
+  `executePlinyMode(messages, conv.model, content, {
+              enabled: true,`,
+  `executePlinyMode(messages, conv.model, content, {
+              enabled: true,
+              modeSelection: executionSelection,
+              modeTarget: executionTarget,`,
+);
+replaceRequired(
+  "executePlinyMode(messages, conv.model, content);",
+  "executePlinyMode(messages, conv.model, content, { modeSelection: executionSelection, modeTarget: executionTarget });",
+);
+replaceRequired(
+  "executeParseltongue(messages, conv.model, content);",
+  "executeParseltongue(messages, conv.model, content, executionSelection);",
+);
+
+replaceRegex(
+  /        \} else \{\n          \/\/ Direct single-model mode \(OpenRouter key required\)\n[\s\S]*?\n        \}\n      \} finally \{/,
+  `        } else if (state.plinyMode) {
+          // Regeneration keeps CLASSIC prompt behavior and its saved model.
+          try {
+            abortController = new AbortController();
+            const result = await executePlinyMode(messages, conv.model, userQuery);
+            conv.messages = conv.messages.slice(0, userMsgIdx + 1);
+            conv.messages.push({
+              role: 'assistant',
+              content: result?.content || '**Error:** Crow-GodMod3 CLASSIC regeneration failed.',
+              strategy: result?.strategy,
+              score: result?.score,
+              magic: result?.magic,
+            });
+            saveState();
+          } catch (err) {
+            conv.messages = conv.messages.slice(0, userMsgIdx + 1);
+            conv.messages.push({
+              role: 'assistant',
+              content: err.name === 'AbortError' ? '_[Response stopped]_' : \`**Error:** \${err.message}\`,
+            });
+            saveState();
+          }
+        } else {
+          // PARSELTONGUE regeneration re-runs the transformation race on its
+          // own provider-qualified model instead of falling through to cloud.
+          try {
+            abortController = new AbortController();
+            const result = await executeParseltongue(messages, conv.model, userQuery);
+            conv.messages = conv.messages.slice(0, userMsgIdx + 1);
+            conv.messages.push({
+              role: 'assistant',
+              content: result?.content || '**Error:** PARSELTONGUE regeneration failed.',
+              score: result?.score,
+              magic: result?.magic,
+            });
+            saveState();
+          } catch (err) {
+            conv.messages = conv.messages.slice(0, userMsgIdx + 1);
+            conv.messages.push({
+              role: 'assistant',
+              content: err.name === 'AbortError' ? '_[Response stopped]_' : \`**Error:** \${err.message}\`,
+            });
+            saveState();
+          }
+        }
+      } finally {`,
+  1,
+);
+replaceRequired(
+  `      const userQuery = historyMessages[historyMessages.length - 1]?.content || '';
+
+      try {
+        if (state.ultraplinian) {`,
+  `      const userQuery = historyMessages[historyMessages.length - 1]?.content || '';
+      const executionMode = getCurrentMode();
+      const executionSelection = getModeExecutionSelection(executionMode);
+      const executionTarget = getPinnedModeTarget(executionSelection);
+
+      try {
+        if (executionMode === 'ultraplinian') {`,
+);
+replaceRequired(
+  "const result = await ultraplinian(messages, userQuery, null);",
+  "const result = await ultraplinian(messages, userQuery, null, executionSelection);",
+);
+replaceRequired(
+  "        } else if (state.plinyMode) {\n          // Regeneration keeps CLASSIC",
+  "        } else if (executionMode === 'pliny') {\n          // Regeneration keeps CLASSIC",
+);
+replaceRequired(
+  "const result = await executePlinyMode(messages, conv.model, userQuery);",
+  "const result = await executePlinyMode(messages, conv.model, userQuery, { modeSelection: executionSelection, modeTarget: executionTarget });",
+);
+replaceRequired(
+  "const result = await executeParseltongue(messages, conv.model, userQuery);",
+  "const result = await executeParseltongue(messages, conv.model, userQuery, executionSelection);",
+);
+
+replaceRequired(
+  `          const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Authorization': \`Bearer \${state.apiKey}\`,
+              'Content-Type': 'application/json',
+              'HTTP-Referer': 'https://godmod3.ai',
+              'X-Title': 'GODMOD3.AI'
+            },
+            body: JSON.stringify(normalizeOpenRouterRequestBody({
+              model: conv.model,
+              messages: retryMessages,
+              temperature: params.temperature,
+              top_p: params.top_p,
+              frequency_penalty: state.modelFreqPenalty ?? 0,
+              presence_penalty: params.presence_penalty || state.modelPresPenalty || 0,
+              max_tokens: state.modelMaxTokens ?? 4096
+            })),
+            signal: abortController.signal
+          });`,
+  `          const fallbackRequest = resolveModeModelRequest('parseltongue', conv.model, executionSelection);
+          const response = await fetchChatCompletion({
+            model: fallbackRequest.model,
+            messages: retryMessages,
+            temperature: params.temperature,
+            top_p: params.top_p,
+            frequency_penalty: state.modelFreqPenalty ?? 0,
+            presence_penalty: params.presence_penalty || state.modelPresPenalty || 0,
+            max_tokens: state.modelMaxTokens ?? 4096
+          }, {
+            provider: fallbackRequest.provider,
+            title: 'Crow-GodMod3-retry',
+            signal: abortController.signal,
+          });`,
 );
 replaceRequired(
   `      for (const conv of state.conversations) {
@@ -849,7 +2117,8 @@ replaceRequired(
       document.getElementById('localModelsInput').value = state.localModels || '';
       document.getElementById('localApiKeyInput').value = state.localApiKey || '';
       document.getElementById('localConnectionStatus').textContent = '';
-      updateLocalRuntimeHelp(state.localRuntime);`,
+      updateLocalRuntimeHelp(state.localRuntime);
+      refreshModeModelSelect();`,
 );
 
 replaceRequired(
@@ -865,13 +2134,122 @@ replaceRequired(
         state.localBaseUrl,
       );
       document.getElementById('localRuntimeInput').value = state.localRuntime;
-      state.localModels = (document.getElementById('localModelsInput').value || '').trim();`,
+      state.localModels = (document.getElementById('localModelsInput').value || '').trim();
+      state.modeModelSelections = normalizeModeModelSelections(
+        state.modeModelSelections,
+        state.model,
+        parseLocalModelIds(state.localModels),
+      );`,
+);
+replaceRequired(
+  "      state.model = document.getElementById('defaultModelInput').value;",
+  `      const defaultModelValue = document.getElementById('defaultModelInput').value;
+      if (OPENROUTER_FREE_CHAT_MODEL_SET.has(defaultModelValue)) {
+        state.model = defaultModelValue;
+      }`,
+);
+
+replaceRequired(
+  `      // Show/hide model selectors based on mode
+      const libertasSelector = document.getElementById('libertasModelSelect');
+      if (currentMode === 'ultraplinian') {
+        selector.style.display = 'none';
+        if (libertasSelector) libertasSelector.style.display = 'none';
+      } else if (currentMode === 'pliny') {
+        selector.style.display = 'none';
+        if (libertasSelector) libertasSelector.style.display = 'block';
+      } else {
+        selector.style.display = 'block';
+        if (libertasSelector) libertasSelector.style.display = 'none';
+      }`,
+  `      // The provider/model picker is available in every mode. CLASSIC keeps
+      // its separate prompt-strategy picker alongside it.
+      const libertasSelector = document.getElementById('libertasModelSelect');
+      selector.style.display = 'block';
+      if (libertasSelector) libertasSelector.style.display = currentMode === 'pliny' ? 'block' : 'none';
+      refreshModeModelSelect();`,
+);
+
+replaceRequired(
+  "      document.getElementById('modelSelect').value = state.model;",
+  "      refreshModeModelSelect();",
+  1,
+);
+
+replaceRequired(
+  `    function saveState() {
+      state.model = document.getElementById('modelSelect').value;
+
+      // Also update current conversation's model/persona if mid-conversation
+      const conv = getCurrentConv();
+      if (conv) {
+        conv.model = state.model;
+        conv.persona = state.persona;
+      }`,
+  `    function saveState() {
+      // Model picker changes are applied by setCurrentModeModelSelection().
+      // Never copy its provider-encoded option value into legacy state.model.
+      const conv = getCurrentConv();
+      if (conv) {
+        conv.persona = state.persona;
+      }`,
+);
+replaceRequired(
+  `      state.model = document.getElementById('modelSelect').value;
+      const conv = getCurrentConv();
+      if (conv) {
+        conv.model = state.model;
+        conv.persona = state.persona;
+      }`,
+  `      const conv = getCurrentConv();
+      if (conv) {
+        conv.persona = state.persona;
+      }`,
+  1,
+);
+replaceRequired(
+  `      if (conv) {
+        document.getElementById('modelSelect').value = conv.model;
+        document.getElementById('personaSelect').value = conv.persona;
+        state.model = conv.model;
+        state.persona = conv.persona;
+      }`,
+  `      if (conv) {
+        document.getElementById('personaSelect').value = conv.persona;
+        state.model = conv.model;
+        state.persona = conv.persona;
+        refreshModeModelSelect();
+      }`,
+);
+replaceRequired(
+  `        } else if (mode === 'PLINY' || mode === 'G0DM0D3 CLASSIC') {
+          state.ultraplinian = false;
+          state.plinyMode = true;
+        }`,
+  `        } else if (mode === 'PLINY' || mode.includes('CLASSIC')) {
+          state.ultraplinian = false;
+          state.plinyMode = true;
+        } else if (mode.includes('PARSELTONGUE')) {
+          state.ultraplinian = false;
+          state.plinyMode = false;
+        }`,
+);
+replaceRequired(
+  `      saveState();
+      render();
+
+      // Put the message back in the input field and send`,
+  `      updateModeSwitcherUI();
+      saveState();
+      render();
+
+      // Put the message back in the input field and send`,
 );
 
 replaceRequired(
   `        _version: 2,
         _exportedAt: new Date().toISOString(),`,
-  `        _version: 3,
+  `        _version: 4,
         _exportedAt: new Date().toISOString(),`,
 );
 replaceRequired(
@@ -885,13 +2263,14 @@ replaceRequired(
         localRuntime: state.localRuntime,
         localBaseUrl: state.localBaseUrl,
         localModels: state.localModels,
+        modeModelSelections: state.modeModelSelections,
       };`,
 );
 replaceRequired(
   `        'modelTemperature', 'modelTopP', 'modelMaxTokens', 'modelFreqPenalty', 'modelPresPenalty',
         'sidebarOpen', 'backendUrl'];`,
   `        'modelTemperature', 'modelTopP', 'modelMaxTokens', 'modelFreqPenalty', 'modelPresPenalty',
-        'localEnabled', 'localOnly', 'localRuntime', 'localBaseUrl', 'localModels',
+        'localEnabled', 'localOnly', 'localRuntime', 'localBaseUrl', 'localModels', 'modeModelSelections',
         'sidebarOpen', 'backendUrl'];`,
 );
 replaceRequired(
@@ -915,6 +2294,12 @@ replaceRequired(
       candidate.localModels = typeof candidate.localModels === 'string'
         ? candidate.localModels.slice(0, 1000)
         : '';
+      candidate.modeModelSelections = normalizeModeModelSelections(
+        candidate.modeModelSelections,
+        candidate.model,
+        parseLocalModelIds(candidate.localModels),
+        candidate.localOnly,
+      );
 
       // Sanitize conversations: validate structure, strip dangerous values`,
 );
@@ -1319,6 +2704,8 @@ const crowThemeStyles = `
     .chat-header {
       background: rgb(6 8 20 / 90%);
       backdrop-filter: blur(16px);
+      z-index: 50;
+      overflow: visible;
     }
 
     .brand-mark {
@@ -1605,6 +2992,7 @@ const crowThemeStyles = `
 `;
 
 replaceRequired("</style>", `${crowThemeStyles}\n  </style>`);
+replaceRequired(".split('/')[1]", ".split('/').pop()", 20);
 
 function getHueAndSaturation(red, green, blue) {
   const [r, g, b] = [red, green, blue].map((value) => value / 255);
