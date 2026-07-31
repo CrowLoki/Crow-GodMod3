@@ -266,6 +266,9 @@ test("ships one default WebLLM demo without replacing server runtimes", async ()
   assert.match(html, /Deleting chats removes conversation history only/);
   assert.match(html, /To remove the model, clear Crow-GodMod3's browser\/site data/);
   assert.match(html, /void requestPersistentWebLlmStorage\(\);/);
+  assert.match(html, /if \(model === WEBLLM_DEMO_MODEL\) \{/);
+  assert.match(html, /Math\.max\(1, Math\.min\(512, Math\.floor\(requested\)\)\)/);
+  assert.match(html, /webLlmRequestBody\(body, model\)/);
   assert.match(html, /webLlmEnabled: true,/);
   assert.match(html, /webLlmModels: WEBLLM_DEMO_MODEL,/);
   assert.match(html, /it is not hosted inside this website/);
