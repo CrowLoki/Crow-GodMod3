@@ -12,6 +12,7 @@ Supported presets:
 - vLLM — `http://localhost:8000/v1`
 - llama.cpp — `http://localhost:8080/v1`
 - Custom OpenAI-compatible loopback server
+- WebLLM — MLC models running directly through WebGPU in the browser
 
 ## Connect from Crow-GodMod3
 
@@ -187,11 +188,42 @@ must expose:
 
 An optional API key is sent as `Authorization: Bearer <key>`.
 
+## WebLLM in browser
+
+WebLLM does not require a local server. It downloads a compatible quantized
+model into the current browser's cache and performs inference through WebGPU on
+that device.
+
+1. Use a current Chrome, Edge, or another browser with WebGPU enabled.
+2. Open **Settings → API Keys → WebLLM · In-Browser Models**.
+3. Enable WebLLM and click **Discover Browser Models**. This loads only the
+   pinned WebLLM library and its model catalogue; it does not download model
+   weights.
+4. Select a WebLLM model from the header model picker for the desired mode.
+5. Send a message. The browser downloads and caches that model on first use,
+   then generates locally. Loading progress appears in the WebLLM settings
+   status.
+
+WebLLM models use MLC model artifacts plus a compatible WebAssembly model
+library. Ordinary GGUF, Safetensors, Ollama, and LM Studio downloads cannot be
+selected directly. A custom model must first be compiled and published in the
+MLC/WebLLM format with both its model URL and matching `model_lib` URL.
+
+Crow-GodMod3 serializes browser generations because one WebGPU engine cannot
+reliably run the site's parallel race requests simultaneously. Other providers
+and modes remain unchanged.
+
+Official documentation:
+[WebLLM](https://github.com/mlc-ai/web-llm) and
+[custom model records](https://webllm.mlc.ai/docs/user/advanced_usage.html).
+
 ## Local-only behavior
 
 Local-only mode:
 
 - excludes OpenRouter and Venice from ULTRAPLINIAN races;
+- permits either an OpenAI-compatible loopback runtime or an explicitly
+  selected WebLLM browser model;
 - uses lightweight local checks for classification/refusal detection and the
   first selected model in the active mode's frozen pool for remaining judge,
   coaching, accuracy, and Liquid calls;
@@ -218,3 +250,5 @@ runtime may keep its own request logs.
   from API-key, connection, and account failures.
 - **Slow races or out-of-memory errors:** use fewer model IDs, reduce Max
   Tokens, or disable additional coaching and Liquid refinement passes.
+- **WebLLM unavailable:** use HTTPS or localhost and verify WebGPU is enabled.
+  Browser models cannot be loaded from ordinary GGUF files.

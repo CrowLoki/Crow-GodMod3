@@ -246,6 +246,39 @@ test("ships first-class loopback presets for every supported local runtime", asy
   assert.match(openSettingsSource, /updateLocalRuntimeHelp\(state\.localRuntime\)/);
 });
 
+test("ships optional WebLLM browser inference without replacing server runtimes", async () => {
+  const html = await readFile(publicEntry, "utf8");
+  assert.match(
+    html,
+    /const WEBLLM_MODULE_URL = 'https:\/\/esm\.run\/@mlc-ai\/web-llm@0\.2\.84';/,
+  );
+  assert.match(html, /id="webLlmEnabled"/);
+  assert.match(html, /onclick="discoverWebLlmModels\(\)"/);
+  assert.match(html, /ordinary GGUF files are not compatible/);
+  assert.match(html, /filter\(record => record\?\.model_type !== 1\)/);
+  assert.match(
+    html,
+    /const MODE_MODEL_PROVIDERS = new Set\(\['auto', 'openrouter', 'venice', 'local', 'webllm'\]\)/,
+  );
+  assert.match(
+    html,
+    /appendModeModelOptions\(select, 'WebLLM · in browser', 'webllm', getWebLlmModels\(\)\)/,
+  );
+  assert.match(html, /if \(provider === 'webllm'\) \{/);
+  assert.match(
+    html,
+    /const data = await runWebLlmChat\(target\.model, requestBody, options\.signal\)/,
+  );
+  assert.match(
+    html,
+    /_webLlmGenerationQueue = queued\.catch\(\(\) => \{\}\)/,
+    "one WebGPU engine must serialize the site's parallel completion requests",
+  );
+  assert.match(html, /'wasm-unsafe-eval' https:\/\/esm\.run https:\/\/cdn\.jsdelivr\.net/);
+  assert.match(html, /https:\/\/huggingface\.co https:\/\/\*\.huggingface\.co/);
+  assert.match(html, /worker-src 'self' blob:/);
+});
+
 test("discovers unlimited local chat inventory with one-model default and user-selected races", async () => {
   const html = await readFile(publicEntry, "utf8");
   assert.match(html, /const MAX_LOCAL_MODEL_STORAGE_CHARS = 1048576;/);
@@ -472,7 +505,7 @@ globalThis.discoverLocalChatModelsForTest = discoverLocalChatModels;`,
   );
   assert.match(
     html,
-    /function usesLightweightLocalHelpers\(modeTarget = null\)[\s\S]*modeTarget\?\.provider === 'local'/,
+    /function usesLightweightLocalHelpers\(modeTarget = null\)[\s\S]*\['local', 'webllm'\]\.includes\(modeTarget\?\.provider\)/,
   );
   assert.match(
     html,
@@ -1997,12 +2030,14 @@ test("backs up local runtime settings without exporting its API key", async () =
     "localRaceModels",
     "localModeModelPools",
     "localReasoningEffort",
+    "webLlmEnabled",
+    "webLlmModels",
     "modeModelSelections",
     "modeModelSelectionVersion",
   ]) {
     assert.match(exportSource, new RegExp(`${key}: state\\.${key}`));
   }
-  assert.match(exportSource, /_version: 5/);
+  assert.match(exportSource, /_version: 6/);
   assert.doesNotMatch(exportSource, /localApiKey/);
 
   const importStart = html.indexOf("const allowed = ['conversations'");
@@ -2013,6 +2048,8 @@ test("backs up local runtime settings without exporting its API key", async () =
   assert.match(importAllowlist, /'localRaceModels'/);
   assert.match(importAllowlist, /'localModeModelPools'/);
   assert.match(importAllowlist, /'localReasoningEffort'/);
+  assert.match(importAllowlist, /'webLlmEnabled'/);
+  assert.match(importAllowlist, /'webLlmModels'/);
   assert.match(importAllowlist, /'modeModelSelections'/);
   assert.match(importAllowlist, /'modeModelSelectionVersion'/);
   assert.doesNotMatch(importAllowlist, /'localApiKey'/);
