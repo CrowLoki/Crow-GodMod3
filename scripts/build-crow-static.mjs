@@ -264,6 +264,7 @@ const runtimeOpenRouterModelConfig = `    // OpenRouter models allowed by Crow's
 
     function normalizePersistedChatModel(model) {
       const requested = String(model || '');
+      if (getWebLlmModels().includes(requested)) return requested;
       if (getLocalModels().includes(requested)) return requested;
       if (typeof VENICE_MODELS !== 'undefined' && VENICE_MODELS.includes(requested)) {
         return requested;
@@ -484,11 +485,134 @@ const runtimeLocalProviderConfig = `    // First-class loopback runtime presets.
       return message;
     }`;
 
+const runtimeWebLlmConfig = `    // Optional in-browser inference through WebLLM. The module is loaded only
+    // when a user asks to discover or run browser models; model weights stay in
+    // that browser's cache and never pass through the Crow-GodMod3 host.
+    const WEBLLM_MODULE_URL = 'https://esm.run/@mlc-ai/web-llm@0.2.84';
+    let _webLlmModulePromise = null;
+    let _webLlmEngine = null;
+    let _webLlmLoadedModel = '';
+    let _webLlmGenerationQueue = Promise.resolve();
+
+    function getWebLlmModels() {
+      return parseLocalModelIds(state.webLlmModels);
+    }
+
+    function hasWebLlmProvider() {
+      return state.webLlmEnabled === true
+        && typeof navigator !== 'undefined'
+        && !!navigator.gpu
+        && getWebLlmModels().length > 0;
+    }
+
+    function setWebLlmStatus(message, color = 'var(--text-dim)') {
+      const status = document.getElementById('webLlmStatus');
+      if (!status) return;
+      status.textContent = message;
+      status.style.color = color;
+    }
+
+    async function loadWebLlmModule() {
+      if (!window.isSecureContext) {
+        throw new Error('WebLLM requires a secure HTTPS page or localhost.');
+      }
+      if (!navigator.gpu) {
+        throw new Error('WebGPU is unavailable in this browser or device.');
+      }
+      _webLlmModulePromise ||= import(WEBLLM_MODULE_URL);
+      return _webLlmModulePromise;
+    }
+
+    async function discoverWebLlmModels() {
+      setWebLlmStatus('Loading the WebLLM model catalogue…');
+      try {
+        const webllm = await loadWebLlmModule();
+        const models = [...new Set(
+          (webllm.prebuiltAppConfig?.model_list || [])
+            .filter(record => record?.model_type !== 1)
+            .map(record => record?.model_id)
+            .filter(model => typeof model === 'string' && model.trim()),
+        )];
+        if (!models.length) throw new Error('WebLLM returned no prebuilt model IDs.');
+        state.webLlmEnabled = true;
+        state.webLlmModels = models.join(', ');
+        const enabled = document.getElementById('webLlmEnabled');
+        if (enabled) enabled.checked = true;
+        saveState();
+        refreshModeModelSelect();
+        setWebLlmStatus(
+          \`Ready — \${models.length} browser model\${models.length === 1 ? '' : 's'} available. A selected model downloads only on first use.\`,
+          'var(--success)',
+        );
+      } catch (error) {
+        setWebLlmStatus(\`WebLLM unavailable: \${error?.message || error}\`, 'var(--danger)');
+      }
+    }
+
+    async function getWebLlmEngine(model) {
+      const webllm = await loadWebLlmModule();
+      const onProgress = progress => {
+        const percent = Number.isFinite(progress?.progress)
+          ? \` \${Math.round(progress.progress * 100)}%\`
+          : '';
+        setWebLlmStatus(progress?.text || \`Preparing \${model}…\${percent}\`);
+      };
+      if (!_webLlmEngine) {
+        _webLlmEngine = await webllm.CreateMLCEngine(model, {
+          initProgressCallback: onProgress,
+        });
+        _webLlmLoadedModel = model;
+      } else if (_webLlmLoadedModel !== model) {
+        await _webLlmEngine.reload(model);
+        _webLlmLoadedModel = model;
+      }
+      setWebLlmStatus(\`Loaded in this browser: \${model}\`, 'var(--success)');
+      return _webLlmEngine;
+    }
+
+    function webLlmRequestBody(body) {
+      const allowed = [
+        'messages', 'temperature', 'top_p', 'max_tokens', 'frequency_penalty',
+        'presence_penalty', 'stop', 'seed', 'response_format',
+      ];
+      return Object.fromEntries(
+        allowed
+          .filter(key => body[key] !== undefined)
+          .map(key => [key, body[key]]),
+      );
+    }
+
+    async function runWebLlmChat(model, body, signal) {
+      const run = async () => {
+        if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
+        const engine = await getWebLlmEngine(model);
+        let abortHandler = null;
+        const abortPromise = signal
+          ? new Promise((_, reject) => {
+              abortHandler = () => {
+                try { engine.interruptGenerate?.(); } catch (_) {}
+                reject(new DOMException('Aborted', 'AbortError'));
+              };
+              signal.addEventListener('abort', abortHandler, { once: true });
+            })
+          : null;
+        try {
+          const completion = engine.chat.completions.create(webLlmRequestBody(body));
+          return await (abortPromise ? Promise.race([completion, abortPromise]) : completion);
+        } finally {
+          if (abortHandler) signal.removeEventListener('abort', abortHandler);
+        }
+      };
+      const queued = _webLlmGenerationQueue.then(run, run);
+      _webLlmGenerationQueue = queued.catch(() => {});
+      return queued;
+    }`;
+
 const runtimeModeModelConfig = `    // Each mode keeps its own explicit provider + model choice.
     // "auto" preserves the mode's native cloud behavior and adds that mode's
     // independently selected local-model pool. Every pool defaults to one
     // local model but has no fixed model-count ceiling.
-    const MODE_MODEL_PROVIDERS = new Set(['auto', 'openrouter', 'venice', 'local']);
+    const MODE_MODEL_PROVIDERS = new Set(['auto', 'openrouter', 'venice', 'local', 'webllm']);
     const MODE_MODEL_IDS = new Set(['ultraplinian', 'parseltongue', 'pliny']);
     const MODE_MODEL_SELECTION_SCHEMA_VERSION = 2;
     const MODE_LOCAL_POOL_LABELS = Object.freeze({
@@ -749,6 +873,9 @@ const runtimeModeModelConfig = `    // Each mode keeps its own explicit provider
       if (selection.provider === 'local') {
         return hasLocalProvider() && getLocalModels().includes(selection.model);
       }
+      if (selection.provider === 'webllm') {
+        return hasWebLlmProvider() && getWebLlmModels().includes(selection.model);
+      }
       if (selection.provider === 'openrouter') {
         return !state.localOnly
           && !!state.apiKey
@@ -932,6 +1059,9 @@ const runtimeModeModelConfig = `    // Each mode keeps its own explicit provider
         const runtime = LOCAL_RUNTIME_PRESETS[state.localRuntime]?.label || 'Local';
         appendModeModelOptions(select, runtime, 'local', getLocalModels());
       }
+      if (state.webLlmEnabled) {
+        appendModeModelOptions(select, 'WebLLM · in browser', 'webllm', getWebLlmModels());
+      }
       if (!state.localOnly && state.apiKey) {
         appendModeModelOptions(select, 'OpenRouter', 'openrouter', OPENROUTER_FREE_CHAT_MODELS);
       }
@@ -980,6 +1110,8 @@ replaceRequired(
   `${runtimeOpenRouterModelConfig}
 
 ${runtimeLocalProviderConfig}
+
+${runtimeWebLlmConfig}
 
 ${runtimeModeModelConfig}
 
@@ -1115,6 +1247,23 @@ replaceRequired(
               <span id="localConnectionStatus" style="font-size:11px;color:var(--text-dim);flex:1 1 230px;min-width:0;line-height:1.45;overflow-wrap:anywhere;"></span>
             </div>
             <a href="/LOCAL_MODELS.md" target="_blank" class="api-key-link">Setup commands for every runtime →</a>
+          </div>
+          <div class="settings-section">
+            <div class="settings-section-title">WebLLM · In-Browser Models (Optional)</div>
+            <div class="form-group">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+                <input type="checkbox" id="webLlmEnabled" style="width:auto;">
+                <label for="webLlmEnabled" style="margin:0;">Enable models that run inside this browser</label>
+              </div>
+              <small style="color:#888;display:block;line-height:1.5;">
+                Requires WebGPU and HTTPS. The first use downloads the selected MLC/WebLLM model into this browser's cache; ordinary GGUF files are not compatible. Prompts and generated text stay on this device.
+              </small>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+              <button type="button" class="api-key-btn" onclick="discoverWebLlmModels()">Discover Browser Models</button>
+              <span id="webLlmStatus" style="font-size:11px;color:var(--text-dim);flex:1 1 230px;min-width:0;line-height:1.45;overflow-wrap:anywhere;"></span>
+            </div>
+            <a href="/LOCAL_MODELS.md#webllm-in-browser" target="_blank" class="api-key-link">WebLLM setup and model format →</a>
           </div>`,
 );
 
@@ -1193,6 +1342,8 @@ replaceRequired(
       localApiKey: '',  // Optional token for authenticated local servers
       localReasoningEffort: 'none',  // LM Studio: prefer visible final text by default
       localReasoningOffModels: '',  // Capability cache populated by LM Studio discovery
+      webLlmEnabled: false,  // Run selected MLC models directly in this WebGPU browser
+      webLlmModels: '',  // Prebuilt model IDs discovered from the pinned WebLLM release
       modeModelSelections: null,  // Explicit provider + model, saved independently for each mode
       modeModelSelectionVersion: 0,  // Migrated to the current per-mode pool schema on load`,
 );
@@ -1320,8 +1471,33 @@ replaceRequired(
 
 replaceRequired(
   `      'localEnabled', 'localOnly', 'localBaseUrl', 'localModels', 'localApiKey',`,
-  `      'localEnabled', 'localOnly', 'localRuntime', 'localBaseUrl', 'localModels', 'localRaceModels', 'localModeModelPools', 'localApiKey', 'localReasoningEffort', 'localReasoningOffModels',
+  `      'localEnabled', 'localOnly', 'localRuntime', 'localBaseUrl', 'localModels', 'localRaceModels', 'localModeModelPools', 'localApiKey', 'localReasoningEffort', 'localReasoningOffModels', 'webLlmEnabled', 'webLlmModels',
       'modeModelSelections', 'modeModelSelectionVersion',`,
+);
+
+replaceRequired(
+  `    function hasAnyChatProvider() {
+      if (state.localOnly) return hasLocalProvider();
+      return !!(state.apiKey || state.veniceApiKey || hasLocalProvider());
+    }`,
+  `    function hasAnyChatProvider() {
+      if (state.localOnly) return hasLocalProvider() || hasWebLlmProvider();
+      return !!(state.apiKey || state.veniceApiKey || hasLocalProvider() || hasWebLlmProvider());
+    }`,
+);
+
+replaceRequired(
+  `    function inferProviderForModel(model) {
+      if (getLocalModels().includes(model)) return 'local';
+      if (typeof VENICE_MODELS !== 'undefined' && VENICE_MODELS.includes(model)) return 'venice';
+      return 'openrouter';
+    }`,
+  `    function inferProviderForModel(model) {
+      if (getWebLlmModels().includes(model)) return 'webllm';
+      if (getLocalModels().includes(model)) return 'local';
+      if (typeof VENICE_MODELS !== 'undefined' && VENICE_MODELS.includes(model)) return 'venice';
+      return 'openrouter';
+    }`,
 );
 
 replaceRequired(
@@ -1649,6 +1825,22 @@ replaceRequired(
         ) {
           requestBody.reasoning_effort = 'none';
         }
+      }
+      if (target.provider === 'webllm') {
+        delete requestBody.reasoning;
+        delete requestBody.reasoning_effort;
+        try {
+          const data = await runWebLlmChat(target.model, requestBody, options.signal);
+          return new Response(JSON.stringify(data), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+          });
+        } catch (error) {
+          return new Response(JSON.stringify({ error: { message: error?.message || String(error) } }), {
+            status: error?.name === 'AbortError' ? 499 : 500,
+            headers: { 'Content-Type': 'application/json' },
+          });
+        }
       }`,
 );
 replaceRequired(
@@ -1691,13 +1883,14 @@ replaceRequired(
       if (!MODE_MODEL_PROVIDERS.has(provider)) {
         throw new Error('Unknown model provider.');
       }
-      if (explicitProvider && state.localOnly && provider !== 'local') {
+      if (explicitProvider && state.localOnly && !['local', 'webllm'].includes(provider)) {
         throw new Error(\`The selected \${provider} model is unavailable while Local-only mode is enabled.\`);
       }
       if (!explicitProvider) {
-        if (state.localOnly) provider = 'local';
+        if (state.localOnly) provider = hasLocalProvider() ? 'local' : 'webllm';
         else if (state.apiKey) provider = 'openrouter';
         else if (hasLocalProvider()) provider = 'local';
+        else if (hasWebLlmProvider()) provider = 'webllm';
         else if (state.veniceApiKey) provider = 'venice';
         else throw new Error('No model provider is configured.');
       }
@@ -1714,6 +1907,21 @@ replaceRequired(
           model: localModels.includes(requestedModel) ? requestedModel : localModels[0],
           url: \`\${normalizeLocalBaseUrl()}/chat/completions\`,
           apiKey: state.localApiKey || '',
+        };
+      }
+      if (provider === 'webllm') {
+        const browserModels = getWebLlmModels();
+        if (!hasWebLlmProvider()) {
+          throw new Error('The selected WebLLM provider is unavailable. Enable it in Settings → API Keys.');
+        }
+        if (explicitProvider && !browserModels.includes(requestedModel)) {
+          throw new Error(\`The selected WebLLM model "\${requestedModel}" is no longer available.\`);
+        }
+        return {
+          provider,
+          model: browserModels.includes(requestedModel) ? requestedModel : browserModels[0],
+          url: '',
+          apiKey: '',
         };
       }
       if (provider === 'venice') {
@@ -2701,6 +2909,10 @@ replaceRequired(
             parseLocalModelIds(state.localModels),
           )
         : '';
+      state.webLlmEnabled = state.webLlmEnabled === true;
+      state.webLlmModels = typeof state.webLlmModels === 'string'
+        ? state.webLlmModels.slice(0, MAX_LOCAL_MODEL_STORAGE_CHARS)
+        : '';
       const legacyLocalRaceModels = typeof state.localRaceModels === 'string'
         ? state.localRaceModels.slice(0, MAX_LOCAL_MODEL_STORAGE_CHARS)
         : '';
@@ -2842,13 +3054,13 @@ replaceRequired(
           return false;
         }
       }
-      if (state.localOnly) return hasLocalProvider();
-      return !!(state.apiKey || state.veniceApiKey || hasLocalProvider());
+      if (state.localOnly) return hasLocalProvider() || hasWebLlmProvider();
+      return !!(state.apiKey || state.veniceApiKey || hasLocalProvider() || hasWebLlmProvider());
     }
 
     function usesLightweightLocalHelpers(modeTarget = null) {
-      return modeTarget?.provider === 'local'
-        || (state.localOnly && hasLocalProvider());
+      return ['local', 'webllm'].includes(modeTarget?.provider)
+        || (state.localOnly && (hasLocalProvider() || hasWebLlmProvider()));
     }`,
 );
 replaceRequired(
@@ -3549,6 +3761,10 @@ replaceRequired(
       document.getElementById('localApiKeyInput').value = state.localApiKey || '';
       document.getElementById('localReasoningEffortInput').value = state.localReasoningEffort === 'auto' ? 'auto' : 'none';
       document.getElementById('localConnectionStatus').textContent = '';
+      document.getElementById('webLlmEnabled').checked = !!state.webLlmEnabled;
+      document.getElementById('webLlmStatus').textContent = state.webLlmEnabled
+        ? \`\${getWebLlmModels().length} browser model ID\${getWebLlmModels().length === 1 ? '' : 's'} saved.\`
+        : '';
       updateLocalRuntimeHelp(state.localRuntime);
       refreshModeModelSelect();
       renderLocalRaceModelPicker();`,
@@ -3577,6 +3793,7 @@ replaceRequired(
             parseLocalModelIds(state.localModels),
           )
         : '';
+      state.webLlmEnabled = document.getElementById('webLlmEnabled').checked;
       state.modeModelSelections = normalizeModeModelSelections(
         state.modeModelSelections,
         state.model,
@@ -3699,7 +3916,7 @@ replaceRequired(
 replaceRequired(
   `        _version: 2,
         _exportedAt: new Date().toISOString(),`,
-  `        _version: 5,
+  `        _version: 6,
         _exportedAt: new Date().toISOString(),`,
 );
 replaceRequired(
@@ -3716,6 +3933,8 @@ replaceRequired(
         localRaceModels: state.localRaceModels,
         localModeModelPools: state.localModeModelPools,
         localReasoningEffort: state.localReasoningEffort,
+        webLlmEnabled: state.webLlmEnabled,
+        webLlmModels: state.webLlmModels,
         modeModelSelections: state.modeModelSelections,
         modeModelSelectionVersion: state.modeModelSelectionVersion,
       };`,
@@ -3724,7 +3943,7 @@ replaceRequired(
   `        'modelTemperature', 'modelTopP', 'modelMaxTokens', 'modelFreqPenalty', 'modelPresPenalty',
         'sidebarOpen', 'backendUrl'];`,
   `        'modelTemperature', 'modelTopP', 'modelMaxTokens', 'modelFreqPenalty', 'modelPresPenalty',
-        'localEnabled', 'localOnly', 'localRuntime', 'localBaseUrl', 'localModels', 'localRaceModels', 'localModeModelPools', 'localReasoningEffort', 'modeModelSelections', 'modeModelSelectionVersion',
+        'localEnabled', 'localOnly', 'localRuntime', 'localBaseUrl', 'localModels', 'localRaceModels', 'localModeModelPools', 'localReasoningEffort', 'webLlmEnabled', 'webLlmModels', 'modeModelSelections', 'modeModelSelectionVersion',
         'sidebarOpen', 'backendUrl'];`,
 );
 replaceRequired(
@@ -3750,6 +3969,10 @@ replaceRequired(
         : '';
       candidate.localReasoningEffort = imported.localReasoningEffort === 'auto' ? 'auto' : 'none';
       candidate.localReasoningOffModels = '';
+      candidate.webLlmEnabled = candidate.webLlmEnabled === true;
+      candidate.webLlmModels = typeof candidate.webLlmModels === 'string'
+        ? candidate.webLlmModels.slice(0, MAX_LOCAL_MODEL_STORAGE_CHARS)
+        : '';
       candidate.localRaceModels = typeof imported.localRaceModels === 'string'
         ? normalizeLocalRaceModelSelection(
             imported.localRaceModels.slice(0, MAX_LOCAL_MODEL_STORAGE_CHARS),
@@ -3838,6 +4061,18 @@ replaceRequired(
 replaceRequired(
   "http://127.0.0.1:* https://127.0.0.1:* http://[::1]:* https://[::1]:*",
   "http://127.0.0.1:* https://127.0.0.1:*",
+);
+replaceRequired(
+  "script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://challenges.cloudflare.com;",
+  "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://esm.run https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://challenges.cloudflare.com;",
+);
+replaceRequired(
+  "https://api.venice.ai http://localhost:*",
+  "https://api.venice.ai https://esm.run https://cdn.jsdelivr.net https://huggingface.co https://*.huggingface.co https://*.hf.co https://*.xethub.hf.co https://raw.githubusercontent.com http://localhost:*",
+);
+replaceRequired(
+  "; img-src 'self' data: blob:;",
+  "; worker-src 'self' blob:; img-src 'self' data: blob:;",
 );
 
 replaceRequired(
