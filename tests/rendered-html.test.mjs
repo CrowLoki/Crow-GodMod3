@@ -162,31 +162,17 @@ test("routes OpenRouter chat through the configured free-model allowlist", async
 
   assert.match(
     html,
-    /return \{ provider: 'openrouter', model: normalizeOpenRouterModel\(requestedModel\),/,
+    /provider: 'openrouter',\s+model: normalizeOpenRouterModel\(openRouterModel\),\s+url: 'https:\/\/openrouter\.ai\/api\/v1\/chat\/completions'/,
   );
   assert.match(
     html,
     /normalizeOpenRouterRequestBody\(\{ \.\.\.body, model: target\.model \}\)/,
   );
-  assert.ok(
-    (html.match(/normalizeOpenRouterRequestBody\(/g) ?? []).length >= 5,
-    "Every OpenRouter request path should normalize its model and parameters",
+  assert.doesNotMatch(
+    html,
+    /fetch\('https:\/\/openrouter\.ai\/api\/v1\/chat\/completions'|fetch\(fetchUrl/,
+    "Mode-specific requests must use the provider-aware transport",
   );
-
-  const directOpenRouterCalls = [
-    ...html.matchAll(
-      /fetch\('https:\/\/openrouter\.ai\/api\/v1\/chat\/completions'/g,
-    ),
-  ];
-  assert.ok(directOpenRouterCalls.length > 0);
-  for (const call of directOpenRouterCalls) {
-    const requestSource = html.slice(call.index, call.index + 1_500);
-    assert.match(
-      requestSource,
-      /body:\s*JSON\.stringify\(normalizeOpenRouterRequestBody\(/,
-      `Direct OpenRouter request at offset ${call.index} bypasses normalization`,
-    );
-  }
 });
 
 test("migrates saved paid-model selections to valid free chat models", async () => {
@@ -258,6 +244,442 @@ test("ships first-class loopback presets for every supported local runtime", asy
     "Opening settings must not overwrite a saved custom URL",
   );
   assert.match(openSettingsSource, /updateLocalRuntimeHelp\(state\.localRuntime\)/);
+});
+
+test("keeps an explicit provider-qualified model choice for every mode", async () => {
+  const html = await readFile(publicEntry, "utf8");
+
+  assert.match(
+    html,
+    /modeModelSelections: null,\s+\/\/ Explicit provider \+ model, saved independently for each mode/,
+  );
+  assert.match(
+    html,
+    /id="modelSelect" onchange="setCurrentModeModelSelection\(this\.value\)"/,
+  );
+  assert.match(
+    html,
+    /selector\.style\.display = 'block';[\s\S]*refreshModeModelSelect\(\);/,
+  );
+  assert.match(
+    html,
+    /ultraplinian: 'Automatic · race all available models'/,
+  );
+  assert.match(
+    html,
+    /parseltongue: 'Automatic · best configured provider'/,
+  );
+  assert.match(
+    html,
+    /pliny: 'Automatic · paired model for each prompt'/,
+  );
+  assert.match(
+    html,
+    /pliny: 'Crow-GodMod3 CLASSIC',[\s\S]*select\.setAttribute\('aria-label', `Model for \$\{modeLabels\[mode\] \|\| mode\}`\)/,
+  );
+  const chatHeaderRules = [
+    ...html.matchAll(/\.chat-header\s*\{([^}]*)\}/g),
+  ].map((match) => match[1]);
+  assert.ok(
+    chatHeaderRules.some(
+      (rule) => /position:\s*sticky;/.test(rule) && /top:\s*0;/.test(rule),
+    ),
+    "The mobile chat header must remain sticky",
+  );
+  assert.ok(
+    chatHeaderRules.some(
+      (rule) =>
+        /backdrop-filter:\s*blur\(16px\);/.test(rule) &&
+        /z-index:\s*50;/.test(rule) &&
+        /overflow:\s*visible;/.test(rule),
+    ),
+    "The mode menu must stack above the conversation panel so every mode remains clickable",
+  );
+
+  const helperStart = html.indexOf("function inferPersistedModelProvider");
+  const helperEnd = html.indexOf(
+    "\n\n    function appendModeModelOptions",
+    helperStart,
+  );
+  assert.ok(helperStart > 0 && helperEnd > helperStart);
+
+  const context = vm.createContext({
+    state: {
+      apiKey: "openrouter-present",
+      veniceApiKey: "",
+      localOnly: false,
+      localEnabled: true,
+      localModels: "same/model, lm-beta",
+      model: "same/model",
+      modeModelSelections: {
+        ultraplinian: { provider: "local", model: "lm-beta" },
+        parseltongue: { provider: "local", model: "same/model" },
+        pliny: { provider: "openrouter", model: "same/model" },
+      },
+    },
+    OPENROUTER_DEFAULT_MODEL: "same/model",
+    OPENROUTER_LEGACY_MODEL_MIGRATIONS: {},
+    OPENROUTER_FREE_CHAT_MODEL_SET: new Set(["same/model"]),
+    VENICE_MODELS: [],
+    MODE_MODEL_PROVIDERS: new Set([
+      "auto",
+      "openrouter",
+      "venice",
+      "local",
+    ]),
+    MODE_MODEL_IDS: new Set(["ultraplinian", "parseltongue", "pliny"]),
+    getLocalModels() {
+      return ["same/model", "lm-beta"];
+    },
+    hasLocalProvider() {
+      return true;
+    },
+    getCurrentMode() {
+      return "parseltongue";
+    },
+    normalizeOpenRouterModel(model) {
+      return model === "same/model" ? model : "same/model";
+    },
+    resolveChatTarget(model, provider) {
+      return {
+        provider: provider === "auto" ? "openrouter" : provider,
+        model,
+      };
+    },
+    encodeURIComponent,
+    decodeURIComponent,
+    JSON,
+  });
+  vm.runInContext(
+    `${html.slice(helperStart, helperEnd)}
+globalThis.getModeModelRequestForTest = getModeModelRequest;
+globalThis.getModeExecutionSelectionForTest = getModeExecutionSelection;
+globalThis.getPinnedModeTargetForTest = getPinnedModeTarget;
+globalThis.resolveModeModelRequestForTest = resolveModeModelRequest;
+globalThis.encodeModeModelSelectionForTest = encodeModeModelSelection;
+globalThis.decodeModeModelSelectionForTest = decodeModeModelSelection;`,
+    context,
+  );
+
+  assert.deepEqual(
+    structuredClone(
+      context.getModeModelRequestForTest("parseltongue", "same/model"),
+    ),
+    { provider: "local", model: "same/model" },
+    "A local target must stay local even when an OpenRouter key and identical model ID exist",
+  );
+  assert.deepEqual(
+    structuredClone(context.getModeModelRequestForTest("pliny", "same/model")),
+    { provider: "openrouter", model: "same/model" },
+  );
+  assert.deepEqual(
+    structuredClone(
+      context.decodeModeModelSelectionForTest(
+        context.encodeModeModelSelectionForTest({
+          provider: "local",
+          model: "model:with/slashes|and spaces",
+        }),
+      ),
+    ),
+    { provider: "local", model: "model:with/slashes|and spaces" },
+  );
+
+  context.state.modeModelSelections.parseltongue = {
+    provider: "auto",
+    model: "",
+  };
+  const automaticSnapshot =
+    context.getModeExecutionSelectionForTest("parseltongue");
+  assert.equal(Object.isFrozen(automaticSnapshot), true);
+  assert.deepEqual(structuredClone(automaticSnapshot), {
+    provider: "auto",
+    model: "",
+  });
+  assert.equal(context.getPinnedModeTargetForTest(automaticSnapshot), null);
+
+  context.state.modeModelSelections.parseltongue = {
+    provider: "local",
+    model: "lm-beta",
+  };
+  assert.deepEqual(
+    structuredClone(
+      context.resolveModeModelRequestForTest(
+        "parseltongue",
+        "same/model",
+        automaticSnapshot,
+      ),
+    ),
+    { provider: "openrouter", model: "same/model" },
+    "An Automatic snapshot must stay Automatic without becoming the later live picker value",
+  );
+
+  const explicitSnapshot =
+    context.getModeExecutionSelectionForTest("parseltongue");
+  context.state.modeModelSelections.parseltongue = {
+    provider: "openrouter",
+    model: "same/model",
+  };
+  assert.deepEqual(
+    structuredClone(
+      context.resolveModeModelRequestForTest(
+        "parseltongue",
+        "same/model",
+        explicitSnapshot,
+      ),
+    ),
+    { provider: "local", model: "lm-beta" },
+    "An explicit snapshot must retain its exact provider and model for the whole run",
+  );
+});
+
+test("routes PARSELTONGUE, CLASSIC, FAST, and regeneration without changing mode", async () => {
+  const html = await readFile(publicEntry, "utf8");
+
+  const functionSource = (name, nextName) => {
+    const start = html.indexOf(`function ${name}`);
+    const end = html.indexOf(`function ${nextName}`, start + name.length);
+    assert.ok(start > 0 && end > start, `Missing ${name}`);
+    return html.slice(start, end);
+  };
+
+  const sendSource = functionSource("sendMessage", "stopGeneration");
+  const regenerateSource = functionSource(
+    "regenerateFromMessage",
+    "retryMessage",
+  );
+  assert.doesNotMatch(sendSource, /selectMode\('ultraplinian'\)/);
+  assert.doesNotMatch(regenerateSource, /selectMode\('ultraplinian'\)/);
+  assert.match(regenerateSource, /executePlinyMode\(/);
+  assert.match(regenerateSource, /executeParseltongue\(/);
+
+  const classicStart = html.indexOf("async function executePlinyMode");
+  const classicEnd = html.indexOf(
+    "\n\n    // ═══════════════════════════════════════════════════════════════════\n    // PARSELTONGUE",
+    classicStart,
+  );
+  const classicSource = html.slice(classicStart, classicEnd);
+  assert.match(classicSource, /resolveModeModelRequest\('pliny'/);
+  assert.match(classicSource, /fetchChatCompletion\(bodyParams/);
+  assert.doesNotMatch(classicSource, /openrouter\.ai|Bearer \$\{state\.apiKey\}/);
+
+  const parselStart = html.indexOf("async function executeParseltongue");
+  const parselEnd = html.indexOf(
+    "\n\n    // ═══════════════════════════════════════════════════════════════════\n    // End Parseltongue",
+    parselStart,
+  );
+  const parselSource = html.slice(parselStart, parselEnd);
+  assert.match(parselSource, /resolveModeModelRequest\('parseltongue'/);
+  assert.match(parselSource, /fetchChatCompletion\(\{/);
+  assert.doesNotMatch(parselSource, /openrouter\.ai|Bearer \$\{state\.apiKey\}/);
+
+  const fastStart = html.indexOf("const fastStreamPromise");
+  const fastEnd = html.indexOf("\n\n          if (isFastSolo)", fastStart);
+  const fastSource = html.slice(fastStart, fastEnd);
+  assert.match(fastSource, /resolveModeModelRequest\('pliny'/);
+  assert.match(fastSource, /fetchChatCompletion\(\{/);
+  assert.doesNotMatch(fastSource, /openrouter\.ai|Bearer \$\{state\.apiKey\}/);
+
+  assert.match(
+    sendSource,
+    /if \(attachedImage && hasAuxiliaryModelProvider\(executionTarget\)\)/,
+    "Vision must run for any available exact target, including Venice-only configurations",
+  );
+  assert.doesNotMatch(
+    sendSource,
+    /attachedImage && \(state\.apiKey \|\| hasLocalProvider\(\)\)/,
+  );
+});
+
+test("never falls back from an unavailable explicit provider-qualified target", async () => {
+  const html = await readFile(publicEntry, "utf8");
+  const resolverStart = html.indexOf("function resolveChatTarget");
+  const resolverEnd = html.indexOf(
+    "\n\n    async function fetchChatCompletion",
+    resolverStart,
+  );
+  const auxiliaryStart = html.indexOf("function hasAuxiliaryModelProvider");
+  const auxiliaryEnd = html.indexOf(
+    "\n\n    function inferProviderForModel",
+    auxiliaryStart,
+  );
+  assert.ok(resolverStart > 0 && resolverEnd > resolverStart);
+  assert.ok(auxiliaryStart > 0 && auxiliaryEnd > auxiliaryStart);
+
+  const runtimeState = {
+    apiKey: "openrouter-present",
+    veniceApiKey: "venice-present",
+    localOnly: false,
+    localEnabled: true,
+    localApiKey: "",
+    localModels: ["same/model", "lm-beta"],
+  };
+  const freeModels = new Set(["same/model"]);
+  const veniceModels = ["same/model"];
+  const context = vm.createContext({
+    state: runtimeState,
+    MODE_MODEL_PROVIDERS: new Set([
+      "auto",
+      "openrouter",
+      "venice",
+      "local",
+    ]),
+    OPENROUTER_LEGACY_MODEL_MIGRATIONS: {},
+    OPENROUTER_FREE_CHAT_MODEL_SET: freeModels,
+    VENICE_MODELS: veniceModels,
+    getLocalModels() {
+      return runtimeState.localModels;
+    },
+    hasLocalProvider() {
+      return runtimeState.localEnabled && runtimeState.localModels.length > 0;
+    },
+    normalizeLocalBaseUrl() {
+      return "http://localhost:1234/v1";
+    },
+    normalizeOpenRouterModel(model) {
+      return freeModels.has(model) ? model : "same/model";
+    },
+  });
+  vm.runInContext(
+    `${html.slice(resolverStart, resolverEnd)}
+${html.slice(auxiliaryStart, auxiliaryEnd)}
+globalThis.resolveChatTargetForTest = resolveChatTarget;
+globalThis.hasAuxiliaryModelProviderForTest = hasAuxiliaryModelProvider;`,
+    context,
+  );
+
+  assert.deepEqual(
+    structuredClone(
+      context.resolveChatTargetForTest("same/model", "local"),
+    ),
+    {
+      provider: "local",
+      model: "same/model",
+      url: "http://localhost:1234/v1/chat/completions",
+      apiKey: "",
+    },
+  );
+  assert.deepEqual(
+    structuredClone(
+      context.resolveChatTargetForTest("same/model", "openrouter"),
+    ),
+    {
+      provider: "openrouter",
+      model: "same/model",
+      url: "https://openrouter.ai/api/v1/chat/completions",
+      apiKey: "openrouter-present",
+    },
+  );
+  assert.deepEqual(
+    structuredClone(
+      context.resolveChatTargetForTest("same/model", "venice"),
+    ),
+    {
+      provider: "venice",
+      model: "same/model",
+      url: "https://api.venice.ai/api/v1/chat/completions",
+      apiKey: "venice-present",
+    },
+    "Identical model IDs must retain the explicitly selected provider",
+  );
+
+  runtimeState.apiKey = "";
+  assert.throws(
+    () => context.resolveChatTargetForTest("same/model", "openrouter"),
+    /selected OpenRouter model provider is unavailable/,
+    "An explicit OpenRouter target must not fall back to a configured local model",
+  );
+  runtimeState.apiKey = "openrouter-present";
+
+  assert.throws(
+    () => context.resolveChatTargetForTest("missing-local-model", "local"),
+    /selected local model "missing-local-model" is no longer available/,
+    "An explicit missing local model must not fall back to its first discovered model or OpenRouter",
+  );
+
+  runtimeState.veniceApiKey = "";
+  assert.throws(
+    () => context.resolveChatTargetForTest("same/model", "venice"),
+    /selected Venice model provider is unavailable/,
+    "An explicit Venice target must not fall back to OpenRouter or local",
+  );
+  runtimeState.veniceApiKey = "venice-present";
+
+  assert.equal(
+    context.hasAuxiliaryModelProviderForTest({
+      provider: "local",
+      model: "same/model",
+    }),
+    true,
+  );
+  assert.equal(
+    context.hasAuxiliaryModelProviderForTest({
+      provider: "local",
+      model: "missing-local-model",
+    }),
+    false,
+    "Auxiliary availability must validate the exact selected target",
+  );
+  runtimeState.apiKey = "";
+  assert.equal(
+    context.hasAuxiliaryModelProviderForTest({
+      provider: "openrouter",
+      model: "same/model",
+    }),
+    false,
+    "Another configured provider must not make an unavailable exact auxiliary target appear available",
+  );
+  runtimeState.apiKey = "openrouter-present";
+  assert.equal(context.hasAuxiliaryModelProviderForTest(null), true);
+});
+
+test("keeps ULTRAPLINIAN winner identity provider-qualified", async () => {
+  const html = await readFile(publicEntry, "utf8");
+  const ultraStart = html.indexOf("async function ultraplinian");
+  const ultraEnd = html.indexOf("async function consortium", ultraStart);
+  assert.ok(ultraStart > 0 && ultraEnd > ultraStart);
+  const ultraSource = html.slice(ultraStart, ultraEnd);
+
+  const abortedResults = [
+    ...ultraSource.matchAll(
+      /\{([^{}\n]*error:\s*'aborted-early-stop'[^{}\n]*)\}/g,
+    ),
+  ];
+  assert.ok(abortedResults.length >= 2, "Expected both ULTRAPLINIAN abort paths");
+  for (const [, fields] of abortedResults) {
+    assert.match(
+      fields,
+      /provider:\s*entryProvider/,
+      "Every aborted race result must retain its provider",
+    );
+  }
+
+  const winnerChecks = [
+    ...ultraSource.matchAll(/isWinner:\s*([^\n,}]+)/g),
+  ].map((match) => match[1]);
+  assert.ok(winnerChecks.length >= 3, "Expected early, final, and fallback winner checks");
+  for (const expression of winnerChecks) {
+    assert.match(
+      expression,
+      /sameModelTarget\(|\.provider\s*===|provider\s*===/,
+      `Winner comparison is not provider-qualified: ${expression}`,
+    );
+  }
+  assert.doesNotMatch(ultraSource, /isWinner:\s*r\.model ===/);
+
+  const leaderLookup = ultraSource.match(
+    /const leaderResult = allResults\.find\(([^;]+)\);/,
+  );
+  assert.ok(leaderLookup, "Missing live-leader fallback lookup");
+  assert.match(
+    leaderLookup[1],
+    /sameModelTarget\(|\.provider\s*===|provider\s*===/,
+    "The live-leader fallback lookup must include provider identity",
+  );
+  assert.match(ultraSource, /currentLeader(?:Target|Provider)/);
+  assert.ok(
+    [...ultraSource.matchAll(/winnerProvider:/g)].length >= 3,
+    "Every ULTRAPLINIAN success path must publish the winner provider",
+  );
 });
 
 test("normalizes each local runtime endpoint without broadening loopback access", async () => {
@@ -348,9 +770,11 @@ test("backs up local runtime settings without exporting its API key", async () =
     "localRuntime",
     "localBaseUrl",
     "localModels",
+    "modeModelSelections",
   ]) {
     assert.match(exportSource, new RegExp(`${key}: state\\.${key}`));
   }
+  assert.match(exportSource, /_version: 4/);
   assert.doesNotMatch(exportSource, /localApiKey/);
 
   const importStart = html.indexOf("const allowed = ['conversations'");
@@ -358,6 +782,7 @@ test("backs up local runtime settings without exporting its API key", async () =
   const importAllowlist = html.slice(importStart, importEnd);
   assert.match(importAllowlist, /'localRuntime'/);
   assert.match(importAllowlist, /'localBaseUrl'/);
+  assert.match(importAllowlist, /'modeModelSelections'/);
   assert.doesNotMatch(importAllowlist, /'localApiKey'/);
   assert.match(
     html,
