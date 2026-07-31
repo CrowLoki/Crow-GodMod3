@@ -246,15 +246,22 @@ test("ships first-class loopback presets for every supported local runtime", asy
   assert.match(openSettingsSource, /updateLocalRuntimeHelp\(state\.localRuntime\)/);
 });
 
-test("ships optional WebLLM browser inference without replacing server runtimes", async () => {
+test("ships one default WebLLM demo without replacing server runtimes", async () => {
   const html = await readFile(publicEntry, "utf8");
   assert.match(
     html,
     /const WEBLLM_MODULE_URL = 'https:\/\/esm\.run\/@mlc-ai\/web-llm@0\.2\.84';/,
   );
+  assert.match(
+    html,
+    /const WEBLLM_DEMO_MODEL = 'Qwen3\.5-0\.8B-q4f16_1-MLC';/,
+  );
+  assert.match(html, /webLlmEnabled: true,/);
+  assert.match(html, /webLlmModels: WEBLLM_DEMO_MODEL,/);
+  assert.match(html, /it is not hosted inside this website/);
   assert.match(html, /id="webLlmEnabled"/);
   assert.match(html, /onclick="discoverWebLlmModels\(\)"/);
-  assert.match(html, /ordinary GGUF files are not compatible/);
+  assert.match(html, /ordinary GGUF files are not compatible/i);
   assert.match(html, /filter\(record => record\?\.model_type !== 1\)/);
   assert.match(
     html,
@@ -273,6 +280,16 @@ test("ships optional WebLLM browser inference without replacing server runtimes"
     html,
     /_webLlmGenerationQueue = queued\.catch\(\(\) => \{\}\)/,
     "one WebGPU engine must serialize the site's parallel completion requests",
+  );
+  assert.match(
+    html,
+    /if \(!raceEntries\.length && hasWebLlmProvider\(\)\) \{[\s\S]*?raceEntries\.push\(\{ model: demoModel, provider: 'webllm' \}\);/,
+    "Automatic ULTRAPLINIAN must run one browser target when no server or API key is configured",
+  );
+  assert.match(
+    html,
+    /const needsWebLlmDemoMigration = parsed\.webLlmDemoVersion !== WEBLLM_DEMO_VERSION;/,
+    "existing browser state must receive the one-model demo migration",
   );
   assert.match(html, /'wasm-unsafe-eval' https:\/\/esm\.run https:\/\/cdn\.jsdelivr\.net/);
   assert.match(html, /https:\/\/huggingface\.co https:\/\/\*\.huggingface\.co/);

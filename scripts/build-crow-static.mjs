@@ -489,6 +489,8 @@ const runtimeWebLlmConfig = `    // Optional in-browser inference through WebLLM
     // when a user asks to discover or run browser models; model weights stay in
     // that browser's cache and never pass through the Crow-GodMod3 host.
     const WEBLLM_MODULE_URL = 'https://esm.run/@mlc-ai/web-llm@0.2.84';
+    const WEBLLM_DEMO_MODEL = 'Qwen3.5-0.8B-q4f16_1-MLC';
+    const WEBLLM_DEMO_VERSION = 1;
     let _webLlmModulePromise = null;
     let _webLlmEngine = null;
     let _webLlmLoadedModel = '';
@@ -1249,14 +1251,14 @@ replaceRequired(
             <a href="/LOCAL_MODELS.md" target="_blank" class="api-key-link">Setup commands for every runtime →</a>
           </div>
           <div class="settings-section">
-            <div class="settings-section-title">WebLLM · In-Browser Models (Optional)</div>
+            <div class="settings-section-title">WebLLM · In-Browser Demo</div>
             <div class="form-group">
               <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
                 <input type="checkbox" id="webLlmEnabled" style="width:auto;">
                 <label for="webLlmEnabled" style="margin:0;">Enable models that run inside this browser</label>
               </div>
               <small style="color:#888;display:block;line-height:1.5;">
-                Requires WebGPU and HTTPS. The first use downloads the selected MLC/WebLLM model into this browser's cache; ordinary GGUF files are not compatible. Prompts and generated text stay on this device.
+                The included demo uses <strong>Qwen3.5 0.8B</strong>. Its roughly 447 MB MLC model downloads only when first used and stays in this browser's cache; it is not hosted inside this website. Requires WebGPU and HTTPS. Ordinary GGUF files are not compatible. Prompts and generated text stay on this device.
               </small>
             </div>
             <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
@@ -1342,8 +1344,9 @@ replaceRequired(
       localApiKey: '',  // Optional token for authenticated local servers
       localReasoningEffort: 'none',  // LM Studio: prefer visible final text by default
       localReasoningOffModels: '',  // Capability cache populated by LM Studio discovery
-      webLlmEnabled: false,  // Run selected MLC models directly in this WebGPU browser
-      webLlmModels: '',  // Prebuilt model IDs discovered from the pinned WebLLM release
+      webLlmEnabled: true,  // A fresh browser can run the single lightweight demo without setup
+      webLlmModels: WEBLLM_DEMO_MODEL,  // Only one demo model; discovery remains opt-in
+      webLlmDemoVersion: WEBLLM_DEMO_VERSION,  // One-time migration for browsers predating the demo
       modeModelSelections: null,  // Explicit provider + model, saved independently for each mode
       modeModelSelectionVersion: 0,  // Migrated to the current per-mode pool schema on load`,
 );
@@ -1471,8 +1474,27 @@ replaceRequired(
 
 replaceRequired(
   `      'localEnabled', 'localOnly', 'localBaseUrl', 'localModels', 'localApiKey',`,
-  `      'localEnabled', 'localOnly', 'localRuntime', 'localBaseUrl', 'localModels', 'localRaceModels', 'localModeModelPools', 'localApiKey', 'localReasoningEffort', 'localReasoningOffModels', 'webLlmEnabled', 'webLlmModels',
+  `      'localEnabled', 'localOnly', 'localRuntime', 'localBaseUrl', 'localModels', 'localRaceModels', 'localModeModelPools', 'localApiKey', 'localReasoningEffort', 'localReasoningOffModels', 'webLlmEnabled', 'webLlmModels', 'webLlmDemoVersion',
       'modeModelSelections', 'modeModelSelectionVersion',`,
+);
+
+replaceRequired(
+  `          const parsed = JSON.parse(saved);
+          // Only merge whitelisted keys
+          for (const key of Object.keys(parsed)) {
+            if (STATE_KEYS.has(key)) state[key] = parsed[key];
+          }`,
+  `          const parsed = JSON.parse(saved);
+          const needsWebLlmDemoMigration = parsed.webLlmDemoVersion !== WEBLLM_DEMO_VERSION;
+          // Only merge whitelisted keys
+          for (const key of Object.keys(parsed)) {
+            if (STATE_KEYS.has(key)) state[key] = parsed[key];
+          }
+          if (needsWebLlmDemoMigration) {
+            state.webLlmEnabled = true;
+            state.webLlmModels = WEBLLM_DEMO_MODEL;
+            state.webLlmDemoVersion = WEBLLM_DEMO_VERSION;
+          }`,
 );
 
 replaceRequired(
@@ -1704,6 +1726,12 @@ replaceRequired(
           localModels.forEach(model => raceEntries.push({ model, provider: 'local' }));
           _log(\`[ULTRAPLINIAN] +\${localModels.length} local models added to race\`);
           addThinkingLog(\`!LOCAL +\${localModels.length} model\${localModels.length === 1 ? '' : 's'} loaded\`, 'info');
+        }
+        if (!raceEntries.length && hasWebLlmProvider()) {
+          const demoModel = getWebLlmModels()[0];
+          raceEntries.push({ model: demoModel, provider: 'webllm' });
+          _log(\`[ULTRAPLINIAN] Browser demo target: \${demoModel}\`);
+          addThinkingLog(\`!WEBLLM · \${demoModel}\`, 'info');
         }
       }`,
 );
@@ -2913,6 +2941,9 @@ replaceRequired(
       state.webLlmModels = typeof state.webLlmModels === 'string'
         ? state.webLlmModels.slice(0, MAX_LOCAL_MODEL_STORAGE_CHARS)
         : '';
+      state.webLlmDemoVersion = Number.isInteger(state.webLlmDemoVersion)
+        ? Math.max(0, state.webLlmDemoVersion)
+        : 0;
       const legacyLocalRaceModels = typeof state.localRaceModels === 'string'
         ? state.localRaceModels.slice(0, MAX_LOCAL_MODEL_STORAGE_CHARS)
         : '';
@@ -3935,6 +3966,7 @@ replaceRequired(
         localReasoningEffort: state.localReasoningEffort,
         webLlmEnabled: state.webLlmEnabled,
         webLlmModels: state.webLlmModels,
+        webLlmDemoVersion: state.webLlmDemoVersion,
         modeModelSelections: state.modeModelSelections,
         modeModelSelectionVersion: state.modeModelSelectionVersion,
       };`,
@@ -3943,7 +3975,7 @@ replaceRequired(
   `        'modelTemperature', 'modelTopP', 'modelMaxTokens', 'modelFreqPenalty', 'modelPresPenalty',
         'sidebarOpen', 'backendUrl'];`,
   `        'modelTemperature', 'modelTopP', 'modelMaxTokens', 'modelFreqPenalty', 'modelPresPenalty',
-        'localEnabled', 'localOnly', 'localRuntime', 'localBaseUrl', 'localModels', 'localRaceModels', 'localModeModelPools', 'localReasoningEffort', 'webLlmEnabled', 'webLlmModels', 'modeModelSelections', 'modeModelSelectionVersion',
+        'localEnabled', 'localOnly', 'localRuntime', 'localBaseUrl', 'localModels', 'localRaceModels', 'localModeModelPools', 'localReasoningEffort', 'webLlmEnabled', 'webLlmModels', 'webLlmDemoVersion', 'modeModelSelections', 'modeModelSelectionVersion',
         'sidebarOpen', 'backendUrl'];`,
 );
 replaceRequired(
@@ -3973,6 +4005,9 @@ replaceRequired(
       candidate.webLlmModels = typeof candidate.webLlmModels === 'string'
         ? candidate.webLlmModels.slice(0, MAX_LOCAL_MODEL_STORAGE_CHARS)
         : '';
+      candidate.webLlmDemoVersion = Number.isInteger(candidate.webLlmDemoVersion)
+        ? Math.max(0, candidate.webLlmDemoVersion)
+        : 0;
       candidate.localRaceModels = typeof imported.localRaceModels === 'string'
         ? normalizeLocalRaceModelSelection(
             imported.localRaceModels.slice(0, MAX_LOCAL_MODEL_STORAGE_CHARS),
