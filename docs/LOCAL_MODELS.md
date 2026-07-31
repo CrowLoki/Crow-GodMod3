@@ -223,6 +223,11 @@ conversation history. To remove the model files, clear Crow-GodMod3's browser
 site data; private browsing, storage cleanup, or changing browser/device can
 require a later re-download.
 
+The built-in 0.8B demo caps each visible answer at 512 output tokens so the
+site's shared 4,096-token setting does not turn a small in-browser response into
+a many-minute generation. Models deliberately added through discovery retain
+the configured generation budget.
+
 WebLLM models use MLC model artifacts plus a compatible WebAssembly model
 library. Ordinary GGUF, Safetensors, Ollama, and LM Studio downloads cannot be
 selected directly. A custom model must first be compiled and published in the

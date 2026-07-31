@@ -630,16 +630,25 @@ const runtimeWebLlmConfig = `    // Optional in-browser inference through WebLLM
       return _webLlmEngine;
     }
 
-    function webLlmRequestBody(body) {
+    function webLlmRequestBody(body, model) {
       const allowed = [
         'messages', 'temperature', 'top_p', 'max_tokens', 'frequency_penalty',
         'presence_penalty', 'stop', 'seed', 'response_format',
       ];
-      return Object.fromEntries(
+      const request = Object.fromEntries(
         allowed
           .filter(key => body[key] !== undefined)
           .map(key => [key, body[key]]),
       );
+      // The public 0.8B demo prioritizes a timely visible answer. The shared
+      // UI default is 4096 tokens, which can take many minutes in-browser.
+      if (model === WEBLLM_DEMO_MODEL) {
+        const requested = Number(request.max_tokens);
+        request.max_tokens = Number.isFinite(requested)
+          ? Math.max(1, Math.min(512, Math.floor(requested)))
+          : 512;
+      }
+      return request;
     }
 
     async function runWebLlmChat(model, body, signal) {
@@ -657,7 +666,7 @@ const runtimeWebLlmConfig = `    // Optional in-browser inference through WebLLM
             })
           : null;
         try {
-          const completion = engine.chat.completions.create(webLlmRequestBody(body));
+          const completion = engine.chat.completions.create(webLlmRequestBody(body, model));
           return await (abortPromise ? Promise.race([completion, abortPromise]) : completion);
         } finally {
           if (abortHandler) signal.removeEventListener('abort', abortHandler);
