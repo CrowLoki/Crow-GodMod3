@@ -243,7 +243,10 @@ test("ships first-class loopback presets for every supported local runtime", asy
     /applyLocalRuntimePreset\(/,
     "Opening settings must not overwrite a saved custom URL",
   );
-  assert.match(openSettingsSource, /updateLocalRuntimeHelp\(state\.localRuntime\)/);
+  assert.match(
+    openSettingsSource,
+    /applyLocalRuntimeProfileToState\(state\.localRuntime\);\s+renderActiveLocalRuntimeProfile\(\);/,
+  );
 });
 
 test("discovers unlimited local chat inventory with one-model default and user-selected races", async () => {
@@ -264,7 +267,12 @@ test("discovers unlimited local chat inventory with one-model default and user-s
   let availableLocalModels = [];
   const context = vm.createContext({
     URL,
-    state: { localRaceModels: "", localModeModelPools: null },
+    LOCAL_RUNTIME_IDS: new Set(localRuntimeIds),
+    state: {
+      localRuntime: "ollama",
+      localRaceModels: "",
+      localModeModelPools: null,
+    },
     getLocalModels() {
       return availableLocalModels;
     },
@@ -504,6 +512,388 @@ globalThis.discoverLocalChatModelsForTest = discoverLocalChatModels;`,
   );
 });
 
+test("ignores stale local discovery success and failure after a newer request", async () => {
+  const html = await readFile(publicEntry, "utf8");
+  const functionStart = html.indexOf("async function testLocalConnection()");
+  const functionEnd = html.indexOf(
+    "\n\n    // ═══════════════════════════════════════════════════════════════════",
+    functionStart,
+  );
+  assert.ok(
+    functionStart > 0 && functionEnd > functionStart,
+    "Missing local connection test helper",
+  );
+  const invalidationStart = html.indexOf(
+    "function invalidateActiveLocalRuntimeDiscovery",
+  );
+  const invalidationEnd = html.indexOf(
+    "\n\n    function setLocalApiKeyForRuntime",
+    invalidationStart,
+  );
+  assert.ok(
+    invalidationStart > 0 && invalidationEnd > invalidationStart,
+    "Missing local discovery invalidation helper",
+  );
+
+  const elements = {
+    localConnectionStatus: { textContent: "", style: {} },
+    localRuntimeInput: { value: "ollama" },
+    localBaseUrlInput: { value: localRuntimePresets.ollama.baseUrl },
+    localApiKeyInput: { value: "same-token" },
+    localModelsInput: { value: "" },
+    localReasoningEffortInput: { value: "none" },
+    localEnabled: { checked: false },
+  };
+  const discoveries = [];
+  let profile = {
+    baseUrl: localRuntimePresets.ollama.baseUrl,
+    models: "",
+    modeModelPools: {
+      ultraplinian: [],
+      parseltongue: [],
+      pliny: [],
+    },
+    reasoningEffort: "none",
+    reasoningOffModels: "",
+  };
+  const state = {
+    localRuntime: "ollama",
+    localModeModelPools: profile.modeModelPools,
+    localEnabled: false,
+  };
+  const context = vm.createContext({
+    LOCAL_RUNTIME_IDS: new Set(localRuntimeIds),
+    LOCAL_RUNTIME_PRESETS: localRuntimePresets,
+    state,
+    document: {
+      getElementById(id) {
+        return elements[id] || null;
+      },
+    },
+    normalizeLocalBaseUrl(value) {
+      return value;
+    },
+    getLocalRuntimeProfile() {
+      return profile;
+    },
+    setLocalRuntimeProfile(_runtime, nextProfile) {
+      profile = structuredClone(nextProfile);
+      return profile;
+    },
+    setLocalApiKeyForRuntime() {},
+    discoverLocalChatModels() {
+      return new Promise((resolve, reject) => {
+        discoveries.push({ resolve, reject });
+      });
+    },
+    applyLocalRuntimeProfileToState() {},
+    renderActiveLocalRuntimeProfile() {},
+    saveState() {},
+    describeLocalConnectionFailure(error) {
+      return error.message;
+    },
+  });
+  vm.runInContext(
+    `let _localApiKeyGeneration = 0;
+let _localRuntimeProfileGenerations = {};
+function bumpLocalRuntimeProfileGeneration(runtime) {
+  const next = (_localRuntimeProfileGenerations[runtime] || 0) + 1;
+  _localRuntimeProfileGenerations[runtime] = next;
+  return next;
+}
+${html.slice(invalidationStart, invalidationEnd)}
+${html.slice(functionStart, functionEnd)}
+globalThis.testLocalConnectionForTest = testLocalConnection;
+globalThis.invalidateActiveLocalRuntimeDiscoveryForTest = invalidateActiveLocalRuntimeDiscovery;
+globalThis.getLocalApiKeyGenerationForTest = () => _localApiKeyGeneration;`,
+    context,
+  );
+
+  const first = context.testLocalConnectionForTest();
+  const second = context.testLocalConnectionForTest();
+  assert.equal(discoveries.length, 2);
+  discoveries[1].resolve({
+    models: ["new-model"],
+    reasoningOffModels: [],
+    skipped: 0,
+    source: "openai-compatible",
+  });
+  await second;
+  const currentSuccessStatus = elements.localConnectionStatus.textContent;
+  discoveries[0].resolve({
+    models: ["old-model"],
+    reasoningOffModels: [],
+    skipped: 0,
+    source: "openai-compatible",
+  });
+  await first;
+  assert.equal(profile.models, "new-model");
+  assert.equal(elements.localConnectionStatus.textContent, currentSuccessStatus);
+  assert.equal(context.getLocalApiKeyGenerationForTest(), 2);
+
+  const staleFailure = context.testLocalConnectionForTest();
+  const latestSuccess = context.testLocalConnectionForTest();
+  discoveries[3].resolve({
+    models: ["latest-model"],
+    reasoningOffModels: [],
+    skipped: 0,
+    source: "openai-compatible",
+  });
+  await latestSuccess;
+  const latestSuccessStatus = elements.localConnectionStatus.textContent;
+  discoveries[2].reject(new Error("stale failure"));
+  await staleFailure;
+  assert.equal(profile.models, "latest-model");
+  assert.equal(elements.localConnectionStatus.textContent, latestSuccessStatus);
+  assert.equal(context.getLocalApiKeyGenerationForTest(), 4);
+
+  const staleAfterTyping = context.testLocalConnectionForTest();
+  elements.localModelsInput.value = "manually-typed-model";
+  const keyGenerationBeforeTyping =
+    context.getLocalApiKeyGenerationForTest();
+  context.invalidateActiveLocalRuntimeDiscoveryForTest(true);
+  assert.equal(
+    context.getLocalApiKeyGenerationForTest(),
+    keyGenerationBeforeTyping + 1,
+    "Typing a credential must invalidate a pending startup decrypt",
+  );
+  const editedStatus = elements.localConnectionStatus.textContent;
+  discoveries[4].resolve({
+    models: ["stale-discovered-model"],
+    reasoningOffModels: [],
+    skipped: 0,
+    source: "openai-compatible",
+  });
+  await staleAfterTyping;
+  assert.equal(elements.localModelsInput.value, "manually-typed-model");
+  assert.equal(profile.models, "latest-model");
+  assert.equal(editedStatus, "Settings changed — test again.");
+  assert.equal(elements.localConnectionStatus.textContent, editedStatus);
+
+  for (const handler of [
+    /id="localEnabled"[^>]*onchange="invalidateActiveLocalRuntimeDiscovery\(\)"/,
+    /id="localBaseUrlInput"[^>]*oninput="invalidateActiveLocalRuntimeDiscovery\(\)"/,
+    /id="localModelsInput"[^>]*oninput="invalidateActiveLocalRuntimeDiscovery\(\)"/,
+    /id="localApiKeyInput"[^>]*oninput="invalidateActiveLocalRuntimeDiscovery\(true\)"/,
+    /id="localReasoningEffortInput"[^>]*onchange="invalidateActiveLocalRuntimeDiscovery\(\)"/,
+  ]) {
+    assert.match(html, handler);
+  }
+
+  const saveStart = html.indexOf("function saveSettings()");
+  const saveEnd = html.indexOf("\n\n    function generateApiKey", saveStart);
+  const saveSource = html.slice(saveStart, saveEnd);
+  assert.match(
+    saveSource,
+    /const newLocalKey =[\s\S]*?_localApiKeyGeneration\+\+;\s+state\.localApiKey = newLocalKey;/,
+    "An explicit Save must invalidate pending credential decryption even when the saved key is blank",
+  );
+  assert.doesNotMatch(
+    saveSource,
+    /if \(newLocalKey !== state\.localApiKey\) _localApiKeyGeneration\+\+;/,
+  );
+});
+
+test("keeps unlimited inventories and mode pools separate across local runtime switches", async () => {
+  const html = await readFile(publicEntry, "utf8");
+  const helperStart = html.indexOf("function parseLocalModelIds");
+  const helperEnd = html.indexOf(
+    "\n\n    function renderLocalRaceModelPicker",
+    helperStart,
+  );
+  assert.ok(
+    helperStart > 0 && helperEnd > helperStart,
+    "Missing per-runtime profile helpers",
+  );
+
+  const ollamaModels = Array.from(
+    { length: 140 },
+    (_, index) => `ollama-model-${index}`,
+  );
+  const lmStudioModels = ["shared-model", "lm-a", "lm-b", "lm-c"];
+  const state = {
+    localRuntime: "ollama",
+    localBaseUrl: localRuntimePresets.ollama.baseUrl,
+    localModels: ollamaModels.join(", "),
+    localRaceModels: ollamaModels.join(", "),
+    localModeModelPools: {
+      ultraplinian: ollamaModels.join(", "),
+      parseltongue: [ollamaModels[2], ollamaModels[139]].join(", "),
+      pliny: ollamaModels.slice(10, 15).join(", "),
+    },
+    localReasoningEffort: "none",
+    localReasoningOffModels: "",
+    localRuntimeProfiles: {
+      ollama: {
+        baseUrl: localRuntimePresets.ollama.baseUrl,
+        models: ollamaModels.join(", "),
+        modeModelPools: {
+          ultraplinian: ollamaModels.join(", "),
+          parseltongue: [ollamaModels[2], ollamaModels[139]].join(", "),
+          pliny: ollamaModels.slice(10, 15).join(", "),
+        },
+        reasoningEffort: "none",
+      },
+      lmstudio: {
+        baseUrl: localRuntimePresets.lmstudio.baseUrl,
+        models: lmStudioModels.join(", "),
+        modeModelPools: {
+          ultraplinian: "shared-model, lm-a, lm-b",
+          parseltongue: "lm-c",
+          pliny: "lm-b, shared-model",
+        },
+        reasoningEffort: "auto",
+        reasoningOffModels: "shared-model, lm-b",
+      },
+    },
+    localRuntimeProfileVersion: 1,
+    localApiKey: "ollama-secret",
+  };
+  const localKeys = {
+    ollama: "ollama-secret",
+    lmstudio: "lmstudio-secret",
+  };
+  const context = vm.createContext({
+    state,
+    LOCAL_RUNTIME_PRESETS: localRuntimePresets,
+    LOCAL_RUNTIME_IDS: new Set(localRuntimeIds),
+    MAX_LOCAL_MODEL_STORAGE_CHARS: 1_048_576,
+    MODE_MODEL_IDS: new Set(["ultraplinian", "parseltongue", "pliny"]),
+    _localApiKeysByRuntime: localKeys,
+    normalizeLocalRuntime(runtime) {
+      return localRuntimeIds.includes(runtime) ? runtime : "custom";
+    },
+    getLocalModels() {
+      return String(state.localModels || "")
+        .split(",")
+        .map((model) => model.trim())
+        .filter(Boolean);
+    },
+  });
+  vm.runInContext(
+    `${html.slice(helperStart, helperEnd)}
+globalThis.getLocalAutomaticRaceModelsForTest = getLocalAutomaticRaceModels;
+globalThis.applyLocalRuntimeProfileToStateForTest = applyLocalRuntimeProfileToState;
+globalThis.getLocalRuntimeProfileForTest = getLocalRuntimeProfile;`,
+    context,
+  );
+
+  context.applyLocalRuntimeProfileToStateForTest("ollama");
+  assert.equal(context.getLocalAutomaticRaceModelsForTest("ultraplinian").length, 140);
+  assert.deepEqual(
+    structuredClone(context.getLocalAutomaticRaceModelsForTest("parseltongue")),
+    [ollamaModels[2], ollamaModels[139]],
+  );
+  assert.deepEqual(
+    structuredClone(context.getLocalAutomaticRaceModelsForTest("pliny")),
+    ollamaModels.slice(10, 15),
+  );
+  const preservedOllamaProfile = structuredClone(
+    context.getLocalRuntimeProfileForTest("ollama"),
+  );
+
+  context.applyLocalRuntimeProfileToStateForTest("lmstudio");
+  assert.equal(state.localRuntime, "lmstudio");
+  assert.equal(state.localModels, lmStudioModels.join(", "));
+  assert.equal(state.localApiKey, "lmstudio-secret");
+  assert.deepEqual(
+    structuredClone(context.getLocalAutomaticRaceModelsForTest("ultraplinian")),
+    ["shared-model", "lm-a", "lm-b"],
+  );
+  assert.deepEqual(
+    structuredClone(context.getLocalAutomaticRaceModelsForTest("parseltongue")),
+    ["lm-c"],
+  );
+  assert.deepEqual(
+    structuredClone(context.getLocalAutomaticRaceModelsForTest("pliny")),
+    ["lm-b", "shared-model"],
+  );
+
+  context.applyLocalRuntimeProfileToStateForTest("docker");
+  assert.equal(state.localModels, "");
+  assert.deepEqual(
+    structuredClone(context.getLocalAutomaticRaceModelsForTest("ultraplinian")),
+    [],
+    "An unconfigured runtime must not inherit another runtime's inventory",
+  );
+
+  context.applyLocalRuntimeProfileToStateForTest("ollama");
+  assert.deepEqual(
+    structuredClone(context.getLocalRuntimeProfileForTest("ollama")),
+    preservedOllamaProfile,
+    "Switching away and back must restore the exact unlimited inventory and pools",
+  );
+  assert.equal(state.localApiKey, "ollama-secret");
+});
+
+test("migrates legacy singleton local settings into only the active runtime profile", async () => {
+  const html = await readFile(publicEntry, "utf8");
+  const helperStart = html.indexOf("function parseLocalModelIds");
+  const helperEnd = html.indexOf(
+    "\n\n    function renderLocalRaceModelPicker",
+    helperStart,
+  );
+  assert.ok(helperStart > 0 && helperEnd > helperStart);
+
+  const state = {
+    localRuntime: "lmstudio",
+    localRaceModels: "legacy-a, legacy-b",
+  };
+  const context = vm.createContext({
+    state,
+    LOCAL_RUNTIME_PRESETS: localRuntimePresets,
+    LOCAL_RUNTIME_IDS: new Set(localRuntimeIds),
+    MAX_LOCAL_MODEL_STORAGE_CHARS: 1_048_576,
+    MODE_MODEL_IDS: new Set(["ultraplinian", "parseltongue", "pliny"]),
+    _localApiKeysByRuntime: {},
+    normalizeLocalRuntime(runtime) {
+      return localRuntimeIds.includes(runtime) ? runtime : "custom";
+    },
+    getLocalModels: () => [],
+  });
+  vm.runInContext(
+    `${html.slice(helperStart, helperEnd)}
+globalThis.normalizeLocalRuntimeProfilesForTest = normalizeLocalRuntimeProfiles;`,
+    context,
+  );
+
+  const migrated = structuredClone(
+    context.normalizeLocalRuntimeProfilesForTest(null, "lmstudio", {
+      baseUrl: "http://localhost:1234/v1",
+      models: "legacy-a, legacy-b, legacy-c",
+      raceModels: "legacy-a, legacy-b",
+      modeModelPools: {
+        ultraplinian: "legacy-a, legacy-b",
+        parseltongue: "legacy-c",
+        pliny: "legacy-b",
+      },
+      reasoningEffort: "auto",
+      reasoningOffModels: "legacy-a, missing-model",
+    }),
+  );
+
+  assert.equal(migrated.lmstudio.models, "legacy-a, legacy-b, legacy-c");
+  assert.deepEqual(migrated.lmstudio.modeModelPools, {
+    ultraplinian: "legacy-a, legacy-b",
+    parseltongue: "legacy-c",
+    pliny: "legacy-b",
+  });
+  assert.equal(migrated.lmstudio.reasoningEffort, "auto");
+  assert.equal(migrated.lmstudio.reasoningOffModels, "legacy-a");
+  for (const runtime of localRuntimeIds.filter((id) => id !== "lmstudio")) {
+    assert.equal(
+      migrated[runtime].models,
+      "",
+      `Legacy LM Studio inventory leaked into ${runtime}`,
+    );
+    assert.deepEqual(migrated[runtime].modeModelPools, {
+      ultraplinian: "",
+      parseltongue: "",
+      pliny: "",
+    });
+  }
+});
+
 test("keeps local tier counts truthful for unlimited automatic pools and pinned models", async () => {
   const html = await readFile(publicEntry, "utf8");
   const helperStart = html.indexOf("function _tierCount(tier)");
@@ -645,8 +1035,13 @@ globalThis.diagnoseForTest = diagnoseAllModelsFailed;`,
   assert.ok(fetchStart > 0 && fetchEnd > fetchStart, "Missing chat transport");
   const transportState = {
     localRuntime: "lmstudio",
-    localReasoningEffort: "none",
-    localReasoningOffModels: "ornith-1.0-9b",
+  };
+  const transportProfiles = {
+    lmstudio: {
+      reasoningEffort: "none",
+      reasoningOffModels: "ornith-1.0-9b",
+    },
+    vllm: { reasoningEffort: "none", reasoningOffModels: "" },
   };
   let capturedRequest;
   const transportContext = vm.createContext({
@@ -658,9 +1053,12 @@ globalThis.diagnoseForTest = diagnoseAllModelsFailed;`,
         .split(",")
         .map((value) => value.trim())
         .filter(Boolean),
-    resolveChatTarget: () => ({
+    getLocalRuntimeProfile: (runtime) => transportProfiles[runtime],
+    getLocalTransportSnapshot: () => null,
+    resolveChatTarget: (model) => ({
       provider: "local",
-      model: "ornith-1.0-9b",
+      runtime: transportState.localRuntime,
+      model,
       url: "http://127.0.0.1:1234/v1/chat/completions",
       apiKey: "",
     }),
@@ -684,7 +1082,7 @@ globalThis.fetchChatForTest = fetchChatCompletion;`,
     "none",
     "the explicit LM Studio final-answer setting disables hidden reasoning",
   );
-  transportState.localReasoningEffort = "auto";
+  transportProfiles.lmstudio.reasoningEffort = "auto";
   await transportContext.fetchChatForTest(
     { model: "ornith-1.0-9b", messages: [] },
     { provider: "local" },
@@ -695,7 +1093,6 @@ globalThis.fetchChatForTest = fetchChatCompletion;`,
     "model-default reasoning must remain available as an explicit user choice",
   );
   transportState.localRuntime = "vllm";
-  transportState.localReasoningEffort = "none";
   await transportContext.fetchChatForTest(
     { model: "any-vllm-model", messages: [] },
     { provider: "local" },
@@ -706,7 +1103,8 @@ globalThis.fetchChatForTest = fetchChatCompletion;`,
     "LM Studio reasoning controls must not leak into other local runtimes",
   );
   transportState.localRuntime = "lmstudio";
-  transportState.localReasoningOffModels = "";
+  transportProfiles.lmstudio.reasoningEffort = "none";
+  transportProfiles.lmstudio.reasoningOffModels = "";
   await transportContext.fetchChatForTest(
     { model: "ornith-1.0-9b", messages: [] },
     { provider: "local" },
@@ -793,12 +1191,22 @@ test("keeps an explicit provider-qualified model choice for every mode", async (
     helperStart,
   );
   assert.ok(helperStart > 0 && helperEnd > helperStart);
+  const transportHelperStart = html.indexOf("const _localTransportSnapshots");
+  const transportHelperEnd = html.indexOf(
+    "\n\n    function bumpLocalRuntimeProfileGeneration",
+    transportHelperStart,
+  );
+  assert.ok(
+    transportHelperStart > 0 && transportHelperEnd > transportHelperStart,
+  );
 
   const modeSelectionState = {
     apiKey: "openrouter-present",
     veniceApiKey: "",
     localOnly: false,
     localEnabled: true,
+    localRuntime: "lmstudio",
+    localBaseUrl: localRuntimePresets.lmstudio.baseUrl,
     localModels: "same/model, lm-beta",
     model: "same/model",
     modeModelSelections: {
@@ -821,6 +1229,17 @@ test("keeps an explicit provider-qualified model choice for every mode", async (
     ]),
     MODE_MODEL_IDS: new Set(["ultraplinian", "parseltongue", "pliny"]),
     MODE_MODEL_SELECTION_SCHEMA_VERSION: 2,
+    LOCAL_RUNTIME_IDS: new Set(localRuntimeIds),
+    _localApiKeysByRuntime: {},
+    getLocalRuntimeProfile() {
+      return {
+        baseUrl: modeSelectionState.localBaseUrl,
+        models: modeSelectionState.localModels,
+        modeModelPools: {},
+        reasoningEffort: "none",
+        reasoningOffModels: "",
+      };
+    },
     getLocalModels() {
       return ["same/model", "lm-beta"];
     },
@@ -837,7 +1256,7 @@ test("keeps an explicit provider-qualified model choice for every mode", async (
     normalizeOpenRouterModel(model) {
       return model === "same/model" ? model : "same/model";
     },
-    resolveChatTarget(model, provider) {
+    resolveChatTarget(model, provider, runtime) {
       const resolvedProvider =
         provider === "auto"
           ? modeSelectionState.apiKey
@@ -851,6 +1270,10 @@ test("keeps an explicit provider-qualified model choice for every mode", async (
       return {
         provider: resolvedProvider,
         model,
+        runtime:
+          resolvedProvider === "local"
+            ? runtime || modeSelectionState.localRuntime
+            : undefined,
       };
     },
     encodeURIComponent,
@@ -858,7 +1281,8 @@ test("keeps an explicit provider-qualified model choice for every mode", async (
     JSON,
   });
   vm.runInContext(
-    `${html.slice(helperStart, helperEnd)}
+    `${html.slice(transportHelperStart, transportHelperEnd)}
+${html.slice(helperStart, helperEnd)}
 globalThis.getModeModelRequestForTest = getModeModelRequest;
 globalThis.getModeExecutionSelectionForTest = getModeExecutionSelection;
 globalThis.getModeAuxiliaryTargetForTest = getModeAuxiliaryTarget;
@@ -875,12 +1299,12 @@ globalThis.decodeModeModelSelectionForTest = decodeModeModelSelection;`,
     structuredClone(
       context.getModeModelRequestForTest("parseltongue", "same/model"),
     ),
-    { provider: "local", model: "same/model" },
+    { provider: "local", model: "same/model", runtime: "lmstudio" },
     "A local target must stay local even when an OpenRouter key and identical model ID exist",
   );
   assert.deepEqual(
     structuredClone(context.getModeModelRequestForTest("pliny", "same/model")),
-    { provider: "openrouter", model: "same/model" },
+    { provider: "openrouter", model: "same/model", runtime: undefined },
   );
   assert.deepEqual(
     structuredClone(
@@ -905,13 +1329,14 @@ globalThis.decodeModeModelSelectionForTest = decodeModeModelSelection;`,
     provider: "auto",
     model: "",
     localModels: ["same/model", "lm-beta"],
+    runtime: "lmstudio",
   });
   assert.equal(Object.isFrozen(automaticSnapshot.localModels), true);
   assert.deepEqual(
     structuredClone(
       context.getModeAuxiliaryTargetForTest(automaticSnapshot),
     ),
-    { provider: "local", model: "same/model" },
+    { provider: "local", model: "same/model", runtime: "lmstudio" },
     "Automatic helper calls must stay on the frozen selected pool instead of the first discovered model",
   );
   assert.deepEqual(
@@ -924,19 +1349,35 @@ globalThis.decodeModeModelSelectionForTest = decodeModeModelSelection;`,
     ),
     [
       { provider: "openrouter", model: "same/model" },
-      { provider: "local", model: "same/model" },
-      { provider: "local", model: "lm-beta" },
+      { provider: "local", model: "same/model", runtime: "lmstudio" },
+      { provider: "local", model: "lm-beta", runtime: "lmstudio" },
     ],
     "Automatic mode targets must preserve same-ID models from different providers and include the entire selected local pool",
   );
 
   modeSelectionState.localEnabled = false;
+  assert.deepEqual(
+    structuredClone(
+      context.getModeRaceTargetsForTest(
+        "parseltongue",
+        "same/model",
+        automaticSnapshot,
+      ),
+    ),
+    [
+      { provider: "openrouter", model: "same/model" },
+      { provider: "local", model: "same/model", runtime: "lmstudio" },
+      { provider: "local", model: "lm-beta", runtime: "lmstudio" },
+    ],
+    "An in-flight Automatic race must retain its frozen local pool after the live runtime is disabled",
+  );
   const cloudOnlySnapshot =
     context.getModeExecutionSelectionForTest("parseltongue");
   assert.deepEqual(structuredClone(cloudOnlySnapshot), {
     provider: "auto",
     model: "",
     localModels: [],
+    runtime: "lmstudio",
   });
   assert.equal(
     context.getModeAuxiliaryTargetForTest(cloudOnlySnapshot),
@@ -969,7 +1410,7 @@ globalThis.decodeModeModelSelectionForTest = decodeModeModelSelection;`,
         exactSubsetSnapshot,
       ),
     ),
-    [{ provider: "local", model: "lm-beta" }],
+    [{ provider: "local", model: "lm-beta", runtime: "lmstudio" }],
     "An in-flight Automatic run must retain its exact selected local subset even if the live pool changes",
   );
   assert.deepEqual(
@@ -1045,7 +1486,7 @@ globalThis.decodeModeModelSelectionForTest = decodeModeModelSelection;`,
     context.getModeExecutionSelectionForTest("parseltongue");
   assert.deepEqual(
     structuredClone(context.getModeAuxiliaryTargetForTest(explicitSnapshot)),
-    { provider: "local", model: "lm-beta" },
+    { provider: "local", model: "lm-beta", runtime: "lmstudio" },
   );
   context.state.modeModelSelections.parseltongue = {
     provider: "openrouter",
@@ -1059,7 +1500,7 @@ globalThis.decodeModeModelSelectionForTest = decodeModeModelSelection;`,
         explicitSnapshot,
       ),
     ),
-    { provider: "local", model: "lm-beta" },
+    { provider: "local", model: "lm-beta", runtime: "lmstudio" },
     "An explicit snapshot must retain its exact provider and model for the whole run",
   );
 });
@@ -1335,7 +1776,7 @@ test("executes every selected CLASSIC model while preserving the prompt selectio
     fetchChatCompletion: async (body, options) => {
       calls.push({
         model: body.model,
-        provider: options.provider,
+        provider: options.modeTarget?.provider || options.provider,
         maxTokens: body.max_tokens,
       });
       return {
@@ -1456,6 +1897,153 @@ globalThis.executePlinyModeForTest = executePlinyMode;`,
   );
 });
 
+test("routes local requests through only the frozen runtime profile", async () => {
+  const html = await readFile(publicEntry, "utf8");
+  const resolverStart = html.indexOf("function resolveChatTarget");
+  const resolverEnd = html.indexOf(
+    "\n\n    async function fetchChatCompletion",
+    resolverStart,
+  );
+  assert.ok(resolverStart > 0 && resolverEnd > resolverStart);
+  const transportHelperStart = html.indexOf("const _localTransportSnapshots");
+  const transportHelperEnd = html.indexOf(
+    "\n\n    function bumpLocalRuntimeProfileGeneration",
+    transportHelperStart,
+  );
+  assert.ok(
+    transportHelperStart > 0 && transportHelperEnd > transportHelperStart,
+  );
+
+  const profiles = {
+    ollama: {
+      baseUrl: "http://localhost:11434/v1",
+      models: "shared-model, ollama-only",
+    },
+    lmstudio: {
+      baseUrl: "http://localhost:1234/v1",
+      models: "shared-model, lmstudio-only",
+    },
+  };
+  const runtimeState = {
+    apiKey: "",
+    veniceApiKey: "",
+    localOnly: true,
+    localEnabled: true,
+    localRuntime: "ollama",
+    localBaseUrl: profiles.ollama.baseUrl,
+  };
+  const context = vm.createContext({
+    state: runtimeState,
+    MODE_MODEL_PROVIDERS: new Set([
+      "auto",
+      "openrouter",
+      "venice",
+      "local",
+    ]),
+    LOCAL_RUNTIME_IDS: new Set(localRuntimeIds),
+    OPENROUTER_LEGACY_MODEL_MIGRATIONS: {},
+    OPENROUTER_FREE_CHAT_MODEL_SET: new Set(),
+    VENICE_MODELS: [],
+    _localApiKeysByRuntime: {
+      ollama: "ollama-key",
+      lmstudio: "lmstudio-key",
+    },
+    parseLocalModelIds: (raw) =>
+      String(raw || "")
+        .split(",")
+        .map((model) => model.trim())
+        .filter(Boolean),
+    getLocalRuntimeProfile(runtime) {
+      return profiles[runtime];
+    },
+    normalizeLocalRuntime(runtime) {
+      return localRuntimeIds.includes(runtime) ? runtime : "custom";
+    },
+    normalizeLocalBaseUrl(raw) {
+      return String(raw).replace(/\/+$/, "");
+    },
+    hasLocalProvider: () => true,
+    normalizeOpenRouterModel: (model) => model,
+  });
+  vm.runInContext(
+    `${html.slice(transportHelperStart, transportHelperEnd)}
+${html.slice(resolverStart, resolverEnd)}
+globalThis.attachLocalTransportSnapshotForTest = attachLocalTransportSnapshot;
+globalThis.resolveChatTargetForTest = resolveChatTarget;`,
+    context,
+  );
+
+  const executionContext = {};
+  context.attachLocalTransportSnapshotForTest(executionContext, "ollama");
+  const frozenOllamaTarget = structuredClone(
+    context.resolveChatTargetForTest(
+      "shared-model",
+      "local",
+      "ollama",
+      executionContext,
+    ),
+  );
+  assert.deepEqual(frozenOllamaTarget, {
+    provider: "local",
+    runtime: "ollama",
+    model: "shared-model",
+    url: "http://localhost:11434/v1/chat/completions",
+    apiKey: "ollama-key",
+  });
+  assert.throws(
+    () =>
+      context.resolveChatTargetForTest(
+        "lmstudio-only",
+        "local",
+        "ollama",
+      ),
+    /no longer available/,
+    "An inactive runtime's inventory must not satisfy the active runtime",
+  );
+
+  runtimeState.localRuntime = "lmstudio";
+  runtimeState.localBaseUrl = profiles.lmstudio.baseUrl;
+  assert.deepEqual(
+    structuredClone(
+      context.resolveChatTargetForTest("shared-model", "local"),
+    ),
+    {
+      provider: "local",
+      runtime: "lmstudio",
+      model: "shared-model",
+      url: "http://localhost:1234/v1/chat/completions",
+      apiKey: "lmstudio-key",
+    },
+  );
+  assert.deepEqual(
+    structuredClone(
+      context.resolveChatTargetForTest(
+        "shared-model",
+        "local",
+        "ollama",
+        executionContext,
+      ),
+    ),
+    frozenOllamaTarget,
+    "A frozen Ollama run must not jump to LM Studio after the UI switches runtime",
+  );
+  profiles.ollama.baseUrl = "http://localhost:9999/v1";
+  profiles.ollama.models = "replacement-only";
+  context._localApiKeysByRuntime.ollama = "replacement-key";
+  assert.deepEqual(
+    structuredClone(
+      context.resolveChatTargetForTest(
+        "shared-model",
+        "local",
+        "ollama",
+        executionContext,
+      ),
+    ),
+    frozenOllamaTarget,
+    "A running answer must retain its original endpoint, credential, and inventory after the saved profile is edited",
+  );
+});
+
 test("never falls back from an unavailable explicit provider-qualified target", async () => {
   const html = await readFile(publicEntry, "utf8");
   const resolverStart = html.indexOf("function resolveChatTarget");
@@ -1470,12 +2058,22 @@ test("never falls back from an unavailable explicit provider-qualified target", 
   );
   assert.ok(resolverStart > 0 && resolverEnd > resolverStart);
   assert.ok(auxiliaryStart > 0 && auxiliaryEnd > auxiliaryStart);
+  const transportHelperStart = html.indexOf("const _localTransportSnapshots");
+  const transportHelperEnd = html.indexOf(
+    "\n\n    function bumpLocalRuntimeProfileGeneration",
+    transportHelperStart,
+  );
+  assert.ok(
+    transportHelperStart > 0 && transportHelperEnd > transportHelperStart,
+  );
 
   const runtimeState = {
     apiKey: "openrouter-present",
     veniceApiKey: "venice-present",
     localOnly: false,
     localEnabled: true,
+    localRuntime: "lmstudio",
+    localBaseUrl: "http://localhost:1234/v1",
     localApiKey: "",
     localModels: ["same/model", "lm-beta"],
   };
@@ -1492,6 +2090,20 @@ test("never falls back from an unavailable explicit provider-qualified target", 
     OPENROUTER_LEGACY_MODEL_MIGRATIONS: {},
     OPENROUTER_FREE_CHAT_MODEL_SET: freeModels,
     VENICE_MODELS: veniceModels,
+    LOCAL_RUNTIME_IDS: new Set(localRuntimeIds),
+    _localApiKeysByRuntime: {},
+    parseLocalModelIds(raw) {
+      return String(raw || "")
+        .split(",")
+        .map((model) => model.trim())
+        .filter(Boolean);
+    },
+    getLocalRuntimeProfile() {
+      return {
+        baseUrl: runtimeState.localBaseUrl,
+        models: runtimeState.localModels.join(", "),
+      };
+    },
     getLocalModels() {
       return runtimeState.localModels;
     },
@@ -1501,14 +2113,19 @@ test("never falls back from an unavailable explicit provider-qualified target", 
     normalizeLocalBaseUrl() {
       return "http://localhost:1234/v1";
     },
+    normalizeLocalRuntime(runtime) {
+      return localRuntimeIds.includes(runtime) ? runtime : "custom";
+    },
     normalizeOpenRouterModel(model) {
       return freeModels.has(model) ? model : "same/model";
     },
   });
   vm.runInContext(
-    `${html.slice(resolverStart, resolverEnd)}
+    `${html.slice(transportHelperStart, transportHelperEnd)}
+${html.slice(resolverStart, resolverEnd)}
 ${html.slice(auxiliaryStart, auxiliaryEnd)}
 globalThis.resolveChatTargetForTest = resolveChatTarget;
+globalThis.createModeTargetForTest = createModeTarget;
 globalThis.hasAuxiliaryModelProviderForTest = hasAuxiliaryModelProvider;`,
     context,
   );
@@ -1519,6 +2136,7 @@ globalThis.hasAuxiliaryModelProviderForTest = hasAuxiliaryModelProvider;`,
     ),
     {
       provider: "local",
+      runtime: "lmstudio",
       model: "same/model",
       url: "http://localhost:1234/v1/chat/completions",
       apiKey: "",
@@ -1561,13 +2179,22 @@ globalThis.hasAuxiliaryModelProviderForTest = hasAuxiliaryModelProvider;`,
     /selected local model "missing-local-model" is no longer available/,
     "An explicit missing local model must not fall back to its first discovered model or OpenRouter",
   );
+  const frozenLocalAuxiliaryTarget =
+    context.createModeTargetForTest("local", "same/model", "lmstudio");
   runtimeState.localEnabled = false;
+  runtimeState.localModels = [];
+  assert.equal(
+    context.hasAuxiliaryModelProviderForTest(frozenLocalAuxiliaryTarget),
+    true,
+    "A helper already attached to a frozen local run must remain available after live settings change",
+  );
   assert.throws(
     () => context.resolveChatTargetForTest("same/model", "local"),
     /selected local model provider is unavailable/,
     "A disabled explicit local pin must fail exactly instead of falling back to cloud",
   );
   runtimeState.localEnabled = true;
+  runtimeState.localModels = ["same/model", "lm-beta"];
 
   runtimeState.veniceApiKey = "";
   assert.throws(
@@ -2002,8 +2629,17 @@ test("backs up local runtime settings without exporting its API key", async () =
   ]) {
     assert.match(exportSource, new RegExp(`${key}: state\\.${key}`));
   }
-  assert.match(exportSource, /_version: 5/);
+  assert.match(
+    exportSource,
+    /localRuntimeProfiles: normalizeLocalRuntimeProfiles\(\s+state\.localRuntimeProfiles,\s+state\.localRuntime,/,
+  );
+  assert.match(
+    exportSource,
+    /localRuntimeProfileVersion: LOCAL_RUNTIME_PROFILE_SCHEMA_VERSION/,
+  );
+  assert.match(exportSource, /_version: 6/);
   assert.doesNotMatch(exportSource, /localApiKey/);
+  assert.doesNotMatch(exportSource, /_localApiKeysByRuntime/);
 
   const importStart = html.indexOf("const allowed = ['conversations'");
   const importEnd = html.indexOf("];", importStart) + 2;
@@ -2012,10 +2648,13 @@ test("backs up local runtime settings without exporting its API key", async () =
   assert.match(importAllowlist, /'localBaseUrl'/);
   assert.match(importAllowlist, /'localRaceModels'/);
   assert.match(importAllowlist, /'localModeModelPools'/);
+  assert.match(importAllowlist, /'localRuntimeProfiles'/);
+  assert.match(importAllowlist, /'localRuntimeProfileVersion'/);
   assert.match(importAllowlist, /'localReasoningEffort'/);
   assert.match(importAllowlist, /'modeModelSelections'/);
   assert.match(importAllowlist, /'modeModelSelectionVersion'/);
   assert.doesNotMatch(importAllowlist, /'localApiKey'/);
+  assert.doesNotMatch(importAllowlist, /'_localApiKeysByRuntime'/);
   assert.match(
     html,
     /candidate\.localRuntime = imported\.localRuntime === undefined\s+\? inferLocalRuntimeFromBaseUrl\(candidate\.localBaseUrl\)/,
@@ -2024,6 +2663,118 @@ test("backs up local runtime settings without exporting its API key", async () =
     html,
     /candidate\.localModels = typeof candidate\.localModels === 'string'\s+\? candidate\.localModels\.slice\(0, MAX_LOCAL_MODEL_STORAGE_CHARS\)/,
   );
+
+  const profileStart = html.indexOf("function parseLocalModelIds");
+  const profileEnd = html.indexOf(
+    "\n\n    function renderLocalRaceModelPicker",
+    profileStart,
+  );
+  assert.ok(profileStart > 0 && profileEnd > profileStart);
+  const capturedBackups = [];
+  class TestBlob {
+    constructor(parts) {
+      this.parts = parts;
+    }
+  }
+  const backupState = {
+    conversations: [],
+    localEnabled: true,
+    localOnly: true,
+    localRuntime: "ollama",
+    localBaseUrl: localRuntimePresets.ollama.baseUrl,
+    localModels: "ollama-a, ollama-b",
+    localRaceModels: "ollama-a, ollama-b",
+    localModeModelPools: {
+      ultraplinian: "ollama-a, ollama-b",
+      parseltongue: "ollama-b",
+      pliny: "ollama-a",
+    },
+    localReasoningEffort: "none",
+    localReasoningOffModels: "",
+    localApiKey: "active-runtime-secret",
+    localRuntimeProfiles: {
+      ollama: {
+        baseUrl: localRuntimePresets.ollama.baseUrl,
+        models: "ollama-a, ollama-b",
+        modeModelPools: {
+          ultraplinian: "ollama-a, ollama-b",
+          parseltongue: "ollama-b",
+          pliny: "ollama-a",
+        },
+        apiKey: "nested-ollama-secret",
+      },
+      lmstudio: {
+        baseUrl: localRuntimePresets.lmstudio.baseUrl,
+        models: "lm-a, lm-b",
+        modeModelPools: {
+          ultraplinian: "lm-a, lm-b",
+          parseltongue: "lm-b",
+          pliny: "lm-a",
+        },
+        localApiKey: "nested-lm-secret",
+      },
+    },
+    localRuntimeProfileVersion: 1,
+  };
+  const backupContext = vm.createContext({
+    state: backupState,
+    LOCAL_RUNTIME_PRESETS: localRuntimePresets,
+    LOCAL_RUNTIME_IDS: new Set(localRuntimeIds),
+    MAX_LOCAL_MODEL_STORAGE_CHARS: 1_048_576,
+    MODE_MODEL_IDS: new Set(["ultraplinian", "parseltongue", "pliny"]),
+    _localApiKeysByRuntime: {
+      ollama: "credential-map-secret",
+      lmstudio: "second-map-secret",
+    },
+    normalizeLocalRuntime(runtime) {
+      return localRuntimeIds.includes(runtime) ? runtime : "custom";
+    },
+    getLocalModels() {
+      return String(backupState.localModels || "")
+        .split(",")
+        .map((model) => model.trim())
+        .filter(Boolean);
+    },
+    Blob: TestBlob,
+    URL: {
+      createObjectURL(blob) {
+        capturedBackups.push(JSON.parse(blob.parts.join("")));
+        return "blob:test-backup";
+      },
+      revokeObjectURL() {},
+    },
+    document: {
+      createElement: () => ({ click() {} }),
+      body: {
+        appendChild() {},
+        removeChild() {},
+      },
+    },
+  });
+  vm.runInContext(
+    `${html.slice(profileStart, profileEnd)}
+${exportSource}
+globalThis.exportFullBackupForTest = exportFullBackup;`,
+    backupContext,
+  );
+  backupContext.exportFullBackupForTest();
+  assert.equal(capturedBackups.length, 1);
+  const backup = capturedBackups[0];
+  assert.equal(backup._version, 6);
+  assert.equal(backup.localRuntimeProfileVersion, 1);
+  assert.equal(backup.localRuntimeProfiles.ollama.models, "ollama-a, ollama-b");
+  assert.equal(backup.localRuntimeProfiles.lmstudio.models, "lm-a, lm-b");
+  const serializedBackup = JSON.stringify(backup);
+  for (const secret of [
+    "active-runtime-secret",
+    "nested-ollama-secret",
+    "nested-lm-secret",
+    "credential-map-secret",
+    "second-map-secret",
+  ]) {
+    assert.doesNotMatch(serializedBackup, new RegExp(secret));
+  }
+  assert.doesNotMatch(serializedBackup, /localApiKey|apiKey/i);
 });
 
 test("legacy backup import resets newer local selection fields instead of retaining live state", async () => {
@@ -2058,6 +2809,13 @@ test("legacy backup import resets newer local selection fields instead of retain
         parseltongue: "current-local-model",
         pliny: "current-local-model",
       },
+      localRuntimeProfiles: {
+        lmstudio: {
+          baseUrl: "http://localhost:1234/v1",
+          models: "current-local-model",
+        },
+      },
+      localRuntimeProfileVersion: 1,
       localReasoningEffort: "auto",
       localReasoningOffModels: "current-local-model",
       modeModelSelections: {
@@ -2096,11 +2854,66 @@ test("legacy backup import resets newer local selection fields instead of retain
         pliny: normalize(source.pliny),
       };
     },
+    normalizeLocalRuntimeProfiles: (profiles, activeRuntime, legacyProfile) => {
+      const source =
+        profiles && typeof profiles === "object" && !Array.isArray(profiles)
+          ? profiles
+          : {};
+      const normalized = Object.fromEntries(
+        localRuntimeIds.map((runtime) => [
+          runtime,
+          {
+            baseUrl: localRuntimePresets[runtime].baseUrl || "",
+            models: "",
+            modeModelPools: {
+              ultraplinian: "",
+              parseltongue: "",
+              pliny: "",
+            },
+            reasoningEffort: "none",
+            reasoningOffModels: "",
+          },
+        ]),
+      );
+      const activeSource = source[activeRuntime] || legacyProfile;
+      if (activeSource) {
+        const models = String(activeSource.models || "")
+          .split(",")
+          .map((model) => model.trim())
+          .filter(Boolean);
+        const available = new Set(models);
+        const normalizePool = (raw) =>
+          String(raw || "")
+            .split(",")
+            .map((model) => model.trim())
+            .filter((model) => available.has(model))
+            .join(", ");
+        normalized[activeRuntime] = {
+          baseUrl: activeSource.baseUrl,
+          models: activeSource.models,
+          modeModelPools: {
+            ultraplinian: normalizePool(
+              activeSource.modeModelPools?.ultraplinian ||
+                activeSource.raceModels,
+            ),
+            parseltongue: normalizePool(
+              activeSource.modeModelPools?.parseltongue,
+            ),
+            pliny: normalizePool(activeSource.modeModelPools?.pliny),
+          },
+          reasoningEffort:
+            activeSource.reasoningEffort === "auto" ? "auto" : "none",
+          reasoningOffModels: "",
+        };
+      }
+      return normalized;
+    },
     migrateLegacyModeModelSelections: () => ({
       ultraplinian: { provider: "auto", model: "" },
       parseltongue: { provider: "auto", model: "" },
       pliny: { provider: "auto", model: "" },
     }),
+    LOCAL_RUNTIME_PROFILE_SCHEMA_VERSION: 1,
     MODE_MODEL_SELECTION_SCHEMA_VERSION: 2,
   });
   vm.runInContext(
@@ -2117,6 +2930,11 @@ globalThis.migratedCandidateForTest = candidate;`,
   });
   assert.equal(candidate.localReasoningEffort, "none");
   assert.equal(candidate.localReasoningOffModels, "");
+  assert.equal(candidate.localRuntimeProfiles.lmstudio.models, "legacy-local-model");
+  assert.equal(candidate.localRuntimeProfileVersion, 1);
+  for (const runtime of localRuntimeIds.filter((id) => id !== "lmstudio")) {
+    assert.equal(candidate.localRuntimeProfiles[runtime].models, "");
+  }
   assert.deepEqual(candidate.modeModelSelections.ultraplinian, {
     provider: "auto",
     model: "",

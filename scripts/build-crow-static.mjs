@@ -443,7 +443,9 @@ const runtimeLocalProviderConfig = `    // First-class loopback runtime presets.
       const help = document.getElementById('localRuntimeHelp');
       const keyInput = document.getElementById('localApiKeyInput');
       const origin = window.location.origin;
-      if (help) help.textContent = preset.help.replaceAll('{origin}', origin);
+      if (help) {
+        help.textContent = \`\${preset.help.replaceAll('{origin}', origin)} This runtime keeps its own model inventory and three mode pools; only the selected runtime runs.\`;
+      }
       if (keyInput) keyInput.placeholder = preset.apiKeyPlaceholder;
       const originHint = document.getElementById('localOriginHint');
       if (originHint) originHint.textContent = origin;
@@ -452,17 +454,21 @@ const runtimeLocalProviderConfig = `    // First-class loopback runtime presets.
     function applyLocalRuntimePreset(runtime) {
       const runtimeId = LOCAL_RUNTIME_IDS.has(runtime) ? runtime : 'custom';
       const preset = LOCAL_RUNTIME_PRESETS[runtimeId];
-      const baseUrlInput = document.getElementById('localBaseUrlInput');
-      const modelsInput = document.getElementById('localModelsInput');
       const status = document.getElementById('localConnectionStatus');
-      if (preset.baseUrl && baseUrlInput && baseUrlInput.value !== preset.baseUrl) {
-        baseUrlInput.value = preset.baseUrl;
-        if (modelsInput) modelsInput.value = '';
+      const previousRuntime = normalizeLocalRuntime(state.localRuntime, state.localBaseUrl);
+      if (previousRuntime !== runtimeId) {
+        captureActiveLocalRuntimeProfileFromForm(previousRuntime);
+        applyLocalRuntimeProfileToState(runtimeId);
+        renderActiveLocalRuntimeProfile();
+        saveState();
       }
+      const modelCount = getLocalModels().length;
       if (status) {
-        status.textContent = runtimeId === 'custom'
-          ? 'Custom URL selected — enter its base URL, then test.'
-          : \`\${preset.label} preset loaded — test to discover model IDs.\`;
+        status.textContent = modelCount
+          ? \`\${preset.label} profile restored — \${modelCount} saved model ID\${modelCount === 1 ? '' : 's'}.\`
+          : runtimeId === 'custom'
+            ? 'Custom profile selected — enter its base URL, then test.'
+            : \`\${preset.label} profile selected — test to discover model IDs.\`;
         status.style.color = 'var(--text-dim)';
       }
       updateLocalRuntimeHelp(runtimeId);
@@ -524,12 +530,16 @@ const runtimeModeModelConfig = `    // Each mode keeps its own explicit provider
       return normalized;
     }
 
-    function getLocalAutomaticRaceModels(mode = 'ultraplinian') {
+    function getLocalAutomaticRaceModels(mode = 'ultraplinian', runtime = state.localRuntime) {
       const safeMode = MODE_MODEL_IDS.has(mode) ? mode : 'ultraplinian';
-      const localModels = getLocalModels();
+      const runtimeId = LOCAL_RUNTIME_IDS.has(runtime) ? runtime : state.localRuntime;
+      const localModels = getLocalModels(runtimeId);
       if (!localModels.length) return [];
       const available = new Set(localModels);
-      const pools = normalizeLocalModeModelPools(state.localModeModelPools, localModels);
+      const profilePools = runtimeId === state.localRuntime
+        ? state.localModeModelPools
+        : getLocalRuntimeProfile(runtimeId).modeModelPools;
+      const pools = normalizeLocalModeModelPools(profilePools, localModels);
       const selected = parseLocalModelIds(pools[safeMode])
         .filter(model => available.has(model));
       // Safe public default: one model. Users can deliberately tick every
@@ -542,6 +552,244 @@ const runtimeModeModelConfig = `    // Each mode keeps its own explicit provider
       return parseLocalModelIds(raw)
         .filter(model => available.has(model))
         .join(', ');
+    }
+
+    const LOCAL_RUNTIME_PROFILE_SCHEMA_VERSION = 1;
+
+    function defaultLocalRuntimeProfile(runtime) {
+      const runtimeId = LOCAL_RUNTIME_IDS.has(runtime) ? runtime : 'custom';
+      return {
+        baseUrl: LOCAL_RUNTIME_PRESETS[runtimeId].baseUrl || '',
+        models: '',
+        modeModelPools: normalizeLocalModeModelPools({}, [], ''),
+        reasoningEffort: 'none',
+        reasoningOffModels: '',
+      };
+    }
+
+    function normalizeLocalRuntimeProfile(profile, runtime) {
+      const runtimeId = LOCAL_RUNTIME_IDS.has(runtime) ? runtime : 'custom';
+      const fallback = defaultLocalRuntimeProfile(runtimeId);
+      const source = profile && typeof profile === 'object' && !Array.isArray(profile)
+        ? profile
+        : {};
+      const baseUrl = typeof source.baseUrl === 'string'
+        ? source.baseUrl.slice(0, 300)
+        : fallback.baseUrl;
+      const models = typeof source.models === 'string'
+        ? source.models.slice(0, MAX_LOCAL_MODEL_STORAGE_CHARS)
+        : '';
+      const localModels = parseLocalModelIds(models);
+      const legacyRaceModels = typeof source.raceModels === 'string'
+        ? source.raceModels.slice(0, MAX_LOCAL_MODEL_STORAGE_CHARS)
+        : '';
+      return {
+        baseUrl: baseUrl || fallback.baseUrl,
+        models,
+        modeModelPools: normalizeLocalModeModelPools(
+          source.modeModelPools,
+          localModels,
+          legacyRaceModels,
+        ),
+        reasoningEffort: source.reasoningEffort === 'auto' ? 'auto' : 'none',
+        reasoningOffModels: runtimeId === 'lmstudio'
+          ? normalizeLocalRaceModelSelection(source.reasoningOffModels, localModels)
+          : '',
+      };
+    }
+
+    function normalizeLocalRuntimeProfiles(
+      profiles,
+      activeRuntime = state.localRuntime,
+      legacyProfile = null,
+    ) {
+      const runtimeId = LOCAL_RUNTIME_IDS.has(activeRuntime) ? activeRuntime : 'custom';
+      const source = profiles && typeof profiles === 'object' && !Array.isArray(profiles)
+        ? profiles
+        : {};
+      const normalized = {};
+      for (const id of LOCAL_RUNTIME_IDS) {
+        normalized[id] = normalizeLocalRuntimeProfile(source[id], id);
+      }
+      if (
+        legacyProfile
+        && !Object.prototype.hasOwnProperty.call(source, runtimeId)
+      ) {
+        normalized[runtimeId] = normalizeLocalRuntimeProfile(legacyProfile, runtimeId);
+      }
+      return normalized;
+    }
+
+    function getLocalRuntimeProfile(runtime = state.localRuntime) {
+      const runtimeId = LOCAL_RUNTIME_IDS.has(runtime) ? runtime : 'custom';
+      state.localRuntimeProfiles = normalizeLocalRuntimeProfiles(
+        state.localRuntimeProfiles,
+        state.localRuntime,
+      );
+      return state.localRuntimeProfiles[runtimeId];
+    }
+
+    function setLocalRuntimeProfile(runtime, profile) {
+      const runtimeId = LOCAL_RUNTIME_IDS.has(runtime) ? runtime : 'custom';
+      state.localRuntimeProfiles = normalizeLocalRuntimeProfiles(
+        state.localRuntimeProfiles,
+        state.localRuntime,
+      );
+      state.localRuntimeProfiles[runtimeId] = normalizeLocalRuntimeProfile(profile, runtimeId);
+      state.localRuntimeProfileVersion = LOCAL_RUNTIME_PROFILE_SCHEMA_VERSION;
+      return state.localRuntimeProfiles[runtimeId];
+    }
+
+    function normalizeLocalApiKeyMap(keys) {
+      const source = keys && typeof keys === 'object' && !Array.isArray(keys)
+        ? keys
+        : {};
+      const normalized = {};
+      for (const runtime of LOCAL_RUNTIME_IDS) {
+        if (typeof source[runtime] === 'string' && source[runtime]) {
+          normalized[runtime] = source[runtime].slice(0, 500);
+        }
+      }
+      return normalized;
+    }
+
+    const _localTransportSnapshots = new WeakMap();
+
+    function getLocalTransportSnapshot(context, runtime) {
+      if (!context || typeof context !== 'object') return null;
+      const snapshot = _localTransportSnapshots.get(context);
+      return snapshot?.runtime === runtime ? snapshot : null;
+    }
+
+    function attachLocalTransportSnapshot(target, runtime, source = null) {
+      if (!target || typeof target !== 'object') return target;
+      const runtimeId = LOCAL_RUNTIME_IDS.has(runtime) ? runtime : state.localRuntime;
+      const inherited = getLocalTransportSnapshot(source, runtimeId);
+      if (inherited) {
+        _localTransportSnapshots.set(target, inherited);
+        return target;
+      }
+      const profile = getLocalRuntimeProfile(runtimeId);
+      _localTransportSnapshots.set(target, Object.freeze({
+        runtime: runtimeId,
+        baseUrl: profile.baseUrl,
+        models: profile.models,
+        reasoningEffort: profile.reasoningEffort,
+        reasoningOffModels: profile.reasoningOffModels,
+        enabled: state.localEnabled,
+        apiKey: _localApiKeysByRuntime[runtimeId]
+          || (runtimeId === state.localRuntime ? state.localApiKey : '')
+          || '',
+      }));
+      return target;
+    }
+
+    function createModeTarget(provider, model, runtime = state.localRuntime, source = null) {
+      const target = { provider, model };
+      if (provider === 'local') {
+        target.runtime = LOCAL_RUNTIME_IDS.has(runtime) ? runtime : state.localRuntime;
+        attachLocalTransportSnapshot(target, target.runtime, source);
+      }
+      return target;
+    }
+
+    function bumpLocalRuntimeProfileGeneration(runtime) {
+      const runtimeId = LOCAL_RUNTIME_IDS.has(runtime) ? runtime : 'custom';
+      const next = Number(_localRuntimeProfileGenerations[runtimeId] || 0) + 1;
+      _localRuntimeProfileGenerations[runtimeId] = next;
+      return next;
+    }
+
+    function invalidateActiveLocalRuntimeDiscovery(invalidatePendingKeyLoad = false) {
+      const runtimeInput = document.getElementById('localRuntimeInput');
+      const runtimeId = LOCAL_RUNTIME_IDS.has(runtimeInput?.value)
+        ? runtimeInput.value
+        : normalizeLocalRuntime(state.localRuntime, state.localBaseUrl);
+      bumpLocalRuntimeProfileGeneration(runtimeId);
+      if (invalidatePendingKeyLoad) _localApiKeyGeneration++;
+      const status = document.getElementById('localConnectionStatus');
+      if (status) {
+        status.textContent = 'Settings changed — test again.';
+        status.style.color = 'var(--text-dim)';
+      }
+    }
+
+    function setLocalApiKeyForRuntime(runtime, rawKey, invalidatePendingLoad = true) {
+      const runtimeId = LOCAL_RUNTIME_IDS.has(runtime) ? runtime : 'custom';
+      const key = String(rawKey || '').trim().slice(0, 500);
+      const previous = _localApiKeysByRuntime[runtimeId] || '';
+      if (invalidatePendingLoad && key !== previous) _localApiKeyGeneration++;
+      if (key) _localApiKeysByRuntime[runtimeId] = key;
+      else delete _localApiKeysByRuntime[runtimeId];
+      return key;
+    }
+
+    function captureActiveLocalRuntimeProfile(userEdit = false) {
+      const runtimeId = normalizeLocalRuntime(state.localRuntime, state.localBaseUrl);
+      const profile = setLocalRuntimeProfile(runtimeId, {
+        baseUrl: state.localBaseUrl,
+        models: state.localModels,
+        modeModelPools: state.localModeModelPools,
+        reasoningEffort: state.localReasoningEffort,
+        reasoningOffModels: state.localReasoningOffModels,
+      });
+      if (userEdit) bumpLocalRuntimeProfileGeneration(runtimeId);
+      return profile;
+    }
+
+    function captureActiveLocalRuntimeProfileFromForm(runtime = state.localRuntime) {
+      const runtimeId = LOCAL_RUNTIME_IDS.has(runtime) ? runtime : 'custom';
+      const baseUrlInput = document.getElementById('localBaseUrlInput');
+      const modelsInput = document.getElementById('localModelsInput');
+      const reasoningInput = document.getElementById('localReasoningEffortInput');
+      const keyInput = document.getElementById('localApiKeyInput');
+      const profile = setLocalRuntimeProfile(runtimeId, {
+        baseUrl: (
+          baseUrlInput
+            ? baseUrlInput.value
+            : state.localBaseUrl || LOCAL_RUNTIME_PRESETS[runtimeId].baseUrl || ''
+        ).trim() || LOCAL_RUNTIME_PRESETS[runtimeId].baseUrl || '',
+        models: (modelsInput ? modelsInput.value : state.localModels || '').trim(),
+        modeModelPools: state.localModeModelPools,
+        reasoningEffort: reasoningInput?.value === 'auto' ? 'auto' : 'none',
+        reasoningOffModels: state.localReasoningOffModels,
+      });
+      const key = (keyInput ? keyInput.value : state.localApiKey || '').trim();
+      setLocalApiKeyForRuntime(runtimeId, key);
+      bumpLocalRuntimeProfileGeneration(runtimeId);
+      return profile;
+    }
+
+    function applyLocalRuntimeProfileToState(runtime, includeKey = true) {
+      const runtimeId = LOCAL_RUNTIME_IDS.has(runtime) ? runtime : 'custom';
+      const profile = getLocalRuntimeProfile(runtimeId);
+      state.localRuntime = runtimeId;
+      state.localBaseUrl = profile.baseUrl;
+      state.localModels = profile.models;
+      state.localModeModelPools = { ...profile.modeModelPools };
+      state.localRaceModels = state.localModeModelPools.ultraplinian;
+      state.localReasoningEffort = profile.reasoningEffort;
+      state.localReasoningOffModels = profile.reasoningOffModels;
+      if (includeKey) state.localApiKey = _localApiKeysByRuntime[runtimeId] || '';
+      return profile;
+    }
+
+    function renderActiveLocalRuntimeProfile() {
+      const profile = getLocalRuntimeProfile(state.localRuntime);
+      const runtimeInput = document.getElementById('localRuntimeInput');
+      const baseUrlInput = document.getElementById('localBaseUrlInput');
+      const modelsInput = document.getElementById('localModelsInput');
+      const reasoningInput = document.getElementById('localReasoningEffortInput');
+      const keyInput = document.getElementById('localApiKeyInput');
+      if (runtimeInput) runtimeInput.value = state.localRuntime;
+      if (baseUrlInput) baseUrlInput.value = profile.baseUrl;
+      if (modelsInput) modelsInput.value = profile.models;
+      if (reasoningInput) reasoningInput.value = profile.reasoningEffort;
+      if (keyInput) keyInput.value = state.localApiKey || '';
+      updateLocalRuntimeHelp(state.localRuntime);
+      refreshModeModelSelect();
+      renderLocalRaceModelPicker();
+      buildTierSelect();
     }
 
     function renderLocalRaceModelPicker() {
@@ -600,6 +848,7 @@ const runtimeModeModelConfig = `    // Each mode keeps its own explicit provider
       state.localModeModelPools = normalizeLocalModeModelPools(state.localModeModelPools);
       state.localModeModelPools[safeMode] = selected.join(', ');
       state.localRaceModels = state.localModeModelPools.ultraplinian;
+      captureActiveLocalRuntimeProfile(true);
       saveState();
       renderLocalRaceModelPicker();
       buildTierSelect();
@@ -611,6 +860,7 @@ const runtimeModeModelConfig = `    // Each mode keeps its own explicit provider
       state.localModeModelPools = normalizeLocalModeModelPools(state.localModeModelPools);
       state.localModeModelPools[safeMode] = localModels.join(', ');
       state.localRaceModels = state.localModeModelPools.ultraplinian;
+      captureActiveLocalRuntimeProfile(true);
       saveState();
       renderLocalRaceModelPicker();
       buildTierSelect();
@@ -621,6 +871,7 @@ const runtimeModeModelConfig = `    // Each mode keeps its own explicit provider
       state.localModeModelPools = normalizeLocalModeModelPools(state.localModeModelPools);
       state.localModeModelPools[safeMode] = '';
       state.localRaceModels = state.localModeModelPools.ultraplinian;
+      captureActiveLocalRuntimeProfile(true);
       saveState();
       renderLocalRaceModelPicker();
       buildTierSelect();
@@ -766,12 +1017,25 @@ const runtimeModeModelConfig = `    // Each mode keeps its own explicit provider
     function getModeModelRequest(mode, fallbackModel = state.model) {
       const selection = getModeModelSelection(mode);
       if (selection.provider !== 'auto') {
-        return { provider: selection.provider, model: selection.model };
+        const request = {
+          provider: selection.provider,
+          model: selection.model,
+          runtime: selection.provider === 'local' ? state.localRuntime : undefined,
+        };
+        if (selection.provider === 'local') {
+          attachLocalTransportSnapshot(request, request.runtime);
+        }
+        return request;
       }
-      return {
+      const request = {
         provider: 'auto',
         model: String(fallbackModel || state.model || OPENROUTER_DEFAULT_MODEL),
+        runtime: state.localRuntime,
       };
+      if (hasLocalProvider(request.runtime)) {
+        attachLocalTransportSnapshot(request, request.runtime);
+      }
+      return request;
     }
 
     function getModeExecutionSelection(mode = getCurrentMode()) {
@@ -779,37 +1043,57 @@ const runtimeModeModelConfig = `    // Each mode keeps its own explicit provider
       const localModels = selection.provider === 'auto' && hasLocalProvider()
         ? Object.freeze([...getLocalAutomaticRaceModels(mode)])
         : Object.freeze([]);
-      return Object.freeze({
+      const executionSelection = {
         provider: selection.provider,
         model: selection.model,
         localModels,
-      });
+        runtime: state.localRuntime,
+      };
+      if (selection.provider === 'local' || localModels.length) {
+        attachLocalTransportSnapshot(executionSelection, executionSelection.runtime);
+      }
+      return Object.freeze(executionSelection);
     }
 
     function getModeAuxiliaryTarget(selection) {
       if (selection?.provider && selection.provider !== 'auto') {
-        return Object.freeze({
-          provider: selection.provider,
-          model: selection.model,
-        });
+        return Object.freeze(createModeTarget(
+          selection.provider,
+          selection.model,
+          selection.runtime,
+          selection,
+        ));
       }
       const automaticLocalModel = Array.isArray(selection?.localModels)
         ? selection.localModels[0]
         : '';
       return automaticLocalModel
-        ? Object.freeze({ provider: 'local', model: automaticLocalModel })
+        ? Object.freeze(createModeTarget(
+            'local',
+            automaticLocalModel,
+            selection.runtime,
+            selection,
+          ))
         : null;
     }
 
     function modelTargetKey(target) {
-      return encodeURIComponent(JSON.stringify([target?.provider || '', target?.model || '']));
+      return encodeURIComponent(JSON.stringify([
+        target?.provider || '',
+        target?.model || '',
+        target?.provider === 'local' ? target?.runtime || '' : '',
+      ]));
     }
 
     function sameModelTarget(left, right) {
       return !!left
         && !!right
         && left.provider === right.provider
-        && left.model === right.model;
+        && left.model === right.model
+        && (
+          left.provider !== 'local'
+          || (left.runtime || '') === (right.runtime || '')
+        );
     }
 
     function resolveModeModelRequest(mode, fallbackModel = state.model, executionSelection) {
@@ -819,13 +1103,25 @@ const runtimeModeModelConfig = `    // Each mode keeps its own explicit provider
           ? {
               provider: 'auto',
               model: String(fallbackModel || state.model || OPENROUTER_DEFAULT_MODEL),
+              runtime: executionSelection.runtime,
             }
           : {
               provider: executionSelection.provider,
               model: executionSelection.model,
+              runtime: executionSelection.runtime,
             };
-      const target = resolveChatTarget(request.model, request.provider);
-      return { provider: target.provider, model: target.model };
+      const target = resolveChatTarget(
+        request.model,
+        request.provider,
+        request.runtime,
+        executionSelection || request,
+      );
+      return createModeTarget(
+        target.provider,
+        target.model,
+        target.runtime,
+        target,
+      );
     }
 
     function getModeRaceTargets(mode, fallbackModel = state.model, executionSelection) {
@@ -833,8 +1129,18 @@ const runtimeModeModelConfig = `    // Each mode keeps its own explicit provider
         ? getModeExecutionSelection(mode)
         : executionSelection;
       if (selection.provider !== 'auto') {
-        const target = resolveChatTarget(selection.model, selection.provider);
-        return [{ provider: target.provider, model: target.model }];
+        const target = resolveChatTarget(
+          selection.model,
+          selection.provider,
+          selection.runtime,
+          selection,
+        );
+        return [createModeTarget(
+          target.provider,
+          target.model,
+          target.runtime,
+          target,
+        )];
       }
 
       const targets = [];
@@ -857,17 +1163,32 @@ const runtimeModeModelConfig = `    // Each mode keeps its own explicit provider
           targets.push({ provider: nativeTarget.provider, model: nativeTarget.model });
         } catch (_) {}
       }
-      if (hasLocalProvider()) {
-        const selectedLocalModels = Array.isArray(selection.localModels)
-          ? selection.localModels
-          : getLocalAutomaticRaceModels(mode);
+      const selectedLocalModels = Array.isArray(selection.localModels)
+        ? selection.localModels
+        : [];
+      if (selectedLocalModels.length) {
         for (const model of selectedLocalModels) {
-          targets.push({ provider: 'local', model });
+          targets.push(createModeTarget(
+            'local',
+            model,
+            selection.runtime,
+            selection,
+          ));
         }
       }
       if (!targets.length) {
-        const fallbackTarget = resolveChatTarget(fallbackModel, 'auto');
-        targets.push({ provider: fallbackTarget.provider, model: fallbackTarget.model });
+        const fallbackTarget = resolveChatTarget(
+          fallbackModel,
+          'auto',
+          selection.runtime,
+          selection,
+        );
+        targets.push(createModeTarget(
+          fallbackTarget.provider,
+          fallbackTarget.model,
+          fallbackTarget.runtime,
+          fallbackTarget,
+        ));
       }
 
       const seen = new Set();
@@ -1062,7 +1383,7 @@ replaceRequired(
             <div class="settings-section-title">Local Model Runtimes (Optional)</div>
             <div class="form-group">
               <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-                <input type="checkbox" id="localEnabled" style="width:auto;">
+                <input type="checkbox" id="localEnabled" style="width:auto;" onchange="invalidateActiveLocalRuntimeDiscovery()">
                 <label for="localEnabled" style="margin:0;">Enable OpenAI-compatible local models</label>
               </div>
               <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
@@ -1085,23 +1406,23 @@ replaceRequired(
             </div>
             <div class="form-group">
               <label for="localBaseUrlInput">Base URL</label>
-              <input type="text" id="localBaseUrlInput" placeholder="http://localhost:11434/v1" spellcheck="false">
+              <input type="text" id="localBaseUrlInput" placeholder="http://localhost:11434/v1" spellcheck="false" oninput="invalidateActiveLocalRuntimeDiscovery()">
               <small style="color:#888;display:block;margin-top:4px;line-height:1.5;">
                 Restricted to this computer: <code>localhost</code> or <code>127.0.0.1</code>. Docker Model Runner uses the nested <code>/engines/v1</code> path.
               </small>
             </div>
             <div class="form-group">
               <label for="localModelsInput">Model IDs</label>
-              <textarea id="localModelsInput" rows="4" placeholder="qwen3:8b, llama3.2:3b" spellcheck="false" style="resize:vertical;"></textarea>
+              <textarea id="localModelsInput" rows="4" placeholder="qwen3:8b, llama3.2:3b" spellcheck="false" style="resize:vertical;" oninput="invalidateActiveLocalRuntimeDiscovery()"></textarea>
               <small style="color:#888;display:block;margin-top:4px;">Exact IDs reported by <code>/models</code>. There is no model-count limit. Each mode’s Automatic pool is configured independently under Strategies; a header pin still runs one exact model.</small>
             </div>
             <div class="form-group">
               <label for="localApiKeyInput">API Key (Optional)</label>
-              <input type="password" id="localApiKeyInput" placeholder="Optional bearer token">
+              <input type="password" id="localApiKeyInput" placeholder="Optional bearer token" oninput="invalidateActiveLocalRuntimeDiscovery(true)">
             </div>
             <div class="form-group">
               <label for="localReasoningEffortInput">LM Studio reasoning</label>
-              <select id="localReasoningEffortInput">
+              <select id="localReasoningEffortInput" onchange="invalidateActiveLocalRuntimeDiscovery()">
                 <option value="none">Final answers only (recommended)</option>
                 <option value="auto">Use each model's default reasoning</option>
               </select>
@@ -1190,11 +1511,20 @@ replaceRequired(
       localModels: '',  // Comma-separated model IDs available from the local server
       localRaceModels: '',  // Legacy ULTRAPLINIAN pool; migrated into localModeModelPools
       localModeModelPools: null,  // Independent unlimited pools; each empty pool defaults to one
+      localRuntimeProfiles: null,  // One independent inventory and three mode pools per runtime
+      localRuntimeProfileVersion: 0,  // Legacy singleton fields migrate into the active profile
       localApiKey: '',  // Optional token for authenticated local servers
       localReasoningEffort: 'none',  // LM Studio: prefer visible final text by default
       localReasoningOffModels: '',  // Capability cache populated by LM Studio discovery
       modeModelSelections: null,  // Explicit provider + model, saved independently for each mode
       modeModelSelectionVersion: 0,  // Migrated to the current per-mode pool schema on load`,
+);
+
+replaceRequired(
+  `    let _localApiKeyGeneration = 0;`,
+  `    let _localApiKeyGeneration = 0;
+    let _localApiKeysByRuntime = {};
+    let _localRuntimeProfileGenerations = {};`,
 );
 
 replaceRequired(
@@ -1204,8 +1534,27 @@ replaceRequired(
         .map(model => model.trim())
         .filter(Boolean))].slice(0, 8);
     }`,
-  `    function getLocalModels() {
-      return parseLocalModelIds(state.localModels);
+  `    function getLocalModels(runtime = state.localRuntime) {
+      const runtimeId = LOCAL_RUNTIME_IDS.has(runtime) ? runtime : state.localRuntime;
+      const rawModels = runtimeId === state.localRuntime
+        ? state.localModels
+        : getLocalRuntimeProfile(runtimeId).models;
+      return parseLocalModelIds(rawModels);
+    }`,
+);
+
+replaceRequired(
+  `    function hasLocalProvider() {
+      if (!state.localEnabled || getLocalModels().length === 0) return false;
+      try { normalizeLocalBaseUrl(); return true; } catch (_) { return false; }
+    }`,
+  `    function hasLocalProvider(runtime = state.localRuntime) {
+      const runtimeId = LOCAL_RUNTIME_IDS.has(runtime) ? runtime : state.localRuntime;
+      if (!state.localEnabled || getLocalModels(runtimeId).length === 0) return false;
+      const baseUrl = runtimeId === state.localRuntime
+        ? state.localBaseUrl
+        : getLocalRuntimeProfile(runtimeId).baseUrl;
+      try { normalizeLocalBaseUrl(baseUrl, runtimeId); return true; } catch (_) { return false; }
     }`,
 );
 
@@ -1278,6 +1627,7 @@ replaceRequired(
       const runtimeInput = document.getElementById('localRuntimeInput');
       const runtime = LOCAL_RUNTIME_IDS.has(runtimeInput?.value) ? runtimeInput.value : 'custom';
       let baseUrl = '';
+      let discoveryGeneration = null;
       if (status) { status.textContent = 'Checking /models…'; status.style.color = 'var(--text-dim)'; }
       try {
         baseUrl = normalizeLocalBaseUrl(
@@ -1286,19 +1636,41 @@ replaceRequired(
         );
         const key = (document.getElementById('localApiKeyInput').value || '').trim();
         const headers = key ? { Authorization: \`Bearer \${key}\` } : {};
+        const existingProfile = getLocalRuntimeProfile(runtime);
+        const requestProfile = setLocalRuntimeProfile(runtime, {
+          ...existingProfile,
+          baseUrl,
+          models: (document.getElementById('localModelsInput').value || existingProfile.models || '').trim(),
+          modeModelPools: runtime === state.localRuntime
+            ? state.localModeModelPools
+            : existingProfile.modeModelPools,
+          reasoningEffort: document.getElementById('localReasoningEffortInput').value === 'auto'
+            ? 'auto'
+            : 'none',
+        });
+        setLocalApiKeyForRuntime(runtime, key, false);
+        _localApiKeyGeneration++;
+        discoveryGeneration = bumpLocalRuntimeProfileGeneration(runtime);
         const discovery = await discoverLocalChatModels(runtime, baseUrl, headers);
+        if (_localRuntimeProfileGenerations[runtime] !== discoveryGeneration) return;
         const models = discovery.models;
         if (!models.length) throw new Error('Server returned no model IDs');
-        document.getElementById('localBaseUrlInput').value = baseUrl;
-        document.getElementById('localModelsInput').value = models.join(', ');
-        document.getElementById('localEnabled').checked = true;
-        state.localReasoningOffModels = runtime === 'lmstudio'
-          ? discovery.reasoningOffModels.join(', ')
-          : '';
-        saveSettings();
-        renderLocalRaceModelPicker();
-        buildTierSelect();
-        const label = LOCAL_RUNTIME_PRESETS[state.localRuntime].label;
+        setLocalRuntimeProfile(runtime, {
+          ...requestProfile,
+          baseUrl,
+          models: models.join(', '),
+          reasoningOffModels: runtime === 'lmstudio'
+            ? discovery.reasoningOffModels.join(', ')
+            : '',
+        });
+        state.localEnabled = true;
+        if (runtime === state.localRuntime) {
+          applyLocalRuntimeProfileToState(runtime);
+          document.getElementById('localEnabled').checked = true;
+          renderActiveLocalRuntimeProfile();
+        }
+        saveState();
+        const label = LOCAL_RUNTIME_PRESETS[runtime].label;
         if (status) {
           const capabilityLabel = discovery.source.startsWith('lmstudio-')
             ? 'chat-capable model'
@@ -1310,6 +1682,8 @@ replaceRequired(
           status.style.color = 'var(--success)';
         }
       } catch (err) {
+        if (discoveryGeneration !== null
+          && _localRuntimeProfileGenerations[runtime] !== discoveryGeneration) return;
         if (status) {
           status.textContent = \`Connection failed: \${describeLocalConnectionFailure(err, runtime, baseUrl)}\`;
           status.style.color = 'var(--danger)';
@@ -1320,7 +1694,7 @@ replaceRequired(
 
 replaceRequired(
   `      'localEnabled', 'localOnly', 'localBaseUrl', 'localModels', 'localApiKey',`,
-  `      'localEnabled', 'localOnly', 'localRuntime', 'localBaseUrl', 'localModels', 'localRaceModels', 'localModeModelPools', 'localApiKey', 'localReasoningEffort', 'localReasoningOffModels',
+  `      'localEnabled', 'localOnly', 'localRuntime', 'localBaseUrl', 'localModels', 'localRaceModels', 'localModeModelPools', 'localRuntimeProfiles', 'localRuntimeProfileVersion', 'localApiKey', 'localReasoningEffort', 'localReasoningOffModels',
       'modeModelSelections', 'modeModelSelectionVersion',`,
 );
 
@@ -1505,8 +1879,18 @@ replaceRequired(
       const ultraSelection = executionSelection || getModeExecutionSelection('ultraplinian');
       const raceEntries = [];
       if (ultraSelection.provider !== 'auto') {
-        const pinnedTarget = resolveChatTarget(ultraSelection.model, ultraSelection.provider);
-        raceEntries.push({ model: pinnedTarget.model, provider: pinnedTarget.provider });
+        const pinnedTarget = resolveChatTarget(
+          ultraSelection.model,
+          ultraSelection.provider,
+          ultraSelection.runtime,
+          ultraSelection,
+        );
+        raceEntries.push(createModeTarget(
+          pinnedTarget.provider,
+          pinnedTarget.model,
+          pinnedTarget.runtime,
+          pinnedTarget,
+        ));
         _log(\`[ULTRAPLINIAN] Pinned target: \${pinnedTarget.provider} / \${pinnedTarget.model}\`);
         addThinkingLog(\`!PINNED \${pinnedTarget.provider.toUpperCase()} · \${pinnedTarget.model}\`, 'info');
       } else {
@@ -1521,15 +1905,57 @@ replaceRequired(
           _log(\`[ULTRAPLINIAN] +\${veniceSlice.length} Venice models added to race\`);
           addThinkingLog(\`!VENICE +\${veniceSlice.length} models loaded\`, 'info');
         }
-        if (hasLocalProvider()) {
-          const localModels = Array.isArray(ultraSelection.localModels)
-            ? ultraSelection.localModels
-            : getLocalAutomaticRaceModels('ultraplinian');
-          localModels.forEach(model => raceEntries.push({ model, provider: 'local' }));
+        const localModels = Array.isArray(ultraSelection.localModels)
+          ? ultraSelection.localModels
+          : [];
+        if (localModels.length) {
+          localModels.forEach(model => raceEntries.push(createModeTarget(
+            'local',
+            model,
+            ultraSelection.runtime,
+            ultraSelection,
+          )));
           _log(\`[ULTRAPLINIAN] +\${localModels.length} local models added to race\`);
           addThinkingLog(\`!LOCAL +\${localModels.length} model\${localModels.length === 1 ? '' : 's'} loaded\`, 'info');
         }
       }`,
+);
+replaceRequired(
+  "    async function queryModel(model, messages, prefill, signal, provider) {",
+  "    async function queryModel(model, messages, prefill, signal, provider, modeTarget = null) {",
+);
+replaceRequired(
+  `          }, { provider, title: 'GODMOD3.AI-ultraplinian', signal });`,
+  `          }, {
+            provider,
+            title: 'Crow-GodMod3-ultraplinian',
+            signal,
+            modeTarget: modeTarget || createModeTarget(provider, model),
+          });`,
+);
+replaceRequired(
+  "          const result = await queryModel(model, modelMessages, prefill, controller.signal, entryProvider);",
+  "          const result = await queryModel(model, modelMessages, prefill, controller.signal, entryProvider, entry);",
+);
+replaceRequired(
+  `          success: true,
+          provider
+        };`,
+  `          success: true,
+          provider,
+          runtime: modeTarget?.runtime
+        };`,
+  1,
+);
+replaceRequired(
+  `          success: false,
+          provider
+        };`,
+  `          success: false,
+          provider,
+          runtime: modeTarget?.runtime
+        };`,
+  1,
 );
 replaceRequired(
   "      setThinkingModels(raceEntries.map(e => e.model));",
@@ -1642,10 +2068,12 @@ replaceRequired(
   `      if (target.provider === 'local') {
         delete requestBody.reasoning;
         delete requestBody.reasoning_effort;
+        const localProfile = getLocalTransportSnapshot(target, target.runtime)
+          || getLocalRuntimeProfile(target.runtime);
         if (
-          state.localRuntime === 'lmstudio'
-          && state.localReasoningEffort !== 'auto'
-          && parseLocalModelIds(state.localReasoningOffModels).includes(target.model)
+          target.runtime === 'lmstudio'
+          && localProfile.reasoningEffort !== 'auto'
+          && parseLocalModelIds(localProfile.reasoningOffModels).includes(target.model)
         ) {
           requestBody.reasoning_effort = 'none';
         }
@@ -1683,8 +2111,21 @@ replaceRequired(
       if (!state.apiKey) throw new Error('OpenRouter API key is missing.');
       return { provider: 'openrouter', model: normalizeOpenRouterModel(requestedModel), url: 'https://openrouter.ai/api/v1/chat/completions', apiKey: state.apiKey };
     }`,
-  `    function resolveChatTarget(requestedModel, preferredProvider = 'auto') {
-      const localModels = getLocalModels();
+  `    function resolveChatTarget(
+      requestedModel,
+      preferredProvider = 'auto',
+      requestedRuntime = state.localRuntime,
+      executionContext = null,
+    ) {
+      const runtimeId = LOCAL_RUNTIME_IDS.has(requestedRuntime)
+        ? requestedRuntime
+        : normalizeLocalRuntime(state.localRuntime, state.localBaseUrl);
+      const frozenLocalTransport = getLocalTransportSnapshot(executionContext, runtimeId);
+      const localProfile = frozenLocalTransport || getLocalRuntimeProfile(runtimeId);
+      const localModels = parseLocalModelIds(localProfile.models);
+      const localEnabled = frozenLocalTransport
+        ? frozenLocalTransport.enabled
+        : state.localEnabled;
       const explicitProvider = preferredProvider !== 'auto';
       let provider = preferredProvider;
 
@@ -1697,24 +2138,29 @@ replaceRequired(
       if (!explicitProvider) {
         if (state.localOnly) provider = 'local';
         else if (state.apiKey) provider = 'openrouter';
-        else if (hasLocalProvider()) provider = 'local';
+        else if (localEnabled && localModels.length) provider = 'local';
         else if (state.veniceApiKey) provider = 'venice';
         else throw new Error('No model provider is configured.');
       }
 
       if (provider === 'local') {
-        if (!hasLocalProvider()) {
+        if (!localEnabled || !localModels.length) {
           throw new Error('The selected local model provider is unavailable. Reconnect it in Settings → API Keys.');
         }
         if (explicitProvider && !localModels.includes(requestedModel)) {
           throw new Error(\`The selected local model "\${requestedModel}" is no longer available.\`);
         }
-        return {
+        const target = {
           provider,
+          runtime: runtimeId,
           model: localModels.includes(requestedModel) ? requestedModel : localModels[0],
-          url: \`\${normalizeLocalBaseUrl()}/chat/completions\`,
-          apiKey: state.localApiKey || '',
+          url: \`\${normalizeLocalBaseUrl(localProfile.baseUrl, runtimeId)}/chat/completions\`,
+          apiKey: frozenLocalTransport?.apiKey
+            ?? _localApiKeysByRuntime[runtimeId]
+            ?? (runtimeId === state.localRuntime ? state.localApiKey : '')
+            ?? '',
         };
+        return attachLocalTransportSnapshot(target, runtimeId, executionContext);
       }
       if (provider === 'venice') {
         if (!state.veniceApiKey) throw new Error('The selected Venice model provider is unavailable.');
@@ -1754,6 +2200,8 @@ replaceRequired(
       const target = resolveChatTarget(
         inheritedTarget?.model || body.model,
         inheritedTarget?.provider || options.provider || 'auto',
+        inheritedTarget?.runtime,
+        inheritedTarget,
       );`,
 );
 replaceRequired(
@@ -1963,7 +2411,7 @@ replaceRequired(
             presence_penalty: state.modelPresPenalty ?? 0,
             max_tokens: state.modelMaxTokens ?? 4096,
           }, {
-            provider: variant.target.provider,
+            modeTarget: variant.target,
             title: 'Crow-GodMod3-parseltongue',
             signal: abortController?.signal,
           });`,
@@ -1973,6 +2421,7 @@ replaceRequired(
           duration,`,
   `          model: winner.model,
           provider: winner.provider,
+          runtime: winner.runtime,
           duration,`,
 );
 replaceRequired(
@@ -2059,6 +2508,7 @@ replaceRequired(
             raceLabel: variant.raceLabel,
             model: variant.target.model,
             provider: variant.target.provider,
+            runtime: variant.target.runtime,
             params,
             variant,`,
 );
@@ -2170,7 +2620,7 @@ replaceRequired(
           frequency_penalty: state.modelFreqPenalty ?? 0,
           presence_penalty: state.modelPresPenalty ?? 0
         }, {
-          provider: modeRequest.provider,
+          modeTarget: modeRequest,
           title: 'Crow-GodMod3-strategy',
           signal,
         });`,
@@ -2252,7 +2702,7 @@ replaceRequired(
                 temperature: 1.0,
                 top_p: 1.0,
               }, {
-                provider: fastModeRequest.provider,
+                modeTarget: fastModeRequest,
                 title: 'Crow-GodMod3-godmode-fast',
                 signal: abortController.signal,
               });`,
@@ -2374,7 +2824,7 @@ replaceRequired(
             signal: AbortSignal.any([abortController?.signal, earlyExitAbort.signal].filter(Boolean))
           });`,
   `          const response = await fetchChatCompletion(bodyParams, {
-            provider: modeRequest.provider,
+            modeTarget: modeRequest,
             title: 'Crow-GodMod3-godmode-classic',
             signal: AbortSignal.any([abortController?.signal, earlyExitAbort.signal].filter(Boolean)),
           });`,
@@ -2715,6 +3165,20 @@ replaceRequired(
         legacyLocalRaceModels,
       );
       state.localRaceModels = state.localModeModelPools.ultraplinian;
+      state.localRuntimeProfiles = normalizeLocalRuntimeProfiles(
+        state.localRuntimeProfiles,
+        state.localRuntime,
+        {
+          baseUrl: state.localBaseUrl,
+          models: state.localModels,
+          raceModels: legacyLocalRaceModels,
+          modeModelPools: state.localModeModelPools,
+          reasoningEffort: state.localReasoningEffort,
+          reasoningOffModels: state.localReasoningOffModels,
+        },
+      );
+      state.localRuntimeProfileVersion = LOCAL_RUNTIME_PROFILE_SCHEMA_VERSION;
+      applyLocalRuntimeProfileToState(state.localRuntime, false);
       state.modeModelSelections = migrateLegacyModeModelSelections(
         state.modeModelSelections,
         state.model,
@@ -2761,6 +3225,50 @@ replaceRequired(
           refreshModeModelSelect();`,
 );
 replaceRequired(
+  `      const encLocalKey = localStorage.getItem('g0dm0d3-local-apikey');
+      if (encLocalKey) {
+        const genAtLoad = _localApiKeyGeneration;
+        decryptApiKey(encLocalKey).then(plain => {
+          if (_localApiKeyGeneration !== genAtLoad) return;
+          state.localApiKey = plain;
+        });
+      } else if (state.localApiKey) {
+        // Migrate a PR-preview plaintext local key into the separate store.
+        const legacyLocalKey = state.localApiKey;
+        encryptApiKey(legacyLocalKey).then(enc => {
+          if (state.localApiKey !== legacyLocalKey) return;
+          localStorage.setItem('g0dm0d3-local-apikey', enc);
+          saveState();
+        });
+      }`,
+  `      const encLocalKey = localStorage.getItem('g0dm0d3-local-apikey');
+      if (encLocalKey) {
+        const genAtLoad = _localApiKeyGeneration;
+        decryptApiKey(encLocalKey).then(plain => {
+          if (_localApiKeyGeneration !== genAtLoad) return;
+          let parsedKeys = null;
+          try {
+            const parsed = JSON.parse(plain);
+            if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+              parsedKeys = parsed;
+            }
+          } catch (_) {}
+          _localApiKeysByRuntime = normalizeLocalApiKeyMap(
+            parsedKeys || { [state.localRuntime]: plain },
+          );
+          state.localApiKey = _localApiKeysByRuntime[state.localRuntime] || '';
+          const keyInput = document.getElementById('localApiKeyInput');
+          if (keyInput) keyInput.value = state.localApiKey;
+        });
+      } else if (state.localApiKey) {
+        // Migrate the legacy scalar credential into the active runtime's map.
+        _localApiKeysByRuntime = normalizeLocalApiKeyMap({
+          [state.localRuntime]: state.localApiKey,
+        });
+        saveState();
+      }`,
+);
+replaceRequired(
   `      const conv = getCurrentConv();
 
       // Build user message (may include image metadata for re-rendering)`,
@@ -2770,6 +3278,39 @@ replaceRequired(
       const executionTarget = getModeAuxiliaryTarget(executionSelection);
 
       // Build user message (may include image metadata for re-rendering)`,
+);
+replaceRequired(
+  `      const { apiKey, localApiKey, ...stateWithoutKeys } = state;`,
+  `      captureActiveLocalRuntimeProfile();
+      _localApiKeysByRuntime = normalizeLocalApiKeyMap(_localApiKeysByRuntime);
+      if (state.localApiKey) {
+        _localApiKeysByRuntime[state.localRuntime] = state.localApiKey;
+      } else {
+        delete _localApiKeysByRuntime[state.localRuntime];
+      }
+      const { apiKey, localApiKey, ...stateWithoutKeys } = state;`,
+);
+replaceRequired(
+  `      if (localApiKey) {
+        const keyAtFlush = localApiKey;
+        encryptApiKey(keyAtFlush).then(enc => {
+          if (state.localApiKey === keyAtFlush) {
+            try { localStorage.setItem('g0dm0d3-local-apikey', enc); } catch (_) {}
+          }
+        });
+      } else {
+        localStorage.removeItem('g0dm0d3-local-apikey');
+      }`,
+  `      const localKeysAtFlush = JSON.stringify(_localApiKeysByRuntime);
+      if (Object.keys(_localApiKeysByRuntime).length) {
+        encryptApiKey(localKeysAtFlush).then(enc => {
+          if (JSON.stringify(_localApiKeysByRuntime) === localKeysAtFlush) {
+            try { localStorage.setItem('g0dm0d3-local-apikey', enc); } catch (_) {}
+          }
+        });
+      } else {
+        localStorage.removeItem('g0dm0d3-local-apikey');
+      }`,
 );
 replaceRequired(
   "          visionContext = await processImageWithVision(attachedImage, content);",
@@ -2836,7 +3377,7 @@ replaceRequired(
   `    function hasAuxiliaryModelProvider(modeTarget = null) {
       if (modeTarget) {
         try {
-          resolveChatTarget(modeTarget.model, modeTarget.provider);
+          resolveChatTarget(modeTarget.model, modeTarget.provider, modeTarget.runtime, modeTarget);
           return true;
         } catch (_) {
           return false;
@@ -3147,31 +3688,33 @@ replaceRequired(
 );
 replaceRequired(
   "            const abortResult = { model, content: '', success: false, error: 'aborted-early-stop', duration: 0 };",
-  "            const abortResult = { model, provider: entryProvider, content: '', success: false, error: 'aborted-early-stop', duration: 0 };",
+  "            const abortResult = { model, provider: entryProvider, runtime: entry.runtime, content: '', success: false, error: 'aborted-early-stop', duration: 0 };",
 );
 replaceRequired(
   "          const errorResult = { model, content: '', success: false, error: err.message, duration: 0 };",
-  "          const errorResult = { model, provider: entryProvider, content: '', success: false, error: err.message, duration: 0 };",
+  "          const errorResult = { model, provider: entryProvider, runtime: entry.runtime, content: '', success: false, error: err.message, duration: 0 };",
 );
 replaceRequired(
   "          if (controller.signal.aborted) return { model, content: '', success: false, error: 'aborted-early-stop', duration: 0 };",
-  "          if (controller.signal.aborted) return { model, provider: entryProvider, content: '', success: false, error: 'aborted-early-stop', duration: 0 };",
+  "          if (controller.signal.aborted) return { model, provider: entryProvider, runtime: entry.runtime, content: '', success: false, error: 'aborted-early-stop', duration: 0 };",
 );
 replaceRequired(
   `      let currentLeaderScore = 0;
       let currentLeaderModel = null;`,
   `      let currentLeaderScore = 0;
       let currentLeaderModel = null;
-      let currentLeaderProvider = null;`,
+      let currentLeaderProvider = null;
+      let currentLeaderRuntime = null;`,
 );
 replaceRequired(
   "            const continuityBonus = (state.lastUltraWinner && model === state.lastUltraWinner && messages.filter(m => m.role === 'assistant').length > 0) ? 5 : 0;",
-  "            const continuityBonus = (sameModelTarget(priorWinnerTarget, { provider: entryProvider, model }) && messages.filter(m => m.role === 'assistant').length > 0) ? 5 : 0;",
+  "            const continuityBonus = (sameModelTarget(priorWinnerTarget, { provider: entryProvider, model, runtime: entry.runtime }) && messages.filter(m => m.role === 'assistant').length > 0) ? 5 : 0;",
 );
 replaceRequired(
   "              currentLeaderModel = model;",
   `              currentLeaderModel = model;
-              currentLeaderProvider = entryProvider;`,
+              currentLeaderProvider = entryProvider;
+              currentLeaderRuntime = entry.runtime;`,
 );
 replaceRequired(
   "        state.lastUltraWinner = earlyWinner.model;",
@@ -3179,6 +3722,7 @@ replaceRequired(
         state.lastUltraWinnerTarget = Object.freeze({
           provider: earlyWinner.provider,
           model: earlyWinner.model,
+          runtime: earlyWinner.runtime,
         });`,
 );
 replaceRequired(
@@ -3187,6 +3731,7 @@ replaceRequired(
         state.lastUltraWinnerTarget = Object.freeze({
           provider: winner.provider,
           model: winner.model,
+          runtime: winner.runtime,
         });`,
 );
 replaceRequired(
@@ -3195,6 +3740,7 @@ replaceRequired(
           state.lastUltraWinnerTarget = Object.freeze({
             provider: currentLeaderProvider,
             model: currentLeaderModel,
+            runtime: currentLeaderRuntime,
           });`,
 );
 replaceRequired(
@@ -3207,7 +3753,7 @@ replaceRequired(
 );
 replaceRequired(
   "r.model === currentLeaderModel",
-  "r.provider === currentLeaderProvider && r.model === currentLeaderModel",
+  "sameModelTarget(r, { provider: currentLeaderProvider, model: currentLeaderModel, runtime: currentLeaderRuntime })",
   2,
 );
 replaceRequired(
@@ -3521,7 +4067,7 @@ replaceRequired(
             presence_penalty: params.presence_penalty || state.modelPresPenalty || 0,
             max_tokens: state.modelMaxTokens ?? 4096
           }, {
-            provider: fallbackRequest.provider,
+            modeTarget: fallbackRequest,
             title: 'Crow-GodMod3-retry',
             signal: abortController.signal,
           });`,
@@ -3543,15 +4089,9 @@ replaceRequired(
   `      document.getElementById('localEnabled').checked = !!state.localEnabled;
       document.getElementById('localOnly').checked = !!state.localOnly;
       state.localRuntime = normalizeLocalRuntime(state.localRuntime, state.localBaseUrl);
-      document.getElementById('localRuntimeInput').value = state.localRuntime;
-      document.getElementById('localBaseUrlInput').value = state.localBaseUrl || 'http://localhost:11434/v1';
-      document.getElementById('localModelsInput').value = state.localModels || '';
-      document.getElementById('localApiKeyInput').value = state.localApiKey || '';
-      document.getElementById('localReasoningEffortInput').value = state.localReasoningEffort === 'auto' ? 'auto' : 'none';
-      document.getElementById('localConnectionStatus').textContent = '';
-      updateLocalRuntimeHelp(state.localRuntime);
-      refreshModeModelSelect();
-      renderLocalRaceModelPicker();`,
+      applyLocalRuntimeProfileToState(state.localRuntime);
+      renderActiveLocalRuntimeProfile();
+      document.getElementById('localConnectionStatus').textContent = '';`,
 );
 
 replaceRequired(
@@ -3597,6 +4137,14 @@ replaceRequired(
       if (OPENROUTER_FREE_CHAT_MODEL_SET.has(defaultModelValue)) {
         state.model = defaultModelValue;
       }`,
+);
+
+replaceRequired(
+  `      if (newLocalKey !== state.localApiKey) _localApiKeyGeneration++;
+      state.localApiKey = newLocalKey;`,
+  `      _localApiKeyGeneration++;
+      state.localApiKey = newLocalKey;
+      captureActiveLocalRuntimeProfile(true);`,
 );
 
 replaceRequired(
@@ -3697,9 +4245,16 @@ replaceRequired(
 );
 
 replaceRequired(
+  `    function exportFullBackup() {
+      const exportData = {`,
+  `    function exportFullBackup() {
+      captureActiveLocalRuntimeProfile();
+      const exportData = {`,
+);
+replaceRequired(
   `        _version: 2,
         _exportedAt: new Date().toISOString(),`,
-  `        _version: 5,
+  `        _version: 6,
         _exportedAt: new Date().toISOString(),`,
 );
 replaceRequired(
@@ -3716,6 +4271,11 @@ replaceRequired(
         localRaceModels: state.localRaceModels,
         localModeModelPools: state.localModeModelPools,
         localReasoningEffort: state.localReasoningEffort,
+        localRuntimeProfiles: normalizeLocalRuntimeProfiles(
+          state.localRuntimeProfiles,
+          state.localRuntime,
+        ),
+        localRuntimeProfileVersion: LOCAL_RUNTIME_PROFILE_SCHEMA_VERSION,
         modeModelSelections: state.modeModelSelections,
         modeModelSelectionVersion: state.modeModelSelectionVersion,
       };`,
@@ -3724,7 +4284,7 @@ replaceRequired(
   `        'modelTemperature', 'modelTopP', 'modelMaxTokens', 'modelFreqPenalty', 'modelPresPenalty',
         'sidebarOpen', 'backendUrl'];`,
   `        'modelTemperature', 'modelTopP', 'modelMaxTokens', 'modelFreqPenalty', 'modelPresPenalty',
-        'localEnabled', 'localOnly', 'localRuntime', 'localBaseUrl', 'localModels', 'localRaceModels', 'localModeModelPools', 'localReasoningEffort', 'modeModelSelections', 'modeModelSelectionVersion',
+        'localEnabled', 'localOnly', 'localRuntime', 'localBaseUrl', 'localModels', 'localRaceModels', 'localModeModelPools', 'localReasoningEffort', 'localRuntimeProfiles', 'localRuntimeProfileVersion', 'modeModelSelections', 'modeModelSelectionVersion',
         'sidebarOpen', 'backendUrl'];`,
 );
 replaceRequired(
@@ -3767,6 +4327,31 @@ replaceRequired(
         candidate.localRaceModels,
       );
       candidate.localRaceModels = candidate.localModeModelPools.ultraplinian;
+      const importedProfiles = imported.localRuntimeProfiles
+        && typeof imported.localRuntimeProfiles === 'object'
+        && !Array.isArray(imported.localRuntimeProfiles)
+        ? imported.localRuntimeProfiles
+        : null;
+      candidate.localRuntimeProfiles = normalizeLocalRuntimeProfiles(
+        importedProfiles,
+        candidate.localRuntime,
+        {
+          baseUrl: candidate.localBaseUrl,
+          models: candidate.localModels,
+          raceModels: candidate.localRaceModels,
+          modeModelPools: candidate.localModeModelPools,
+          reasoningEffort: candidate.localReasoningEffort,
+          reasoningOffModels: '',
+        },
+      );
+      candidate.localRuntimeProfileVersion = LOCAL_RUNTIME_PROFILE_SCHEMA_VERSION;
+      const activeImportedProfile = candidate.localRuntimeProfiles[candidate.localRuntime];
+      candidate.localBaseUrl = activeImportedProfile.baseUrl;
+      candidate.localModels = activeImportedProfile.models;
+      candidate.localModeModelPools = { ...activeImportedProfile.modeModelPools };
+      candidate.localRaceModels = candidate.localModeModelPools.ultraplinian;
+      candidate.localReasoningEffort = activeImportedProfile.reasoningEffort;
+      candidate.localReasoningOffModels = activeImportedProfile.reasoningOffModels;
       candidate.modeModelSelections = migrateLegacyModeModelSelections(
         imported.modeModelSelections,
         candidate.model,
@@ -3778,6 +4363,18 @@ replaceRequired(
       candidate.modeModelSelectionVersion = MODE_MODEL_SELECTION_SCHEMA_VERSION;
 
       // Sanitize conversations: validate structure, strip dangerous values`,
+);
+
+replaceRequired(
+  `      for (const key of allowed) {
+        if (candidate[key] !== undefined) state[key] = candidate[key];
+      }
+      if (candidate.apiKey) _apiKeyGeneration++;`,
+  `      for (const key of allowed) {
+        if (candidate[key] !== undefined) state[key] = candidate[key];
+      }
+      state.localApiKey = _localApiKeysByRuntime[state.localRuntime] || '';
+      if (candidate.apiKey) _apiKeyGeneration++;`,
 );
 
 replaceRequired(

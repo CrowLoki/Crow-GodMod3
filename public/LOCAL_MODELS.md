@@ -35,6 +35,17 @@ the first local model. Users can tick any number of models, including the full
 discovered inventory; Crow-GodMod3 applies no fixed model-count limit. The
 runtime and the user's hardware determine how much work is practical.
 
+Each runtime preset keeps its own remembered model inventory and its own three
+per-mode pools. Only the currently selected runtime can execute local requests;
+models from the other saved runtimes are not mixed into the race. Switching to
+another runtime does not clear or merge the current profile. Switching back
+restores that runtime's discovered inventory and its ULTRAPLINIAN,
+PARSELTONGUE, and CLASSIC selections.
+
+Optional runtime credentials remain in encrypted browser storage on the device
+where they were entered. Crow-GodMod3 backups exclude those credentials. After
+restoring elsewhere, enter any required local API keys on that browser/device.
+
 With the header picker set to **Automatic**:
 
 - ULTRAPLINIAN adds its selected local pool to its configured OpenRouter and
