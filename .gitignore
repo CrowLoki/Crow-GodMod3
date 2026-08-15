@@ -46,3 +46,6 @@ next-env.d.ts
 /work/
 /public/crow-theme/
 /public/manifest.webmanifest
+
+# TypeScript incremental build metadata
+tsconfig.tsbuildinfo

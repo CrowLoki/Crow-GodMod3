@@ -4434,7 +4434,8 @@ replaceRequired(
   `  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">`,
-  `  <link href="/crow-theme/fonts/bitfeather/crow-bitfeather.css" rel="stylesheet">
+  `  <link rel="preconnect" href="https://openrouter.ai" crossorigin>
+  <link href="/crow-theme/fonts/bitfeather/crow-bitfeather.css" rel="stylesheet">
   <link href="/crow-theme/tokens/crow-theme.css" rel="stylesheet">`,
 );
 replaceRequired(
@@ -4444,6 +4445,16 @@ replaceRequired(
 replaceRequired(
   "http://127.0.0.1:* https://127.0.0.1:* http://[::1]:* https://[::1]:*",
   "http://127.0.0.1:* https://127.0.0.1:*",
+);
+
+// Telemetry is disabled, so drop Cloudflare telemetry origins from the CSP.
+replaceRequired(
+  " https://static.cloudflareinsights.com https://challenges.cloudflare.com",
+  "",
+);
+replaceRequired(
+  " https://cloudflareinsights.com https://*.cloudflareinsights.com",
+  "",
 );
 
 replaceRequired(

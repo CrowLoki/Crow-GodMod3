@@ -92,6 +92,23 @@ test("serves the verified static clone directly at the root", async () => {
   );
 });
 
+test("hardens the generated CSP and removes unused external preconnects", async () => {
+  const html = await readFile(publicEntry, "utf8");
+
+  // OpenRouter is the primary external API, so preconnect to it.
+  assert.match(html, /<link rel="preconnect" href="https:\/\/openrouter\.ai" crossorigin>/);
+
+  // No leftover Google Fonts preconnects from the upstream snapshot.
+  assert.doesNotMatch(html, /href="https:\/\/fonts\.googleapis\.com"/);
+  assert.doesNotMatch(html, /href="https:\/\/fonts\.gstatic\.com"/);
+
+  // Telemetry is disabled, so Cloudflare telemetry origins must not be in the CSP.
+  assert.doesNotMatch(html, /cloudflareinsights/);
+
+  // Venice remains an allowed provider for users who configure it.
+  assert.match(html, /https:\/\/api\.venice\.ai/);
+});
+
 test("contains no orange, amber, yellow, or gold visual colour tokens", async () => {
   const html = await readFile(publicEntry, "utf8");
   const forbidden =
