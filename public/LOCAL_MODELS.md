@@ -6,6 +6,7 @@ server running on the same computer. The connection is restricted to
 
 Supported presets:
 
+- Crow Free AI Gateway — `http://127.0.0.1:8766/v1`
 - Ollama — `http://localhost:11434/v1`
 - LM Studio — `http://localhost:1234/v1`
 - Docker Model Runner — `http://localhost:12434/engines/v1`
@@ -78,6 +79,55 @@ cannot bypass a denied browser permission.
 
 If you self-host the interface, replace the production origin in the examples
 below with the origin shown in the Local Model Runtimes settings panel.
+
+## Crow Free AI Gateway
+
+The Crow Free AI Gateway preset connects to Crow's unified free-AI gateway
+from the separate `Crow's Free AI Model Access` project. It exposes every
+local Ollama model plus the recovered anonymous Crow Print routes (chat,
+image generation, text-to-speech, and speech transcription) through one
+loopback OpenAI-compatible server.
+
+1. Start the gateway from that project with
+   `scripts\start_vendor_compat_gateway.cmd` (vendor routes included) or
+   `scripts\start_local_text_ai.cmd` (local Ollama only).
+2. Select **Crow Free AI Gateway** in Crow-GodMod3 and click
+   **Test & Discover Models**. No API key is required.
+3. Discovered chat models appear as `provider:model-id` (for example
+   `ollama:crow-4b:latest` or `miaoxue-chat:glm-4-flash-250414`). Image,
+   speech, and transcription routes are kept out of the chat inventory and
+   are used by the modality switcher instead.
+
+The gateway allows browser calls from any loopback origin, so a locally
+served Crow-GodMod3 can reach it without extra CORS setup. The hosted app at
+`https://crow-godmod3.vercel.app` is not a loopback origin; use a local copy
+of the app when working with the gateway.
+
+### Modality switcher (text / image / audio / video, in and out)
+
+The modality switcher sits in the chat header next to the strategy mode
+menu and states what each tool does:
+
+- **TEXT · IN·OUT** — normal chat with the selected provider and model.
+- **IMAGE · OUT** — the composer prompt is sent to the runtime's
+  `/images/generations` route; the generated image renders inline in the
+  conversation. On the Crow gateway this uses `miaoxue-image:default`.
+- **IMAGE · IN** — attaches an image for vision chat (the existing upload
+  flow).
+- **AUDIO · OUT** — the composer text is sent to the runtime's
+  `/audio/speech` route; the spoken audio renders as an inline player. On
+  the Crow gateway this uses `miaoxue-tts:default`.
+- **AUDIO · IN** — records from the microphone, converts the audio to
+  16 kHz mono PCM in the browser, and sends it to the runtime's
+  `/audio/transcriptions` route; the transcript lands in the composer for
+  review before sending. On the Crow gateway this uses
+  `iflytek-asr:default`.
+- **VIDEO · OUT** — shown but unavailable: no configured provider offers a
+  video route yet.
+
+Each option shows the exact model route it will use once discovered.
+Modalities only run on the selected local runtime; cloud providers are
+never called by the modality layer.
 
 ## LM Studio
 
