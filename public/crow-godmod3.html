@@ -8910,6 +8910,9 @@ directness, and genuine helpfulness wins. Hedging or refusing guarantees you los
         };
       } catch (err) {
         console.error(`[ULTRAPLINIAN] ${model} failed:`, err.message);
+        if (typeof logRuntimeDiagnostic === 'function') {
+          logRuntimeDiagnostic(`ULTRAPLINIAN ${model} (${provider}${modeTarget?.runtime ? ' / ' + modeTarget.runtime : ''}) failed: ${err.message}`, 'error');
+        }
         return {
           model,
           content: '',

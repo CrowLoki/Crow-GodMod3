@@ -1957,6 +1957,15 @@ replaceRequired(
         };`,
   1,
 );
+
+replaceRequired(
+  '        console.error(`[ULTRAPLINIAN] ${model} failed:`, err.message);',
+  `        console.error(\`[ULTRAPLINIAN] \${model} failed:\`, err.message);
+        if (typeof logRuntimeDiagnostic === 'function') {
+          logRuntimeDiagnostic(\`ULTRAPLINIAN \${model} (\${provider}\${modeTarget?.runtime ? ' / ' + modeTarget.runtime : ''}) failed: \${err.message}\`, 'error');
+        }`,
+  1,
+);
 replaceRequired(
   "      setThinkingModels(raceEntries.map(e => e.model));",
   "      setThinkingModels(raceEntries.map(getUltraplinianThinkingModelKey));",
