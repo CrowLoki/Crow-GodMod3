@@ -5212,6 +5212,15 @@ const localRuntimeStatusStyles = '    /* Local runtime status badge in the chat 
       '    .local-runtime-status.disconnected .status-dot {\n' +
       '      background: var(--crow-text-dim);\n' +
       '    }\n' +
+      '.local-runtime-status.error {\n' +
+      '  color: var(--crow-state-danger, #ff637d);\n' +
+      '  background: rgb(255 99 125 / 12%);\n' +
+      '  border-color: rgb(255 99 125 / 35%);\n' +
+      '}\n' +
+      '.local-runtime-status.error .status-dot {\n' +
+      '  background: var(--crow-state-danger, #ff637d);\n' +
+      '  box-shadow: 0 0 6px var(--crow-state-danger, #ff637d);\n' +
+      '}\n' +
       '    @media (max-width: 640px) {\n' +
       '      .local-runtime-status {\n' +
       '        display: none;\n' +
@@ -5349,17 +5358,22 @@ replaceRequired(
 
 replaceRequired(
   '    function updateModeSwitcherUI() {',
+  '    let _localRuntimeErrorCount = 0;\n\n' +
   '    function updateLocalRuntimeStatusBadge() {\n' +
-  "      const badge = document.getElementById('localRuntimeStatusBadge');\n" +
-  "      if (!badge) return;\n" +
-  "      const runtimeId = LOCAL_RUNTIME_IDS.has(state.localRuntime) ? state.localRuntime : 'custom';\n" +
+    "      const badge = document.getElementById('localRuntimeStatusBadge');\n" +
+    "      if (!badge) return;\n" +
+    "      const runtimeId = LOCAL_RUNTIME_IDS.has(state.localRuntime) ? state.localRuntime : 'custom';\n" +
   '      const preset = LOCAL_RUNTIME_PRESETS[runtimeId];\n' +
   "      const runtimeLabel = preset ? preset.label : 'Local';\n" +
   '      const profile = getLocalRuntimeProfile(runtimeId);\n' +
   '      const models = parseLocalModelIds(profile.models);\n' +
   '      const isConnected = state.localEnabled && models.length > 0;\n' +
-  "      const statusText = badge.querySelector('.status-text');\n" +
-  '      if (isConnected) {\n' +
+    "      const statusText = badge.querySelector('.status-text');\n" +
+  "      const errorCount = typeof _localRuntimeErrorCount !== 'undefined' ? _localRuntimeErrorCount : 0;\n" +
+  '      if (errorCount > 0) {\n' +
+  "        badge.className = 'local-runtime-status error';\n" +
+  "        if (statusText) statusText.textContent = runtimeLabel + ' · ' + errorCount + ' error' + (errorCount === 1 ? '' : 's');\n" +
+  '      } else if (isConnected) {\n' +
   "        badge.className = 'local-runtime-status connected';\n" +
   "        if (statusText) statusText.textContent = runtimeLabel + ' · ' + models.length + ' model' + (models.length === 1 ? '' : 's');\n" +
   '      } else {\n' +
@@ -5367,7 +5381,7 @@ replaceRequired(
   "        if (statusText) statusText.textContent = runtimeLabel + ' · offline';\n" +
   '      }\n' +
   '    }\n\n' +
-  '    function updateModeSwitcherUI() {',
+  '    function updateModeSwitcherUI() {'
 );
 
 replaceRequired(
@@ -5390,6 +5404,10 @@ replaceRequired(
   "      if (type === 'error' || type === 'warning') {\n" +
   "        const diagPanel = document.getElementById('localRuntimeDiagnostics');\n" +
   "        if (diagPanel) diagPanel.classList.add('open');\n" +
+  "      }\n" +
+  "      if (type === 'error') {\n" +
+  "        if (typeof _localRuntimeErrorCount !== 'undefined') _localRuntimeErrorCount++;\n" +
+  "        if (typeof updateLocalRuntimeStatusBadge === 'function') updateLocalRuntimeStatusBadge();\n" +
   "      }\n" +
   '    }\n\n' +
   '    function toggleRuntimeDiagnostics() {\n' +
@@ -5421,6 +5439,8 @@ replaceRequired(
   "      const panel = document.getElementById('localRuntimeDiagnosticsLog');\n" +
   "      if (!panel) return;\n" +
   "      panel.replaceChildren();\n" +
+  "      if (typeof _localRuntimeErrorCount !== 'undefined') _localRuntimeErrorCount = 0;\n" +
+  "      if (typeof updateLocalRuntimeStatusBadge === 'function') updateLocalRuntimeStatusBadge();\n" +
   "      logRuntimeDiagnostic('Diagnostics log cleared', 'info');\n" +
   '    }\n\n' +
   '    function updateModeSwitcherUI() {',

@@ -3783,6 +3783,15 @@
     .local-runtime-status.disconnected .status-dot {
       background: var(--crow-text-dim);
     }
+.local-runtime-status.error {
+  color: var(--crow-state-danger, #ff637d);
+  background: rgb(255 99 125 / 12%);
+  border-color: rgb(255 99 125 / 35%);
+}
+.local-runtime-status.error .status-dot {
+  background: var(--crow-state-danger, #ff637d);
+  box-shadow: 0 0 6px var(--crow-state-danger, #ff637d);
+}
     @media (max-width: 640px) {
       .local-runtime-status {
         display: none;
@@ -14622,6 +14631,8 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
       return 'parseltongue';
     }
 
+    let _localRuntimeErrorCount = 0;
+
     function updateLocalRuntimeStatusBadge() {
       const badge = document.getElementById('localRuntimeStatusBadge');
       if (!badge) return;
@@ -14632,7 +14643,11 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
       const models = parseLocalModelIds(profile.models);
       const isConnected = state.localEnabled && models.length > 0;
       const statusText = badge.querySelector('.status-text');
-      if (isConnected) {
+      const errorCount = typeof _localRuntimeErrorCount !== 'undefined' ? _localRuntimeErrorCount : 0;
+      if (errorCount > 0) {
+        badge.className = 'local-runtime-status error';
+        if (statusText) statusText.textContent = runtimeLabel + ' · ' + errorCount + ' error' + (errorCount === 1 ? '' : 's');
+      } else if (isConnected) {
         badge.className = 'local-runtime-status connected';
         if (statusText) statusText.textContent = runtimeLabel + ' · ' + models.length + ' model' + (models.length === 1 ? '' : 's');
       } else {
@@ -14659,6 +14674,10 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
       if (type === 'error' || type === 'warning') {
         const diagPanel = document.getElementById('localRuntimeDiagnostics');
         if (diagPanel) diagPanel.classList.add('open');
+      }
+      if (type === 'error') {
+        if (typeof _localRuntimeErrorCount !== 'undefined') _localRuntimeErrorCount++;
+        if (typeof updateLocalRuntimeStatusBadge === 'function') updateLocalRuntimeStatusBadge();
       }
     }
 
@@ -14693,6 +14712,8 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
       const panel = document.getElementById('localRuntimeDiagnosticsLog');
       if (!panel) return;
       panel.replaceChildren();
+      if (typeof _localRuntimeErrorCount !== 'undefined') _localRuntimeErrorCount = 0;
+      if (typeof updateLocalRuntimeStatusBadge === 'function') updateLocalRuntimeStatusBadge();
       logRuntimeDiagnostic('Diagnostics log cleared', 'info');
     }
 
