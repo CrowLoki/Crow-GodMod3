@@ -5434,6 +5434,17 @@ replaceRequired(
   '      const diagnosis = diagnoseAllModelsFailed(allResults);\n' +
   "      if (typeof logRuntimeDiagnostic === 'function') logRuntimeDiagnostic('ULTRAPLINIAN: ' + diagnosis, 'error');\n",
 );
+
+replaceRequired(
+  '    function updateModeSwitcherUI() {\n' +
+  '      const btn = document.getElementById(\'modeSwitcherBtn\');\n',
+  '    function updateModeSwitcherUI() {\n' +
+  "      const ultraCb = document.getElementById('ultraplinian');\n" +
+  "      const plinyCb = document.getElementById('plinyMode');\n" +
+  "      if (ultraCb) ultraCb.checked = !!state.ultraplinian;\n" +
+  "      if (plinyCb) plinyCb.checked = !!state.plinyMode;\n" +
+  '      const btn = document.getElementById(\'modeSwitcherBtn\');\n',
+);
 replaceRequired(
   '</body>',
   '<div class="local-runtime-diagnostics" id="localRuntimeDiagnostics" aria-live="polite">\n' +

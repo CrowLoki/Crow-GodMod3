@@ -3078,7 +3078,7 @@ test("shows a local-runtime status badge in the header", async () => {
     /function updateLocalRuntimeStatusBadge()/,
     "Must expose a badge update helper",
   );
-  const uiStart = html.indexOf("function updateModeSwitcherUI");
+  const uiStart = html.indexOf("function getCurrentMode");
   const uiEnd = html.indexOf("\n\n    // Legacy function for compatibility", uiStart);
   assert.ok(uiStart > 0 && uiEnd > uiStart, "Missing updateModeSwitcherUI");
   assert.match(
@@ -3313,4 +3313,68 @@ globalThis.copyRuntimeDiagnosticForTest = copyRuntimeDiagnostics;`,
   assert.equal(logEntries.length, 1);
   assert.equal(logEntries[0].message, "Diagnostics log copied to clipboard");
   assert.equal(logEntries[0].type, "success");
+});
+
+test("updateModeSwitcherUI keeps hidden mode checkboxes in sync", async () => {
+  const html = await readFile(publicEntry, "utf8");
+
+  const uiStart = html.indexOf("function getCurrentMode");
+  const uiEnd = html.indexOf("\n\n    // Legacy function for compatibility", uiStart);
+  assert.ok(uiStart > 0 && uiEnd > uiStart, "Missing updateModeSwitcherUI");
+
+  const checks = {};
+  const uiContext = vm.createContext({
+    state: { ultraplinian: false, plinyMode: true, localRuntime: "ollama", localEnabled: false },
+    document: {
+      getElementById(id) {
+        if (id === "ultraplinian" || id === "plinyMode") {
+          return {
+            get checked() { return checks[id]; },
+            set checked(v) { checks[id] = v; },
+          };
+        }
+        if (id === "modeSwitcherBtn") {
+          return {
+            className: "",
+            innerHTML: "",
+            querySelector() { return null; },
+          };
+        }
+        if (id === "modelSelect") {
+          return {
+            style: {},
+            replaceChildren() {},
+            appendChild() {},
+            setAttribute() {},
+            options: [],
+            value: "auto",
+            dataset: {},
+          };
+        }
+        if (id === "libertasModelSelect") return null;
+        return null;
+      },
+      querySelectorAll() { return []; },
+    },
+    MODE_MODEL_IDS: new Set(["ultraplinian", "parseltongue", "pliny"]),
+    LOCAL_RUNTIME_IDS: new Set(localRuntimeIds),
+    LOCAL_RUNTIME_PRESETS: localRuntimePresets,
+    getLocalRuntimeProfile() {
+      return { baseUrl: "", models: "", modeModelPools: {}, reasoningEffort: "none", reasoningOffModels: "" };
+    },
+    parseLocalModelIds() { return []; },
+    refreshModeModelSelect() {},
+    updateLocalRuntimeStatusBadge() {},
+    getCurrentMode: undefined,
+  });
+
+  vm.runInContext(
+    `${html.slice(uiStart, uiEnd)}
+
+globalThis.updateModeSwitcherUIForTest = updateModeSwitcherUI;`,
+    uiContext,
+  );
+  uiContext.updateModeSwitcherUIForTest();
+  assert.equal(checks.ultraplinian, false, "ultraplinian checkbox should match state");
+  assert.equal(checks.plinyMode, true, "plinyMode checkbox should match state");
 });

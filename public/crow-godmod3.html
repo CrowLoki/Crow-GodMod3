@@ -14677,6 +14677,10 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
     }
 
     function updateModeSwitcherUI() {
+      const ultraCb = document.getElementById('ultraplinian');
+      const plinyCb = document.getElementById('plinyMode');
+      if (ultraCb) ultraCb.checked = !!state.ultraplinian;
+      if (plinyCb) plinyCb.checked = !!state.plinyMode;
       const btn = document.getElementById('modeSwitcherBtn');
       const selector = document.getElementById('modelSelect');
       const currentMode = getCurrentMode();
