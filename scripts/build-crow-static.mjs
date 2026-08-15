@@ -5319,6 +5319,12 @@ const localRuntimeDiagnosticsStyles = "    /* Local runtime diagnostics panel */
   "    }\n" +
   "    .local-runtime-diagnostics-msg.success {\n" +
   "      color: var(--success);\n" +
+  "    }\n" +
+  "    .local-runtime-diagnostics-msg.warning {\n" +
+  "      color: var(--warning);\n" +
+  "    }\n" +
+  "    .local-runtime-diagnostics-msg.info {\n" +
+  "      color: var(--cyan);\n" +
   "    }\n";
 
 replaceRequired('  </style>', localRuntimeDiagnosticsStyles + '\n  </style>');
@@ -5381,6 +5387,10 @@ replaceRequired(
   "      entry.appendChild(msg);\n" +
   "      panel.appendChild(entry);\n" +
   "      panel.scrollTop = panel.scrollHeight;\n" +
+  "      if (type === 'error' || type === 'warning') {\n" +
+  "        const diagPanel = document.getElementById('localRuntimeDiagnostics');\n" +
+  "        if (diagPanel) diagPanel.classList.add('open');\n" +
+  "      }\n" +
   '    }\n\n' +
   '    function toggleRuntimeDiagnostics() {\n' +
   "      const panel = document.getElementById('localRuntimeDiagnostics');\n" +

@@ -3741,6 +3741,12 @@
     .local-runtime-diagnostics-msg.success {
       color: var(--success);
     }
+    .local-runtime-diagnostics-msg.warning {
+      color: var(--warning);
+    }
+    .local-runtime-diagnostics-msg.info {
+      color: var(--cyan);
+    }
 
     /* Local runtime status badge in the chat header */
     .local-runtime-status {
@@ -14650,6 +14656,10 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
       entry.appendChild(msg);
       panel.appendChild(entry);
       panel.scrollTop = panel.scrollHeight;
+      if (type === 'error' || type === 'warning') {
+        const diagPanel = document.getElementById('localRuntimeDiagnostics');
+        if (diagPanel) diagPanel.classList.add('open');
+      }
     }
 
     function toggleRuntimeDiagnostics() {
