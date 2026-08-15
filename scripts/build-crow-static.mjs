@@ -5209,6 +5209,96 @@ const localRuntimeStatusStyles = '    /* Local runtime status badge in the chat 
       '      }\n' +
       '    }\n';
 
+const localRuntimeDiagnosticsStyles = "    /* Local runtime diagnostics panel */\n" +
+  "    .local-runtime-diagnostics-btn {\n" +
+  "      background: transparent;\n" +
+  "      border: 1px solid var(--crow-border-subtle);\n" +
+  "      color: var(--crow-text-dim);\n" +
+  "      border-radius: 999px;\n" +
+  "      width: 26px;\n" +
+  "      height: 26px;\n" +
+  "      display: inline-flex;\n" +
+  "      align-items: center;\n" +
+  "      justify-content: center;\n" +
+  "      cursor: pointer;\n" +
+  "      font-size: 12px;\n" +
+  "      margin-left: 4px;\n" +
+  "      transition: all 0.2s ease;\n" +
+  "    }\n" +
+  "    .local-runtime-diagnostics-btn:hover {\n" +
+  "      border-color: var(--crow-border-focus);\n" +
+  "      color: var(--crow-product-signal);\n" +
+  "    }\n" +
+  "    .local-runtime-diagnostics {\n" +
+  "      position: fixed;\n" +
+  "      bottom: 0;\n" +
+  "      left: 0;\n" +
+  "      right: 0;\n" +
+  "      max-height: 220px;\n" +
+  "      background: var(--crow-bg-canvas, #03040a);\n" +
+  "      border-top: 1px solid var(--crow-border-subtle);\n" +
+  "      color: var(--crow-text);\n" +
+  "      font: 12px/1.4 var(--crow-font-mono);\n" +
+  "      z-index: 1000;\n" +
+  "      display: flex;\n" +
+  "      flex-direction: column;\n" +
+  "      transition: transform 0.2s ease;\n" +
+  "      transform: translateY(100%);\n" +
+  "    }\n" +
+  "    .local-runtime-diagnostics.open {\n" +
+  "      transform: translateY(0);\n" +
+  "    }\n" +
+  "    .local-runtime-diagnostics-header {\n" +
+  "      display: flex;\n" +
+  "      align-items: center;\n" +
+  "      justify-content: space-between;\n" +
+  "      padding: 8px 12px;\n" +
+  "      border-bottom: 1px solid var(--crow-border-subtle);\n" +
+  "      background: rgb(115 76 255 / 10%);\n" +
+  "    }\n" +
+  "    .local-runtime-diagnostics-title {\n" +
+  "      font-weight: 600;\n" +
+  "      color: var(--crow-product-primary);\n" +
+  "    }\n" +
+  "    .local-runtime-diagnostics-close {\n" +
+  "      background: transparent;\n" +
+  "      border: none;\n" +
+  "      color: var(--crow-text-dim);\n" +
+  "      cursor: pointer;\n" +
+  "      font-size: 16px;\n" +
+  "    }\n" +
+  "    .local-runtime-diagnostics-log {\n" +
+  "      overflow-y: auto;\n" +
+  "      padding: 8px 12px;\n" +
+  "      flex: 1;\n" +
+  "    }\n" +
+  "    .local-runtime-diagnostics-log:empty::before {\n" +
+  "      content: \"No local runtime events yet.\";\n" +
+  "      color: var(--crow-text-dim);\n" +
+  "      font-style: italic;\n" +
+  "    }\n" +
+  "    .local-runtime-diagnostics-entry {\n" +
+  "      margin-bottom: 6px;\n" +
+  "      display: flex;\n" +
+  "      gap: 8px;\n" +
+  "    }\n" +
+  "    .local-runtime-diagnostics-time {\n" +
+  "      color: var(--crow-text-dim);\n" +
+  "      flex-shrink: 0;\n" +
+  "    }\n" +
+  "    .local-runtime-diagnostics-msg {\n" +
+  "      color: var(--crow-text);\n" +
+  "      word-break: break-word;\n" +
+  "    }\n" +
+  "    .local-runtime-diagnostics-msg.error {\n" +
+  "      color: var(--danger);\n" +
+  "    }\n" +
+  "    .local-runtime-diagnostics-msg.success {\n" +
+  "      color: var(--success);\n" +
+  "    }\n";
+
+replaceRequired('  </style>', localRuntimeDiagnosticsStyles + '\n  </style>');
+
 replaceRequired('  </style>', localRuntimeStatusStyles + '\n  </style>');
 
 replaceRequired(
@@ -5219,6 +5309,12 @@ replaceRequired(
   '          </button>\n' +
   '          <span class="header-separator">|</span>\n' +
   '          <!-- Prompts tried counter -->',
+);
+
+replaceRequired(
+  '<span class="header-separator">|</span>\n          <!-- Prompts tried counter -->',
+  '<button class="local-runtime-diagnostics-btn" id="localRuntimeDiagnosticsToggle" onclick="toggleRuntimeDiagnostics()" title="Local runtime diagnostics" aria-label="Toggle local runtime diagnostics">🧠</button>\n' +
+  '<span class="header-separator">|</span>\n          <!-- Prompts tried counter -->',
 );
 
 replaceRequired(
@@ -5245,6 +5341,32 @@ replaceRequired(
 );
 
 replaceRequired(
+  '    function updateModeSwitcherUI() {',
+  '    function logRuntimeDiagnostic(message, type) {\n' +
+  "      const panel = document.getElementById('localRuntimeDiagnosticsLog');\n" +
+  "      if (!panel) return;\n" +
+  "      const entry = document.createElement('div');\n" +
+  "      entry.className = 'local-runtime-diagnostics-entry';\n" +
+  "      const time = document.createElement('span');\n" +
+  "      time.className = 'local-runtime-diagnostics-time';\n" +
+  "      time.textContent = new Date().toLocaleTimeString();\n" +
+  "      const msg = document.createElement('span');\n" +
+  "      msg.className = 'local-runtime-diagnostics-msg' + (type ? ' ' + type : '');\n" +
+  "      msg.textContent = message;\n" +
+  "      entry.appendChild(time);\n" +
+  "      entry.appendChild(msg);\n" +
+  "      panel.appendChild(entry);\n" +
+  "      panel.scrollTop = panel.scrollHeight;\n" +
+  '    }\n\n' +
+  '    function toggleRuntimeDiagnostics() {\n' +
+  "      const panel = document.getElementById('localRuntimeDiagnostics');\n" +
+  "      if (!panel) return;\n" +
+  "      panel.classList.toggle('open');\n" +
+  '    }\n\n' +
+  '    function updateModeSwitcherUI() {',
+);
+
+replaceRequired(
   '      refreshModeModelSelect();\n    }\n\n    // Legacy function for compatibility',
   '      refreshModeModelSelect();\n      updateLocalRuntimeStatusBadge();\n    }\n\n    // Legacy function for compatibility',
 );
@@ -5256,12 +5378,22 @@ replaceRequired(
 
 replaceRequired(
   "          status.textContent = `${label}: ${models.length} ${capabilityLabel} ID${models.length === 1 ? '' : 's'} saved${skippedLabel}.`;\n          status.style.color = 'var(--success)';\n        }\n      } catch (err) {",
-  "          status.textContent = `${label}: ${models.length} ${capabilityLabel} ID${models.length === 1 ? '' : 's'} saved${skippedLabel}.`;\n          status.style.color = 'var(--success)';\n        }\n        if (typeof updateLocalRuntimeStatusBadge === 'function') updateLocalRuntimeStatusBadge();\n      } catch (err) {",
+  "          status.textContent = `${label}: ${models.length} ${capabilityLabel} ID${models.length === 1 ? '' : 's'} saved${skippedLabel}.`;\n          status.style.color = 'var(--success)';\n        }\n        if (typeof logRuntimeDiagnostic === 'function') logRuntimeDiagnostic(`${label}: ${models.length} ${capabilityLabel} ID${models.length === 1 ? '' : 's'} saved${skippedLabel}.`, 'success');\n        if (typeof updateLocalRuntimeStatusBadge === 'function') updateLocalRuntimeStatusBadge();\n      } catch (err) {",
 );
 
 replaceRequired(
   "          status.textContent = `Connection failed: ${describeLocalConnectionFailure(err, runtime, baseUrl)}`;\n          status.style.color = 'var(--danger)';\n        }\n      }\n    }",
-  "          status.textContent = `Connection failed: ${describeLocalConnectionFailure(err, runtime, baseUrl)}`;\n          status.style.color = 'var(--danger)';\n        }\n        if (typeof updateLocalRuntimeStatusBadge === 'function') updateLocalRuntimeStatusBadge();\n      }\n    }",
+  "          status.textContent = `Connection failed: ${describeLocalConnectionFailure(err, runtime, baseUrl)}`;\n          status.style.color = 'var(--danger)';\n        }\n        if (typeof logRuntimeDiagnostic === 'function') logRuntimeDiagnostic(`Connection failed: ${describeLocalConnectionFailure(err, runtime, baseUrl)}`, 'error');\n        if (typeof updateLocalRuntimeStatusBadge === 'function') updateLocalRuntimeStatusBadge();\n      }\n    }",
+);
+
+
+replaceRequired(
+  '</body>',
+  '<div class="local-runtime-diagnostics" id="localRuntimeDiagnostics" aria-live="polite">\n' +
+  '<div class="local-runtime-diagnostics-header"><span class="local-runtime-diagnostics-title">Local Runtime Diagnostics</span><button class="local-runtime-diagnostics-close" onclick="toggleRuntimeDiagnostics()">×</button></div>\n' +
+  '<div class="local-runtime-diagnostics-log" id="localRuntimeDiagnosticsLog"></div>\n' +
+  '</div>\n' +
+  '</body>',
 );
 
 await mkdir(dirname(outputPath), { recursive: true });

@@ -3171,3 +3171,70 @@ globalThis.updateLocalRuntimeStatusBadgeForTest = updateLocalRuntimeStatusBadge;
     "LM Studio · offline",
   );
 });
+
+
+test("shows a local runtime diagnostics panel", async () => {
+  const html = await readFile(publicEntry, "utf8");
+
+  assert.match(
+    html,
+    /id="localRuntimeDiagnosticsToggle"/,
+    "Header must include a local runtime diagnostics toggle",
+  );
+  assert.match(
+    html,
+    /id="localRuntimeDiagnostics"/,
+    "Must include a local runtime diagnostics panel",
+  );
+  assert.match(
+    html,
+    /function logRuntimeDiagnostic\(/,
+    "Must expose a logRuntimeDiagnostic helper",
+  );
+  assert.match(
+    html,
+    /function toggleRuntimeDiagnostics\(/,
+    "Must expose a toggleRuntimeDiagnostics helper",
+  );
+
+  const logStart = html.indexOf("function logRuntimeDiagnostic");
+  const logEnd = html.indexOf("\n\n    function toggleRuntimeDiagnostics", logStart);
+  assert.ok(logStart > 0 && logEnd > logStart, "Missing logRuntimeDiagnostic");
+
+  const logEntries = [];
+  const logContext = vm.createContext({
+    document: {
+      getElementById(id) {
+        if (id !== "localRuntimeDiagnosticsLog") return null;
+        return {
+          appendChild(child) {
+            logEntries.push(child);
+          },
+          scrollTop: 0,
+          scrollHeight: 0,
+        };
+      },
+      createElement() {
+        return { className: "", textContent: "", appendChild() {} };
+      },
+    },
+    Date: {
+      prototype: { toLocaleTimeString() { return "12:00:00"; } },
+    },
+  });
+
+  // Patch Date constructor so new Date().toLocaleTimeString() works in the VM
+  logContext.Date = class {
+    toLocaleTimeString() { return "12:00:00"; }
+  };
+
+  vm.runInContext(
+    `${html.slice(logStart, logEnd)}
+
+globalThis.logRuntimeDiagnosticForTest = logRuntimeDiagnostic;`,
+    logContext,
+  );
+  logContext.logRuntimeDiagnosticForTest("LM Studio: 2 models saved", "success");
+  assert.equal(logEntries.length, 1);
+  assert.equal(logEntries[0].className, "local-runtime-diagnostics-entry");
+});

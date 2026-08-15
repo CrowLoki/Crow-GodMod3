@@ -3639,6 +3639,94 @@
       }
     }
 
+    /* Local runtime diagnostics panel */
+    .local-runtime-diagnostics-btn {
+      background: transparent;
+      border: 1px solid var(--crow-border-subtle);
+      color: var(--crow-text-dim);
+      border-radius: 999px;
+      width: 26px;
+      height: 26px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 12px;
+      margin-left: 4px;
+      transition: all 0.2s ease;
+    }
+    .local-runtime-diagnostics-btn:hover {
+      border-color: var(--crow-border-focus);
+      color: var(--crow-product-signal);
+    }
+    .local-runtime-diagnostics {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      max-height: 220px;
+      background: var(--crow-bg-canvas, #03040a);
+      border-top: 1px solid var(--crow-border-subtle);
+      color: var(--crow-text);
+      font: 12px/1.4 var(--crow-font-mono);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s ease;
+      transform: translateY(100%);
+    }
+    .local-runtime-diagnostics.open {
+      transform: translateY(0);
+    }
+    .local-runtime-diagnostics-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--crow-border-subtle);
+      background: rgb(115 76 255 / 10%);
+    }
+    .local-runtime-diagnostics-title {
+      font-weight: 600;
+      color: var(--crow-product-primary);
+    }
+    .local-runtime-diagnostics-close {
+      background: transparent;
+      border: none;
+      color: var(--crow-text-dim);
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .local-runtime-diagnostics-log {
+      overflow-y: auto;
+      padding: 8px 12px;
+      flex: 1;
+    }
+    .local-runtime-diagnostics-log:empty::before {
+      content: "No local runtime events yet.";
+      color: var(--crow-text-dim);
+      font-style: italic;
+    }
+    .local-runtime-diagnostics-entry {
+      margin-bottom: 6px;
+      display: flex;
+      gap: 8px;
+    }
+    .local-runtime-diagnostics-time {
+      color: var(--crow-text-dim);
+      flex-shrink: 0;
+    }
+    .local-runtime-diagnostics-msg {
+      color: var(--crow-text);
+      word-break: break-word;
+    }
+    .local-runtime-diagnostics-msg.error {
+      color: var(--danger);
+    }
+    .local-runtime-diagnostics-msg.success {
+      color: var(--success);
+    }
+
     /* Local runtime status badge in the chat header */
     .local-runtime-status {
       display: inline-flex;
@@ -3794,7 +3882,8 @@
           <button class="local-runtime-status" id="localRuntimeStatusBadge" onclick="openSettings()" title="Local runtime status · click to open settings" aria-live="polite">
             <span class="status-dot"></span><span class="status-text">Local · offline</span>
           </button>
-          <span class="header-separator">|</span>
+          <button class="local-runtime-diagnostics-btn" id="localRuntimeDiagnosticsToggle" onclick="toggleRuntimeDiagnostics()" title="Local runtime diagnostics" aria-label="Toggle local runtime diagnostics">🧠</button>
+<span class="header-separator">|</span>
           <!-- Prompts tried counter -->
           <div class="header-prompts-counter" id="headerPromptsCounter" title="Total prompts tried">
             <span class="prompts-hash">#</span>
@@ -6000,6 +6089,7 @@
           status.textContent = `${label}: ${models.length} ${capabilityLabel} ID${models.length === 1 ? '' : 's'} saved${skippedLabel}.`;
           status.style.color = 'var(--success)';
         }
+        if (typeof logRuntimeDiagnostic === 'function') logRuntimeDiagnostic(`${label}: ${models.length} ${capabilityLabel} ID${models.length === 1 ? '' : 's'} saved${skippedLabel}.`, 'success');
         if (typeof updateLocalRuntimeStatusBadge === 'function') updateLocalRuntimeStatusBadge();
       } catch (err) {
         if (discoveryGeneration !== null
@@ -6008,6 +6098,7 @@
           status.textContent = `Connection failed: ${describeLocalConnectionFailure(err, runtime, baseUrl)}`;
           status.style.color = 'var(--danger)';
         }
+        if (typeof logRuntimeDiagnostic === 'function') logRuntimeDiagnostic(`Connection failed: ${describeLocalConnectionFailure(err, runtime, baseUrl)}`, 'error');
         if (typeof updateLocalRuntimeStatusBadge === 'function') updateLocalRuntimeStatusBadge();
       }
     }
@@ -14524,6 +14615,29 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
       }
     }
 
+    function logRuntimeDiagnostic(message, type) {
+      const panel = document.getElementById('localRuntimeDiagnosticsLog');
+      if (!panel) return;
+      const entry = document.createElement('div');
+      entry.className = 'local-runtime-diagnostics-entry';
+      const time = document.createElement('span');
+      time.className = 'local-runtime-diagnostics-time';
+      time.textContent = new Date().toLocaleTimeString();
+      const msg = document.createElement('span');
+      msg.className = 'local-runtime-diagnostics-msg' + (type ? ' ' + type : '');
+      msg.textContent = message;
+      entry.appendChild(time);
+      entry.appendChild(msg);
+      panel.appendChild(entry);
+      panel.scrollTop = panel.scrollHeight;
+    }
+
+    function toggleRuntimeDiagnostics() {
+      const panel = document.getElementById('localRuntimeDiagnostics');
+      if (!panel) return;
+      panel.classList.toggle('open');
+    }
+
     function updateModeSwitcherUI() {
       const btn = document.getElementById('modeSwitcherBtn');
       const selector = document.getElementById('modelSelect');
@@ -19606,5 +19720,9 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
         'color:#7c5cff;font-family:monospace;'
       );    })();
   </script>
+<div class="local-runtime-diagnostics" id="localRuntimeDiagnostics" aria-live="polite">
+<div class="local-runtime-diagnostics-header"><span class="local-runtime-diagnostics-title">Local Runtime Diagnostics</span><button class="local-runtime-diagnostics-close" onclick="toggleRuntimeDiagnostics()">×</button></div>
+<div class="local-runtime-diagnostics-log" id="localRuntimeDiagnosticsLog"></div>
+</div>
 </body>
 </html>
