@@ -27,3 +27,8 @@ jobs:
 
       - name: Build and test
         run: npm test
+
+      - name: Verify generated HTML is in sync
+        run: |
+          npm run generate:static
+          git diff --exit-code public/crow-godmod3.html
