@@ -5167,6 +5167,103 @@ if (html.length < 500_000) {
   throw new Error(`Generated app is unexpectedly small: ${html.length} bytes.`);
 }
 
+// Crow-GodMod3 header local-runtime status badge
+const localRuntimeStatusStyles = '    /* Local runtime status badge in the chat header */\n' +
+      '    .local-runtime-status {\n' +
+      '      display: inline-flex;\n' +
+      '      align-items: center;\n' +
+      '      gap: 6px;\n' +
+      '      padding: 4px 10px;\n' +
+      '      border-radius: 999px;\n' +
+      '      font: 11px/1 var(--crow-font-mono);\n' +
+      '      color: var(--crow-text-dim);\n' +
+      '      background: rgb(115 76 255 / 10%);\n' +
+      '      border: 1px solid var(--crow-border-subtle);\n' +
+      '      cursor: pointer;\n' +
+      '      transition: all 0.2s ease;\n' +
+      '      white-space: nowrap;\n' +
+      '    }\n' +
+      '    .local-runtime-status:hover {\n' +
+      '      background: rgb(115 76 255 / 16%);\n' +
+      '      border-color: var(--crow-border-focus);\n' +
+      '    }\n' +
+      '    .local-runtime-status.connected {\n' +
+      '      color: var(--crow-product-signal, #45e7ff);\n' +
+      '      background: rgb(69 231 255 / 12%);\n' +
+      '      border-color: rgb(69 231 255 / 35%);\n' +
+      '    }\n' +
+      '    .local-runtime-status.connected .status-dot {\n' +
+      '      background: var(--crow-product-signal, #45e7ff);\n' +
+      '      box-shadow: 0 0 6px var(--crow-product-signal, #45e7ff);\n' +
+      '    }\n' +
+      '    .local-runtime-status.disconnected {\n' +
+      '      color: var(--crow-text-dim);\n' +
+      '      background: rgb(255 255 255 / 5%);\n' +
+      '    }\n' +
+      '    .local-runtime-status.disconnected .status-dot {\n' +
+      '      background: var(--crow-text-dim);\n' +
+      '    }\n' +
+      '    @media (max-width: 640px) {\n' +
+      '      .local-runtime-status {\n' +
+      '        display: none;\n' +
+      '      }\n' +
+      '    }\n';
+
+replaceRequired('  </style>', localRuntimeStatusStyles + '\n  </style>');
+
+replaceRequired(
+  '        <div class="header-right">\n          <!-- Prompts tried counter -->',
+  '        <div class="header-right">\n' +
+  '          <button class="local-runtime-status" id="localRuntimeStatusBadge" onclick="openSettings()" title="Local runtime status · click to open settings" aria-live="polite">\n' +
+  '            <span class="status-dot"></span><span class="status-text">Local · offline</span>\n' +
+  '          </button>\n' +
+  '          <span class="header-separator">|</span>\n' +
+  '          <!-- Prompts tried counter -->',
+);
+
+replaceRequired(
+  '    function updateModeSwitcherUI() {',
+  '    function updateLocalRuntimeStatusBadge() {\n' +
+  "      const badge = document.getElementById('localRuntimeStatusBadge');\n" +
+  "      if (!badge) return;\n" +
+  "      const runtimeId = LOCAL_RUNTIME_IDS.has(state.localRuntime) ? state.localRuntime : 'custom';\n" +
+  '      const preset = LOCAL_RUNTIME_PRESETS[runtimeId];\n' +
+  "      const runtimeLabel = preset ? preset.label : 'Local';\n" +
+  '      const profile = getLocalRuntimeProfile(runtimeId);\n' +
+  '      const models = parseLocalModelIds(profile.models);\n' +
+  '      const isConnected = state.localEnabled && models.length > 0;\n' +
+  "      const statusText = badge.querySelector('.status-text');\n" +
+  '      if (isConnected) {\n' +
+  "        badge.className = 'local-runtime-status connected';\n" +
+  "        if (statusText) statusText.textContent = runtimeLabel + ' · ' + models.length + ' model' + (models.length === 1 ? '' : 's');\n" +
+  '      } else {\n' +
+  "        badge.className = 'local-runtime-status disconnected';\n" +
+  "        if (statusText) statusText.textContent = runtimeLabel + ' · offline';\n" +
+  '      }\n' +
+  '    }\n\n' +
+  '    function updateModeSwitcherUI() {',
+);
+
+replaceRequired(
+  '      refreshModeModelSelect();\n    }\n\n    // Legacy function for compatibility',
+  '      refreshModeModelSelect();\n      updateLocalRuntimeStatusBadge();\n    }\n\n    // Legacy function for compatibility',
+);
+
+replaceRequired(
+  '      updateLocalRuntimeHelp(state.localRuntime);\n      refreshModeModelSelect();\n      renderLocalRaceModelPicker();\n      buildTierSelect();\n    }',
+  '      updateLocalRuntimeHelp(state.localRuntime);\n      refreshModeModelSelect();\n      renderLocalRaceModelPicker();\n      buildTierSelect();\n      updateLocalRuntimeStatusBadge();\n    }',
+);
+
+replaceRequired(
+  "          status.textContent = `${label}: ${models.length} ${capabilityLabel} ID${models.length === 1 ? '' : 's'} saved${skippedLabel}.`;\n          status.style.color = 'var(--success)';\n        }\n      } catch (err) {",
+  "          status.textContent = `${label}: ${models.length} ${capabilityLabel} ID${models.length === 1 ? '' : 's'} saved${skippedLabel}.`;\n          status.style.color = 'var(--success)';\n        }\n        if (typeof updateLocalRuntimeStatusBadge === 'function') updateLocalRuntimeStatusBadge();\n      } catch (err) {",
+);
+
+replaceRequired(
+  "          status.textContent = `Connection failed: ${describeLocalConnectionFailure(err, runtime, baseUrl)}`;\n          status.style.color = 'var(--danger)';\n        }\n      }\n    }",
+  "          status.textContent = `Connection failed: ${describeLocalConnectionFailure(err, runtime, baseUrl)}`;\n          status.style.color = 'var(--danger)';\n        }\n        if (typeof updateLocalRuntimeStatusBadge === 'function') updateLocalRuntimeStatusBadge();\n      }\n    }",
+);
+
 await mkdir(dirname(outputPath), { recursive: true });
 await writeFile(outputPath, html, "utf8");
 console.log(`Generated ${outputPath} (${html.length.toLocaleString()} bytes).`);

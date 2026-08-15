@@ -3063,3 +3063,111 @@ test("packages the public source byte-for-byte", async () => {
     "Packaged HTML bytes differ from the maintained public source",
   );
 });
+
+
+test("shows a local-runtime status badge in the header", async () => {
+  const html = await readFile(publicEntry, "utf8");
+
+  assert.match(
+    html,
+    /id="localRuntimeStatusBadge"/,
+    "Header must include a local runtime status badge",
+  );
+  assert.match(
+    html,
+    /function updateLocalRuntimeStatusBadge()/,
+    "Must expose a badge update helper",
+  );
+  const uiStart = html.indexOf("function updateModeSwitcherUI");
+  const uiEnd = html.indexOf("\n\n    // Legacy function for compatibility", uiStart);
+  assert.ok(uiStart > 0 && uiEnd > uiStart, "Missing updateModeSwitcherUI");
+  assert.match(
+    html.slice(uiStart, uiEnd),
+    /updateLocalRuntimeStatusBadge\(\);/,
+    "updateModeSwitcherUI must refresh the local runtime badge",
+  );
+
+  const badgeStart = html.indexOf("function updateLocalRuntimeStatusBadge");
+  const badgeEnd = html.indexOf(
+    "\n\n    function updateModeSwitcherUI",
+    badgeStart,
+  );
+  assert.ok(badgeStart > 0 && badgeEnd > badgeStart);
+
+  const badgeContext = vm.createContext({
+    state: {
+      localEnabled: true,
+      localRuntime: "lmstudio",
+      localModels: "model-a, model-b",
+      localModeModelPools: {},
+      localRuntimeProfiles: {
+        lmstudio: {
+          baseUrl: "http://localhost:1234/v1",
+          models: "model-a, model-b",
+          modeModelPools: {},
+          reasoningEffort: "none",
+          reasoningOffModels: "",
+        },
+      },
+      localRuntimeProfileVersion: 1,
+      localApiKey: "",
+    },
+    document: {
+      getElementById(id) {
+        if (id !== "localRuntimeStatusBadge") return null;
+        if (!this._badgeEl) {
+          this._badgeEl = {
+            className: "",
+            querySelector(selector) {
+              if (selector !== ".status-text") return null;
+              if (!this._statusText) this._statusText = { textContent: "" };
+              return this._statusText;
+              },
+          };
+        }
+        return this._badgeEl;
+      },
+    },
+    LOCAL_RUNTIME_IDS: new Set(localRuntimeIds),
+    LOCAL_RUNTIME_PRESETS: localRuntimePresets,
+    getLocalRuntimeProfile(runtime) {
+      return (
+        this.state.localRuntimeProfiles[runtime] || {
+          baseUrl: "",
+          models: "",
+          modeModelPools: {},
+          reasoningEffort: "none",
+          reasoningOffModels: "",
+        }
+      );
+    },
+    parseLocalModelIds(raw) {
+      return String(raw || "")
+        .split(",")
+        .map((value) => value.trim())
+        .filter(Boolean);
+    },
+  });
+  badgeContext.getLocalRuntimeProfile = badgeContext.getLocalRuntimeProfile.bind(badgeContext);
+  vm.runInContext(
+    `${html.slice(badgeStart, badgeEnd)}
+
+globalThis.updateLocalRuntimeStatusBadgeForTest = updateLocalRuntimeStatusBadge;`,
+    badgeContext,
+  );
+  badgeContext.updateLocalRuntimeStatusBadgeForTest();
+  const badge = badgeContext.document.getElementById("localRuntimeStatusBadge");
+  assert.equal(badge.className, "local-runtime-status connected");
+  assert.equal(
+    badge.querySelector(".status-text").textContent,
+    "LM Studio · 2 models",
+  );
+
+  badgeContext.state.localEnabled = false;
+  badgeContext.updateLocalRuntimeStatusBadgeForTest();
+  assert.equal(badge.className, "local-runtime-status disconnected");
+  assert.equal(
+    badge.querySelector(".status-text").textContent,
+    "LM Studio · offline",
+  );
+});

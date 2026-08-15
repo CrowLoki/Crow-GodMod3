@@ -3639,6 +3639,47 @@
       }
     }
 
+    /* Local runtime status badge in the chat header */
+    .local-runtime-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font: 11px/1 var(--crow-font-mono);
+      color: var(--crow-text-dim);
+      background: rgb(115 76 255 / 10%);
+      border: 1px solid var(--crow-border-subtle);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .local-runtime-status:hover {
+      background: rgb(115 76 255 / 16%);
+      border-color: var(--crow-border-focus);
+    }
+    .local-runtime-status.connected {
+      color: var(--crow-product-signal, #45e7ff);
+      background: rgb(69 231 255 / 12%);
+      border-color: rgb(69 231 255 / 35%);
+    }
+    .local-runtime-status.connected .status-dot {
+      background: var(--crow-product-signal, #45e7ff);
+      box-shadow: 0 0 6px var(--crow-product-signal, #45e7ff);
+    }
+    .local-runtime-status.disconnected {
+      color: var(--crow-text-dim);
+      background: rgb(255 255 255 / 5%);
+    }
+    .local-runtime-status.disconnected .status-dot {
+      background: var(--crow-text-dim);
+    }
+    @media (max-width: 640px) {
+      .local-runtime-status {
+        display: none;
+      }
+    }
+
   </style>
 </head>
 <body data-crow-theme data-crow-product="crow-godmod3">
@@ -3750,6 +3791,10 @@
           </select>
         </div>
         <div class="header-right">
+          <button class="local-runtime-status" id="localRuntimeStatusBadge" onclick="openSettings()" title="Local runtime status · click to open settings" aria-live="polite">
+            <span class="status-dot"></span><span class="status-text">Local · offline</span>
+          </button>
+          <span class="header-separator">|</span>
           <!-- Prompts tried counter -->
           <div class="header-prompts-counter" id="headerPromptsCounter" title="Total prompts tried">
             <span class="prompts-hash">#</span>
@@ -5129,6 +5174,7 @@
       refreshModeModelSelect();
       renderLocalRaceModelPicker();
       buildTierSelect();
+      updateLocalRuntimeStatusBadge();
     }
 
     function renderLocalRaceModelPicker() {
@@ -5954,6 +6000,7 @@
           status.textContent = `${label}: ${models.length} ${capabilityLabel} ID${models.length === 1 ? '' : 's'} saved${skippedLabel}.`;
           status.style.color = 'var(--success)';
         }
+        if (typeof updateLocalRuntimeStatusBadge === 'function') updateLocalRuntimeStatusBadge();
       } catch (err) {
         if (discoveryGeneration !== null
           && _localRuntimeProfileGenerations[runtime] !== discoveryGeneration) return;
@@ -5961,6 +6008,7 @@
           status.textContent = `Connection failed: ${describeLocalConnectionFailure(err, runtime, baseUrl)}`;
           status.style.color = 'var(--danger)';
         }
+        if (typeof updateLocalRuntimeStatusBadge === 'function') updateLocalRuntimeStatusBadge();
       }
     }
 
@@ -14457,6 +14505,25 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
       return 'parseltongue';
     }
 
+    function updateLocalRuntimeStatusBadge() {
+      const badge = document.getElementById('localRuntimeStatusBadge');
+      if (!badge) return;
+      const runtimeId = LOCAL_RUNTIME_IDS.has(state.localRuntime) ? state.localRuntime : 'custom';
+      const preset = LOCAL_RUNTIME_PRESETS[runtimeId];
+      const runtimeLabel = preset ? preset.label : 'Local';
+      const profile = getLocalRuntimeProfile(runtimeId);
+      const models = parseLocalModelIds(profile.models);
+      const isConnected = state.localEnabled && models.length > 0;
+      const statusText = badge.querySelector('.status-text');
+      if (isConnected) {
+        badge.className = 'local-runtime-status connected';
+        if (statusText) statusText.textContent = runtimeLabel + ' · ' + models.length + ' model' + (models.length === 1 ? '' : 's');
+      } else {
+        badge.className = 'local-runtime-status disconnected';
+        if (statusText) statusText.textContent = runtimeLabel + ' · offline';
+      }
+    }
+
     function updateModeSwitcherUI() {
       const btn = document.getElementById('modeSwitcherBtn');
       const selector = document.getElementById('modelSelect');
@@ -14488,6 +14555,7 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
       selector.style.display = 'block';
       if (libertasSelector) libertasSelector.style.display = currentMode === 'pliny' ? 'block' : 'none';
       refreshModeModelSelect();
+      updateLocalRuntimeStatusBadge();
     }
 
     // Legacy function for compatibility
