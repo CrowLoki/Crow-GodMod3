@@ -6348,7 +6348,7 @@
           status.textContent = `${label}: ${models.length} ${capabilityLabel} ID${models.length === 1 ? '' : 's'} saved${skippedLabel}.`;
           status.style.color = 'var(--success)';
         }
-        if (typeof logRuntimeDiagnostic === 'function') logRuntimeDiagnostic(`${label}: ${models.length} ${capabilityLabel} ID${models.length === 1 ? '' : 's'} saved${skippedLabel}.`, 'success');
+        if (typeof logRuntimeDiagnostic === 'function') logRuntimeDiagnostic(`${label}: ${models.length} ${discovery.source.startsWith('lmstudio-') ? 'chat-capable model' : 'candidate model'} ID${models.length === 1 ? '' : 's'} saved${discovery.skipped ? '; ' + discovery.skipped + ' non-chat ID' + (discovery.skipped === 1 ? '' : 's') + ' skipped' : ''}.`, 'success');
         if (typeof updateLocalRuntimeStatusBadge === 'function') updateLocalRuntimeStatusBadge();
       } catch (err) {
         if (discoveryGeneration !== null
@@ -15036,6 +15036,9 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
             : runtimeId === 'crowfree'
               ? 'start the gateway, then Test & Discover'
               : `no route on ${runtimeLabel}`;
+        }
+        if (m.id === 'video' && !crowModalityRouteFor(m.capability)) {
+          note = 'no video-capable provider yet';
         }
         return `
               <div class="modality-option${active ? ' active' : ''}${available ? '' : ' unavailable'}" data-modality="${m.id}" onclick="selectCrowModality('${m.id}')">

@@ -13,7 +13,8 @@ const isCodexSeatbeltSandbox = process.env.CODEX_SANDBOX === "seatbelt";
 
 const localBindingConfig = {
   main: "./worker/index.ts",
-  compatibility_flags: ["nodejs_compat"],
+  // compatibility_flags come from wrangler.jsonc; repeating them here makes
+  // Miniflare fail with "Compatibility flag specified multiple times".
   d1_databases: d1
     ? [
         {

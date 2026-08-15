@@ -90,6 +90,9 @@
               ? 'start the gateway, then Test & Discover'
               : `no route on ${runtimeLabel}`;
         }
+        if (m.id === 'video' && !crowModalityRouteFor(m.capability)) {
+          note = 'no video-capable provider yet';
+        }
         return `
               <div class="modality-option${active ? ' active' : ''}${available ? '' : ' unavailable'}" data-modality="${m.id}" onclick="selectCrowModality('${m.id}')">
                 <span class="modality-option-icon">${m.icon}</span>

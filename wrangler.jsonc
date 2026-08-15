@@ -2,7 +2,9 @@
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "crow-godmod3",
   "main": "worker/index.ts",
-  "compatibility_date": "2026-08-15",
+  // Newest date supported by the installed wrangler/workerd binary; a newer
+  // date makes the local dev server fail to start.
+  "compatibility_date": "2026-05-22",
   "compatibility_flags": ["nodejs_compat"],
   "observability": {
     "enabled": true,
