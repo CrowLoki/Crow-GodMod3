@@ -3697,6 +3697,21 @@
       cursor: pointer;
       font-size: 16px;
     }
+    .local-runtime-diagnostics-copy {
+      background: transparent;
+      border: 1px solid var(--crow-border-subtle);
+      color: var(--crow-text-dim);
+      border-radius: 4px;
+      cursor: pointer;
+      font: 11px/1 var(--crow-font-mono);
+      padding: 3px 8px;
+      margin-right: 8px;
+      transition: all 0.2s ease;
+    }
+    .local-runtime-diagnostics-copy:hover {
+      border-color: var(--crow-border-focus);
+      color: var(--crow-product-signal);
+    }
     .local-runtime-diagnostics-log {
       overflow-y: auto;
       padding: 8px 12px;
@@ -6059,6 +6074,7 @@
         setLocalApiKeyForRuntime(runtime, key, false);
         _localApiKeyGeneration++;
         discoveryGeneration = bumpLocalRuntimeProfileGeneration(runtime);
+        if (typeof logRuntimeDiagnostic === 'function') logRuntimeDiagnostic('Discovering models on ' + (LOCAL_RUNTIME_PRESETS[runtime]?.label || runtime) + '…', 'info');
         const discovery = await discoverLocalChatModels(runtime, baseUrl, headers);
         if (_localRuntimeProfileGenerations[runtime] !== discoveryGeneration) return;
         const models = discovery.models;
@@ -13905,6 +13921,7 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
       });
 
       const diagnosis = diagnoseAllModelsFailed(allResults);
+      if (typeof logRuntimeDiagnostic === 'function') logRuntimeDiagnostic('ULTRAPLINIAN: ' + diagnosis, 'error');
       return { content: `**Error:** ${escapeHtml(diagnosis)}`, strategy: 'ultraplinian-failed', score: -9999 };
     }
 
@@ -14636,6 +14653,27 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
       const panel = document.getElementById('localRuntimeDiagnostics');
       if (!panel) return;
       panel.classList.toggle('open');
+    }
+
+    function copyRuntimeDiagnostics() {
+      const panel = document.getElementById('localRuntimeDiagnosticsLog');
+      if (!panel) return;
+      const lines = [];
+      panel.querySelectorAll('.local-runtime-diagnostics-entry').forEach(entry => {
+        const time = entry.querySelector('.local-runtime-diagnostics-time')?.textContent || '';
+        const msg = entry.querySelector('.local-runtime-diagnostics-msg')?.textContent || '';
+        lines.push((time + ' ' + msg).trim());
+      });
+      const text = lines.join('\n') || 'No local runtime events yet.';
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          logRuntimeDiagnostic('Diagnostics log copied to clipboard', 'success');
+        }).catch(() => {
+          logRuntimeDiagnostic('Failed to copy diagnostics log', 'error');
+        });
+      } else {
+        logRuntimeDiagnostic('Clipboard API unavailable in this browser', 'error');
+      }
     }
 
     function updateModeSwitcherUI() {
@@ -19721,7 +19759,7 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
       );    })();
   </script>
 <div class="local-runtime-diagnostics" id="localRuntimeDiagnostics" aria-live="polite">
-<div class="local-runtime-diagnostics-header"><span class="local-runtime-diagnostics-title">Local Runtime Diagnostics</span><button class="local-runtime-diagnostics-close" onclick="toggleRuntimeDiagnostics()">×</button></div>
+<div class="local-runtime-diagnostics-header"><span class="local-runtime-diagnostics-title">Local Runtime Diagnostics</span><div><button class="local-runtime-diagnostics-copy" onclick="copyRuntimeDiagnostics()" title="Copy diagnostics log">Copy log</button><button class="local-runtime-diagnostics-close" onclick="toggleRuntimeDiagnostics()">×</button></div></div>
 <div class="local-runtime-diagnostics-log" id="localRuntimeDiagnosticsLog"></div>
 </div>
 </body>

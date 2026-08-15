@@ -3196,6 +3196,26 @@ test("shows a local runtime diagnostics panel", async () => {
     /function toggleRuntimeDiagnostics\(/,
     "Must expose a toggleRuntimeDiagnostics helper",
   );
+  assert.match(
+    html,
+    /function copyRuntimeDiagnostics\(/,
+    "Must expose a copyRuntimeDiagnostics helper",
+  );
+  assert.match(
+    html,
+    /class="local-runtime-diagnostics-copy"[^>]*>Copy log</,
+    "Panel header must include a Copy log button",
+  );
+  assert.match(
+    html,
+    /logRuntimeDiagnostic\('Discovering models on '/,
+    "Must log the start of local model discovery",
+  );
+  assert.match(
+    html,
+    /logRuntimeDiagnostic\('ULTRAPLINIAN: ' \+ diagnosis, 'error'\)/,
+    "Must log ULTRAPLINIAN failure diagnosis",
+  );
 
   const logStart = html.indexOf("function logRuntimeDiagnostic");
   const logEnd = html.indexOf("\n\n    function toggleRuntimeDiagnostics", logStart);
@@ -3237,4 +3257,60 @@ globalThis.logRuntimeDiagnosticForTest = logRuntimeDiagnostic;`,
   logContext.logRuntimeDiagnosticForTest("LM Studio: 2 models saved", "success");
   assert.equal(logEntries.length, 1);
   assert.equal(logEntries[0].className, "local-runtime-diagnostics-entry");
+});
+
+test("copyRuntimeDiagnostics exports the log to clipboard", async () => {
+  const html = await readFile(publicEntry, "utf8");
+
+  const copyStart = html.indexOf("function copyRuntimeDiagnostics");
+  const copyEnd = html.indexOf("\n\n    function updateModeSwitcherUI", copyStart);
+  assert.ok(copyStart > 0 && copyEnd > copyStart, "Missing copyRuntimeDiagnostics");
+
+  const copied = [];
+  const logEntries = [];
+  const copyContext = vm.createContext({
+    document: {
+      getElementById(id) {
+        if (id !== "localRuntimeDiagnosticsLog") return null;
+        return {
+          querySelectorAll(selector) {
+            if (selector !== ".local-runtime-diagnostics-entry") return [];
+            return [
+              {
+                querySelector(sel) {
+                  if (sel === ".local-runtime-diagnostics-time") return { textContent: "12:00:00" };
+                  if (sel === ".local-runtime-diagnostics-msg") return { textContent: "test entry" };
+                  return null;
+                },
+              },
+            ];
+          },
+        };
+      },
+    },
+    navigator: {
+      clipboard: {
+        writeText(text) {
+          copied.push(text);
+          return Promise.resolve();
+        },
+      },
+    },
+    logRuntimeDiagnostic(message, type) {
+      logEntries.push({ message, type });
+    },
+  });
+
+  vm.runInContext(
+    `${html.slice(copyStart, copyEnd)}
+
+globalThis.copyRuntimeDiagnosticForTest = copyRuntimeDiagnostics;`,
+    copyContext,
+  );
+  await copyContext.copyRuntimeDiagnosticForTest();
+  assert.equal(copied.length, 1);
+  assert.equal(copied[0], "12:00:00 test entry");
+  assert.equal(logEntries.length, 1);
+  assert.equal(logEntries[0].message, "Diagnostics log copied to clipboard");
+  assert.equal(logEntries[0].type, "success");
 });

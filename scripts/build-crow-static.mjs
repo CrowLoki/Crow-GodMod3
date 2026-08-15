@@ -5267,6 +5267,21 @@ const localRuntimeDiagnosticsStyles = "    /* Local runtime diagnostics panel */
   "      cursor: pointer;\n" +
   "      font-size: 16px;\n" +
   "    }\n" +
+  "    .local-runtime-diagnostics-copy {\n" +
+  "      background: transparent;\n" +
+  "      border: 1px solid var(--crow-border-subtle);\n" +
+  "      color: var(--crow-text-dim);\n" +
+  "      border-radius: 4px;\n" +
+  "      cursor: pointer;\n" +
+  "      font: 11px/1 var(--crow-font-mono);\n" +
+  "      padding: 3px 8px;\n" +
+  "      margin-right: 8px;\n" +
+  "      transition: all 0.2s ease;\n" +
+  "    }\n" +
+  "    .local-runtime-diagnostics-copy:hover {\n" +
+  "      border-color: var(--crow-border-focus);\n" +
+  "      color: var(--crow-product-signal);\n" +
+  "    }\n" +
   "    .local-runtime-diagnostics-log {\n" +
   "      overflow-y: auto;\n" +
   "      padding: 8px 12px;\n" +
@@ -5363,6 +5378,26 @@ replaceRequired(
   "      if (!panel) return;\n" +
   "      panel.classList.toggle('open');\n" +
   '    }\n\n' +
+  '    function copyRuntimeDiagnostics() {\n' +
+  "      const panel = document.getElementById('localRuntimeDiagnosticsLog');\n" +
+  "      if (!panel) return;\n" +
+  "      const lines = [];\n" +
+  "      panel.querySelectorAll('.local-runtime-diagnostics-entry').forEach(entry => {\n" +
+  "        const time = entry.querySelector('.local-runtime-diagnostics-time')?.textContent || '';\n" +
+  "        const msg = entry.querySelector('.local-runtime-diagnostics-msg')?.textContent || '';\n" +
+  "        lines.push((time + ' ' + msg).trim());\n" +
+  "      });\n" +
+  "      const text = lines.join('\\n') || 'No local runtime events yet.';\n" +
+  "      if (navigator.clipboard && navigator.clipboard.writeText) {\n" +
+  "        navigator.clipboard.writeText(text).then(() => {\n" +
+  "          logRuntimeDiagnostic('Diagnostics log copied to clipboard', 'success');\n" +
+  "        }).catch(() => {\n" +
+  "          logRuntimeDiagnostic('Failed to copy diagnostics log', 'error');\n" +
+  "        });\n" +
+  "      } else {\n" +
+  "        logRuntimeDiagnostic('Clipboard API unavailable in this browser', 'error');\n" +
+  "      }\n" +
+  '    }\n\n' +
   '    function updateModeSwitcherUI() {',
 );
 
@@ -5387,10 +5422,22 @@ replaceRequired(
 );
 
 
+
+replaceRequired(
+  '        const discovery = await discoverLocalChatModels(runtime, baseUrl, headers);\n',
+  '        if (typeof logRuntimeDiagnostic === \'function\') logRuntimeDiagnostic(\'Discovering models on \' + (LOCAL_RUNTIME_PRESETS[runtime]?.label || runtime) + \'…\', \'info\');\n' +
+  '        const discovery = await discoverLocalChatModels(runtime, baseUrl, headers);\n',
+);
+
+replaceRequired(
+  '      const diagnosis = diagnoseAllModelsFailed(allResults);\n',
+  '      const diagnosis = diagnoseAllModelsFailed(allResults);\n' +
+  "      if (typeof logRuntimeDiagnostic === 'function') logRuntimeDiagnostic('ULTRAPLINIAN: ' + diagnosis, 'error');\n",
+);
 replaceRequired(
   '</body>',
   '<div class="local-runtime-diagnostics" id="localRuntimeDiagnostics" aria-live="polite">\n' +
-  '<div class="local-runtime-diagnostics-header"><span class="local-runtime-diagnostics-title">Local Runtime Diagnostics</span><button class="local-runtime-diagnostics-close" onclick="toggleRuntimeDiagnostics()">×</button></div>\n' +
+  '<div class="local-runtime-diagnostics-header"><span class="local-runtime-diagnostics-title">Local Runtime Diagnostics</span><div><button class="local-runtime-diagnostics-copy" onclick="copyRuntimeDiagnostics()" title="Copy diagnostics log">Copy log</button><button class="local-runtime-diagnostics-close" onclick="toggleRuntimeDiagnostics()">×</button></div></div>\n' +
   '<div class="local-runtime-diagnostics-log" id="localRuntimeDiagnosticsLog"></div>\n' +
   '</div>\n' +
   '</body>',
