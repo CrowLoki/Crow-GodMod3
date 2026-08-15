@@ -3378,3 +3378,45 @@ globalThis.updateModeSwitcherUIForTest = updateModeSwitcherUI;`,
   assert.equal(checks.ultraplinian, false, "ultraplinian checkbox should match state");
   assert.equal(checks.plinyMode, true, "plinyMode checkbox should match state");
 });
+
+test("clearRuntimeDiagnostics empties the diagnostics log", async () => {
+  const html = await readFile(publicEntry, "utf8");
+
+  assert.match(
+    html,
+    /function clearRuntimeDiagnostics\(/,
+    "Must expose a clearRuntimeDiagnostics helper",
+  );
+
+  const clearStart = html.indexOf("function clearRuntimeDiagnostics");
+  const clearEnd = html.indexOf("\n\n    function updateModeSwitcherUI", clearStart);
+  assert.ok(clearStart > 0 && clearEnd > clearStart, "Missing clearRuntimeDiagnostics");
+
+  const cleared = [];
+  const logEntries = [];
+  const clearContext = vm.createContext({
+    document: {
+      getElementById(id) {
+        if (id !== "localRuntimeDiagnosticsLog") return null;
+        return {
+          replaceChildren() {
+            cleared.push("cleared");
+          },
+        };
+      },
+    },
+    logRuntimeDiagnostic(message, type) {
+      logEntries.push({ message, type });
+    },
+  });
+
+  vm.runInContext(
+    `${html.slice(clearStart, clearEnd)}\n\nglobalThis.clearRuntimeDiagnosticForTest = clearRuntimeDiagnostics;`,
+    clearContext,
+  );
+  clearContext.clearRuntimeDiagnosticForTest();
+  assert.equal(cleared.length, 1);
+  assert.equal(logEntries.length, 1);
+  assert.equal(logEntries[0].message, "Diagnostics log cleared");
+  assert.equal(logEntries[0].type, "info");
+});

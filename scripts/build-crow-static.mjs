@@ -5398,6 +5398,12 @@ replaceRequired(
   "        logRuntimeDiagnostic('Clipboard API unavailable in this browser', 'error');\n" +
   "      }\n" +
   '    }\n\n' +
+  '    function clearRuntimeDiagnostics() {\n' +
+  "      const panel = document.getElementById('localRuntimeDiagnosticsLog');\n" +
+  "      if (!panel) return;\n" +
+  "      panel.replaceChildren();\n" +
+  "      logRuntimeDiagnostic('Diagnostics log cleared', 'info');\n" +
+  '    }\n\n' +
   '    function updateModeSwitcherUI() {',
 );
 
@@ -5448,7 +5454,7 @@ replaceRequired(
 replaceRequired(
   '</body>',
   '<div class="local-runtime-diagnostics" id="localRuntimeDiagnostics" aria-live="polite">\n' +
-  '<div class="local-runtime-diagnostics-header"><span class="local-runtime-diagnostics-title">Local Runtime Diagnostics</span><div><button class="local-runtime-diagnostics-copy" onclick="copyRuntimeDiagnostics()" title="Copy diagnostics log">Copy log</button><button class="local-runtime-diagnostics-close" onclick="toggleRuntimeDiagnostics()">×</button></div></div>\n' +
+  '<div class="local-runtime-diagnostics-header"><span class="local-runtime-diagnostics-title">Local Runtime Diagnostics</span><div><button class="local-runtime-diagnostics-copy" onclick="copyRuntimeDiagnostics()" title="Copy diagnostics log">Copy log</button><button class="local-runtime-diagnostics-copy" onclick="clearRuntimeDiagnostics()" title="Clear diagnostics log">Clear</button><button class="local-runtime-diagnostics-close" onclick="toggleRuntimeDiagnostics()">×</button></div></div>\n' +
   '<div class="local-runtime-diagnostics-log" id="localRuntimeDiagnosticsLog"></div>\n' +
   '</div>\n' +
   '</body>',

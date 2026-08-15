@@ -14676,6 +14676,13 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
       }
     }
 
+    function clearRuntimeDiagnostics() {
+      const panel = document.getElementById('localRuntimeDiagnosticsLog');
+      if (!panel) return;
+      panel.replaceChildren();
+      logRuntimeDiagnostic('Diagnostics log cleared', 'info');
+    }
+
     function updateModeSwitcherUI() {
       const ultraCb = document.getElementById('ultraplinian');
       const plinyCb = document.getElementById('plinyMode');
@@ -19763,7 +19770,7 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
       );    })();
   </script>
 <div class="local-runtime-diagnostics" id="localRuntimeDiagnostics" aria-live="polite">
-<div class="local-runtime-diagnostics-header"><span class="local-runtime-diagnostics-title">Local Runtime Diagnostics</span><div><button class="local-runtime-diagnostics-copy" onclick="copyRuntimeDiagnostics()" title="Copy diagnostics log">Copy log</button><button class="local-runtime-diagnostics-close" onclick="toggleRuntimeDiagnostics()">×</button></div></div>
+<div class="local-runtime-diagnostics-header"><span class="local-runtime-diagnostics-title">Local Runtime Diagnostics</span><div><button class="local-runtime-diagnostics-copy" onclick="copyRuntimeDiagnostics()" title="Copy diagnostics log">Copy log</button><button class="local-runtime-diagnostics-copy" onclick="clearRuntimeDiagnostics()" title="Clear diagnostics log">Clear</button><button class="local-runtime-diagnostics-close" onclick="toggleRuntimeDiagnostics()">×</button></div></div>
 <div class="local-runtime-diagnostics-log" id="localRuntimeDiagnosticsLog"></div>
 </div>
 </body>
