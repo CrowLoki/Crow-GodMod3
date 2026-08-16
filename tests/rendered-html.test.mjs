@@ -116,7 +116,7 @@ test("ships images with dimensions, priority hints, and lazy-loading", async () 
 
   // Hero/LCP candidate gets fetchpriority and async decoding.
   assert.match(html, /<img[^>]*class="welcome-crow"[^>]*fetchpriority="high"[^>]*decoding="async"/);
-  assert.match(html, /<img[^>]*class="welcome-crow"[^>]*width="512"[^>]*height="512"/);
+  assert.match(html, /<img[^>]*class="welcome-crow"[^>]*width="341"[^>]*height="512"/);
 
   // Generated thumbnails are deferred.
   assert.match(html, /<img[^>]*id="imagePreviewThumb"[^>]*loading="lazy"[^>]*decoding="async"/);
@@ -3007,6 +3007,12 @@ test("ships only the Crow-GodMod3 runtime web assets", async () => {
     "fonts/bitfeather/woff2/CrowBitfeatherDisplay-Bold.woff2",
     "fonts/bitfeather/woff2/CrowBitfeatherMono-Regular.woff2",
     "fonts/bitfeather/woff2/CrowBitfeatherMono-Bold.woff2",
+    "fonts/crow-signal.css",
+    "fonts/woff2/CrowSignalDisplay-Regular.woff2",
+    "fonts/woff2/CrowSignalDisplay-Bold.woff2",
+    "fonts/woff2/CrowSignalMono-Regular.woff2",
+    "fonts/woff2/CrowSignalMono-Bold.woff2",
+    "assets/mascots/exports/glitch-ascendant-welcome-512h.png",
     "cursors/v0.5/src/32/normal.png",
     "cursors/v0.5/src/32/link.png",
     "cursors/v0.5/src/32/text.png",
@@ -3566,4 +3572,31 @@ test("discovery success logging never references block-scoped labels out of scop
   assert.ok(!logCall[0].includes("capabilityLabel"), "log line must not use capabilityLabel");
   assert.ok(!logCall[0].includes("skippedLabel"), "log line must not use skippedLabel");
   assert.match(logCall[0], /discovery\.source\.startsWith\('lmstudio-'\)/);
+});
+
+test("ships the Crow Signal identity layer: fonts, mascot, privacy pill, game, rain", async () => {
+  const html = await readFile(publicEntry, "utf8");
+
+  // Crow Signal font family is linked and its files ship.
+  assert.match(html, /href="\/crow-theme\/fonts\/crow-signal\.css"/);
+  assert.match(html, /--crow-font-mono: "Crow Bitfeather Mono", "Crow Signal Mono", monospace/);
+
+  // The welcome hero shows the Glitch Ascendant master it names.
+  assert.match(html, /class="welcome-signal">CROW SYSTEM \/\/ GLITCH ASCENDANT</);
+  assert.match(html, /class="welcome-crow" src="\/crow-theme\/assets\/mascots\/exports\/glitch-ascendant-welcome-512h\.png"/);
+
+  // Telemetry-off is visible in the header, not buried in settings.
+  assert.match(html, /class="no-signal-pill"/);
+  assert.match(html, /NO-SIGNAL · TELEMETRY OFF/);
+
+  // The upstream waiting game finally has a trigger at race start.
+  const gameIdx = html.indexOf("showWaitingGame();");
+  const raceIdx = html.indexOf("await ultraplinian(messages, content");
+  assert.ok(gameIdx > 0 && raceIdx > 0 && gameIdx < raceIdx,
+    "showWaitingGame must fire before the ULTRAPLINIAN race starts");
+
+  // The matrix rain carries the CrowClaw palette, not stock green.
+  assert.match(html, /ctx\.fillStyle = '#7c5cff'/);
+  assert.match(html, /\(i % 4 === 0\) \? '#45e7ff' : '#7c5cff'/);
+  assert.doesNotMatch(html, /#00ff41/);
 });

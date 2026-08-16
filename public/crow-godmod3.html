@@ -38,6 +38,7 @@
   <link rel="dns-prefetch" href="https://openrouter.ai"><link rel="preconnect" href="https://openrouter.ai" crossorigin>
   <link href="/crow-theme/fonts/bitfeather/crow-bitfeather.css" rel="stylesheet">
   <link href="/crow-theme/tokens/crow-theme.css" rel="stylesheet">
+  <link href="/crow-theme/fonts/crow-signal.css" rel="stylesheet">
   <style>
     :root {
       --bg: var(--crow-bg-canvas, #03040a);
@@ -3312,6 +3313,13 @@
   
 
     /* Crow Theme v0.1 — Crow-GodMod3 product binding */
+    /* Crow Signal ships the display face; Bitfeather keeps small UI/code text.
+       The tokens file defines these vars on :root AND [data-crow-theme] (the
+       attribute lives on <body>), so this override must cover both. */
+    :root, [data-crow-theme] {
+      --crow-font-display: "Crow Signal Display", "Crow Bitfeather Display", sans-serif;
+      --crow-font-mono: "Crow Bitfeather Mono", "Crow Signal Mono", monospace;
+    }
     ::selection {
       color: var(--crow-text-strong);
       background: var(--crow-selection-bg);
@@ -3454,9 +3462,9 @@
     }
 
     .welcome-crow {
-      width: 76px;
-      height: 76px;
-      object-fit: cover;
+      width: auto;
+      height: 148px;
+      object-fit: contain;
       border: 1px solid rgb(115 76 255 / 42%);
       border-radius: 20px;
       box-shadow:
@@ -3626,8 +3634,8 @@
       }
 
       .welcome-crow {
-        width: 62px;
-        height: 62px;
+        width: auto;
+        height: 108px;
         border-radius: 16px;
       }
 
@@ -3988,6 +3996,30 @@
       text-decoration: underline;
     }
 
+    /* NO-SIGNAL privacy pill — telemetry-off as a visible brand feature */
+    .no-signal-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--crow-state-success);
+      color: var(--crow-state-success);
+      font: 600 10px/1 var(--crow-font-mono);
+      letter-spacing: 1.2px;
+      cursor: help;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .no-signal-pill .no-signal-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 8px currentColor;
+    }
+
   </style>
 </head>
 <body data-crow-theme data-crow-product="crow-godmod3">
@@ -4112,6 +4144,7 @@
           <button class="local-runtime-status" id="localRuntimeStatusBadge" onclick="openSettings()" title="Local runtime status · click to open settings" aria-live="polite">
             <span class="status-dot"></span><span class="status-text">Local · offline</span>
           </button>
+          <span class="no-signal-pill" title="Application telemetry is disabled in this Crow-GodMod3 build: no analytics, no beacons, no tracking. Provider requests go only to the endpoints you configure."><span class="no-signal-dot"></span>NO-SIGNAL · TELEMETRY OFF</span>
           <button class="local-runtime-diagnostics-btn" id="localRuntimeDiagnosticsToggle" onclick="toggleRuntimeDiagnostics()" title="Local runtime diagnostics" aria-label="Toggle local runtime diagnostics">🧠</button>
 <span class="header-separator">|</span>
           <!-- Prompts tried counter -->
@@ -4130,7 +4163,7 @@
         <div class="welcome" id="welcome">
           <div class="welcome-signal">CROW SYSTEM // GLITCH ASCENDANT</div>
           <div class="welcome-icon">
-            <img class="welcome-crow" src="/crow-theme/assets/icons/avatars/crow-signal-avatar-512.png" alt="Crow Signal" width="512" height="512" fetchpriority="high" decoding="async">
+            <img class="welcome-crow" src="/crow-theme/assets/mascots/exports/glitch-ascendant-welcome-512h.png" alt="Glitch Ascendant — the Crow System mascot" width="341" height="512" fetchpriority="high" decoding="async">
           </div>
           <h2>Crow-GodMod3</h2>
           <p class="welcome-copy">Open-source, privacy-respecting multi-model AI with the CrowClaw visual identity. <span>{CROW-GODMOD3:ENABLED}</span></p>
@@ -17348,6 +17381,7 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
           }
         };
 
+        if (typeof showWaitingGame === 'function') showWaitingGame();
         try {
           const result = await ultraplinian(messages, content, handleLeaderChange, executionSelection);
           _log('[DEBUG] ultraplinian() returned:', result);
@@ -20380,6 +20414,7 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
           ctx.font = fontSize + 'px monospace';
           for (let i = 0; i < drops.length; i++) {
             const text = chars[Math.floor(Math.random() * chars.length)];
+            ctx.fillStyle = (i % 4 === 0) ? '#45e7ff' : '#7c5cff';
             ctx.fillText(text, i * fontSize, drops[i] * fontSize);
             if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
             drops[i]++;

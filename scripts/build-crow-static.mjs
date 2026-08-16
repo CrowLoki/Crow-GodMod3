@@ -40,6 +40,12 @@ const runtimeThemeFiles = [
   "fonts/bitfeather/woff2/CrowBitfeatherDisplay-Bold.woff2",
   "fonts/bitfeather/woff2/CrowBitfeatherMono-Regular.woff2",
   "fonts/bitfeather/woff2/CrowBitfeatherMono-Bold.woff2",
+  "fonts/crow-signal.css",
+  "fonts/woff2/CrowSignalDisplay-Regular.woff2",
+  "fonts/woff2/CrowSignalDisplay-Bold.woff2",
+  "fonts/woff2/CrowSignalMono-Regular.woff2",
+  "fonts/woff2/CrowSignalMono-Bold.woff2",
+  "assets/mascots/exports/glitch-ascendant-welcome-512h.png",
   "cursors/v0.5/src/32/normal.png",
   "cursors/v0.5/src/32/link.png",
   "cursors/v0.5/src/32/text.png",
@@ -4464,7 +4470,8 @@ replaceRequired(
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">`,
   `  <link rel="dns-prefetch" href="https://openrouter.ai"><link rel="preconnect" href="https://openrouter.ai" crossorigin>
   <link href="/crow-theme/fonts/bitfeather/crow-bitfeather.css" rel="stylesheet">
-  <link href="/crow-theme/tokens/crow-theme.css" rel="stylesheet">`,
+  <link href="/crow-theme/tokens/crow-theme.css" rel="stylesheet">
+  <link href="/crow-theme/fonts/crow-signal.css" rel="stylesheet">`,
 );
 replaceRequired(
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com;",
@@ -4546,7 +4553,7 @@ replaceRequired(
           <p>Open-source, privacy-respecting, liberated AI chat. {GODMODE:ENABLED}</p>`,
   `          <div class="welcome-signal">CROW SYSTEM // GLITCH ASCENDANT</div>
           <div class="welcome-icon">
-            <img class="welcome-crow" src="/crow-theme/assets/icons/avatars/crow-signal-avatar-512.png" alt="Crow Signal" width="512" height="512" fetchpriority="high" decoding="async">
+            <img class="welcome-crow" src="/crow-theme/assets/mascots/exports/glitch-ascendant-welcome-512h.png" alt="Glitch Ascendant — the Crow System mascot" width="341" height="512" fetchpriority="high" decoding="async">
           </div>
           <h2>Crow-GodMod3</h2>
           <p class="welcome-copy">Open-source, privacy-respecting multi-model AI with the CrowClaw visual identity. <span>{CROW-GODMOD3:ENABLED}</span></p>`,
@@ -4793,6 +4800,13 @@ replaceRegex(
 const crowThemeStyles = `
 
     /* Crow Theme v0.1 — Crow-GodMod3 product binding */
+    /* Crow Signal ships the display face; Bitfeather keeps small UI/code text.
+       The tokens file defines these vars on :root AND [data-crow-theme] (the
+       attribute lives on <body>), so this override must cover both. */
+    :root, [data-crow-theme] {
+      --crow-font-display: "Crow Signal Display", "Crow Bitfeather Display", sans-serif;
+      --crow-font-mono: "Crow Bitfeather Mono", "Crow Signal Mono", monospace;
+    }
     ::selection {
       color: var(--crow-text-strong);
       background: var(--crow-selection-bg);
@@ -4935,9 +4949,9 @@ const crowThemeStyles = `
     }
 
     .welcome-crow {
-      width: 76px;
-      height: 76px;
-      object-fit: cover;
+      width: auto;
+      height: 148px;
+      object-fit: contain;
       border: 1px solid rgb(115 76 255 / 42%);
       border-radius: 20px;
       box-shadow:
@@ -5107,8 +5121,8 @@ const crowThemeStyles = `
       }
 
       .welcome-crow {
-        width: 62px;
-        height: 62px;
+        width: auto;
+        height: 108px;
         border-radius: 16px;
       }
 
@@ -5395,6 +5409,7 @@ replaceRequired(
   '          <button class="local-runtime-status" id="localRuntimeStatusBadge" onclick="openSettings()" title="Local runtime status · click to open settings" aria-live="polite">\n' +
   '            <span class="status-dot"></span><span class="status-text">Local · offline</span>\n' +
   '          </button>\n' +
+  '          <span class="no-signal-pill" title="Application telemetry is disabled in this Crow-GodMod3 build: no analytics, no beacons, no tracking. Provider requests go only to the endpoints you configure."><span class="no-signal-dot"></span>NO-SIGNAL · TELEMETRY OFF</span>\n' +
   '          <span class="header-separator">|</span>\n' +
   '          <!-- Prompts tried counter -->',
 );
@@ -5617,6 +5632,24 @@ replaceRequired(
 replaceRequired(
   "img-src 'self' data: blob:;",
   "img-src 'self' data: blob: https:; media-src 'self' blob: https:;",
+);
+
+// Show the waiting game while an ULTRAPLINIAN race runs. The game was fully
+// implemented upstream (snake/2048/pong, settings dropdown, hidePongGame at
+// race end) but nothing ever called showWaitingGame().
+replaceRequired(
+  '        try {\n          const result = await ultraplinian(messages, content',
+  "        if (typeof showWaitingGame === 'function') showWaitingGame();\n" +
+  '        try {\n          const result = await ultraplinian(messages, content',
+);
+
+// Crow signal rain: the palette engine already recolours the stock Matrix
+// green (#00ff41) to Crow violet (#7c5cff); add a cyan glint every fourth
+// column for the two-tone CrowClaw read.
+replaceRequired(
+  '            ctx.fillText(text, i * fontSize, drops[i] * fontSize);',
+  "            ctx.fillStyle = (i % 4 === 0) ? '#45e7ff' : '#7c5cff';\n" +
+  '            ctx.fillText(text, i * fontSize, drops[i] * fontSize);',
 );
 
 await mkdir(dirname(outputPath), { recursive: true });

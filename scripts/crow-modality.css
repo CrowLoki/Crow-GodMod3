@@ -186,3 +186,27 @@
     .generated-media-caption a:hover {
       text-decoration: underline;
     }
+
+    /* NO-SIGNAL privacy pill — telemetry-off as a visible brand feature */
+    .no-signal-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--crow-state-success);
+      color: var(--crow-state-success);
+      font: 600 10px/1 var(--crow-font-mono);
+      letter-spacing: 1.2px;
+      cursor: help;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .no-signal-pill .no-signal-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 8px currentColor;
+    }
