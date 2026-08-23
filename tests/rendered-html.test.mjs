@@ -108,6 +108,21 @@ test("hardens the generated CSP and removes unused external preconnects", async 
   // Venice remains an allowed provider for users who configure it.
   assert.match(html, /https:\/\/api\.venice\.ai/);
 });
+test("ships images with dimensions, priority hints, and lazy-loading", async () => {
+  const html = await readFile(publicEntry, "utf8");
+
+  // Above-the-fold logo gets explicit size so the browser reserves space.
+  assert.match(html, /<img[^>]*class="brand-mark"[^>]*width="256"[^>]*height="256"/);
+
+  // Hero/LCP candidate gets fetchpriority and async decoding.
+  assert.match(html, /<img[^>]*class="welcome-crow"[^>]*fetchpriority="high"[^>]*decoding="async"/);
+  assert.match(html, /<img[^>]*class="welcome-crow"[^>]*width="341"[^>]*height="512"/);
+
+  // Generated thumbnails are deferred.
+  assert.match(html, /<img[^>]*id="imagePreviewThumb"[^>]*loading="lazy"[^>]*decoding="async"/);
+  assert.match(html, /<img[^>]*class="message-image-thumb"[^>]*loading="lazy"[^>]*decoding="async"/);
+});
+
 
 test("contains no orange, amber, yellow, or gold visual colour tokens", async () => {
   const html = await readFile(publicEntry, "utf8");
@@ -211,6 +226,7 @@ test("migrates saved paid-model selections to valid free chat models", async () 
 
 test("ships first-class loopback presets for every supported local runtime", async () => {
   assert.deepEqual(localRuntimeIds, [
+    "crowfree",
     "ollama",
     "lmstudio",
     "docker",
@@ -2991,6 +3007,12 @@ test("ships only the Crow-GodMod3 runtime web assets", async () => {
     "fonts/bitfeather/woff2/CrowBitfeatherDisplay-Bold.woff2",
     "fonts/bitfeather/woff2/CrowBitfeatherMono-Regular.woff2",
     "fonts/bitfeather/woff2/CrowBitfeatherMono-Bold.woff2",
+    "fonts/crow-signal.css",
+    "fonts/woff2/CrowSignalDisplay-Regular.woff2",
+    "fonts/woff2/CrowSignalDisplay-Bold.woff2",
+    "fonts/woff2/CrowSignalMono-Regular.woff2",
+    "fonts/woff2/CrowSignalMono-Bold.woff2",
+    "assets/mascots/exports/glitch-ascendant-welcome-512h.png",
     "cursors/v0.5/src/32/normal.png",
     "cursors/v0.5/src/32/link.png",
     "cursors/v0.5/src/32/text.png",
@@ -3436,4 +3458,145 @@ test("clearRuntimeDiagnostics empties the diagnostics log", async () => {
   assert.equal(logEntries.length, 1);
   assert.equal(logEntries[0].message, "Diagnostics log cleared");
   assert.equal(logEntries[0].type, "info");
+});
+
+test("exposes the Crow Free AI Gateway runtime preset", async () => {
+  assert.ok(localRuntimeIds.includes("crowfree"));
+  const preset = localRuntimePresets.crowfree;
+  assert.equal(preset.label, "Crow Free AI Gateway");
+  assert.equal(preset.baseUrl, "http://127.0.0.1:8766/v1");
+
+  const html = await readFile(publicEntry, "utf8");
+  assert.match(html, /"crowfree":\{"label":"Crow Free AI Gateway"/);
+  assert.match(html, /http:\/\/127\.0\.0\.1:8766\/v1/);
+  assert.match(html, /<option value="crowfree">Crow Free AI Gateway<\/option>/);
+});
+
+test("ships the modality switcher with text, image, audio, and video in/out", async () => {
+  const html = await readFile(publicEntry, "utf8");
+
+  // Header switcher markup next to the strategy mode switcher.
+  assert.match(html, /id="modalitySwitcher"/);
+  assert.match(html, /id="modalitySwitcherBtn"/);
+  assert.match(html, /id="modalityDropdown"/);
+
+  // All six modality definitions with their directions.
+  for (const id of ["text", "image-out", "image-in", "audio-out", "audio-in", "video"]) {
+    assert.ok(html.includes(`id: '${id}'`), `missing modality ${id}`);
+  }
+
+  // Core layer functions and routing endpoints.
+  assert.match(html, /function toggleModalityDropdown\(\)/);
+  assert.match(html, /function selectCrowModality\(id\)/);
+  assert.match(html, /function crowModalityRouteSend\(content, attachedImage\)/);
+  assert.match(html, /function renderCrowGeneratedMedia\(msg\)/);
+  assert.match(html, /\/images\/generations/);
+  assert.match(html, /\/audio\/speech/);
+  assert.match(html, /\/audio\/transcriptions/);
+
+  // sendMessage routes non-text modalities before the chat pipeline.
+  const guardIdx = html.indexOf("if ((!content && !attachedImage) || isStreaming) return;");
+  const hookIdx = html.indexOf("await crowModalityRouteSend(content, attachedImage)) return;");
+  assert.ok(guardIdx > 0, "missing sendMessage empty-input guard");
+  assert.ok(hookIdx > guardIdx, "modality hook must run right after the guard");
+});
+
+test("lets generated media load over HTTPS while keeping connect-src tight", async () => {
+  const html = await readFile(publicEntry, "utf8");
+  assert.match(html, /img-src 'self' data: blob: https:;/);
+  assert.match(html, /media-src 'self' blob: https:;/);
+  // Script-driven requests remain limited to loopback runtimes and the two
+  // configured cloud providers; no blanket https: connect-src.
+  assert.doesNotMatch(html, /connect-src[^;]* https:;/);
+});
+
+test("keeps non-chat capability models out of chat model inventories", async () => {
+  const html = await readFile(publicEntry, "utf8");
+  const setStart = html.indexOf("const nonChatEvidence = new Set([");
+  assert.ok(setStart > 0, "missing nonChatEvidence set");
+  const setEnd = html.indexOf("]);", setStart);
+  const setBody = html.slice(setStart, setEnd);
+  for (const token of ["'image'", "'tts'", "'asr'", "'audio'", "'video'"]) {
+    assert.ok(setBody.includes(token), `nonChatEvidence missing ${token}`);
+  }
+  // Capability tokens are recorded per runtime for modality routing.
+  assert.match(html, /function recordLocalModelCapabilities\(runtime, descriptors\)/);
+  assert.match(html, /function findLocalModelWithCapability\(runtime, capability\)/);
+});
+
+test("renderCrowGeneratedMedia renders safe media and rejects unsafe URLs", async () => {
+  const html = await readFile(publicEntry, "utf8");
+  const fnStart = html.indexOf("function renderCrowGeneratedMedia");
+  const fnEnd = html.indexOf("\n\n    if (typeof document !== 'undefined'", fnStart);
+  assert.ok(fnStart > 0 && fnEnd > fnStart, "missing renderCrowGeneratedMedia");
+
+  const mediaContext = vm.createContext({
+    escapeAttr(value) {
+      return String(value).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+    },
+  });
+  vm.runInContext(
+    `${html.slice(fnStart, fnEnd)}\n\nglobalThis.renderForTest = renderCrowGeneratedMedia;`,
+    mediaContext,
+  );
+
+  const withImage = mediaContext.renderForTest({
+    role: "assistant",
+    generatedImage: { url: "https://example.com/x.jpg", prompt: "crow" },
+  });
+  assert.match(withImage, /<img class="generated-image"/);
+  assert.match(withImage, /https:\/\/example\.com\/x\.jpg/);
+
+  const withAudio = mediaContext.renderForTest({
+    role: "assistant",
+    generatedAudio: { url: "https://example.com/x.mp3", text: "hello" },
+  });
+  assert.match(withAudio, /<audio class="generated-audio"/);
+
+  const unsafe = mediaContext.renderForTest({
+    role: "assistant",
+    generatedImage: { url: "javascript:alert(1)", prompt: "x" },
+  });
+  assert.equal(unsafe, "");
+});
+
+test("discovery success logging never references block-scoped labels out of scope", async () => {
+  const html = await readFile(publicEntry, "utf8");
+  // Regression: the diagnostics log line used to interpolate capabilityLabel
+  // and skippedLabel outside the if (status) block where they are declared,
+  // which turned every successful Test & Discover into a ReferenceError.
+  const logCall = html.match(
+    /if \(typeof logRuntimeDiagnostic === 'function'\) logRuntimeDiagnostic\(`\$\{label\}: \$\{models\.length\} [\s\S]+?, 'success'\);/,
+  );
+  assert.ok(logCall, "missing discovery success log line");
+  assert.ok(!logCall[0].includes("capabilityLabel"), "log line must not use capabilityLabel");
+  assert.ok(!logCall[0].includes("skippedLabel"), "log line must not use skippedLabel");
+  assert.match(logCall[0], /discovery\.source\.startsWith\('lmstudio-'\)/);
+});
+
+test("ships the Crow Signal identity layer: fonts, mascot, privacy pill, game, rain", async () => {
+  const html = await readFile(publicEntry, "utf8");
+
+  // Crow Signal font family is linked and its files ship.
+  assert.match(html, /href="\/crow-theme\/fonts\/crow-signal\.css"/);
+  assert.match(html, /--crow-font-mono: "Crow Bitfeather Mono", "Crow Signal Mono", monospace/);
+
+  // The welcome hero shows the Glitch Ascendant master it names.
+  assert.match(html, /class="welcome-signal">CROW SYSTEM \/\/ GLITCH ASCENDANT</);
+  assert.match(html, /class="welcome-crow" src="\/crow-theme\/assets\/mascots\/exports\/glitch-ascendant-welcome-512h\.png"/);
+
+  // Telemetry-off is visible in the header, not buried in settings.
+  assert.match(html, /class="no-signal-pill"/);
+  assert.match(html, /NO-SIGNAL · TELEMETRY OFF/);
+
+  // The upstream waiting game finally has a trigger at race start.
+  const gameIdx = html.indexOf("showWaitingGame();");
+  const raceIdx = html.indexOf("await ultraplinian(messages, content");
+  assert.ok(gameIdx > 0 && raceIdx > 0 && gameIdx < raceIdx,
+    "showWaitingGame must fire before the ULTRAPLINIAN race starts");
+
+  // The matrix rain carries the CrowClaw palette, not stock green.
+  assert.match(html, /ctx\.fillStyle = '#7c5cff'/);
+  assert.match(html, /\(i % 4 === 0\) \? '#45e7ff' : '#7c5cff'/);
+  assert.doesNotMatch(html, /#00ff41/);
 });

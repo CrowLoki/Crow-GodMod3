@@ -30,14 +30,15 @@
   <meta name="twitter:image" content="https://crow-godmod3.vercel.app/crow-theme/assets/product-variants/exports/crow-godmod3-1200x630.png">
   <link rel="canonical" href="https://crow-godmod3.vercel.app/">
   <link rel="manifest" href="/manifest.webmanifest">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self' https://openrouter.ai https://*.openrouter.ai https://api.venice.ai http://localhost:* https://localhost:* http://127.0.0.1:* https://127.0.0.1:*; img-src 'self' data: blob:;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self' https://openrouter.ai https://*.openrouter.ai https://api.venice.ai http://localhost:* https://localhost:* http://127.0.0.1:* https://127.0.0.1:*; img-src 'self' data: blob: https:; media-src 'self' blob: https:;">
   <title>Crow-GodMod3</title>
   <link rel="icon" href="/crow-theme/assets/icons/favicon.ico" sizes="any">
   <link rel="icon" type="image/png" href="/crow-theme/assets/icons/png/crow-signal-32.png" sizes="32x32">
   <link rel="apple-touch-icon" href="/crow-theme/assets/icons/png/crow-signal-180.png">
-  <link rel="preconnect" href="https://openrouter.ai" crossorigin>
+  <link rel="dns-prefetch" href="https://openrouter.ai"><link rel="preconnect" href="https://openrouter.ai" crossorigin>
   <link href="/crow-theme/fonts/bitfeather/crow-bitfeather.css" rel="stylesheet">
   <link href="/crow-theme/tokens/crow-theme.css" rel="stylesheet">
+  <link href="/crow-theme/fonts/crow-signal.css" rel="stylesheet">
   <style>
     :root {
       --bg: var(--crow-bg-canvas, #03040a);
@@ -3312,6 +3313,13 @@
   
 
     /* Crow Theme v0.1 — Crow-GodMod3 product binding */
+    /* Crow Signal ships the display face; Bitfeather keeps small UI/code text.
+       The tokens file defines these vars on :root AND [data-crow-theme] (the
+       attribute lives on <body>), so this override must cover both. */
+    :root, [data-crow-theme] {
+      --crow-font-display: "Crow Signal Display", "Crow Bitfeather Display", sans-serif;
+      --crow-font-mono: "Crow Bitfeather Mono", "Crow Signal Mono", monospace;
+    }
     ::selection {
       color: var(--crow-text-strong);
       background: var(--crow-selection-bg);
@@ -3454,9 +3462,9 @@
     }
 
     .welcome-crow {
-      width: 76px;
-      height: 76px;
-      object-fit: cover;
+      width: auto;
+      height: 148px;
+      object-fit: contain;
       border: 1px solid rgb(115 76 255 / 42%);
       border-radius: 20px;
       box-shadow:
@@ -3626,8 +3634,8 @@
       }
 
       .welcome-crow {
-        width: 62px;
-        height: 62px;
+        width: auto;
+        height: 108px;
         border-radius: 16px;
       }
 
@@ -3799,6 +3807,219 @@
       }
     }
 
+    /* Crow modality switcher (text / image / audio / video · in/out) */
+    .modality-switcher {
+      position: relative;
+    }
+
+    .modality-switcher-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-weight: bold;
+      color: var(--text);
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.04);
+      font-family: inherit;
+      font-size: 12px;
+      letter-spacing: 1px;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .modality-switcher-btn:hover {
+      border-color: var(--cyan);
+      box-shadow: 0 0 12px rgba(57, 217, 255, 0.25);
+    }
+
+    .modality-switcher-btn.non-text {
+      border-color: var(--cyan);
+      color: var(--cyan);
+      box-shadow: 0 0 14px rgba(57, 217, 255, 0.3);
+    }
+
+    .modality-switcher-btn.recording {
+      border-color: var(--danger);
+      color: var(--danger);
+      animation: crow-recording-pulse 1.1s ease-in-out infinite;
+    }
+
+    @keyframes crow-recording-pulse {
+      0%, 100% { box-shadow: 0 0 6px rgba(255, 45, 120, 0.35); }
+      50% { box-shadow: 0 0 18px rgba(255, 45, 120, 0.75); }
+    }
+
+    .modality-dir {
+      font-size: 9px;
+      letter-spacing: 0.5px;
+      padding: 2px 5px;
+      border-radius: 4px;
+      border: 1px solid currentColor;
+      opacity: 0.85;
+    }
+
+    .modality-dropdown {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      min-width: 300px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+      z-index: 500;
+      overflow: hidden;
+    }
+
+    .modality-switcher.open .modality-dropdown {
+      display: block;
+    }
+
+    .modality-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+
+    .modality-option:hover {
+      background: rgba(57, 217, 255, 0.08);
+    }
+
+    .modality-option.active {
+      background: rgba(57, 217, 255, 0.12);
+    }
+
+    .modality-option.unavailable {
+      opacity: 0.45;
+    }
+
+    .modality-option-icon {
+      width: 22px;
+      text-align: center;
+      color: var(--cyan);
+      flex-shrink: 0;
+    }
+
+    .modality-option-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .modality-option-name {
+      font-size: 12px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .modality-dir-badge {
+      font-size: 9px;
+      font-weight: normal;
+      padding: 1px 5px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      letter-spacing: 0.5px;
+    }
+
+    .modality-option.active .modality-dir-badge {
+      border-color: var(--cyan);
+      color: var(--cyan);
+    }
+
+    .modality-option-desc {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 2px;
+    }
+
+    .modality-option-route {
+      font-size: 10px;
+      color: var(--cyan);
+      margin-top: 2px;
+      font-family: 'JetBrains Mono', monospace;
+      opacity: 0.85;
+      word-break: break-all;
+    }
+
+    .modality-option-check {
+      color: var(--cyan);
+      opacity: 0;
+      flex-shrink: 0;
+    }
+
+    .modality-option.active .modality-option-check {
+      opacity: 1;
+    }
+
+    /* Generated media inside assistant messages */
+    .generated-media {
+      margin-bottom: 8px;
+    }
+
+    .generated-image {
+      max-width: 340px;
+      max-height: 340px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      display: block;
+    }
+
+    .generated-audio {
+      width: 320px;
+      max-width: 100%;
+      display: block;
+    }
+
+    .generated-media-caption {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 4px;
+      word-break: break-all;
+    }
+
+    .generated-media-caption a {
+      color: var(--cyan);
+      text-decoration: none;
+    }
+
+    .generated-media-caption a:hover {
+      text-decoration: underline;
+    }
+
+    /* NO-SIGNAL privacy pill — telemetry-off as a visible brand feature */
+    .no-signal-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--crow-state-success);
+      color: var(--crow-state-success);
+      font: 600 10px/1 var(--crow-font-mono);
+      letter-spacing: 1.2px;
+      cursor: help;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .no-signal-pill .no-signal-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 8px currentColor;
+    }
+
   </style>
 </head>
 <body data-crow-theme data-crow-product="crow-godmod3">
@@ -3810,7 +4031,7 @@
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div class="logo">
-          <img class="brand-mark" src="/crow-theme/assets/icons/app/crow-signal-app-rounded-256.png" alt="" aria-hidden="true">
+          <img class="brand-mark" src="/crow-theme/assets/icons/app/crow-signal-app-rounded-256.png" alt="" aria-hidden="true" width="256" height="256" decoding="async">
           <span class="logo-text">Crow-GodMod3</span>
         </div>
         <button class="new-chat-btn" onclick="newChat()">
@@ -3873,6 +4094,16 @@
               </div>
             </div>
           </div>
+          <!-- Modality Switcher (Crow) -->
+          <div class="modality-switcher" id="modalitySwitcher">
+            <button class="modality-switcher-btn" id="modalitySwitcherBtn" onclick="toggleModalityDropdown()" aria-label="Select input/output modality" title="Modality: text, image, audio — in/out">
+              <span class="modality-icon" id="modalityIcon">✎</span>
+              <span class="modality-text" id="modalityLabel">TEXT</span>
+              <span class="modality-dir" id="modalityDir">IN · OUT</span>
+              <span class="mode-chevron">▼</span>
+            </button>
+            <div class="modality-dropdown" id="modalityDropdown"></div>
+          </div>
           <select class="model-select" id="modelSelect" onchange="setCurrentModeModelSelection(this.value)" aria-label="Model for current mode" title="Pick the provider and model used by this mode" style="display: none;">
             <optgroup label="InclusionAI">
               <option value="inclusionai/ling-3.0-flash:free">Ling-3.0-flash (free)</option>
@@ -3913,6 +4144,7 @@
           <button class="local-runtime-status" id="localRuntimeStatusBadge" onclick="openSettings()" title="Local runtime status · click to open settings" aria-live="polite">
             <span class="status-dot"></span><span class="status-text">Local · offline</span>
           </button>
+          <span class="no-signal-pill" title="Application telemetry is disabled in this Crow-GodMod3 build: no analytics, no beacons, no tracking. Provider requests go only to the endpoints you configure."><span class="no-signal-dot"></span>NO-SIGNAL · TELEMETRY OFF</span>
           <button class="local-runtime-diagnostics-btn" id="localRuntimeDiagnosticsToggle" onclick="toggleRuntimeDiagnostics()" title="Local runtime diagnostics" aria-label="Toggle local runtime diagnostics">🧠</button>
 <span class="header-separator">|</span>
           <!-- Prompts tried counter -->
@@ -3931,7 +4163,7 @@
         <div class="welcome" id="welcome">
           <div class="welcome-signal">CROW SYSTEM // GLITCH ASCENDANT</div>
           <div class="welcome-icon">
-            <img class="welcome-crow" src="/crow-theme/assets/icons/avatars/crow-signal-avatar-512.png" alt="Crow Signal">
+            <img class="welcome-crow" src="/crow-theme/assets/mascots/exports/glitch-ascendant-welcome-512h.png" alt="Glitch Ascendant — the Crow System mascot" width="341" height="512" fetchpriority="high" decoding="async">
           </div>
           <h2>Crow-GodMod3</h2>
           <p class="welcome-copy">Open-source, privacy-respecting multi-model AI with the CrowClaw visual identity. <span>{CROW-GODMOD3:ENABLED}</span></p>
@@ -3951,7 +4183,7 @@
           </div>
           <!-- Image preview strip (shown when image attached) -->
           <div class="image-preview-strip" id="imagePreviewStrip">
-            <img class="image-preview-thumb" id="imagePreviewThumb" src="" alt="preview">
+            <img class="image-preview-thumb" id="imagePreviewThumb" loading="lazy" decoding="async" src="" alt="preview">
             <div class="image-preview-info">
               <div class="image-preview-name" id="imagePreviewName"></div>
               <div class="image-preview-size" id="imagePreviewSize"></div>
@@ -4572,6 +4804,7 @@
               </small>
               <label for="localRuntimeInput">Runtime preset</label>
               <select id="localRuntimeInput" onchange="applyLocalRuntimePreset(this.value)">
+                <option value="crowfree">Crow Free AI Gateway</option>
                 <option value="ollama">Ollama</option>
                 <option value="lmstudio">LM Studio</option>
                 <option value="docker">Docker Model Runner</option>
@@ -4776,8 +5009,8 @@
     }
 
     // First-class loopback runtime presets. URLs remain editable after selection.
-    const LOCAL_RUNTIME_PRESETS = Object.freeze({"ollama":{"label":"Ollama","baseUrl":"http://localhost:11434/v1","help":"Existing Ollama connection. Allow {origin} in OLLAMA_ORIGINS, restart Ollama, then discover its model IDs.","apiKeyPlaceholder":"Leave blank unless your Ollama gateway requires one"},"lmstudio":{"label":"LM Studio","baseUrl":"http://localhost:1234/v1","help":"Start the Developer server and enable CORS (or run lms server start --cors). Add a token only if LM Studio authentication is enabled.","apiKeyPlaceholder":"Optional LM Studio API token"},"docker":{"label":"Docker Model Runner","baseUrl":"http://localhost:12434/engines/v1","help":"Enable host-side TCP on port 12434 and allow {origin} in Docker Model Runner's CORS settings. Docker Model Runner does not require an API key.","apiKeyPlaceholder":"Not used by Docker Model Runner"},"vllm":{"label":"vLLM","baseUrl":"http://localhost:8000/v1","help":"Serve a chat-capable model on loopback. vLLM allows browser origins by default; enter the same key here if the server uses --api-key.","apiKeyPlaceholder":"Optional vLLM --api-key value"},"llamacpp":{"label":"llama.cpp","baseUrl":"http://localhost:8080/v1","help":"Start llama-server with a chat-capable GGUF model. Its OpenAI-compatible server uses port 8080 by default; --api-key is optional.","apiKeyPlaceholder":"Optional llama-server --api-key value"},"custom":{"label":"Custom OpenAI-compatible","baseUrl":"","help":"Enter a loopback URL exposing /models and /chat/completions in OpenAI format. Existing custom URLs are preserved.","apiKeyPlaceholder":"Optional bearer token for the custom server"}});
-    const LOCAL_RUNTIME_IDS = new Set(["ollama","lmstudio","docker","vllm","llamacpp","custom"]);
+    const LOCAL_RUNTIME_PRESETS = Object.freeze({"crowfree":{"label":"Crow Free AI Gateway","baseUrl":"http://127.0.0.1:8766/v1","help":"Crow's unified free-AI gateway: every local Ollama model plus the recovered anonymous Crow Print routes for chat, image, speech, and transcription. Start it from the Crow's Free AI Model Access project (scripts\\start_vendor_compat_gateway.cmd). No API key required.","apiKeyPlaceholder":"The Crow gateway does not use an API key"},"ollama":{"label":"Ollama","baseUrl":"http://localhost:11434/v1","help":"Existing Ollama connection. Allow {origin} in OLLAMA_ORIGINS, restart Ollama, then discover its model IDs.","apiKeyPlaceholder":"Leave blank unless your Ollama gateway requires one"},"lmstudio":{"label":"LM Studio","baseUrl":"http://localhost:1234/v1","help":"Start the Developer server and enable CORS (or run lms server start --cors). Add a token only if LM Studio authentication is enabled.","apiKeyPlaceholder":"Optional LM Studio API token"},"docker":{"label":"Docker Model Runner","baseUrl":"http://localhost:12434/engines/v1","help":"Enable host-side TCP on port 12434 and allow {origin} in Docker Model Runner's CORS settings. Docker Model Runner does not require an API key.","apiKeyPlaceholder":"Not used by Docker Model Runner"},"vllm":{"label":"vLLM","baseUrl":"http://localhost:8000/v1","help":"Serve a chat-capable model on loopback. vLLM allows browser origins by default; enter the same key here if the server uses --api-key.","apiKeyPlaceholder":"Optional vLLM --api-key value"},"llamacpp":{"label":"llama.cpp","baseUrl":"http://localhost:8080/v1","help":"Start llama-server with a chat-capable GGUF model. Its OpenAI-compatible server uses port 8080 by default; --api-key is optional.","apiKeyPlaceholder":"Optional llama-server --api-key value"},"custom":{"label":"Custom OpenAI-compatible","baseUrl":"","help":"Enter a loopback URL exposing /models and /chat/completions in OpenAI format. Existing custom URLs are preserved.","apiKeyPlaceholder":"Optional bearer token for the custom server"}});
+    const LOCAL_RUNTIME_IDS = new Set(["crowfree","ollama","lmstudio","docker","vllm","llamacpp","custom"]);
     // Browser storage is finite, but Crow-GodMod3 does not impose a model-count
     // ceiling. This one-megabyte text guard prevents malformed backup imports
     // from exhausting the page while still accommodating thousands of IDs.
@@ -4825,7 +5058,8 @@
         'embedding', 'embeddings', 'embed', 'rerank', 'reranking',
         'ranking', 'ranker', 'cross-encoder', 'cross_encoder',
         'text-to-image', 'image-generation', 'speech-to-text',
-        'text-to-speech', 'transcription',
+        'text-to-speech', 'transcription', 'image', 'images', 'tts', 'asr',
+        'audio', 'speech', 'voice', 'video', 'music', 'moderation',
       ]);
       if (tokens.some(token => nonChatEvidence.has(token))) return true;
 
@@ -4883,6 +5117,30 @@
       return url.toString();
     }
 
+    const _localModelCapsByRuntime = {};
+    function recordLocalModelCapabilities(runtime, descriptors) {
+      const map = {};
+      for (const descriptor of Array.isArray(descriptors) ? descriptors : []) {
+        const id = getLocalModelDescriptorId(descriptor);
+        if (!id) continue;
+        map[id] = getLocalModelCapabilityTokens(descriptor);
+      }
+      _localModelCapsByRuntime[runtime] = map;
+    }
+
+    function getLocalModelCapabilities(runtime, modelId) {
+      return _localModelCapsByRuntime[runtime]?.[modelId] || [];
+    }
+
+    function findLocalModelWithCapability(runtime, capability) {
+      const wanted = String(capability || '').toLowerCase();
+      const map = _localModelCapsByRuntime[runtime] || {};
+      for (const [id, tokens] of Object.entries(map)) {
+        if (tokens.includes(wanted)) return id;
+      }
+      return '';
+    }
+
     async function discoverLocalChatModels(runtime, baseUrl, headers, fetchImpl = fetch) {
       if (runtime === 'lmstudio') {
         for (const apiVersion of ['v1', 'v0']) {
@@ -4894,6 +5152,7 @@
             if (!nativeResponse.ok) continue;
             const nativePayload = await nativeResponse.json();
             const descriptors = extractLocalModelDescriptors(nativePayload);
+            recordLocalModelCapabilities(runtime, descriptors);
             if (!descriptors.length) continue;
             const result = filterLocalChatModelDescriptors(descriptors);
             if (result.models.length) {
@@ -4910,6 +5169,7 @@
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const payload = await response.json();
       const descriptors = extractLocalModelDescriptors(payload);
+      recordLocalModelCapabilities(runtime, descriptors);
       if (!descriptors.length) throw new Error('Server returned no model IDs');
       return {
         ...filterLocalChatModelDescriptors(descriptors),
@@ -6121,7 +6381,7 @@
           status.textContent = `${label}: ${models.length} ${capabilityLabel} ID${models.length === 1 ? '' : 's'} saved${skippedLabel}.`;
           status.style.color = 'var(--success)';
         }
-        if (typeof logRuntimeDiagnostic === 'function') logRuntimeDiagnostic(`${label}: ${models.length} ${capabilityLabel} ID${models.length === 1 ? '' : 's'} saved${skippedLabel}.`, 'success');
+        if (typeof logRuntimeDiagnostic === 'function') logRuntimeDiagnostic(`${label}: ${models.length} ${discovery.source.startsWith('lmstudio-') ? 'chat-capable model' : 'candidate model'} ID${models.length === 1 ? '' : 's'} saved${discovery.skipped ? '; ' + discovery.skipped + ' non-chat ID' + (discovery.skipped === 1 ? '' : 's') + ' skipped' : ''}.`, 'success');
         if (typeof updateLocalRuntimeStatusBadge === 'function') updateLocalRuntimeStatusBadge();
       } catch (err) {
         if (discoveryGeneration !== null
@@ -14718,6 +14978,469 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
       logRuntimeDiagnostic('Diagnostics log cleared', 'info');
     }
 
+// ── Crow modality layer ────────────────────────────────────────────────
+// Injected into the generated Crow-GodMod3 app by scripts/build-crow-static.mjs.
+// Adds a modality switcher (text / image / audio / video, in and out) that
+// routes non-text work through the selected local runtime's OpenAI-compatible
+// tool endpoints. The Crow Free AI Gateway (127.0.0.1:8766) exposes chat,
+// image generation, text-to-speech, and transcription routes on loopback.
+//
+// This file is injected verbatim into a <script> block: it must not contain
+// a closing script-tag string. It runs in the same scope as the main app
+// script and may reference its globals (state, saveState, render, …).
+
+    const CROW_MODALITIES = Object.freeze([
+      { id: 'text',      label: 'TEXT',  icon: '✎', dir: 'IN · OUT', sticky: true,
+        desc: 'Chat with the selected provider and model' },
+      { id: 'image-out', label: 'IMAGE', icon: '▣', dir: 'OUT', sticky: true, capability: 'image',
+        desc: 'Prompt becomes a generated image' },
+      { id: 'image-in',  label: 'IMAGE', icon: '▨', dir: 'IN',  sticky: false,
+        desc: 'Attach an image for vision chat' },
+      { id: 'audio-out', label: 'AUDIO', icon: '♪', dir: 'OUT', sticky: true, capability: 'tts',
+        desc: 'Text becomes spoken audio' },
+      { id: 'audio-in',  label: 'AUDIO', icon: '◉', dir: 'IN',  sticky: false, capability: 'asr',
+        desc: 'Microphone becomes transcribed text' },
+      { id: 'video',     label: 'VIDEO', icon: '▸', dir: 'OUT', sticky: true, capability: 'video',
+        desc: 'No video route exists yet' },
+    ]);
+
+    // Deterministic route knowledge for Crow's own gateway, so the modality
+    // tools work even before a Test & Discover run has cached capabilities.
+    const CROW_GATEWAY_KNOWN_ROUTES = Object.freeze({
+      crowfree: Object.freeze({
+        image: 'miaoxue-image:default',
+        tts: 'miaoxue-tts:default',
+        asr: 'iflytek-asr:default',
+      }),
+    });
+
+    let _crowModality = 'text';
+    let _crowMediaRecorder = null;
+    let _crowRecordedChunks = [];
+
+    function getCrowModalityDef(id) {
+      return CROW_MODALITIES.find(m => m.id === id) || CROW_MODALITIES[0];
+    }
+
+    function crowModalityTransport() {
+      const runtimeId = normalizeLocalRuntime(state.localRuntime, state.localBaseUrl);
+      const profile = getLocalRuntimeProfile(runtimeId);
+      let baseUrl = '';
+      try {
+        baseUrl = normalizeLocalBaseUrl(
+          profile.baseUrl || LOCAL_RUNTIME_PRESETS[runtimeId].baseUrl || '',
+          runtimeId,
+        );
+      } catch (_) {
+        baseUrl = '';
+      }
+      const apiKey = (_localApiKeysByRuntime[runtimeId]
+        ?? (runtimeId === state.localRuntime ? state.localApiKey : '')) || '';
+      return { runtimeId, baseUrl, apiKey };
+    }
+
+    function crowModalityRouteFor(capability) {
+      const { runtimeId } = crowModalityTransport();
+      if (typeof findLocalModelWithCapability === 'function') {
+        const discovered = findLocalModelWithCapability(runtimeId, capability);
+        if (discovered) return discovered;
+      }
+      return CROW_GATEWAY_KNOWN_ROUTES[runtimeId]?.[capability] || '';
+    }
+
+    function crowModalityAvailable(modalityDef) {
+      if (!modalityDef.capability) return true;
+      return !!crowModalityRouteFor(modalityDef.capability);
+    }
+
+    function renderModalityOptions() {
+      const dropdown = document.getElementById('modalityDropdown');
+      if (!dropdown) return;
+      const { runtimeId } = crowModalityTransport();
+      const runtimeLabel = LOCAL_RUNTIME_PRESETS[runtimeId]?.label || 'Local';
+      dropdown.innerHTML = CROW_MODALITIES.map(m => {
+        const active = _crowModality === m.id;
+        const available = crowModalityAvailable(m);
+        let note = '';
+        if (m.capability) {
+          const route = crowModalityRouteFor(m.capability);
+          note = route
+            ? `via ${route} · ${runtimeLabel}`
+            : runtimeId === 'crowfree'
+              ? 'start the gateway, then Test & Discover'
+              : `no route on ${runtimeLabel}`;
+        }
+        if (m.id === 'video' && !crowModalityRouteFor(m.capability)) {
+          note = 'no video-capable provider yet';
+        }
+        return `
+              <div class="modality-option${active ? ' active' : ''}${available ? '' : ' unavailable'}" data-modality="${m.id}" onclick="selectCrowModality('${m.id}')">
+                <span class="modality-option-icon">${m.icon}</span>
+                <div class="modality-option-info">
+                  <div class="modality-option-name">${m.label} <span class="modality-dir-badge">${m.dir}</span></div>
+                  <div class="modality-option-desc">${m.desc}</div>
+                  ${note ? `<div class="modality-option-route">${escapeHtml(note)}</div>` : ''}
+                </div>
+                <span class="modality-option-check">✓</span>
+              </div>`;
+      }).join('');
+    }
+
+    function toggleModalityDropdown() {
+      if (_crowMediaRecorder) {
+        crowStopRecording();
+        return;
+      }
+      const switcher = document.getElementById('modalitySwitcher');
+      if (!switcher) return;
+      renderModalityOptions();
+      switcher.classList.toggle('open');
+    }
+
+    if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
+      document.addEventListener('click', (event) => {
+        const switcher = document.getElementById('modalitySwitcher');
+        if (switcher && !switcher.contains(event.target)) {
+          switcher.classList.remove('open');
+        }
+      });
+    }
+
+    function selectCrowModality(id) {
+      const def = getCrowModalityDef(id);
+      const switcher = document.getElementById('modalitySwitcher');
+      if (switcher) switcher.classList.remove('open');
+
+      if (def.capability && !crowModalityAvailable(def)) {
+        const { runtimeId } = crowModalityTransport();
+        const runtimeLabel = LOCAL_RUNTIME_PRESETS[runtimeId]?.label || 'Local';
+        if (typeof logRuntimeDiagnostic === 'function') {
+          logRuntimeDiagnostic(
+            `${def.label} ${def.dir}: no route on ${runtimeLabel}. Select the Crow Free AI Gateway runtime (or one exposing that capability) and run Test & Discover.`,
+            'warning',
+          );
+        }
+        return;
+      }
+
+      if (id === 'image-in') {
+        document.getElementById('imageFileInput')?.click();
+        return;
+      }
+      if (id === 'audio-in') {
+        crowStartRecording();
+        return;
+      }
+
+      _crowModality = def.sticky ? id : 'text';
+      updateCrowModalityUI();
+      if (id !== 'text' && typeof logRuntimeDiagnostic === 'function') {
+        logRuntimeDiagnostic(`Modality set to ${def.label} ${def.dir} — send uses ${crowModalityRouteFor(def.capability)}`, 'info');
+      }
+    }
+
+    function updateCrowModalityUI() {
+      const def = getCrowModalityDef(_crowModality);
+      const label = document.getElementById('modalityLabel');
+      const icon = document.getElementById('modalityIcon');
+      const dir = document.getElementById('modalityDir');
+      const btn = document.getElementById('modalitySwitcherBtn');
+      if (label) label.textContent = _crowMediaRecorder ? 'STOP' : def.label;
+      if (icon) icon.textContent = def.icon;
+      if (dir) dir.textContent = _crowMediaRecorder ? 'REC' : def.dir;
+      if (btn) {
+        btn.classList.toggle('recording', !!_crowMediaRecorder);
+        btn.classList.toggle('non-text', _crowModality !== 'text' || !!_crowMediaRecorder);
+        btn.title = _crowMediaRecorder
+          ? 'Recording — click to stop and transcribe'
+          : `Modality: ${def.label} (${def.dir}) — click to change`;
+      }
+      const input = document.getElementById('messageInput');
+      if (input && !_crowMediaRecorder && !input.dataset.crowBusy) {
+        input.placeholder = _crowModality === 'image-out'
+          ? 'Describe the image to generate…'
+          : _crowModality === 'audio-out'
+            ? 'Text to speak aloud…'
+            : 'Message...';
+      }
+      const sendBtn = document.getElementById('sendBtn');
+      if (sendBtn) {
+        sendBtn.title = _crowModality === 'text'
+          ? 'Send'
+          : `${def.label} ${def.dir} via ${crowModalityRouteFor(def.capability) || 'no route'}`;
+      }
+    }
+
+    // Called from sendMessage; returns true when a non-text modality handled
+    // the send so the normal chat pipeline should not run.
+    async function crowModalityRouteSend(content, attachedImage) {
+      if (_crowModality === 'image-out') {
+        await crowGenerateImage(content);
+        return true;
+      }
+      if (_crowModality === 'audio-out') {
+        await crowSpeakText(content);
+        return true;
+      }
+      return false;
+    }
+
+    function crowModalityBeginSend(content) {
+      // Mirrors the conversation plumbing at the top of sendMessage().
+      if (!state.localEnabled) {
+        if (typeof logRuntimeDiagnostic === 'function') {
+          logRuntimeDiagnostic('Enable the local runtime in Settings → API Keys first.', 'warning');
+        }
+        openSettings();
+        return null;
+      }
+      if (!state.currentId) newChat();
+      const conv = getCurrentConv();
+      const userMsg = { role: 'user', content };
+      conv.messages.push(userMsg);
+      if (conv.messages.length === 1) {
+        conv.title = content.slice(0, 40) + (content.length > 40 ? '...' : '');
+      }
+      const input = document.getElementById('messageInput');
+      input.value = '';
+      autoResize(input);
+      removeAttachedImage();
+      state.promptsTried = (state.promptsTried || 0) + 1;
+      updatePromptsTriedUI();
+      saveState();
+      render();
+      isStreaming = true;
+      updateSendButton();
+      showTyping();
+      return conv;
+    }
+
+    function crowModalityEndSend() {
+      isStreaming = false;
+      updateSendButton();
+      hideTyping();
+      saveState();
+      render();
+    }
+
+    async function crowModalityFetch(path, body) {
+      const { runtimeId, baseUrl, apiKey } = crowModalityTransport();
+      if (!baseUrl) throw new Error('The selected local runtime has no base URL.');
+      const headers = { 'Content-Type': 'application/json' };
+      if (apiKey) headers.Authorization = `Bearer ${apiKey}`;
+      const response = await fetch(`${baseUrl}${path}`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(body),
+      });
+      if (!response.ok) {
+        const detail = (await response.text()).slice(0, 240);
+        throw new Error(`HTTP ${response.status}${detail ? ` — ${detail}` : ''}`);
+      }
+      return response.json();
+    }
+
+    async function crowGenerateImage(prompt) {
+      if (!prompt) {
+        const input = document.getElementById('messageInput');
+        if (input) input.placeholder = 'Describe the image to generate…';
+        return;
+      }
+      const model = crowModalityRouteFor('image');
+      const conv = crowModalityBeginSend(`🎨 ${prompt}`);
+      if (!conv) return;
+      try {
+        if (!model) throw new Error('No image-capable route on this runtime. Run Test & Discover or select the Crow Free AI Gateway.');
+        logRuntimeDiagnostic(`Generating image via ${model}…`, 'info');
+        const data = await crowModalityFetch('/images/generations', { model, prompt });
+        const url = data?.data?.[0]?.url || '';
+        if (!/^https?:\/\//.test(url)) throw new Error('The runtime returned no image URL.');
+        conv.messages.push({
+          role: 'assistant',
+          content: `Generated image for “${prompt}” via \`${model}\`.`,
+          generatedImage: { url, prompt },
+        });
+        logRuntimeDiagnostic(`Image generated via ${model}`, 'success');
+      } catch (err) {
+        conv.messages.push({ role: 'assistant', content: `Image generation failed: ${err.message}` });
+        if (typeof logRuntimeDiagnostic === 'function') logRuntimeDiagnostic(`Image generation failed: ${err.message}`, 'error');
+      } finally {
+        crowModalityEndSend();
+      }
+    }
+
+    async function crowSpeakText(text) {
+      if (!text) {
+        const input = document.getElementById('messageInput');
+        if (input) input.placeholder = 'Text to speak aloud…';
+        return;
+      }
+      const model = crowModalityRouteFor('tts');
+      const conv = crowModalityBeginSend(`🔊 ${text}`);
+      if (!conv) return;
+      try {
+        if (!model) throw new Error('No speech-capable route on this runtime. Run Test & Discover or select the Crow Free AI Gateway.');
+        logRuntimeDiagnostic(`Generating speech via ${model}…`, 'info');
+        const data = await crowModalityFetch('/audio/speech', { model, input: text });
+        const url = data?.audio_source || '';
+        if (!/^https?:\/\//.test(url)) throw new Error('The runtime returned no audio URL.');
+        conv.messages.push({
+          role: 'assistant',
+          content: `Spoken audio for “${text.slice(0, 120)}${text.length > 120 ? '…' : ''}” via \`${model}\`.`,
+          generatedAudio: { url, text },
+        });
+        logRuntimeDiagnostic(`Speech generated via ${model}`, 'success');
+      } catch (err) {
+        conv.messages.push({ role: 'assistant', content: `Speech generation failed: ${err.message}` });
+        if (typeof logRuntimeDiagnostic === 'function') logRuntimeDiagnostic(`Speech generation failed: ${err.message}`, 'error');
+      } finally {
+        crowModalityEndSend();
+      }
+    }
+
+    async function crowStartRecording() {
+      if (_crowMediaRecorder) return;
+      const route = crowModalityRouteFor('asr');
+      if (!route) {
+        if (typeof logRuntimeDiagnostic === 'function') {
+          logRuntimeDiagnostic('AUDIO IN: no transcription route on this runtime. Select the Crow Free AI Gateway and run Test & Discover.', 'warning');
+        }
+        return;
+      }
+      if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') {
+        if (typeof logRuntimeDiagnostic === 'function') {
+          logRuntimeDiagnostic('AUDIO IN: microphone capture is not available in this browser.', 'error');
+        }
+        return;
+      }
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        _crowRecordedChunks = [];
+        const recorder = new MediaRecorder(stream);
+        _crowMediaRecorder = recorder;
+        recorder.ondataavailable = (event) => {
+          if (event.data?.size) _crowRecordedChunks.push(event.data);
+        };
+        recorder.onstop = () => {
+          stream.getTracks().forEach(track => track.stop());
+          const blob = new Blob(_crowRecordedChunks, { type: recorder.mimeType || 'audio/webm' });
+          _crowMediaRecorder = null;
+          _crowRecordedChunks = [];
+          updateCrowModalityUI();
+          crowTranscribeAndInsert(blob, route);
+        };
+        recorder.start();
+        _crowModality = 'audio-in';
+        updateCrowModalityUI();
+        if (typeof logRuntimeDiagnostic === 'function') {
+          logRuntimeDiagnostic('Recording… click the modality button to stop and transcribe.', 'info');
+        }
+      } catch (err) {
+        _crowMediaRecorder = null;
+        updateCrowModalityUI();
+        if (typeof logRuntimeDiagnostic === 'function') {
+          logRuntimeDiagnostic(`Microphone error: ${err.message}`, 'error');
+        }
+      }
+    }
+
+    function crowStopRecording() {
+      if (_crowMediaRecorder) _crowMediaRecorder.stop();
+    }
+
+    // Decode browser audio (webm/opus) to 16 kHz mono signed-16-bit PCM,
+    // then base64 — the exact frame format the transcription route expects.
+    async function crowEncodePcm16Base64(blob) {
+      const arrayBuffer = await blob.arrayBuffer();
+      const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextCtor) throw new Error('Web Audio is not available in this browser.');
+      const audioCtx = new AudioContextCtor();
+      try {
+        const decoded = await audioCtx.decodeAudioData(arrayBuffer);
+        const mono = decoded.getChannelData(0);
+        const ratio = decoded.sampleRate / 16000;
+        const outLength = Math.max(1, Math.round(mono.length / ratio));
+        const pcm = new Int16Array(outLength);
+        for (let i = 0; i < outLength; i++) {
+          const sample = mono[Math.min(mono.length - 1, Math.round(i * ratio))];
+          pcm[i] = Math.max(-32768, Math.min(32767, Math.round(sample * 32767)));
+        }
+        const bytes = new Uint8Array(pcm.buffer);
+        let binary = '';
+        const CHUNK = 0x8000;
+        for (let i = 0; i < bytes.length; i += CHUNK) {
+          binary += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK));
+        }
+        return btoa(binary);
+      } finally {
+        audioCtx.close();
+      }
+    }
+
+    async function crowTranscribeAndInsert(blob, route) {
+      if (!blob || !blob.size) {
+        if (typeof logRuntimeDiagnostic === 'function') logRuntimeDiagnostic('No audio captured.', 'warning');
+        _crowModality = 'text';
+        updateCrowModalityUI();
+        return;
+      }
+      const input = document.getElementById('messageInput');
+      if (input) {
+        input.dataset.crowBusy = '1';
+        input.placeholder = 'Transcribing…';
+      }
+      isStreaming = true;
+      updateSendButton();
+      try {
+        const audio = await crowEncodePcm16Base64(blob);
+        if (typeof logRuntimeDiagnostic === 'function') logRuntimeDiagnostic(`Transcribing via ${route}…`, 'info');
+        const data = await crowModalityFetch('/audio/transcriptions', { model: route, audio });
+        const text = String(data?.text || '').trim();
+        if (!text) throw new Error('The transcription route returned no text.');
+        if (input) {
+          input.value = (input.value ? input.value.replace(/\s+$/, '') + ' ' : '') + text;
+          autoResize(input);
+          input.focus();
+        }
+        if (typeof logRuntimeDiagnostic === 'function') logRuntimeDiagnostic('Transcription complete — review and send.', 'success');
+      } catch (err) {
+        if (typeof logRuntimeDiagnostic === 'function') logRuntimeDiagnostic(`Transcription failed: ${err.message}`, 'error');
+      } finally {
+        isStreaming = false;
+        updateSendButton();
+        _crowModality = 'text';
+        if (input) delete input.dataset.crowBusy;
+        updateCrowModalityUI();
+      }
+    }
+
+    // Render generated media inside assistant messages (called from renderMessages).
+    function renderCrowGeneratedMedia(msg) {
+      if (!msg || typeof msg !== 'object') return '';
+      let out = '';
+      const img = msg.generatedImage;
+      if (img && /^https?:\/\/[^\s"'<>]+$/.test(img.url || '')) {
+        const url = escapeAttr(img.url);
+        const caption = escapeAttr(img.prompt || 'generated image');
+        out += `<div class="generated-media"><a href="${url}" target="_blank" rel="noopener"><img class="generated-image" src="${url}" loading="lazy" decoding="async" alt="${caption}"></a><div class="generated-media-caption">▣ ${caption} · <a href="${url}" target="_blank" rel="noopener">open full size ↗</a></div></div>`;
+      }
+      const audio = msg.generatedAudio;
+      if (audio && /^https?:\/\/[^\s"'<>]+$/.test(audio.url || '')) {
+        const url = escapeAttr(audio.url);
+        const caption = escapeAttr((audio.text || 'generated audio').slice(0, 80));
+        out += `<div class="generated-media"><audio class="generated-audio" controls preload="none" src="${url}"></audio><div class="generated-media-caption">♪ ${caption}</div></div>`;
+      }
+      return out;
+    }
+
+    if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', updateCrowModalityUI);
+      } else {
+        updateCrowModalityUI();
+      }
+    }
+
     function updateModeSwitcherUI() {
       const ultraCb = document.getElementById('ultraplinian');
       const plinyCb = document.getElementById('plinyMode');
@@ -15280,7 +16003,12 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
         // Image thumbnail for user messages with attached images
         const safeImageUrl = (msg.imageDataUrl && /^data:image\/[a-z]+;base64,[A-Za-z0-9+/=]+$/.test(msg.imageDataUrl)) ? msg.imageDataUrl : '';
         const imageThumb = (isUser && safeImageUrl)
-          ? `<img class="message-image-thumb" src="${escapeAttr(safeImageUrl)}" alt="${escapeAttr(msg.imageName || 'image')}">`
+          ? `<img class="message-image-thumb" loading="lazy" decoding="async" src="${escapeAttr(safeImageUrl)}" alt="${escapeAttr(msg.imageName || 'image')}">`
+          : '';
+
+        // Crow generated media (image/audio) attached to assistant messages
+        const generatedMedia = (!isUser && typeof renderCrowGeneratedMedia === 'function')
+          ? renderCrowGeneratedMedia(msg)
           : '';
 
         // Vision badge — only when vision analysis actually ran
@@ -15294,6 +16022,7 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
             <div class="message-wrapper">
               ${magicInfo}
               ${imageThumb}
+              ${generatedMedia}
               <div class="message-content">${formatMessage(state.showMagic && msg.raceCurrentIdx != null && msg.raceResponses?.[msg.raceCurrentIdx]
                 ? msg.raceResponses[msg.raceCurrentIdx].content
                 : msg.content)}</div>
@@ -16474,6 +17203,9 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
       // Need either text or image
       if ((!content && !attachedImage) || isStreaming) return;
 
+      // Crow modality layer: non-text modalities use local-runtime tool endpoints.
+      if (typeof crowModalityRouteSend === 'function' && await crowModalityRouteSend(content, attachedImage)) return;
+
       if (!hasAnyChatProvider()) {
         openSettings();
         return;
@@ -16649,6 +17381,7 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
           }
         };
 
+        if (typeof showWaitingGame === 'function') showWaitingGame();
         try {
           const result = await ultraplinian(messages, content, handleLeaderChange, executionSelection);
           _log('[DEBUG] ultraplinian() returned:', result);
@@ -19681,6 +20414,7 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
           ctx.font = fontSize + 'px monospace';
           for (let i = 0; i < drops.length; i++) {
             const text = chars[Math.floor(Math.random() * chars.length)];
+            ctx.fillStyle = (i % 4 === 0) ? '#45e7ff' : '#7c5cff';
             ctx.fillText(text, i * fontSize, drops[i] * fontSize);
             if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
             drops[i]++;

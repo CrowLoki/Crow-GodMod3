@@ -40,6 +40,12 @@ const runtimeThemeFiles = [
   "fonts/bitfeather/woff2/CrowBitfeatherDisplay-Bold.woff2",
   "fonts/bitfeather/woff2/CrowBitfeatherMono-Regular.woff2",
   "fonts/bitfeather/woff2/CrowBitfeatherMono-Bold.woff2",
+  "fonts/crow-signal.css",
+  "fonts/woff2/CrowSignalDisplay-Regular.woff2",
+  "fonts/woff2/CrowSignalDisplay-Bold.woff2",
+  "fonts/woff2/CrowSignalMono-Regular.woff2",
+  "fonts/woff2/CrowSignalMono-Bold.woff2",
+  "assets/mascots/exports/glitch-ascendant-welcome-512h.png",
   "cursors/v0.5/src/32/normal.png",
   "cursors/v0.5/src/32/link.png",
   "cursors/v0.5/src/32/text.png",
@@ -321,7 +327,8 @@ const runtimeLocalProviderConfig = `    // First-class loopback runtime presets.
         'embedding', 'embeddings', 'embed', 'rerank', 'reranking',
         'ranking', 'ranker', 'cross-encoder', 'cross_encoder',
         'text-to-image', 'image-generation', 'speech-to-text',
-        'text-to-speech', 'transcription',
+        'text-to-speech', 'transcription', 'image', 'images', 'tts', 'asr',
+        'audio', 'speech', 'voice', 'video', 'music', 'moderation',
       ]);
       if (tokens.some(token => nonChatEvidence.has(token))) return true;
 
@@ -379,6 +386,30 @@ const runtimeLocalProviderConfig = `    // First-class loopback runtime presets.
       return url.toString();
     }
 
+    const _localModelCapsByRuntime = {};
+    function recordLocalModelCapabilities(runtime, descriptors) {
+      const map = {};
+      for (const descriptor of Array.isArray(descriptors) ? descriptors : []) {
+        const id = getLocalModelDescriptorId(descriptor);
+        if (!id) continue;
+        map[id] = getLocalModelCapabilityTokens(descriptor);
+      }
+      _localModelCapsByRuntime[runtime] = map;
+    }
+
+    function getLocalModelCapabilities(runtime, modelId) {
+      return _localModelCapsByRuntime[runtime]?.[modelId] || [];
+    }
+
+    function findLocalModelWithCapability(runtime, capability) {
+      const wanted = String(capability || '').toLowerCase();
+      const map = _localModelCapsByRuntime[runtime] || {};
+      for (const [id, tokens] of Object.entries(map)) {
+        if (tokens.includes(wanted)) return id;
+      }
+      return '';
+    }
+
     async function discoverLocalChatModels(runtime, baseUrl, headers, fetchImpl = fetch) {
       if (runtime === 'lmstudio') {
         for (const apiVersion of ['v1', 'v0']) {
@@ -390,6 +421,7 @@ const runtimeLocalProviderConfig = `    // First-class loopback runtime presets.
             if (!nativeResponse.ok) continue;
             const nativePayload = await nativeResponse.json();
             const descriptors = extractLocalModelDescriptors(nativePayload);
+            recordLocalModelCapabilities(runtime, descriptors);
             if (!descriptors.length) continue;
             const result = filterLocalChatModelDescriptors(descriptors);
             if (result.models.length) {
@@ -406,6 +438,7 @@ const runtimeLocalProviderConfig = `    // First-class loopback runtime presets.
       if (!response.ok) throw new Error(\`HTTP \${response.status}\`);
       const payload = await response.json();
       const descriptors = extractLocalModelDescriptors(payload);
+      recordLocalModelCapabilities(runtime, descriptors);
       if (!descriptors.length) throw new Error('Server returned no model IDs');
       return {
         ...filterLocalChatModelDescriptors(descriptors),
@@ -1395,6 +1428,7 @@ replaceRequired(
               </small>
               <label for="localRuntimeInput">Runtime preset</label>
               <select id="localRuntimeInput" onchange="applyLocalRuntimePreset(this.value)">
+                <option value="crowfree">Crow Free AI Gateway</option>
                 <option value="ollama">Ollama</option>
                 <option value="lmstudio">LM Studio</option>
                 <option value="docker">Docker Model Runner</option>
@@ -4434,9 +4468,10 @@ replaceRequired(
   `  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">`,
-  `  <link rel="preconnect" href="https://openrouter.ai" crossorigin>
+  `  <link rel="dns-prefetch" href="https://openrouter.ai"><link rel="preconnect" href="https://openrouter.ai" crossorigin>
   <link href="/crow-theme/fonts/bitfeather/crow-bitfeather.css" rel="stylesheet">
-  <link href="/crow-theme/tokens/crow-theme.css" rel="stylesheet">`,
+  <link href="/crow-theme/tokens/crow-theme.css" rel="stylesheet">
+  <link href="/crow-theme/fonts/crow-signal.css" rel="stylesheet">`,
 );
 replaceRequired(
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com;",
@@ -4455,6 +4490,16 @@ replaceRequired(
 replaceRequired(
   " https://cloudflareinsights.com https://*.cloudflareinsights.com",
   "",
+);
+
+// Lazy-load generated image thumbnails to keep chat rendering fast and reduce data.
+replaceRequired(
+  '<img class="image-preview-thumb" id="imagePreviewThumb"',
+  '<img class="image-preview-thumb" id="imagePreviewThumb" loading="lazy" decoding="async"',
+);
+replaceRequired(
+  '<img class="message-image-thumb"',
+  '<img class="message-image-thumb" loading="lazy" decoding="async"',
 );
 
 replaceRequired(
@@ -4498,7 +4543,7 @@ replaceRequired(
           <span class="logo-text">G0DM0<span class="flipped-e">D</span><span class="flipped-e-soft">E</span></span>
         </div>`,
   `        <div class="logo">
-          <img class="brand-mark" src="/crow-theme/assets/icons/app/crow-signal-app-rounded-256.png" alt="" aria-hidden="true">
+          <img class="brand-mark" src="/crow-theme/assets/icons/app/crow-signal-app-rounded-256.png" alt="" aria-hidden="true" width="256" height="256" decoding="async">
           <span class="logo-text">Crow-GodMod3</span>
         </div>`,
 );
@@ -4508,7 +4553,7 @@ replaceRequired(
           <p>Open-source, privacy-respecting, liberated AI chat. {GODMODE:ENABLED}</p>`,
   `          <div class="welcome-signal">CROW SYSTEM // GLITCH ASCENDANT</div>
           <div class="welcome-icon">
-            <img class="welcome-crow" src="/crow-theme/assets/icons/avatars/crow-signal-avatar-512.png" alt="Crow Signal">
+            <img class="welcome-crow" src="/crow-theme/assets/mascots/exports/glitch-ascendant-welcome-512h.png" alt="Glitch Ascendant — the Crow System mascot" width="341" height="512" fetchpriority="high" decoding="async">
           </div>
           <h2>Crow-GodMod3</h2>
           <p class="welcome-copy">Open-source, privacy-respecting multi-model AI with the CrowClaw visual identity. <span>{CROW-GODMOD3:ENABLED}</span></p>`,
@@ -4755,6 +4800,13 @@ replaceRegex(
 const crowThemeStyles = `
 
     /* Crow Theme v0.1 — Crow-GodMod3 product binding */
+    /* Crow Signal ships the display face; Bitfeather keeps small UI/code text.
+       The tokens file defines these vars on :root AND [data-crow-theme] (the
+       attribute lives on <body>), so this override must cover both. */
+    :root, [data-crow-theme] {
+      --crow-font-display: "Crow Signal Display", "Crow Bitfeather Display", sans-serif;
+      --crow-font-mono: "Crow Bitfeather Mono", "Crow Signal Mono", monospace;
+    }
     ::selection {
       color: var(--crow-text-strong);
       background: var(--crow-selection-bg);
@@ -4897,9 +4949,9 @@ const crowThemeStyles = `
     }
 
     .welcome-crow {
-      width: 76px;
-      height: 76px;
-      object-fit: cover;
+      width: auto;
+      height: 148px;
+      object-fit: contain;
       border: 1px solid rgb(115 76 255 / 42%);
       border-radius: 20px;
       box-shadow:
@@ -5069,8 +5121,8 @@ const crowThemeStyles = `
       }
 
       .welcome-crow {
-        width: 62px;
-        height: 62px;
+        width: auto;
+        height: 108px;
         border-radius: 16px;
       }
 
@@ -5357,6 +5409,7 @@ replaceRequired(
   '          <button class="local-runtime-status" id="localRuntimeStatusBadge" onclick="openSettings()" title="Local runtime status · click to open settings" aria-live="polite">\n' +
   '            <span class="status-dot"></span><span class="status-text">Local · offline</span>\n' +
   '          </button>\n' +
+  '          <span class="no-signal-pill" title="Application telemetry is disabled in this Crow-GodMod3 build: no analytics, no beacons, no tracking. Provider requests go only to the endpoints you configure."><span class="no-signal-dot"></span>NO-SIGNAL · TELEMETRY OFF</span>\n' +
   '          <span class="header-separator">|</span>\n' +
   '          <!-- Prompts tried counter -->',
 );
@@ -5469,7 +5522,7 @@ replaceRequired(
 
 replaceRequired(
   "          status.textContent = `${label}: ${models.length} ${capabilityLabel} ID${models.length === 1 ? '' : 's'} saved${skippedLabel}.`;\n          status.style.color = 'var(--success)';\n        }\n      } catch (err) {",
-  "          status.textContent = `${label}: ${models.length} ${capabilityLabel} ID${models.length === 1 ? '' : 's'} saved${skippedLabel}.`;\n          status.style.color = 'var(--success)';\n        }\n        if (typeof logRuntimeDiagnostic === 'function') logRuntimeDiagnostic(`${label}: ${models.length} ${capabilityLabel} ID${models.length === 1 ? '' : 's'} saved${skippedLabel}.`, 'success');\n        if (typeof updateLocalRuntimeStatusBadge === 'function') updateLocalRuntimeStatusBadge();\n      } catch (err) {",
+  "          status.textContent = `${label}: ${models.length} ${capabilityLabel} ID${models.length === 1 ? '' : 's'} saved${skippedLabel}.`;\n          status.style.color = 'var(--success)';\n        }\n        if (typeof logRuntimeDiagnostic === 'function') logRuntimeDiagnostic(`${label}: ${models.length} ${discovery.source.startsWith('lmstudio-') ? 'chat-capable model' : 'candidate model'} ID${models.length === 1 ? '' : 's'} saved${discovery.skipped ? '; ' + discovery.skipped + ' non-chat ID' + (discovery.skipped === 1 ? '' : 's') + ' skipped' : ''}.`, 'success');\n        if (typeof updateLocalRuntimeStatusBadge === 'function') updateLocalRuntimeStatusBadge();\n      } catch (err) {",
 );
 
 replaceRequired(
@@ -5510,6 +5563,96 @@ replaceRequired(
   '</body>',
 );
 
+// ── Crow modality layer ─────────────────────────────────────────────────
+// Text / image / audio / video (in/out) routed through the selected local
+// runtime's OpenAI-compatible tool endpoints (Crow Free AI Gateway first).
+const crowModalityScriptSource = await readFile(
+  resolve(projectRoot, "scripts", "crow-modality.js"),
+  "utf8",
+);
+if (crowModalityScriptSource.includes("</" + "script>")) {
+  throw new Error("crow-modality.js must not contain a closing script tag.");
+}
+const crowModalityStyleSource = await readFile(
+  resolve(projectRoot, "scripts", "crow-modality.css"),
+  "utf8",
+);
+
+// The modality switcher sits between the strategy mode switcher and the
+// per-mode model picker in the chat header.
+replaceRequired(
+  '            </div>\n          </div>\n          <select class="model-select" id="modelSelect"',
+  '            </div>\n          </div>\n' +
+  '          <!-- Modality Switcher (Crow) -->\n' +
+  '          <div class="modality-switcher" id="modalitySwitcher">\n' +
+  '            <button class="modality-switcher-btn" id="modalitySwitcherBtn" onclick="toggleModalityDropdown()" aria-label="Select input/output modality" title="Modality: text, image, audio — in/out">\n' +
+  '              <span class="modality-icon" id="modalityIcon">✎</span>\n' +
+  '              <span class="modality-text" id="modalityLabel">TEXT</span>\n' +
+  '              <span class="modality-dir" id="modalityDir">IN · OUT</span>\n' +
+  '              <span class="mode-chevron">▼</span>\n' +
+  '            </button>\n' +
+  '            <div class="modality-dropdown" id="modalityDropdown"></div>\n' +
+  '          </div>\n' +
+  '          <select class="model-select" id="modelSelect"',
+);
+
+replaceRequired('  </style>', crowModalityStyleSource + '\n  </style>');
+
+replaceRequired(
+  '    function updateModeSwitcherUI() {',
+  crowModalityScriptSource + '\n    function updateModeSwitcherUI() {',
+);
+
+// Non-text sends route to the modality layer before the chat pipeline.
+replaceRequired(
+  '      // Need either text or image\n      if ((!content && !attachedImage) || isStreaming) return;\n',
+  '      // Need either text or image\n      if ((!content && !attachedImage) || isStreaming) return;\n\n' +
+  '      // Crow modality layer: non-text modalities use local-runtime tool endpoints.\n' +
+  "      if (typeof crowModalityRouteSend === 'function' && await crowModalityRouteSend(content, attachedImage)) return;\n",
+);
+
+// Assistant messages can carry generated media alongside text content.
+replaceRequired(
+  '        // Vision badge — only when vision analysis actually ran',
+  "        // Crow generated media (image/audio) attached to assistant messages\n" +
+  "        const generatedMedia = (!isUser && typeof renderCrowGeneratedMedia === 'function')\n" +
+  '          ? renderCrowGeneratedMedia(msg)\n' +
+  "          : '';\n\n" +
+  '        // Vision badge — only when vision analysis actually ran',
+);
+replaceRequired(
+  '              ${imageThumb}\n',
+  '              ${imageThumb}\n              ${generatedMedia}\n',
+);
+
+// Generated media arrives as remote HTTPS URLs from the configured runtime,
+// so images and audio may load from any HTTPS origin. connect-src stays
+// restricted: only loopback runtimes and the two cloud providers are
+// callable from script.
+replaceRequired(
+  "img-src 'self' data: blob:;",
+  "img-src 'self' data: blob: https:; media-src 'self' blob: https:;",
+);
+
+// Show the waiting game while an ULTRAPLINIAN race runs. The game was fully
+// implemented upstream (snake/2048/pong, settings dropdown, hidePongGame at
+// race end) but nothing ever called showWaitingGame().
+replaceRequired(
+  '        try {\n          const result = await ultraplinian(messages, content',
+  "        if (typeof showWaitingGame === 'function') showWaitingGame();\n" +
+  '        try {\n          const result = await ultraplinian(messages, content',
+);
+
+// Crow signal rain: the palette engine already recolours the stock Matrix
+// green (#00ff41) to Crow violet (#7c5cff); add a cyan glint every fourth
+// column for the two-tone CrowClaw read.
+replaceRequired(
+  '            ctx.fillText(text, i * fontSize, drops[i] * fontSize);',
+  "            ctx.fillStyle = (i % 4 === 0) ? '#45e7ff' : '#7c5cff';\n" +
+  '            ctx.fillText(text, i * fontSize, drops[i] * fontSize);',
+);
+
 await mkdir(dirname(outputPath), { recursive: true });
 await writeFile(outputPath, html, "utf8");
 console.log(`Generated ${outputPath} (${html.length.toLocaleString()} bytes).`);
+
