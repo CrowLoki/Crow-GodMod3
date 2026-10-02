@@ -10,14 +10,18 @@ This continuation reconciled the existing work, upgraded the dependency tree,
 and repaired defects in the existing modality and local-runtime UI. That work
 is published and merged through PR #24, with the real-runtime acceptance
 follow-up delivered through [PR #25](https://github.com/CrowLoki/Crow-GodMod3/pull/25).
-It adds no new Phase 2 feature set.
-Crow-GodMod3 remains independently deployable. No new Vercel deployment has
-completed, and no sibling-project source/configuration files were edited.
+The local text acceptance record is merged through
+[PR #26](https://github.com/CrowLoki/Crow-GodMod3/pull/26). The exact merged source
+`d0936cf528ff7eed23fe36aedc4e4cd898d6347f` is now deployed to Vercel production
+and passed the public-file and browser checks below. This adds no new Phase 2
+feature set. Crow-GodMod3 remains independently deployable, and no
+sibling-project source/configuration files were edited.
 
 Crow explicitly authorized source publication, merge, Vercel deployment,
 temporary LM Studio CORS changes, and the selected free-gateway tests. That
-authorization persists; do not request it again. The remaining deployment and
-LM Studio obstacles are access/policy failures, detailed below.
+authorization persists; do not request it again. Deployment is complete. The
+LM Studio policy limitation and remaining provider/device acceptance are
+detailed below.
 
 | Item | Verified state |
 | --- | --- |
@@ -26,13 +30,15 @@ LM Studio obstacles are access/policy failures, detailed below.
 | Resume branch | `main`; fetch and verify its current HEAD before continuing. The media-only discovery repair was delivered from `codex/runtime-acceptance-followup`. |
 | Starting source baseline | `b3bf2efff92718ef0503e28241c8bc4a79d442fa` |
 | Verified product-code baseline | `4c9d7a66e4949b2e2293b36a13acd9c9b98c60cb` from merged PR #25; later acceptance-evidence updates change documentation only |
-| Remote state at baseline | Live `git ls-remote` returned `4c9d7a66e4949b2e2293b36a13acd9c9b98c60cb` for `main`; recheck current `main` rather than treating this baseline as a permanent HEAD |
+| Deployed source | `d0936cf528ff7eed23fe36aedc4e4cd898d6347f` from merged PR #26; fetch and verify current `main` before resuming later documentation updates |
 | Baseline integration | [PR #24](https://github.com/CrowLoki/Crow-GodMod3/pull/24), merged as `afed312` from head `2585f29` |
 | Runtime acceptance follow-up | [PR #25](https://github.com/CrowLoki/Crow-GodMod3/pull/25), merged as `4c9d7a6` from head `083344d`; implementation commit `81753eef00fd0081c3410135b3c14cee40ae6143` |
-| CI | [PR #25 run 36960731285](https://github.com/CrowLoki/Crow-GodMod3/actions/runs/36960731285) and [main run 36960816916](https://github.com/CrowLoki/Crow-GodMod3/actions/runs/36960816916) passed; PR #24 and its main checks also passed |
-| Earlier open PR / issue query | None returned before PR #24 was opened; PRs #24 and #25 have since been merged |
-| Entry state for the local text acceptance update | Clean working tree on synchronized `main` at `4c9d7a6` |
-| Continuation delivery | Maintenance checkpoint `a10f2fb125c8e47e6f087b758846369875cd6bc2` and the responsive-sidebar repair are included in merged PR #24. The follow-up fixes the media-only discovery defect found by real gateway acceptance and records the remaining deployment/runtime prerequisites. |
+| Local text acceptance record | [PR #26](https://github.com/CrowLoki/Crow-GodMod3/pull/26), merged as `d0936cf`, records real Ollama gateway backend/browser text acceptance and restored temporary services |
+| CI | [PR #26 main run 36961423399](https://github.com/CrowLoki/Crow-GodMod3/actions/runs/36961423399) passed. [PR #25 run 36960731285](https://github.com/CrowLoki/Crow-GodMod3/actions/runs/36960731285), [its main run 36960816916](https://github.com/CrowLoki/Crow-GodMod3/actions/runs/36960816916), and PR #24 checks also passed |
+| Production deployment | `dpl_BajjdbZxYgLXAEnZfi2WRpXAxkGb`, READY, with the production alias and exact `d0936cf` source confirmed by deployment details |
+| Earlier open PR / issue query | None returned before PR #24 was opened; PRs #24, #25, and #26 have since been merged |
+| Entry state for this deployment-evidence update | Clean working tree on synchronized `main` at `d0936cf` |
+| Continuation delivery | Maintenance checkpoint `a10f2fb125c8e47e6f087b758846369875cd6bc2` and sidebar repair are in PR #24; PR #25 fixes media-only discovery; PR #26 records local text acceptance. This deployment-evidence refresh changes only `CONTINUATION.md` and `README.md`. |
 
 The current chat runs in the canonical Documents checkout. The older
 `Crow-GodMod3 Project Continuation` chat
@@ -173,14 +179,19 @@ build and runtime binaries were usable without changing that global policy.
 | Post-fix gateway browser acceptance | Real discovery reports reachable/no chat/speech output advertised; the chat warning remains accurate. A new speech request decoded and played all 2.352 seconds to `ended=true`, `readyState=4`, with no media error |
 | Gateway local text backend | Installed Ollama 0.32.15 was temporarily started with existing `qwen2.5:0.5b`; no download. Exact gateway route `ollama:qwen2.5:0.5b` returned HTTP 200 JSON and valid SSE with a final stop and `[DONE]`. The separate streaming probe produced a model refusal to a benign prompt; transport success is not a model-quality guarantee. |
 | Gateway local text browser | Actual Crow-GodMod3 at `127.0.0.1:4318`, local-only mode, and an explicit `ollama:qwen2.5:0.5b` pin displayed: "Yes, this local text connection works. Please provide the text for me to analyze." The composer returned to ready without an error. |
-| Gateway image / vendor chat / ASR | Donor-gated image, vendor chat, and ASR routes were not invoked because the physical donor prerequisite in the sibling project's `AGENTS.md:6` is absent |
+| Gateway image / vendor chat / ASR | Donor-gated image, vendor chat, and ASR routes were not invoked because the physical donor prerequisite in the sibling project's `AGENTS.md:6` was not established |
 | Temporary gateway cleanup | Original stopped state restored: owned PID 37128 identity verified before stopping, process absent, no listener on 8766, and `/health` refuses connections. Test outputs/media and pre-existing sibling documentation edits preserved. |
 | Temporary local-text services cleanup | Original stopped state restored after browser acceptance: gateway PID 46372, Ollama PID 40604, and its runner PID 26436 identities verified and processes stopped; ports 8766/11434 closed and HTTP probes refused. Selected model blobs retain their recorded sizes; outputs and original sibling edits preserved. |
-| Published page after source delivery | HTTP 200; exact older `ad737d6` HTML, with microphone disabled. No new Vercel deployment or deployment check was observed from the push/merge |
+| Production deployment acceptance | `output/deployment-acceptance-20261002.json` reports `accepted: true`: root plus all 36 public files returned HTTP 200 and matched deployed `d0936cf` source; all 37 resources accepted |
+| Production HTML and headers | Root and direct HTML are 926752 bytes, SHA-256 `6664023a66432e2f1cd932203edb37ea7ede6c3e6e6f9fb5a5b1e792d7c915cb`; security headers and CSP match, including `microphone=(self)` |
+| Production browser | Public page loaded the Crow-GodMod3 UI and research notice with telemetry off and no console warnings/errors. Research terms were not accepted and no new hosted-provider acceptance is claimed |
 
-Browser checks use the actual generated public files served on loopback with
-the source Vercel headers. Screenshots/logs are local ignored files under
-`output/playwright/`; they do not establish real provider/hardware acceptance.
+The earlier fixture and local gateway browser checks use actual generated
+public files served on loopback with the source Vercel headers. Their
+screenshots/logs are local ignored files under `output/playwright/`. Fixture
+results establish app behavior; the separately identified live gateway tests
+establish only their selected provider paths, not physical hardware acceptance.
+The production browser check is a distinct observation of the public site.
 The optional gateway was tested from its own checkout; no sibling source or
 configuration files were changed. The gateway's current CORS allows loopback
 page origins; the hosted Vercel origin is not currently allowed. Its dry-run
@@ -206,10 +217,22 @@ models as candidates. The verified text model was explicitly pinned; the
 in its owning project before relying on an unrestricted automatic gateway pool.
 No sibling source was edited or embedding model invoked during these tests.
 
-The published body SHA-256 is
-`77f10b15f911724f07949cd2d16654622725193ebab41c6977c9a34b91278259`.
-This confirms page-content drift, independently of Git or CI status. A source
-merge cannot by itself establish deployment or live-provider acceptance.
+Production is [crow-godmod3.vercel.app](https://crow-godmod3.vercel.app).
+The [deployment dashboard](https://vercel.com/djdarren2056-gmailcoms-projects/crow-godmod3/BajjdbZxYgLXAEnZfi2WRpXAxkGb)
+and deployment-details response identify the READY production deployment and
+exact `d0936cf528ff7eed23fe36aedc4e4cd898d6347f` source. The acceptance manifest is
+`output/deployment-acceptance-20261002.json`; the deployment dashboard screenshot
+is `output/vercel-production-20261002.jpg`. These evidence files remain local
+ignored output, while this record preserves their outcome.
+
+All 37 checked resources matched the source manifest. Eight text files match
+their Git LF blobs rather than the Windows checkout's CRLF bytes; those line
+ending differences are not deployment drift. The public root and direct
+`/crow-godmod3.html` have the matching size/hash recorded above. AGPL attribution,
+licence, and public corresponding source were also checked. This closes the
+earlier `ad737d6` page-content drift. It establishes deployed content, headers,
+and initial browser rendering, not fresh hosted inference, research-term
+consent, physical microphone capture, or physical speaker output.
 
 The retained upstream sidebar resize limitation is now repaired through the
 maintained build layer. Mobile drawer state stays separate from the desktop
@@ -219,21 +242,23 @@ controls are inert. The upstream snapshot remains unchanged.
 
 ## Current live-action status and blockers
 
-Rechecked after the authorized source publication and merge on 2 October 2026:
+Rechecked after the successful authorized production deployment on
+2 October 2026:
 
-- PR #24 is merged at `afed312` and PR #25 at `4c9d7a6`; both source deliveries
-  and their CI checks passed. Vercel's latest observed deployment remains
-  `dpl_2nii59cUuUCB2ADfrWXgSdRSkZGz`, READY/production for the older `ad737d6`
-  page, recorded as a Git deployment from 15 August. Historical previews also
-  exist. No new deployment or deployment check was observed after push/merge.
-- Vercel deployment is already authorized. The connector's deploy method is
-  unavailable (`method not found`), and its project-detail call rejects its own
-  parameter schema. The cached CLI credential returned `invalidToken`.
-  The browser's existing GitHub sign-in reached Vercel two-factor
-  authentication, which remains the prerequisite for authenticated deployment
-  access. No credential, sign-in URL token, or two-factor code is recorded here.
-  Do not repeat the same broken connector calls or request deployment approval
-  again; complete the legitimate authentication prerequisite before retrying.
+- PR #24 is merged at `afed312`, PR #25 at `4c9d7a6`, and PR #26 at `d0936cf`.
+  Source delivery and CI passed; READY production deployment
+  `dpl_BajjdbZxYgLXAEnZfi2WRpXAxkGb` now serves exact `d0936cf` content at the
+  production alias. The public-file and browser evidence above independently
+  verifies the deployment; it is not inferred from the merge.
+- There is no current Vercel authentication blocker. The plugin already had
+  authenticated read access, while its deploy and build-log methods were
+  unavailable and its project-detail schema was broken. Separate Google
+  dashboard sign-in completed. The GitHub source repository has been connected
+  since 29 July; why the earlier pushes/merges did not deploy automatically was
+  not established.
+  Earlier cached CLI token and dashboard sign-in failures are historical, not
+  current prerequisites. Do not repeat unavailable methods or infer a broken
+  GitHub connection. No authentication secrets are recorded here.
 - The temporary LM Studio CORS change is already authorized by Crow, but
   automatic approval review rejected the action before execution with the
   generic reason `blocked by policy`. No more specific reason was provided.
@@ -249,33 +274,27 @@ Rechecked after the authorized source publication and merge on 2 October 2026:
   succeeded as recorded above. A later temporary start of installed Ollama
   established backend and actual browser text acceptance using the existing
   `qwen2.5:0.5b` model. Image, vendor chat, and ASR were not called: the physical donor
-  prerequisite in that project's `AGENTS.md:6` is absent. No sibling source or
+  prerequisite in that project's `AGENTS.md:6` was not established. No sibling source or
   configuration was edited. Real browser speech playback passed before and
   after the media-only discovery repair. Process cleanup is recorded above.
 
 ## Outstanding work and continuation order
 
-1. **Complete the authorized deployment:** Vercel two-factor authentication is
-   the outstanding access prerequisite. After legitimate authenticated access
-   is available, deploy the latest reviewed and merged `main` (including the
-   media-only discovery follow-up) and verify the public HTML,
-   headers, and browser behavior. Authorization is already granted. Source
-   delivery and both CI runs have passed; do not republish PR #24 or infer
-   deployment from its merge.
-2. **Real local-provider browser acceptance:** LM Studio CORS remains unchanged
+1. **Real local-provider browser acceptance:** LM Studio CORS remains unchanged
    because automatic approval review rejected the authorized mutation. Resolve
    that policy limitation through the permitted workflow before performing the
    controlled change; do not retry through another mechanism to bypass it. If
    a later permitted test changes settings, restore their original values and
    verify restoration. Backend HTTP 200 alone is not browser acceptance.
-3. **Remaining gateway capabilities:** local Ollama text and Edge TTS speech
+2. **Remaining gateway capabilities:** local Ollama text and Edge TTS speech
    passed backend and browser acceptance in this pass. Donor-gated image,
-   vendor chat, and ASR require the sibling project's physical donor prerequisite.
+   vendor chat, and ASR require the sibling project's physical donor prerequisite,
+   which was not established in this pass.
    The provider-wide Ollama capability metadata also needs correction in its
    owning project before broad automatic model selection. Do not infer
    current availability from hardcoded routes or prior fixtures. Preserve the
    separate project's ownership and existing no-paid-route scope.
-4. **Further features:** no new Phase 2 feature set or CrowClaw plugin design
+3. **Further features:** no new Phase 2 feature set or CrowClaw plugin design
    was selected. Preserve standalone operation and optional project boundaries.
 
 Cloudflare's retained scaffold has `observability.enabled: true` and a
