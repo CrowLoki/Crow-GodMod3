@@ -2,6 +2,8 @@
 
 Crow-GodMod3 is an ongoing public project, not a disposable one-off clone.
 
+- Start continuation work by reading `CONTINUATION.md`, then recheck the live
+  checkout and remote state before relying on its dated checkpoint.
 - Preserve the exact product name `Crow-GodMod3`; the `3` is the final `E`.
 - Phase 1 is the faithful, working standalone G0DM0D3 derivative with the
   CrowClaw visual identity.

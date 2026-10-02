@@ -3,7 +3,7 @@ export const localRuntimePresets = Object.freeze({
     label: "Crow Free AI Gateway",
     baseUrl: "http://127.0.0.1:8766/v1",
     help:
-      "Crow's unified free-AI gateway: every local Ollama model plus the recovered anonymous Crow Print routes for chat, image, speech, and transcription. Start it from the Crow's Free AI Model Access project (scripts\\start_vendor_compat_gateway.cmd). No API key required.",
+      "Optional gateway for Ollama and configured chat, image, speech, and transcription providers. Some routes use remote services; discovered capabilities are not proof of availability. Start it from the Crow's Free AI Model Access project (scripts\\start_vendor_compat_gateway.cmd). No API key required.",
     apiKeyPlaceholder: "The Crow gateway does not use an API key",
   },
   ollama: {

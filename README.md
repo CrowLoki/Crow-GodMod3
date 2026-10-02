@@ -12,12 +12,23 @@ CrowClaw visual identity.
 
 This repository is an ongoing project.
 
-- **Phase 1:** establish the faithful standalone Crow-GodMod3 application,
-  preserve the upstream functionality, and apply the CrowClaw identity.
-- **Phase 2:** expand Crow-GodMod3 with additional features defined during the
-  next development phase.
+- **Continue here:** [CONTINUATION.md](CONTINUATION.md) records the verified
+  source baseline, preserved work, deployment differences, checks, and next
+  steps. Read it before resuming development.
+- **Phase 1:** the standalone derivative and CrowClaw identity are implemented;
+  browser, provider, and device acceptance must be established separately.
+- **Existing Phase 2 foundation:** local-runtime profiles and model pools,
+  diagnostics, the optional Crow Free AI Gateway preset, modality switching,
+  and the Crow Signal identity layer are already in the source. The latest
+  integration landed through [PR #23](https://github.com/CrowLoki/Crow-GodMod3/pull/23).
+  Further Phase 2 features require an explicit request.
 - **CrowClaw:** keep Crow-GodMod3 independently usable while making it available
   as an optional CrowClaw plugin in a future phase.
+
+As checked on **2 October 2026**, the public site's HTML still matches the
+older `ad737d6` source revision. Current `main` includes the later gateway,
+modality, and identity integration. See the continuation record for the exact
+source/deployment distinction and the latest maintenance verification.
 
 ## Provenance
 
@@ -31,15 +42,17 @@ This repository is an ongoing project.
 - Application telemetry is disabled. Provider requests still go to the
   provider or local endpoint configured by the user.
 - Local runtime presets connect directly to Ollama, LM Studio, Docker Model
-  Runner, vLLM, llama.cpp, or another OpenAI-compatible loopback server. See
-  the [local-model setup guide](docs/LOCAL_MODELS.md).
+  Runner, vLLM, llama.cpp, Crow Free AI Gateway, or another OpenAI-compatible
+  loopback server. A gateway may forward requests to remote providers; a
+  loopback connection alone does not guarantee on-device inference. See the
+  [local-model setup guide](docs/LOCAL_MODELS.md).
 
 ## CrowClaw styling
 
 CrowClaw styling is applied directly to the standalone Crow-GodMod3
-application. The deployed runtime contains only the web assets the application
-uses: Crow Bitfeather fonts, the five 32px Crow Talon cursor roles, Crow-GodMod3
-icons and imagery, and the shared colour tokens.
+application. The current build contains only the web assets the application
+uses: Crow Bitfeather and Crow Signal fonts, the five 32px Crow Talon cursor
+roles, Crow-GodMod3 icons and imagery, and the shared colour tokens.
 
 The site does not publish a theme-pack catalogue or downloadable Windows
 installer packages. The upstream snapshot remains unchanged.
@@ -47,15 +60,28 @@ installer packages. The upstream snapshot remains unchanged.
 ## Development
 
 ```powershell
-npm install
+npm ci
 npm run dev
 ```
 
 Build and test:
 
 ```powershell
+npm run lint
 npm test
+npm run generate:static
+git diff --exit-code -- public/crow-godmod3.html
 ```
+
+The generator also publishes `docs/LOCAL_MODELS.md` as
+`public/LOCAL_MODELS.md`. Keep both in sync after guide edits. Dependencies
+remain pinned in `package-lock.json`. `npm ci` applies a guarded compatibility
+patch that routes vinext 1.0.1's bundled image parser to the separately pinned
+`image-size` 2.0.4; builds verify the patch again. The patch refuses unexpected
+versions or bundled source instead of silently changing an unknown release.
+Runtime tests use Miniflare/workerd to execute the generated Worker and serve
+its actual assets. See `CONTINUATION.md` for the dated audit, browser checks,
+and remaining live-provider and deployment acceptance.
 
 ## Licence
 

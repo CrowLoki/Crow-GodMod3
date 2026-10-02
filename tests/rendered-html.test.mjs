@@ -32,66 +32,6 @@ const openRouterFreeChatModels = [
   "openai/gpt-oss-20b:free",
 ];
 
-async function render(path = "/?source=test") {
-  const workerUrl = new URL("../dist/server/index.js", import.meta.url);
-  workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);
-  const { default: worker } = await import(workerUrl.href);
-  const source = await readFile(publicEntry, "utf8");
-
-  return worker.fetch(
-    new Request(`http://localhost${path}`, {
-      headers: { accept: "text/html" },
-    }),
-    {
-      ASSETS: {
-        fetch: async (request) => {
-          const requestedUrl = new URL(request.url);
-          assert.equal(requestedUrl.pathname, "/crow-godmod3.html");
-          assert.equal(requestedUrl.search, "?source=test");
-          return new Response(source, {
-            headers: { "content-type": "text/html; charset=utf-8" },
-          });
-        },
-      },
-    },
-    {
-      waitUntil() {},
-      passThroughOnException() {},
-    },
-  );
-}
-
-test("serves the verified static clone directly at the root", async () => {
-  const response = await render();
-  assert.equal(response.status, 200);
-  assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
-
-  const html = await response.text();
-  assert.ok(html.length > 500_000);
-  assert.match(html, /<title>Crow-GodMod3<\/title>/i);
-  assert.match(html, />Crow-GodMod3</);
-  assert.match(html, /data-crow-product="crow-godmod3"/);
-  assert.match(html, /crow-signal-app-rounded-256\.png/);
-  assert.match(html, /crow-godmod3-1920x1080\.png/);
-  assert.match(html, /fonts\/bitfeather\/crow-bitfeather\.css/);
-  assert.match(html, /cursors\/v0\.5\/src\/32\/normal\.png/);
-  assert.match(html, /cursors\/v0\.5\/src\/32\/link\.png/);
-  assert.match(html, /cursors\/v0\.5\/src\/32\/text\.png/);
-  assert.match(html, /cursors\/v0\.5\/src\/32\/move\.png/);
-  assert.match(html, /cursors\/v0\.5\/src\/32\/unavailable\.png/);
-  assert.match(html, /CROW SYSTEM \/\/ GLITCH ASCENDANT/);
-  assert.match(html, /ULTRAPLINIAN/);
-  assert.match(html, /PARSELTONGUE/);
-  assert.match(html, /OpenRouter/);
-  assert.match(html, /const APP_TELEMETRY_ENABLED = false;/);
-  assert.doesNotMatch(html, /<iframe\b/i);
-  assert.doesNotMatch(html, /crow-mascot-v3|CANONICAL MASCOT V3/i);
-  assert.doesNotMatch(
-    html,
-    /crowThemeModal|openCrowThemePack|theme-pack-cta|crow-theme-btn|Explore the Crow Theme|\/crow-theme\/(?:index\.html|downloads\/|docs\/)/i,
-  );
-});
-
 test("hardens the generated CSP and removes unused external preconnects", async () => {
   const html = await readFile(publicEntry, "utf8");
 
@@ -621,6 +561,7 @@ test("ignores stale local discovery success and failure after a newer request", 
     },
     applyLocalRuntimeProfileToState() {},
     renderActiveLocalRuntimeProfile() {},
+    updateApiWarning() {},
     saveState() {},
     describeLocalConnectionFailure(error) {
       return error.message;
@@ -3188,6 +3129,7 @@ test("shows a local-runtime status badge in the header", async () => {
     },
   });
   badgeContext.getLocalRuntimeProfile = badgeContext.getLocalRuntimeProfile.bind(badgeContext);
+  badgeContext.hasLocalProvider = () => badgeContext.state.localEnabled;
   vm.runInContext(
     `${html.slice(badgeStart, badgeEnd)}
 
@@ -3196,10 +3138,10 @@ globalThis.updateLocalRuntimeStatusBadgeForTest = updateLocalRuntimeStatusBadge;
   );
   badgeContext.updateLocalRuntimeStatusBadgeForTest();
   const badge = badgeContext.document.getElementById("localRuntimeStatusBadge");
-  assert.equal(badge.className, "local-runtime-status connected");
+  assert.equal(badge.className, "local-runtime-status configured");
   assert.equal(
     badge.querySelector(".status-text").textContent,
-    "LM Studio · 2 models",
+    "LM Studio · 2 models configured",
   );
 
   badgeContext.state.localEnabled = false;
@@ -3207,7 +3149,7 @@ globalThis.updateLocalRuntimeStatusBadgeForTest = updateLocalRuntimeStatusBadge;
   assert.equal(badge.className, "local-runtime-status disconnected");
   assert.equal(
     badge.querySelector(".status-text").textContent,
-    "LM Studio · offline",
+    "LM Studio · disabled",
   );
 });
 
@@ -3503,8 +3445,9 @@ test("ships the modality switcher with text, image, audio, and video in/out", as
 
 test("lets generated media load over HTTPS while keeping connect-src tight", async () => {
   const html = await readFile(publicEntry, "utf8");
-  assert.match(html, /img-src 'self' data: blob: https:;/);
-  assert.match(html, /media-src 'self' blob: https:;/);
+  assert.match(html, /img-src 'self' data: blob: https: http:\/\/localhost:\* http:\/\/127\.0\.0\.1:\*;/);
+  assert.match(html, /media-src 'self' blob: https: http:\/\/localhost:\* http:\/\/127\.0\.0\.1:\*;/);
+  assert.doesNotMatch(html, /(?:img|media)-src[^;]* http:;/);
   // Script-driven requests remain limited to loopback runtimes and the two
   // configured cloud providers; no blanket https: connect-src.
   assert.doesNotMatch(html, /connect-src[^;]* https:;/);
@@ -3599,4 +3542,23 @@ test("ships the Crow Signal identity layer: fonts, mascot, privacy pill, game, r
   assert.match(html, /ctx\.fillStyle = '#7c5cff'/);
   assert.match(html, /\(i % 4 === 0\) \? '#45e7ff' : '#7c5cff'/);
   assert.doesNotMatch(html, /#00ff41/);
+});
+
+
+test("excludes gateway catalog-only entries while preserving executable chat models", async () => {
+  const html = await readFile(publicEntry, "utf8");
+  const start = html.indexOf("const MAX_LOCAL_MODEL_STORAGE_CHARS");
+  const end = html.indexOf("\n\n    function inferPersistedModelProvider", start);
+  assert.ok(start > 0 && end > start);
+  const context = vm.createContext({ URL, LOCAL_RUNTIME_IDS: new Set(localRuntimeIds) });
+  vm.runInContext(html.slice(start, end) + "\nglobalThis.filterModels = filterLocalChatModelDescriptors;", context);
+  const result = structuredClone(context.filterModels([
+    { id: "friendai-models:catalog-name", capabilities: ["model_catalog"] },
+    { id: "edge-tts:voice-list", capabilities: ["voice_catalog"] },
+    { id: "openrouter:executable", capabilities: ["chat", "model_catalog"] },
+    { id: "ollama:local-model", capabilities: ["chat"] },
+    { id: "unusual-model-without-metadata" },
+  ]));
+  assert.deepEqual(result.models, ["openrouter:executable", "ollama:local-model", "unusual-model-without-metadata"]);
+  assert.equal(result.skipped, 2);
 });
