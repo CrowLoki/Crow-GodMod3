@@ -7,22 +7,29 @@ below is dated. Historical handoffs remain provenance, not current instructions.
 ## Scope and current checkpoint
 
 This continuation reconciled the existing work, upgraded the dependency tree,
-and repaired defects in the existing modality and local-runtime UI. It adds no
-new Phase 2 feature set. Crow-GodMod3 remains independently deployable; no
-deployment or sibling-project edit was made.
+and repaired defects in the existing modality and local-runtime UI. That work
+is published and merged through PR #24. It adds no new Phase 2 feature set.
+Crow-GodMod3 remains independently deployable. No new Vercel deployment has
+completed, and no sibling-project source/configuration files were edited.
+
+Crow explicitly authorized source publication, merge, Vercel deployment,
+temporary LM Studio CORS changes, and the selected free-gateway tests. That
+authorization persists; do not request it again. The remaining deployment and
+LM Studio obstacles are access/policy failures, detailed below.
 
 | Item | Verified state |
 | --- | --- |
 | Canonical checkout | `C:\Users\djdar\Documents\Crow-GodMod3` |
 | Repository | `https://github.com/CrowLoki/Crow-GodMod3.git` |
-| Working branch | `codex/next-authorized-slice` |
+| Resume branch | `main`; fetch and verify its current HEAD before continuing. The media-only discovery repair was delivered from `codex/runtime-acceptance-followup`. |
 | Starting source baseline | `b3bf2efff92718ef0503e28241c8bc4a79d442fa` |
-| Remote state at checkpoint | Live `git ls-remote` returned that baseline SHA for `main` and `codex/next-authorized-slice`; local `main` and both tracking refs agree |
-| Latest integration | [PR #23](https://github.com/CrowLoki/Crow-GodMod3/pull/23), merged 23 August 2026 |
-| CI for main | [Run 32617251823](https://github.com/CrowLoki/Crow-GodMod3/actions/runs/32617251823), success for `b3bf2ef`; historical CI, supplemented by fresh local checks below |
-| Open PRs / issues | None returned by live GitHub queries on 2 October 2026 |
-| Entry state | Clean working tree before this reconciliation |
-| Continuation delivery | Maintenance checkpoint `a10f2fb125c8e47e6f087b758846369875cd6bc2` followed by the responsive-sidebar repair on the same branch; use `git log -1` for the latest exact SHA. No push, merge, or deployment is included in this checkpoint. |
+| Verified merged baseline | `afed312fe6b0aada5137bec4449f98dfcdbbb6c4` from PR #24; the media-only discovery follow-up is recorded below |
+| Remote state at baseline | Live `git ls-remote` returned `afed312fe6b0aada5137bec4449f98dfcdbbb6c4` for `main` and `2585f294183352fb6af805ba266b29780f69c775` for `codex/next-authorized-slice`; recheck current `main` rather than treating this baseline as a permanent HEAD |
+| Latest integration | [PR #24](https://github.com/CrowLoki/Crow-GodMod3/pull/24), merged as `afed312` from head `2585f29` |
+| CI | [PR run 36959434520](https://github.com/CrowLoki/Crow-GodMod3/actions/runs/36959434520) and [main run 36959558554](https://github.com/CrowLoki/Crow-GodMod3/actions/runs/36959558554) passed |
+| Earlier open PR / issue query | None returned before PR #24 was opened; PR #24 has since been merged |
+| Entry state for this documentation refresh | Clean working tree on `main` at `afed312` |
+| Continuation delivery | Maintenance checkpoint `a10f2fb125c8e47e6f087b758846369875cd6bc2` and the responsive-sidebar repair are included in merged PR #24. The follow-up fixes the media-only discovery defect found by real gateway acceptance and records the remaining deployment/runtime prerequisites. |
 
 The current chat runs in the canonical Documents checkout. The older
 `Crow-GodMod3 Project Continuation` chat
@@ -76,7 +83,8 @@ routine continuation:
   through the maintained build layer.
 - Detached worktree `C:\Users\djdar\.codex\worktrees\de82\Crow-GodMod3`
   is clean at `749c641666d3a6a33c27647a2c95515c18b4953f`. Its only difference
-  from the source baseline is `Crow-GodMod3 KIMI-K3-HANDOFF-2026-08-17.md`.
+  from the starting `b3bf2ef` source baseline is
+  `Crow-GodMod3 KIMI-K3-HANDOFF-2026-08-17.md`.
   It contains no additional product implementation. The stash's untracked
   parent contains the identical historical handoff blob
   `c59e5c2498a2b7f29f210eadba8fc995f34d06c6`.
@@ -124,6 +132,11 @@ those old changes blindly.
 - Discovery excludes catalogue-only routes from chat and uses discovered
   capabilities for modality availability. Gateway prompt limits are 500
   characters; the current iflytek ASR route allows 320000 PCM bytes / 10 seconds.
+- Real gateway acceptance found and fixed a media-only discovery defect. A
+  reachable speech-only gateway now reports its advertised speech capability
+  while keeping chat unavailable; catalog-only inventories stay out of chat.
+  Empty or malformed inventories still fail. Missing image/ASR routes are
+  labelled as unadvertised, rather than telling users to restart the gateway.
 - The provider warning refreshes after discovery; status labels describe
   configured models honestly. Diagnostic errors are scoped to the runtime
   that produced them. Header groups wrap at narrow widths and media sizes fit
@@ -140,28 +153,37 @@ build and runtime binaries were usable without changing that global policy.
 | Check | Result |
 | --- | --- |
 | `npm ci --no-fund` | Completed cleanly; audit 0 vulnerabilities |
-| Integrated `npm test` | Latest continuation build and all 99 tests passed; 0 failed, skipped, or cancelled. The earlier a10f2fb checkpoint had 94 passing tests. |
+| Integrated `npm test` | Latest follow-up build and all 103 tests passed; 0 failed, skipped, or cancelled. PR #24 had 99 tests; the earlier a10f2fb checkpoint had 94. |
 | `npm run lint` | Exit 0; 0 errors, 8 warnings in injected modality functions and generated Worker declarations |
 | Real Worker runtime checks | 4 assertions/subtests passed independently before the final build |
 | Modality regressions | 42 tests passed independently, including cancellation, permission failure, cleanup, frozen credentials, URL handling, and gateway limits |
-| Provider-status regressions | 3 new behavioral tests reproduced the old defects, then passed after regeneration |
+| Provider-status regressions | All 7 behavioral tests passed, including valid media-only/catalog-only inventories and empty/malformed responses; media-only and catalog-only regressions failed before the fix |
 | Local browser media | Chromium loaded the generated image and played returned audio; browser-intercepted gateway fixtures, not live provider generation |
 | Browser microphone | Fake microphone recorded and produced PCM sent to the simulated transcription endpoint; transcript appeared for review without autosending |
 | Browser microphone failure / cancellation | With browser permission set to denied, Chromium reported `Not supported`; the app recovered to text mode without a request. Main Stop cancelled a held speech response, restored the composer, and rejected its late result. Unit tests separately cover a rejected permission request. |
 | Responsive browser layout | No horizontal overflow at 1440, 390, or 320 pixels; phone modality menu stays within the viewport and generated image fits |
 | Responsive sidebar continuation | Five new behavioral regressions fail against a10f2fb and pass after repair. Actual browser verified desktop-to-phone collapse, close button, backdrop, Escape, focus restoration, and restoration of both open/closed desktop preferences across 1440/390/320 pixel transitions. |
-| LM Studio backend | Real loopback `/v1/chat/completions` returned HTTP 200 with text from `llama-3.2-1b-instruct` |
-| LM Studio browser access | Failed CORS: the live server returned no Access-Control-Allow-Origin for the page origin; configuration unchanged |
-| Optional gateway / Ollama | Ports 8766 / 11434 refused connections; neither service started |
-| Published page | HTTP 200; exact older `ad737d6` HTML, with microphone disabled; unchanged by this work |
+| Earlier LM Studio backend test | Real loopback `/v1/chat/completions` returned HTTP 200 with text from `llama-3.2-1b-instruct`; this does not establish browser acceptance or a currently loaded model |
+| LM Studio browser access | Failed CORS. The authorized temporary configuration change was rejected by automatic approval review before execution; original settings and unloaded inventory remain unchanged |
+| Optional gateway live discovery | Started for the authorized test from the separate project's `05d517a` source; advertised only `edge-tts:neural-voices`, with `tts` and `voice_catalog` capabilities |
+| Optional gateway live speech | Real Edge TTS request returned HTTP 200, `audio/mpeg`, 27648 bytes, using `en-AU-WilliamNeural`; a separate real browser request then decoded and played all 4.104 seconds, reaching `ended=true`, `readyState=4`, with no media error |
+| Post-fix gateway browser acceptance | Real discovery reports reachable/no chat/speech output advertised; the chat warning remains accurate. A new speech request decoded and played all 2.352 seconds to `ended=true`, `readyState=4`, with no media error |
+| Gateway text / image / vendor chat / ASR | Ollama is unavailable. Donor-gated image, vendor chat, and ASR routes were not invoked because the physical donor prerequisite in the sibling project's `AGENTS.md:6` is absent |
+| Temporary gateway cleanup | Original stopped state restored: owned PID 37128 identity verified before stopping, process absent, no listener on 8766, and `/health` refuses connections. Test outputs/media and pre-existing sibling documentation edits preserved. |
+| Published page after source delivery | HTTP 200; exact older `ad737d6` HTML, with microphone disabled. No new Vercel deployment or deployment check was observed from the push/merge |
 
 Browser checks use the actual generated public files served on loopback with
 the source Vercel headers. Screenshots/logs are local ignored files under
 `output/playwright/`; they do not establish real provider/hardware acceptance.
-The optional gateway source was read in its own checkout; no sibling files or
-runtime configuration were changed. The gateway's current CORS allows loopback
+The optional gateway was tested from its own checkout; no sibling source or
+configuration files were changed. The gateway's current CORS allows loopback
 page origins; the hosted Vercel origin is not currently allowed. Its dry-run
 flag is not a network firewall and was not used to activate remote adapters.
+The live speech result above is separate from the earlier browser fixtures.
+The live browser speech evidence is saved locally in
+`output/gateway-browser-acceptance-20261002.json`. These checks do not verify
+physical speaker output or microphone input. Temporary-process cleanup is
+recorded separately above.
 
 The published body SHA-256 is
 `77f10b15f911724f07949cd2d16654622725193ebab41c6977c9a34b91278259`.
@@ -174,60 +196,63 @@ preference; crossing the 768px breakpoint closes the mobile drawer. Its close
 button, backdrop, and Escape dismiss it and restore focus. Hidden sidebar
 controls are inert. The upstream snapshot remains unchanged.
 
-## Current live-action prerequisites
+## Current live-action status and blockers
 
-Rechecked after resuming from `a10f2fb` on 2 October 2026:
+Rechecked after the authorized source publication and merge on 2 October 2026:
 
-- Both remote branches still point to `b3bf2ef`. Source publishing has not
-  happened. Vercel's latest deployment is
-  `dpl_2nii59cUuUCB2ADfrWXgSdRSkZGz`, READY/production for `ad737d6`, and its
-  recorded source is `git`. Historical preview deployments also exist.
-- The project-detail connector still rejects its own parameter schema. The
-  browser settings URL redirects to Vercel login. The existing CLI credential
-  was tried through the official read-only project API and returned
-  `forbidden / invalidToken`; no credential or login state was changed.
-  Therefore the current Git deployment switches remain unknown. Publishing
-  must either follow a successful settings inspection or explicit approval
-  allowing its possible preview/production deployment effects.
-- LM Studio 0.4.21+2 still listens on `127.0.0.1:1234`. Its inventory has 19
-  installed entries (12 language models, 7 embedding models), with no loaded
-  instances. Discovery lacks Access-Control-Allow-Origin, chat preflight
-  returns HTTP 400, and the live server configuration has `cors: false`.
-  The supported CLI CORS switch allows any website; no exact-origin switch
-  is exposed. A controlled browser test needs approval to enable that setting
-  temporarily, retain loopback binding, possibly restart the server, load the
-  selected installed model, then restore the previous CORS setting.
-- The optional gateway and Ollama remain stopped. The gateway checkout stays
-  at `05d517a5937876d935d65fc7d82a4e84956fe4c1`, retaining its pre-existing
-  documentation changes. Starting it and invoking anonymous external routes
-  remain a separate approval boundary. Use benign test text and synthetic
-  audio; do not activate paid routes or modify sibling source.
-- No existing same-origin inference proxy exists in Crow-GodMod3 or LM Studio.
-  Do not add a new proxy feature merely to bypass the current runtime's CORS
-  configuration.
+- PR #24 is merged at `afed312`; the media-only discovery follow-up adds the
+  real browser acceptance findings. Vercel's latest observed deployment remains
+  `dpl_2nii59cUuUCB2ADfrWXgSdRSkZGz`, READY/production for the older `ad737d6`
+  page, recorded as a Git deployment from 15 August. Historical previews also
+  exist. No new deployment or deployment check was observed after push/merge.
+- Vercel deployment is already authorized. The connector's deploy method is
+  unavailable (`method not found`), and its project-detail call rejects its own
+  parameter schema. The cached CLI credential returned `invalidToken`.
+  The browser's existing GitHub sign-in reached Vercel two-factor
+  authentication, which remains the prerequisite for authenticated deployment
+  access. No credential, sign-in URL token, or two-factor code is recorded here.
+  Do not repeat the same broken connector calls or request deployment approval
+  again; complete the legitimate authentication prerequisite before retrying.
+- The temporary LM Studio CORS change is already authorized by Crow, but
+  automatic approval review rejected the action before execution with the
+  generic reason `blocked by policy`. No more specific reason was provided.
+  No backup was created and no configuration change, restart, or retry through
+  another mechanism occurred. Do not bypass that rejection. LM Studio remains
+  bound to `127.0.0.1:1234`, with `cors: false`, JIT loading enabled, and the same
+  19 installed entries (12 language models, 7 embedding models), all unloaded.
+  Its missing CORS response and HTTP 400 chat preflight leave browser chat
+  acceptance unresolved. No same-origin proxy was added.
+- The optional gateway test is already authorized and was started from
+  `05d517a5937876d935d65fc7d82a4e84956fe4c1` in its separate checkout, preserving
+  its pre-existing documentation changes. Live discovery and Edge TTS speech
+  succeeded as recorded above. Ollama is unavailable, so local text was not
+  accepted. Image, vendor chat, and ASR were not called: the physical donor
+  prerequisite in that project's `AGENTS.md:6` is absent. No sibling source or
+  configuration was edited. Real browser speech playback passed before and
+  after the media-only discovery repair. Process cleanup is recorded above.
 
 ## Outstanding work and continuation order
 
-1. **Resume the saved source checkpoint:** verify the local commit and clean
-   working tree, then review/publish that branch through the normal source
-   delivery workflow. Confirm hosting automation or obtain explicit approval
-   for its deployment effects before publishing. See the verified access
-   limitations above; do not repeat the same connector parameter retries. Do not
-   reapply historical stashes or restart from the original 24-finding audit.
-2. **Real local-provider browser acceptance:** LM Studio is reachable directly
-   but needs an authorized temporary CORS configuration change for browser
-   chat. Restore the original setting after a controlled test. Recheck its
-   actual state before altering it. A server-side response alone is not browser
-   acceptance.
-3. **Optional gateway acceptance:** when its owner authorizes starting the
-   separate gateway and invoking selected providers, discover real capabilities
-   and verify text/image/speech/transcription against those actual routes.
-   Use a locally served app for its current CORS policy. The tests above prove
-   app behavior against controlled responses, not current remote availability.
-4. **Deployment when requested:** deploy the reviewed generated source, then
-   verify the public HTML, headers, browser microphone permission, and actual
-   provider paths. The current public page remains behind source.
-5. **Further features:** no new Phase 2 feature set or CrowClaw plugin design
+1. **Complete the authorized deployment:** Vercel two-factor authentication is
+   the outstanding access prerequisite. After legitimate authenticated access
+   is available, deploy the latest reviewed and merged `main` (including the
+   media-only discovery follow-up) and verify the public HTML,
+   headers, and browser behavior. Authorization is already granted. Source
+   delivery and both CI runs have passed; do not republish PR #24 or infer
+   deployment from its merge.
+2. **Real local-provider browser acceptance:** LM Studio CORS remains unchanged
+   because automatic approval review rejected the authorized mutation. Resolve
+   that policy limitation through the permitted workflow before performing the
+   controlled change; do not retry through another mechanism to bypass it. If
+   a later permitted test changes settings, restore their original values and
+   verify restoration. Backend HTTP 200 alone is not browser acceptance.
+3. **Remaining gateway capabilities:** use current discovery as the boundary.
+   Edge TTS speech passed backend and browser acceptance in this pass. Local
+   text requires available Ollama; donor-gated image, vendor chat, and ASR
+   require the sibling project's physical donor prerequisite. Do not infer
+   current availability from hardcoded routes or prior fixtures. Preserve the
+   separate project's ownership and existing no-paid-route scope.
+4. **Further features:** no new Phase 2 feature set or CrowClaw plugin design
    was selected. Preserve standalone operation and optional project boundaries.
 
 Cloudflare's retained scaffold has `observability.enabled: true` and a

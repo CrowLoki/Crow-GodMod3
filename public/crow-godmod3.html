@@ -4296,7 +4296,7 @@
       <div class="input-area">
         <div class="input-container">
           <div id="noApiWarning" class="no-api-warning" style="display: none;">
-            ! No model provider. <a onclick="startOpenRouterLogin()" style="cursor:pointer;text-decoration:underline;">Log in with OpenRouter</a> or <a onclick="openSettings()" style="cursor:pointer;text-decoration:underline;">configure OpenRouter, Venice, or local models</a> to start.
+            ! No chat model provider. <a onclick="startOpenRouterLogin()" style="cursor:pointer;text-decoration:underline;">Log in with OpenRouter</a> or <a onclick="openSettings()" style="cursor:pointer;text-decoration:underline;">configure OpenRouter, Venice, or local models</a> to start text chat.
           </div>
           <!-- Image preview strip (shown when image attached) -->
           <div class="image-preview-strip" id="imagePreviewStrip">
@@ -5259,6 +5259,31 @@
       return '';
     }
 
+    function getAdvertisedLocalMediaLabels(runtime) {
+      return [['image', 'image output'], ['tts', 'speech output'], ['asr', 'speech input']]
+        .filter(([capability]) => findLocalModelWithCapability(runtime, capability))
+        .map(([, label]) => label);
+    }
+
+    function describeLocalModelDiscovery(runtime, discovery) {
+      const label = LOCAL_RUNTIME_PRESETS[runtime].label;
+      const count = discovery.models.length;
+      if (!count) {
+        const mediaLabels = getAdvertisedLocalMediaLabels(runtime);
+        const mediaSummary = mediaLabels.length
+          ? '; ' + mediaLabels.join(', ') + ' advertised'
+          : '; no supported media routes advertised';
+        return `${label}: reachable; no chat model IDs${mediaSummary}.`;
+      }
+      const capabilityLabel = discovery.source.startsWith('lmstudio-')
+        ? 'chat-capable model'
+        : 'candidate model';
+      const skippedLabel = discovery.skipped
+        ? `; ${discovery.skipped} non-chat ID${discovery.skipped === 1 ? '' : 's'} skipped`
+        : '';
+      return `${label}: ${count} ${capabilityLabel} ID${count === 1 ? '' : 's'} saved${skippedLabel}.`;
+    }
+
     async function discoverLocalChatModels(runtime, baseUrl, headers, fetchImpl = fetch) {
       if (runtime === 'lmstudio') {
         for (const apiVersion of ['v1', 'v0']) {
@@ -5269,7 +5294,7 @@
             );
             if (!nativeResponse.ok) continue;
             const nativePayload = await nativeResponse.json();
-            const descriptors = extractLocalModelDescriptors(nativePayload);
+            const descriptors = extractLocalModelDescriptors(nativePayload).filter(getLocalModelDescriptorId);
             recordLocalModelCapabilities(runtime, descriptors);
             if (!descriptors.length) continue;
             const result = filterLocalChatModelDescriptors(descriptors);
@@ -5286,7 +5311,7 @@
       const response = await fetchImpl(`${baseUrl}/models`, { headers });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const payload = await response.json();
-      const descriptors = extractLocalModelDescriptors(payload);
+      const descriptors = extractLocalModelDescriptors(payload).filter(getLocalModelDescriptorId);
       recordLocalModelCapabilities(runtime, descriptors);
       if (!descriptors.length) throw new Error('Server returned no model IDs');
       return {
@@ -6473,7 +6498,6 @@
         const discovery = await discoverLocalChatModels(runtime, baseUrl, headers);
         if (_localRuntimeProfileGenerations[runtime] !== discoveryGeneration) return;
         const models = discovery.models;
-        if (!models.length) throw new Error('Server returned no model IDs');
         setLocalRuntimeProfile(runtime, {
           ...requestProfile,
           baseUrl,
@@ -6490,19 +6514,13 @@
         }
         saveState();
         updateApiWarning();
-        const label = LOCAL_RUNTIME_PRESETS[runtime].label;
+        const discoveryMessage = describeLocalModelDiscovery(runtime, discovery);
         if (status && runtime === state.localRuntime) {
-          const capabilityLabel = discovery.source.startsWith('lmstudio-')
-            ? 'chat-capable model'
-            : 'candidate model';
-          const skippedLabel = discovery.skipped
-            ? `; ${discovery.skipped} non-chat ID${discovery.skipped === 1 ? '' : 's'} skipped`
-            : '';
-          status.textContent = `${label}: ${models.length} ${capabilityLabel} ID${models.length === 1 ? '' : 's'} saved${skippedLabel}.`;
+          status.textContent = discoveryMessage;
           status.style.color = 'var(--success)';
         }
         if (typeof _localRuntimeErrorCounts !== 'undefined') delete _localRuntimeErrorCounts[runtime];
-        if (typeof logRuntimeDiagnostic === 'function') logRuntimeDiagnostic(`${label}: ${models.length} ${discovery.source.startsWith('lmstudio-') ? 'chat-capable model' : 'candidate model'} ID${models.length === 1 ? '' : 's'} saved${discovery.skipped ? '; ' + discovery.skipped + ' non-chat ID' + (discovery.skipped === 1 ? '' : 's') + ' skipped' : ''}.`, 'success', runtime);
+        if (typeof logRuntimeDiagnostic === 'function') logRuntimeDiagnostic(discoveryMessage, 'success', runtime);
         if (typeof updateLocalRuntimeStatusBadge === 'function') updateLocalRuntimeStatusBadge();
       } catch (err) {
         if (discoveryGeneration !== null
@@ -15021,6 +15039,7 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
       const profile = getLocalRuntimeProfile(runtimeId);
       const models = parseLocalModelIds(profile.models);
       const isConfigured = hasLocalProvider(runtimeId);
+      const mediaLabels = state.localEnabled ? getAdvertisedLocalMediaLabels(runtimeId) : [];
       const statusText = badge.querySelector('.status-text');
       const errorCount = typeof _localRuntimeErrorCounts !== 'undefined' ? (_localRuntimeErrorCounts[runtimeId] || 0) : 0;
       if (errorCount > 0) {
@@ -15029,6 +15048,9 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
       } else if (isConfigured) {
         badge.className = 'local-runtime-status configured';
         if (statusText) statusText.textContent = runtimeLabel + ' · ' + models.length + ' model' + (models.length === 1 ? '' : 's') + ' configured';
+      } else if (mediaLabels.length) {
+        badge.className = 'local-runtime-status configured';
+        if (statusText) statusText.textContent = runtimeLabel + ' · ' + mediaLabels.join(', ') + ' advertised';
       } else {
         badge.className = 'local-runtime-status disconnected';
         if (statusText) statusText.textContent = runtimeLabel + (state.localEnabled ? ' · not configured' : ' · disabled');
@@ -15219,6 +15241,8 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
       if (!dropdown) return;
       const { runtimeId } = crowModalityTransport();
       const runtimeLabel = LOCAL_RUNTIME_PRESETS[runtimeId]?.label || 'Local';
+      const inventoryKnown = typeof _localModelCapsByRuntime !== 'undefined'
+        && Object.prototype.hasOwnProperty.call(_localModelCapsByRuntime, runtimeId);
       dropdown.innerHTML = CROW_MODALITIES.map(m => {
         const active = _crowModality === m.id;
         const available = crowModalityAvailable(m);
@@ -15229,7 +15253,9 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
             && findLocalModelWithCapability(runtimeId, m.capability);
           note = route
             ? `via ${route} · ${runtimeLabel}${discovered ? '' : ' · configured, not verified'}`
-            : runtimeId === 'crowfree'
+            : inventoryKnown
+              ? `no route advertised by ${runtimeLabel}`
+              : runtimeId === 'crowfree'
               ? 'start the gateway, then Test & Discover'
               : `no route on ${runtimeLabel}`;
         }

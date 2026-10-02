@@ -562,6 +562,9 @@ test("ignores stale local discovery success and failure after a newer request", 
     applyLocalRuntimeProfileToState() {},
     renderActiveLocalRuntimeProfile() {},
     updateApiWarning() {},
+    describeLocalModelDiscovery(runtime, discovery) {
+      return `${runtime}: ${discovery.models.length} candidate model IDs saved`;
+    },
     saveState() {},
     describeLocalConnectionFailure(error) {
       return error.message;
@@ -3130,6 +3133,7 @@ test("shows a local-runtime status badge in the header", async () => {
   });
   badgeContext.getLocalRuntimeProfile = badgeContext.getLocalRuntimeProfile.bind(badgeContext);
   badgeContext.hasLocalProvider = () => badgeContext.state.localEnabled;
+  badgeContext.getAdvertisedLocalMediaLabels = () => [];
   vm.runInContext(
     `${html.slice(badgeStart, badgeEnd)}
 
@@ -3503,18 +3507,14 @@ test("renderCrowGeneratedMedia renders safe media and rejects unsafe URLs", asyn
   assert.equal(unsafe, "");
 });
 
-test("discovery success logging never references block-scoped labels out of scope", async () => {
+test("discovery status and logging share a message computed outside the status element guard", async () => {
   const html = await readFile(publicEntry, "utf8");
   // Regression: the diagnostics log line used to interpolate capabilityLabel
   // and skippedLabel outside the if (status) block where they are declared,
   // which turned every successful Test & Discover into a ReferenceError.
-  const logCall = html.match(
-    /if \(typeof logRuntimeDiagnostic === 'function'\) logRuntimeDiagnostic\(`\$\{label\}: \$\{models\.length\} [\s\S]+?, 'success'\);/,
-  );
-  assert.ok(logCall, "missing discovery success log line");
-  assert.ok(!logCall[0].includes("capabilityLabel"), "log line must not use capabilityLabel");
-  assert.ok(!logCall[0].includes("skippedLabel"), "log line must not use skippedLabel");
-  assert.match(logCall[0], /discovery\.source\.startsWith\('lmstudio-'\)/);
+  assert.match(html, /const discoveryMessage = describeLocalModelDiscovery\(runtime, discovery\);\s+if \(status && runtime === state.localRuntime\)/);
+  assert.match(html, /status\.textContent = discoveryMessage;/);
+  assert.match(html, /logRuntimeDiagnostic\(discoveryMessage, 'success', runtime\)/);
 });
 
 test("ships the Crow Signal identity layer: fonts, mascot, privacy pill, game, rain", async () => {
