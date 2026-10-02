@@ -13,7 +13,7 @@ CrowClaw visual identity.
 This repository is an ongoing project.
 
 - **Continue here:** [CONTINUATION.md](CONTINUATION.md) records the verified
-  source baseline, preserved work, deployment differences, checks, and next
+  source baseline, preserved work, production deployment, checks, and next
   steps. Read it before resuming development.
 - **Phase 1:** the standalone derivative and CrowClaw identity are implemented;
   browser, provider, and device acceptance must be established separately.
@@ -25,16 +25,21 @@ This repository is an ongoing project.
   [PR #24](https://github.com/CrowLoki/Crow-GodMod3/pull/24).
   Real gateway acceptance and the media-only discovery repair are recorded in
   [PR #25](https://github.com/CrowLoki/Crow-GodMod3/pull/25).
+  Local Ollama gateway text acceptance is recorded in
+  [PR #26](https://github.com/CrowLoki/Crow-GodMod3/pull/26).
   Further Phase 2 features require an explicit request.
 - **CrowClaw:** keep Crow-GodMod3 independently usable while making it available
   as an optional CrowClaw plugin in a future phase.
 
-As checked on **2 October 2026**, the public site's HTML still matches the
-older `ad737d6` source revision. PR #24 merged at `afed312`, including the later
-gateway, modality, identity, dependency, and sidebar work. PR and main CI passed;
-the maintained build passes 103 tests and lint reports 0 errors / 8 warnings.
-Vercel deployment is already authorized but awaits authenticated access through
-its two-factor sign-in step. No new deployment was observed after push/merge.
+As checked on **2 October 2026**, Vercel production is READY at source
+`d0936cf528ff7eed23fe36aedc4e4cd898d6347f` from merged PR #26. The root page and
+all 36 public files returned HTTP 200 and matched the source manifest; deployed
+headers and CSP match, including `microphone=(self)`. The public browser loaded
+the Crow-GodMod3 UI and research notice with telemetry off and no console
+warnings or errors. This verifies deployment and initial rendering; research
+terms were not accepted and no new hosted-provider acceptance is claimed.
+Main CI passed, the maintained build passes 103 tests, and lint reports
+0 errors / 8 warnings.
 
 The optional gateway passed real browser text using installed Ollama
 `qwen2.5:0.5b`, plus Edge TTS generation, decoding, and playback. No model download
@@ -45,7 +50,9 @@ models as chat candidates. Temporary services are restored after testing and
 test media is preserved. LM Studio browser
 chat remains blocked by unchanged CORS after automatic approval review rejected
 the authorized temporary setting change. See [CONTINUATION.md](CONTINUATION.md)
-for the exact evidence, remaining access requirements, and capability limits.
+for the exact deployment and runtime evidence, remaining policy prerequisite,
+and capability limits. The physical donor prerequisite for the sibling
+gateway's image, vendor chat, and ASR routes was not established in this pass.
 
 ## Provenance
 
@@ -97,8 +104,8 @@ patch that routes vinext 1.0.1's bundled image parser to the separately pinned
 `image-size` 2.0.4; builds verify the patch again. The patch refuses unexpected
 versions or bundled source instead of silently changing an unknown release.
 Runtime tests use Miniflare/workerd to execute the generated Worker and serve
-its actual assets. See `CONTINUATION.md` for the dated audit, browser checks,
-and remaining live-provider and deployment acceptance.
+its actual assets. See `CONTINUATION.md` for the dated audit, deployed-source
+verification, browser checks, and remaining provider/device acceptance.
 
 ## Licence
 
