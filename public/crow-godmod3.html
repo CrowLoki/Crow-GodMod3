@@ -3807,6 +3807,10 @@
       }
     }
 
+    .sidebar-close {
+      display: none;
+    }
+
     /* Keep both header groups within the available chat width. */
     .chat-header {
       flex-wrap: wrap;
@@ -4065,6 +4069,32 @@
     }
 
     @media (max-width: 768px) {
+      .sidebar-header {
+        position: relative;
+      }
+
+      .sidebar-header .logo {
+        padding-right: 36px;
+      }
+
+      .sidebar-close {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 36px;
+        height: 36px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--bg-secondary);
+        color: var(--text);
+        font: inherit;
+        font-size: 24px;
+        cursor: pointer;
+      }
+
       .mode-switcher-btn,
       .modality-switcher-btn {
         gap: 6px;
@@ -4111,11 +4141,12 @@
 <body data-crow-theme data-crow-product="crow-godmod3">
   <div class="app">
     <!-- Mobile overlay -->
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()" aria-hidden="true"></div>
 
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
+        <button class="sidebar-close" id="sidebarClose" type="button" onclick="closeMobileSidebar()" aria-label="Close sidebar">×</button>
         <div class="logo">
           <img class="brand-mark" src="/crow-theme/assets/icons/app/crow-signal-app-rounded-256.png" alt="" aria-hidden="true" width="256" height="256" decoding="async">
           <span class="logo-text">Crow-GodMod3</span>
@@ -4145,7 +4176,7 @@
     <main class="main">
       <header class="chat-header">
         <div class="header-left">
-          <button class="toggle-sidebar" onclick="toggleSidebar()">☰</button>
+          <button class="toggle-sidebar" id="sidebarToggle" type="button" onclick="toggleSidebar()" aria-controls="sidebar" aria-expanded="true" aria-label="Close sidebar">☰</button>
           <!-- Mode Switcher -->
           <div class="mode-switcher" id="modeSwitcher">
             <button class="mode-switcher-btn ultraplinian" id="modeSwitcherBtn" onclick="toggleModeDropdown()">
@@ -14509,10 +14540,7 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
       _initMessageAreaDelegate();
 
       // Collapse sidebar on mobile by default
-      if (window.innerWidth <= 768) {
-        state.sidebarOpen = false;
-        document.getElementById('sidebar').classList.add('collapsed');
-      }
+      initializeResponsiveSidebar();
 
       // Set up auto-save for all settings inputs
       setupSettingsAutoSave();
@@ -16031,10 +16059,51 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
     }
 
     // Sidebar
+    const sidebarMobileQuery = window.matchMedia('(max-width: 768px)');
+    let mobileSidebarOpen = false;
+
+    function syncSidebarUI(restoreFocus = false) {
+      const sidebar = document.getElementById('sidebar');
+      const toggle = document.getElementById('sidebarToggle');
+      const isMobile = sidebarMobileQuery.matches;
+      const isOpen = isMobile ? mobileSidebarOpen : state.sidebarOpen;
+      const hadSidebarFocus = sidebar.contains(document.activeElement);
+      sidebar.classList.toggle('collapsed', !isOpen);
+      sidebar.inert = !isOpen;
+      sidebar.setAttribute('aria-hidden', String(!isOpen));
+      document.getElementById('sidebarOverlay').classList.toggle('visible', isMobile && isOpen);
+      toggle.setAttribute('aria-expanded', String(isOpen));
+      toggle.setAttribute('aria-label', isOpen ? 'Close sidebar' : 'Open sidebar');
+      if (!isOpen && (restoreFocus || hadSidebarFocus)) toggle.focus();
+    }
+
+    function closeMobileSidebar() {
+      if (!sidebarMobileQuery.matches || !mobileSidebarOpen) return;
+      mobileSidebarOpen = false;
+      syncSidebarUI(true);
+    }
+
     function toggleSidebar() {
-      state.sidebarOpen = !state.sidebarOpen;
-      document.getElementById('sidebar').classList.toggle('collapsed', !state.sidebarOpen);
-      document.getElementById('sidebarOverlay').classList.toggle('visible', state.sidebarOpen);
+      if (sidebarMobileQuery.matches) {
+        mobileSidebarOpen = !mobileSidebarOpen;
+      } else {
+        state.sidebarOpen = !state.sidebarOpen;
+      }
+      syncSidebarUI();
+      if (sidebarMobileQuery.matches && mobileSidebarOpen) document.getElementById('sidebarClose').focus();
+    }
+
+    function initializeResponsiveSidebar() {
+      syncSidebarUI();
+      sidebarMobileQuery.addEventListener('change', () => {
+        mobileSidebarOpen = false;
+        syncSidebarUI();
+      });
+      document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape' || event.defaultPrevented || !sidebarMobileQuery.matches || !mobileSidebarOpen) return;
+        event.preventDefault();
+        closeMobileSidebar();
+      });
     }
 
     // Conversations

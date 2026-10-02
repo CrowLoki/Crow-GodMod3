@@ -22,7 +22,7 @@ deployment or sibling-project edit was made.
 | CI for main | [Run 32617251823](https://github.com/CrowLoki/Crow-GodMod3/actions/runs/32617251823), success for `b3bf2ef`; historical CI, supplemented by fresh local checks below |
 | Open PRs / issues | None returned by live GitHub queries on 2 October 2026 |
 | Entry state | Clean working tree before this reconciliation |
-| Continuation delivery | Local commit on `codex/next-authorized-slice` contains this checkpoint, source, tests, and generated assets; use `git log -1` for its exact SHA. No push, merge, or deployment is included in this checkpoint. |
+| Continuation delivery | Maintenance checkpoint `a10f2fb125c8e47e6f087b758846369875cd6bc2` followed by the responsive-sidebar repair on the same branch; use `git log -1` for the latest exact SHA. No push, merge, or deployment is included in this checkpoint. |
 
 The current chat runs in the canonical Documents checkout. The older
 `Crow-GodMod3 Project Continuation` chat
@@ -140,7 +140,7 @@ build and runtime binaries were usable without changing that global policy.
 | Check | Result |
 | --- | --- |
 | `npm ci --no-fund` | Completed cleanly; audit 0 vulnerabilities |
-| Integrated `npm test` | Build and all 94 tests passed; 0 failed, skipped, or cancelled |
+| Integrated `npm test` | Latest continuation build and all 99 tests passed; 0 failed, skipped, or cancelled. The earlier a10f2fb checkpoint had 94 passing tests. |
 | `npm run lint` | Exit 0; 0 errors, 8 warnings in injected modality functions and generated Worker declarations |
 | Real Worker runtime checks | 4 assertions/subtests passed independently before the final build |
 | Modality regressions | 42 tests passed independently, including cancellation, permission failure, cleanup, frozen credentials, URL handling, and gateway limits |
@@ -149,6 +149,7 @@ build and runtime binaries were usable without changing that global policy.
 | Browser microphone | Fake microphone recorded and produced PCM sent to the simulated transcription endpoint; transcript appeared for review without autosending |
 | Browser microphone failure / cancellation | With browser permission set to denied, Chromium reported `Not supported`; the app recovered to text mode without a request. Main Stop cancelled a held speech response, restored the composer, and rejected its late result. Unit tests separately cover a rejected permission request. |
 | Responsive browser layout | No horizontal overflow at 1440, 390, or 320 pixels; phone modality menu stays within the viewport and generated image fits |
+| Responsive sidebar continuation | Five new behavioral regressions fail against a10f2fb and pass after repair. Actual browser verified desktop-to-phone collapse, close button, backdrop, Escape, focus restoration, and restoration of both open/closed desktop preferences across 1440/390/320 pixel transitions. |
 | LM Studio backend | Real loopback `/v1/chat/completions` returned HTTP 200 with text from `llama-3.2-1b-instruct` |
 | LM Studio browser access | Failed CORS: the live server returned no Access-Control-Allow-Origin for the page origin; configuration unchanged |
 | Optional gateway / Ollama | Ports 8766 / 11434 refused connections; neither service started |
@@ -167,24 +168,57 @@ The published body SHA-256 is
 This confirms page-content drift, independently of Git or CI status. A source
 merge cannot by itself establish deployment or live-provider acceptance.
 
-Known browser limitation retained from the upstream UI: shrinking an already
-open desktop sidebar into a phone viewport can leave it covering the controls.
-A fresh load at phone width collapses it correctly. The responsive checks above
-used that normal phone startup state. Fixing resize/menu dismissal is a small
-remaining UI task; it was not part of the header-overflow repair.
+The retained upstream sidebar resize limitation is now repaired through the
+maintained build layer. Mobile drawer state stays separate from the desktop
+preference; crossing the 768px breakpoint closes the mobile drawer. Its close
+button, backdrop, and Escape dismiss it and restore focus. Hidden sidebar
+controls are inert. The upstream snapshot remains unchanged.
+
+## Current live-action prerequisites
+
+Rechecked after resuming from `a10f2fb` on 2 October 2026:
+
+- Both remote branches still point to `b3bf2ef`. Source publishing has not
+  happened. Vercel's latest deployment is
+  `dpl_2nii59cUuUCB2ADfrWXgSdRSkZGz`, READY/production for `ad737d6`, and its
+  recorded source is `git`. Historical preview deployments also exist.
+- The project-detail connector still rejects its own parameter schema. The
+  browser settings URL redirects to Vercel login. The existing CLI credential
+  was tried through the official read-only project API and returned
+  `forbidden / invalidToken`; no credential or login state was changed.
+  Therefore the current Git deployment switches remain unknown. Publishing
+  must either follow a successful settings inspection or explicit approval
+  allowing its possible preview/production deployment effects.
+- LM Studio 0.4.21+2 still listens on `127.0.0.1:1234`. Its inventory has 19
+  installed entries (12 language models, 7 embedding models), with no loaded
+  instances. Discovery lacks Access-Control-Allow-Origin, chat preflight
+  returns HTTP 400, and the live server configuration has `cors: false`.
+  The supported CLI CORS switch allows any website; no exact-origin switch
+  is exposed. A controlled browser test needs approval to enable that setting
+  temporarily, retain loopback binding, possibly restart the server, load the
+  selected installed model, then restore the previous CORS setting.
+- The optional gateway and Ollama remain stopped. The gateway checkout stays
+  at `05d517a5937876d935d65fc7d82a4e84956fe4c1`, retaining its pre-existing
+  documentation changes. Starting it and invoking anonymous external routes
+  remain a separate approval boundary. Use benign test text and synthetic
+  audio; do not activate paid routes or modify sibling source.
+- No existing same-origin inference proxy exists in Crow-GodMod3 or LM Studio.
+  Do not add a new proxy feature merely to bypass the current runtime's CORS
+  configuration.
 
 ## Outstanding work and continuation order
 
 1. **Resume the saved source checkpoint:** verify the local commit and clean
    working tree, then review/publish that branch through the normal source
-   delivery workflow. Confirm hosting automation before any action that might
-   deploy it. The Vercel project-detail connector returned incompatible schema
-   errors, so its current Git deployment setting was not established. Do not
+   delivery workflow. Confirm hosting automation or obtain explicit approval
+   for its deployment effects before publishing. See the verified access
+   limitations above; do not repeat the same connector parameter retries. Do not
    reapply historical stashes or restart from the original 24-finding audit.
 2. **Real local-provider browser acceptance:** LM Studio is reachable directly
-   but needs an authorized CORS configuration change for browser chat. Recheck
-   its actual state before altering it. A server-side response alone is not
-   browser acceptance.
+   but needs an authorized temporary CORS configuration change for browser
+   chat. Restore the original setting after a controlled test. Recheck its
+   actual state before altering it. A server-side response alone is not browser
+   acceptance.
 3. **Optional gateway acceptance:** when its owner authorizes starting the
    separate gateway and invoking selected providers, discover real capabilities
    and verify text/image/speech/transcription against those actual routes.

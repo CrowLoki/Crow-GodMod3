@@ -1,3 +1,7 @@
+    .sidebar-close {
+      display: none;
+    }
+
     /* Keep both header groups within the available chat width. */
     .chat-header {
       flex-wrap: wrap;
@@ -256,6 +260,32 @@
     }
 
     @media (max-width: 768px) {
+      .sidebar-header {
+        position: relative;
+      }
+
+      .sidebar-header .logo {
+        padding-right: 36px;
+      }
+
+      .sidebar-close {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 36px;
+        height: 36px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--bg-secondary);
+        color: var(--text);
+        font: inherit;
+        font-size: 24px;
+        cursor: pointer;
+      }
+
       .mode-switcher-btn,
       .modality-switcher-btn {
         gap: 6px;
