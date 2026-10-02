@@ -23,11 +23,14 @@ Supported presets:
 4. Add the optional bearer token only when the local server requires one.
 5. Click **Test & Discover Models**. Crow-GodMod3 reads the exact IDs returned
    by the runtime and excludes models that are explicitly identified as
-   embedding or reranking models. LM Studio uses its native capability metadata;
+   embedding, reranking, or catalogue-only routes. LM Studio uses its native capability metadata;
    other OpenAI-compatible runtimes retain unknown IDs so unusual chat models
    are not guessed away.
-6. Enable **Local-only mode** if all model inference should stay on the local
-   runtime instead of using OpenRouter or Venice.
+6. Enable **Local-only mode** to send model requests through the selected
+   loopback runtime instead of calling OpenRouter or Venice directly.
+   A gateway can forward those requests to remote providers. For on-device
+   inference, select a model actually served on your own hardware and verify
+   the runtime's routing.
 
 The full discovered inventory remains available in the model controls. Under
 **Settings → Strategies → Local models per question, by mode**, ULTRAPLINIAN,
@@ -82,11 +85,14 @@ below with the origin shown in the Local Model Runtimes settings panel.
 
 ## Crow Free AI Gateway
 
-The Crow Free AI Gateway preset connects to Crow's unified free-AI gateway
-from the separate `Crow's Free AI Model Access` project. It exposes every
-local Ollama model plus the recovered anonymous Crow Print routes (chat,
-image generation, text-to-speech, and speech transcription) through one
-loopback OpenAI-compatible server.
+The Crow Free AI Gateway preset connects to the separate
+`Crow's Free AI Model Access` project through one loopback OpenAI-compatible
+server. The existing integration is designed for local Ollama models plus
+anonymous provider routes for chat, image generation, text-to-speech, and
+speech transcription. Provider availability and actual inference must be
+verified against the running gateway; a saved preset or successful discovery
+alone does not establish that a route currently works. The gateway is optional
+and remains independently owned by that project.
 
 1. Start the gateway from that project with
    `scripts\start_vendor_compat_gateway.cmd` (vendor routes included) or
@@ -116,7 +122,8 @@ menu and states what each tool does:
   flow).
 - **AUDIO · OUT** — the composer text is sent to the runtime's
   `/audio/speech` route; the spoken audio renders as an inline player. On
-  the Crow gateway this uses `miaoxue-tts:default`.
+  the Crow gateway this uses a discovered speech route, such as
+  `edge-tts:neural-voices`; the exact route is shown before sending.
 - **AUDIO · IN** — records from the microphone, converts the audio to
   16 kHz mono PCM in the browser, and sends it to the runtime's
   `/audio/transcriptions` route; the transcript lands in the composer for
@@ -125,9 +132,32 @@ menu and states what each tool does:
 - **VIDEO · OUT** — shown but unavailable: no configured provider offers a
   video route yet.
 
-Each option shows the exact model route it will use once discovered.
+Each option shows the exact model route it will use once discovered. Before
+discovery, preset fallback routes are labelled as configured and unverified.
+After discovery, the returned capabilities determine which routes are available.
 Modalities only run on the selected local runtime; cloud providers are
-never called by the modality layer.
+never called directly by the modality layer. The selected runtime can itself
+forward requests to a remote provider.
+
+The gateway currently limits image and speech prompts to 500 characters.
+Its `iflytek-asr:default` route accepts at most 10 seconds of signed 16-bit,
+16 kHz mono PCM. Crow-GodMod3 checks these limits before sending; oversized
+image or speech prompts stay in the composer. Click the recording **STOP**
+control to finish and transcribe, or the main send/stop button to cancel.
+Transcripts remain in the composer for review before sending.
+
+The source hosting policy now permits microphone requests from the app's own
+origin (`microphone=(self)`); browser permission is still required. Granted
+capture was checked in Chromium with a fake microphone. A browser set to deny
+permission returned `Not supported`, and the app recovered without sending;
+unit tests also cover a rejected permission request. Gateway response handling
+was checked with simulated responses. Those checks do not establish real
+provider or hardware acceptance.
+
+As checked on **2 October 2026**, the published Vercel page is older than this
+source, lacks the modality switcher, and still sends `microphone=()`.
+Deployment and live provider acceptance remain outstanding. See
+`CONTINUATION.md` in the source repository for the current checkpoint.
 
 ## LM Studio
 
@@ -256,6 +286,8 @@ Local-only mode:
 - uses lightweight local checks for classification/refusal detection and the
   first selected model in the active mode's frozen pool for remaining judge,
   coaching, accuracy, and Liquid calls;
+- routes through the selected loopback runtime, which may itself proxy remote
+  services; it does not guarantee that model inference stays on the device;
 - keeps conversations, settings, and keys in browser storage;
 - does not stop ordinary page-hosting or browser traffic.
 

@@ -329,6 +329,7 @@ const runtimeLocalProviderConfig = `    // First-class loopback runtime presets.
         'text-to-image', 'image-generation', 'speech-to-text',
         'text-to-speech', 'transcription', 'image', 'images', 'tts', 'asr',
         'audio', 'speech', 'voice', 'video', 'music', 'moderation',
+        'model_catalog', 'voice_catalog',
       ]);
       if (tokens.some(token => nonChatEvidence.has(token))) return true;
 
@@ -1424,7 +1425,7 @@ replaceRequired(
                 <label for="localOnly" style="margin:0;">Local-only mode</label>
               </div>
               <small style="color:#888;display:block;margin:-6px 0 12px;line-height:1.5;">
-                Local-only mode never calls OpenRouter or Venice. After discovery, configure an independent unlimited local-model pool for each mode under Strategies. The header picker can still pin one exact model for one run mode.
+                Local-only mode sends requests through the selected loopback runtime instead of calling OpenRouter or Venice directly. A gateway may forward requests to remote providers. After discovery, configure an independent unlimited local-model pool for each mode under Strategies. The header picker can still pin one exact model for one run mode.
               </small>
               <label for="localRuntimeInput">Runtime preset</label>
               <select id="localRuntimeInput" onchange="applyLocalRuntimePreset(this.value)">
@@ -1704,8 +1705,9 @@ replaceRequired(
           renderActiveLocalRuntimeProfile();
         }
         saveState();
+        updateApiWarning();
         const label = LOCAL_RUNTIME_PRESETS[runtime].label;
-        if (status) {
+        if (status && runtime === state.localRuntime) {
           const capabilityLabel = discovery.source.startsWith('lmstudio-')
             ? 'chat-capable model'
             : 'candidate model';
@@ -1718,7 +1720,7 @@ replaceRequired(
       } catch (err) {
         if (discoveryGeneration !== null
           && _localRuntimeProfileGenerations[runtime] !== discoveryGeneration) return;
-        if (status) {
+        if (status && runtime === state.localRuntime) {
           status.textContent = \`Connection failed: \${describeLocalConnectionFailure(err, runtime, baseUrl)}\`;
           status.style.color = 'var(--danger)';
         }
@@ -1996,7 +1998,7 @@ replaceRequired(
   '        console.error(`[ULTRAPLINIAN] ${model} failed:`, err.message);',
   `        console.error(\`[ULTRAPLINIAN] \${model} failed:\`, err.message);
         if (typeof logRuntimeDiagnostic === 'function') {
-          logRuntimeDiagnostic(\`ULTRAPLINIAN \${model} (\${provider}\${modeTarget?.runtime ? ' / ' + modeTarget.runtime : ''}) failed: \${err.message}\`, 'error');
+          logRuntimeDiagnostic(\`ULTRAPLINIAN \${model} (\${provider}\${modeTarget?.runtime ? ' / ' + modeTarget.runtime : ''}) failed: \${err.message}\`, 'error', provider === 'local' ? modeTarget?.runtime : null);
         }`,
   1,
 );
@@ -5259,12 +5261,12 @@ const localRuntimeStatusStyles = '    /* Local runtime status badge in the chat 
       '      background: rgb(115 76 255 / 16%);\n' +
       '      border-color: var(--crow-border-focus);\n' +
       '    }\n' +
-      '    .local-runtime-status.connected {\n' +
+      '    .local-runtime-status.configured {\n' +
       '      color: var(--crow-product-signal, #45e7ff);\n' +
       '      background: rgb(69 231 255 / 12%);\n' +
       '      border-color: rgb(69 231 255 / 35%);\n' +
       '    }\n' +
-      '    .local-runtime-status.connected .status-dot {\n' +
+      '    .local-runtime-status.configured .status-dot {\n' +
       '      background: var(--crow-product-signal, #45e7ff);\n' +
       '      box-shadow: 0 0 6px var(--crow-product-signal, #45e7ff);\n' +
       '    }\n' +
@@ -5407,7 +5409,7 @@ replaceRequired(
   '        <div class="header-right">\n          <!-- Prompts tried counter -->',
   '        <div class="header-right">\n' +
   '          <button class="local-runtime-status" id="localRuntimeStatusBadge" onclick="openSettings()" title="Local runtime status · click to open settings" aria-live="polite">\n' +
-  '            <span class="status-dot"></span><span class="status-text">Local · offline</span>\n' +
+  '            <span class="status-dot"></span><span class="status-text">Local · not configured</span>\n' +
   '          </button>\n' +
   '          <span class="no-signal-pill" title="Application telemetry is disabled in this Crow-GodMod3 build: no analytics, no beacons, no tracking. Provider requests go only to the endpoints you configure."><span class="no-signal-dot"></span>NO-SIGNAL · TELEMETRY OFF</span>\n' +
   '          <span class="header-separator">|</span>\n' +
@@ -5422,7 +5424,7 @@ replaceRequired(
 
 replaceRequired(
   '    function updateModeSwitcherUI() {',
-  '    let _localRuntimeErrorCount = 0;\n\n' +
+  '    let _localRuntimeErrorCounts = {};\n\n' +
   '    function updateLocalRuntimeStatusBadge() {\n' +
     "      const badge = document.getElementById('localRuntimeStatusBadge');\n" +
     "      if (!badge) return;\n" +
@@ -5431,18 +5433,18 @@ replaceRequired(
   "      const runtimeLabel = preset ? preset.label : 'Local';\n" +
   '      const profile = getLocalRuntimeProfile(runtimeId);\n' +
   '      const models = parseLocalModelIds(profile.models);\n' +
-  '      const isConnected = state.localEnabled && models.length > 0;\n' +
+  '      const isConfigured = hasLocalProvider(runtimeId);\n' +
     "      const statusText = badge.querySelector('.status-text');\n" +
-  "      const errorCount = typeof _localRuntimeErrorCount !== 'undefined' ? _localRuntimeErrorCount : 0;\n" +
+  "      const errorCount = typeof _localRuntimeErrorCounts !== 'undefined' ? (_localRuntimeErrorCounts[runtimeId] || 0) : 0;\n" +
   '      if (errorCount > 0) {\n' +
   "        badge.className = 'local-runtime-status error';\n" +
-  "        if (statusText) statusText.textContent = runtimeLabel + ' · ' + errorCount + ' error' + (errorCount === 1 ? '' : 's');\n" +
-  '      } else if (isConnected) {\n' +
-  "        badge.className = 'local-runtime-status connected';\n" +
-  "        if (statusText) statusText.textContent = runtimeLabel + ' · ' + models.length + ' model' + (models.length === 1 ? '' : 's');\n" +
+  "        if (statusText) statusText.textContent = runtimeLabel + ' · ' + errorCount + ' logged error' + (errorCount === 1 ? '' : 's');\n" +
+  '      } else if (isConfigured) {\n' +
+  "        badge.className = 'local-runtime-status configured';\n" +
+  "        if (statusText) statusText.textContent = runtimeLabel + ' · ' + models.length + ' model' + (models.length === 1 ? '' : 's') + ' configured';\n" +
   '      } else {\n' +
   "        badge.className = 'local-runtime-status disconnected';\n" +
-  "        if (statusText) statusText.textContent = runtimeLabel + ' · offline';\n" +
+  "        if (statusText) statusText.textContent = runtimeLabel + (state.localEnabled ? ' · not configured' : ' · disabled');\n" +
   '      }\n' +
   '    }\n\n' +
   '    function updateModeSwitcherUI() {'
@@ -5450,7 +5452,7 @@ replaceRequired(
 
 replaceRequired(
   '    function updateModeSwitcherUI() {',
-  '    function logRuntimeDiagnostic(message, type) {\n' +
+  '    function logRuntimeDiagnostic(message, type, runtime = null) {\n' +
   "      const panel = document.getElementById('localRuntimeDiagnosticsLog');\n" +
   "      if (!panel) return;\n" +
   "      const entry = document.createElement('div');\n" +
@@ -5469,8 +5471,8 @@ replaceRequired(
   "        const diagPanel = document.getElementById('localRuntimeDiagnostics');\n" +
   "        if (diagPanel) diagPanel.classList.add('open');\n" +
   "      }\n" +
-  "      if (type === 'error') {\n" +
-  "        if (typeof _localRuntimeErrorCount !== 'undefined') _localRuntimeErrorCount++;\n" +
+  "      if (type === 'error' && runtime && LOCAL_RUNTIME_IDS.has(runtime)) {\n" +
+  "        _localRuntimeErrorCounts[runtime] = (_localRuntimeErrorCounts[runtime] || 0) + 1;\n" +
   "        if (typeof updateLocalRuntimeStatusBadge === 'function') updateLocalRuntimeStatusBadge();\n" +
   "      }\n" +
   '    }\n\n' +
@@ -5503,7 +5505,7 @@ replaceRequired(
   "      const panel = document.getElementById('localRuntimeDiagnosticsLog');\n" +
   "      if (!panel) return;\n" +
   "      panel.replaceChildren();\n" +
-  "      if (typeof _localRuntimeErrorCount !== 'undefined') _localRuntimeErrorCount = 0;\n" +
+  "      if (typeof _localRuntimeErrorCounts !== 'undefined') _localRuntimeErrorCounts = {};\n" +
   "      if (typeof updateLocalRuntimeStatusBadge === 'function') updateLocalRuntimeStatusBadge();\n" +
   "      logRuntimeDiagnostic('Diagnostics log cleared', 'info');\n" +
   '    }\n\n' +
@@ -5517,24 +5519,24 @@ replaceRequired(
 
 replaceRequired(
   '      updateLocalRuntimeHelp(state.localRuntime);\n      refreshModeModelSelect();\n      renderLocalRaceModelPicker();\n      buildTierSelect();\n    }',
-  '      updateLocalRuntimeHelp(state.localRuntime);\n      refreshModeModelSelect();\n      renderLocalRaceModelPicker();\n      buildTierSelect();\n      updateLocalRuntimeStatusBadge();\n    }',
+  '      updateLocalRuntimeHelp(state.localRuntime);\n      refreshModeModelSelect();\n      renderLocalRaceModelPicker();\n      buildTierSelect();\n      updateApiWarning();\n      updateLocalRuntimeStatusBadge();\n    }',
 );
 
 replaceRequired(
   "          status.textContent = `${label}: ${models.length} ${capabilityLabel} ID${models.length === 1 ? '' : 's'} saved${skippedLabel}.`;\n          status.style.color = 'var(--success)';\n        }\n      } catch (err) {",
-  "          status.textContent = `${label}: ${models.length} ${capabilityLabel} ID${models.length === 1 ? '' : 's'} saved${skippedLabel}.`;\n          status.style.color = 'var(--success)';\n        }\n        if (typeof logRuntimeDiagnostic === 'function') logRuntimeDiagnostic(`${label}: ${models.length} ${discovery.source.startsWith('lmstudio-') ? 'chat-capable model' : 'candidate model'} ID${models.length === 1 ? '' : 's'} saved${discovery.skipped ? '; ' + discovery.skipped + ' non-chat ID' + (discovery.skipped === 1 ? '' : 's') + ' skipped' : ''}.`, 'success');\n        if (typeof updateLocalRuntimeStatusBadge === 'function') updateLocalRuntimeStatusBadge();\n      } catch (err) {",
+  "          status.textContent = `${label}: ${models.length} ${capabilityLabel} ID${models.length === 1 ? '' : 's'} saved${skippedLabel}.`;\n          status.style.color = 'var(--success)';\n        }\n        if (typeof _localRuntimeErrorCounts !== 'undefined') delete _localRuntimeErrorCounts[runtime];\n        if (typeof logRuntimeDiagnostic === 'function') logRuntimeDiagnostic(`${label}: ${models.length} ${discovery.source.startsWith('lmstudio-') ? 'chat-capable model' : 'candidate model'} ID${models.length === 1 ? '' : 's'} saved${discovery.skipped ? '; ' + discovery.skipped + ' non-chat ID' + (discovery.skipped === 1 ? '' : 's') + ' skipped' : ''}.`, 'success', runtime);\n        if (typeof updateLocalRuntimeStatusBadge === 'function') updateLocalRuntimeStatusBadge();\n      } catch (err) {",
 );
 
 replaceRequired(
   "          status.textContent = `Connection failed: ${describeLocalConnectionFailure(err, runtime, baseUrl)}`;\n          status.style.color = 'var(--danger)';\n        }\n      }\n    }",
-  "          status.textContent = `Connection failed: ${describeLocalConnectionFailure(err, runtime, baseUrl)}`;\n          status.style.color = 'var(--danger)';\n        }\n        if (typeof logRuntimeDiagnostic === 'function') logRuntimeDiagnostic(`Connection failed: ${describeLocalConnectionFailure(err, runtime, baseUrl)}`, 'error');\n        if (typeof updateLocalRuntimeStatusBadge === 'function') updateLocalRuntimeStatusBadge();\n      }\n    }",
+  "          status.textContent = `Connection failed: ${describeLocalConnectionFailure(err, runtime, baseUrl)}`;\n          status.style.color = 'var(--danger)';\n        }\n        if (typeof logRuntimeDiagnostic === 'function') logRuntimeDiagnostic(`Connection failed: ${describeLocalConnectionFailure(err, runtime, baseUrl)}`, 'error', runtime);\n        if (typeof updateLocalRuntimeStatusBadge === 'function') updateLocalRuntimeStatusBadge();\n      }\n    }",
 );
 
 
 
 replaceRequired(
   '        const discovery = await discoverLocalChatModels(runtime, baseUrl, headers);\n',
-  '        if (typeof logRuntimeDiagnostic === \'function\') logRuntimeDiagnostic(\'Discovering models on \' + (LOCAL_RUNTIME_PRESETS[runtime]?.label || runtime) + \'…\', \'info\');\n' +
+  '        if (typeof logRuntimeDiagnostic === \'function\') logRuntimeDiagnostic(\'Discovering models on \' + (LOCAL_RUNTIME_PRESETS[runtime]?.label || runtime) + \'…\', \'info\', runtime);\n' +
   '        const discovery = await discoverLocalChatModels(runtime, baseUrl, headers);\n',
 );
 
@@ -5611,6 +5613,13 @@ replaceRequired(
   "      if (typeof crowModalityRouteSend === 'function' && await crowModalityRouteSend(content, attachedImage)) return;\n",
 );
 
+// Keep the existing Stop button connected to the active modality operation.
+replaceRequired(
+  '    function stopGeneration() {\n',
+  '    function stopGeneration() {\n' +
+  "      if (typeof crowStopModalityRequest === 'function' && crowStopModalityRequest()) return;\n",
+);
+
 // Assistant messages can carry generated media alongside text content.
 replaceRequired(
   '        // Vision badge — only when vision analysis actually ran',
@@ -5625,13 +5634,12 @@ replaceRequired(
   '              ${imageThumb}\n              ${generatedMedia}\n',
 );
 
-// Generated media arrives as remote HTTPS URLs from the configured runtime,
-// so images and audio may load from any HTTPS origin. connect-src stays
-// restricted: only loopback runtimes and the two cloud providers are
-// callable from script.
+// Generated media can be HTTPS-hosted or served by the selected loopback
+// gateway. Permit HTTP media only on loopback; connect-src remains restricted
+// to the configured local runtimes and the two cloud providers.
 replaceRequired(
   "img-src 'self' data: blob:;",
-  "img-src 'self' data: blob: https:; media-src 'self' blob: https:;",
+  "img-src 'self' data: blob: https: http://localhost:* http://127.0.0.1:*; media-src 'self' blob: https: http://localhost:* http://127.0.0.1:*;",
 );
 
 // Show the waiting game while an ULTRAPLINIAN race runs. The game was fully

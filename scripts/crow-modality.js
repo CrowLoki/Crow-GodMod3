@@ -24,8 +24,8 @@
         desc: 'No video route exists yet' },
     ]);
 
-    // Deterministic route knowledge for Crow's own gateway, so the modality
-    // tools work even before a Test & Discover run has cached capabilities.
+    // Configured route defaults before Test & Discover runs. Discovery is
+    // authoritative once available; these defaults do not verify a provider.
     const CROW_GATEWAY_KNOWN_ROUTES = Object.freeze({
       crowfree: Object.freeze({
         image: 'miaoxue-image:default',
@@ -36,7 +36,48 @@
 
     let _crowModality = 'text';
     let _crowMediaRecorder = null;
-    let _crowRecordedChunks = [];
+    let _crowModalityRequest = null;
+
+    function crowBeginModalityRequest(kind) {
+      const request = { kind, controller: new AbortController() };
+      _crowModalityRequest = request;
+      isStreaming = true;
+      updateSendButton();
+      return request;
+    }
+
+    function crowModalityRequestActive(request) {
+      return !!request && _crowModalityRequest === request && !request.controller.signal.aborted;
+    }
+
+    function crowEndModalityRequest(request) {
+      if (_crowModalityRequest !== request) return false;
+      _crowModalityRequest = null;
+      isStreaming = false;
+      updateSendButton();
+      return true;
+    }
+
+    // The main Stop button cancels the entire operation. The modality button
+    // still stops capture and submits that recording for transcription.
+    function crowStopModalityRequest() {
+      const request = _crowModalityRequest;
+      if (!request) return false;
+      request.controller.abort();
+      request.releaseStream?.();
+      if (request.recorder && request.recorder.state !== 'inactive') request.recorder.stop();
+      crowEndModalityRequest(request);
+      _crowMediaRecorder = null;
+      if (request.kind === 'audio-in') {
+        _crowModality = 'text';
+        const input = document.getElementById('messageInput');
+        if (input) delete input.dataset.crowBusy;
+      }
+      hideTyping();
+      updateCrowModalityUI();
+      if (typeof logRuntimeDiagnostic === 'function') logRuntimeDiagnostic('Modality request canceled.', 'info');
+      return true;
+    }
 
     function getCrowModalityDef(id) {
       return CROW_MODALITIES.find(m => m.id === id) || CROW_MODALITIES[0];
@@ -51,7 +92,7 @@
           profile.baseUrl || LOCAL_RUNTIME_PRESETS[runtimeId].baseUrl || '',
           runtimeId,
         );
-      } catch (_) {
+      } catch {
         baseUrl = '';
       }
       const apiKey = (_localApiKeysByRuntime[runtimeId]
@@ -59,12 +100,14 @@
       return { runtimeId, baseUrl, apiKey };
     }
 
-    function crowModalityRouteFor(capability) {
-      const { runtimeId } = crowModalityTransport();
+    function crowModalityRouteFor(capability, transport = crowModalityTransport()) {
+      const { runtimeId } = transport;
       if (typeof findLocalModelWithCapability === 'function') {
         const discovered = findLocalModelWithCapability(runtimeId, capability);
         if (discovered) return discovered;
       }
+      if (typeof _localModelCapsByRuntime !== 'undefined'
+        && Object.prototype.hasOwnProperty.call(_localModelCapsByRuntime, runtimeId)) return '';
       return CROW_GATEWAY_KNOWN_ROUTES[runtimeId]?.[capability] || '';
     }
 
@@ -84,8 +127,10 @@
         let note = '';
         if (m.capability) {
           const route = crowModalityRouteFor(m.capability);
+          const discovered = typeof findLocalModelWithCapability === 'function'
+            && findLocalModelWithCapability(runtimeId, m.capability);
           note = route
-            ? `via ${route} · ${runtimeLabel}`
+            ? `via ${route} · ${runtimeLabel}${discovered ? '' : ' · configured, not verified'}`
             : runtimeId === 'crowfree'
               ? 'start the gateway, then Test & Discover'
               : `no route on ${runtimeLabel}`;
@@ -207,6 +252,7 @@
 
     function crowModalityBeginSend(content) {
       // Mirrors the conversation plumbing at the top of sendMessage().
+      if (isStreaming) return null;
       if (!state.localEnabled) {
         if (typeof logRuntimeDiagnostic === 'function') {
           logRuntimeDiagnostic('Enable the local runtime in Settings → API Keys first.', 'warning');
@@ -229,22 +275,20 @@
       updatePromptsTriedUI();
       saveState();
       render();
-      isStreaming = true;
-      updateSendButton();
+      const request = crowBeginModalityRequest('media-out');
       showTyping();
-      return conv;
+      return { conv, request };
     }
 
-    function crowModalityEndSend() {
-      isStreaming = false;
-      updateSendButton();
+    function crowModalityEndSend(request) {
+      if (!crowEndModalityRequest(request)) return;
       hideTyping();
       saveState();
       render();
     }
 
-    async function crowModalityFetch(path, body) {
-      const { runtimeId, baseUrl, apiKey } = crowModalityTransport();
+    async function crowModalityFetch(path, body, transport = crowModalityTransport(), request = _crowModalityRequest) {
+      const { baseUrl, apiKey } = transport;
       if (!baseUrl) throw new Error('The selected local runtime has no base URL.');
       const headers = { 'Content-Type': 'application/json' };
       if (apiKey) headers.Authorization = `Bearer ${apiKey}`;
@@ -252,12 +296,37 @@
         method: 'POST',
         headers,
         body: JSON.stringify(body),
+        signal: request?.controller.signal,
       });
       if (!response.ok) {
         const detail = (await response.text()).slice(0, 240);
         throw new Error(`HTTP ${response.status}${detail ? ` — ${detail}` : ''}`);
       }
-      return response.json();
+      try {
+        return await response.json();
+      } catch {
+        throw new Error('The runtime returned invalid JSON. This modality requires the gateway JSON response format.');
+      }
+    }
+
+    function crowModalityMediaUrl(value, transport) {
+      if (typeof value !== 'string' || !value.trim() || /[\s"'<>]/.test(value)) return '';
+      if (!/^https?:\/\//i.test(value) && !/^\/(?![/\\])/.test(value)) return '';
+      try {
+        const url = new URL(value, `${transport.baseUrl}/`);
+        if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) return '';
+        return url.href;
+      } catch {
+        return '';
+      }
+    }
+
+    function crowModalityInputAllowed(value, transport) {
+      if (transport.runtimeId !== 'crowfree' || Array.from(value).length <= 500) return true;
+      if (typeof logRuntimeDiagnostic === 'function') {
+        logRuntimeDiagnostic('The Crow Free AI Gateway accepts up to 500 characters for image prompts and speech. Shorten the text and try again.', 'warning');
+      }
+      return false;
     }
 
     async function crowGenerateImage(prompt) {
@@ -266,15 +335,19 @@
         if (input) input.placeholder = 'Describe the image to generate…';
         return;
       }
-      const model = crowModalityRouteFor('image');
-      const conv = crowModalityBeginSend(`🎨 ${prompt}`);
-      if (!conv) return;
+      const transport = Object.freeze(crowModalityTransport());
+      if (!crowModalityInputAllowed(prompt, transport)) return;
+      const model = crowModalityRouteFor('image', transport);
+      const sending = crowModalityBeginSend(`🎨 ${prompt}`);
+      if (!sending) return;
+      const { conv, request } = sending;
       try {
         if (!model) throw new Error('No image-capable route on this runtime. Run Test & Discover or select the Crow Free AI Gateway.');
         logRuntimeDiagnostic(`Generating image via ${model}…`, 'info');
-        const data = await crowModalityFetch('/images/generations', { model, prompt });
-        const url = data?.data?.[0]?.url || '';
-        if (!/^https?:\/\//.test(url)) throw new Error('The runtime returned no image URL.');
+        const data = await crowModalityFetch('/images/generations', { model, prompt }, transport, request);
+        if (!crowModalityRequestActive(request)) return;
+        const url = crowModalityMediaUrl(data?.data?.[0]?.url, transport);
+        if (!url) throw new Error('The runtime returned no image URL.');
         conv.messages.push({
           role: 'assistant',
           content: `Generated image for “${prompt}” via \`${model}\`.`,
@@ -282,10 +355,11 @@
         });
         logRuntimeDiagnostic(`Image generated via ${model}`, 'success');
       } catch (err) {
+        if (!crowModalityRequestActive(request)) return;
         conv.messages.push({ role: 'assistant', content: `Image generation failed: ${err.message}` });
         if (typeof logRuntimeDiagnostic === 'function') logRuntimeDiagnostic(`Image generation failed: ${err.message}`, 'error');
       } finally {
-        crowModalityEndSend();
+        crowModalityEndSend(request);
       }
     }
 
@@ -295,15 +369,19 @@
         if (input) input.placeholder = 'Text to speak aloud…';
         return;
       }
-      const model = crowModalityRouteFor('tts');
-      const conv = crowModalityBeginSend(`🔊 ${text}`);
-      if (!conv) return;
+      const transport = Object.freeze(crowModalityTransport());
+      if (!crowModalityInputAllowed(text, transport)) return;
+      const model = crowModalityRouteFor('tts', transport);
+      const sending = crowModalityBeginSend(`🔊 ${text}`);
+      if (!sending) return;
+      const { conv, request } = sending;
       try {
         if (!model) throw new Error('No speech-capable route on this runtime. Run Test & Discover or select the Crow Free AI Gateway.');
         logRuntimeDiagnostic(`Generating speech via ${model}…`, 'info');
-        const data = await crowModalityFetch('/audio/speech', { model, input: text });
-        const url = data?.audio_source || '';
-        if (!/^https?:\/\//.test(url)) throw new Error('The runtime returned no audio URL.');
+        const data = await crowModalityFetch('/audio/speech', { model, input: text }, transport, request);
+        if (!crowModalityRequestActive(request)) return;
+        const url = crowModalityMediaUrl(data?.audio_source, transport);
+        if (!url) throw new Error('The runtime returned no audio URL.');
         conv.messages.push({
           role: 'assistant',
           content: `Spoken audio for “${text.slice(0, 120)}${text.length > 120 ? '…' : ''}” via \`${model}\`.`,
@@ -311,16 +389,27 @@
         });
         logRuntimeDiagnostic(`Speech generated via ${model}`, 'success');
       } catch (err) {
+        if (!crowModalityRequestActive(request)) return;
         conv.messages.push({ role: 'assistant', content: `Speech generation failed: ${err.message}` });
         if (typeof logRuntimeDiagnostic === 'function') logRuntimeDiagnostic(`Speech generation failed: ${err.message}`, 'error');
       } finally {
-        crowModalityEndSend();
+        crowModalityEndSend(request);
       }
     }
 
     async function crowStartRecording() {
-      if (_crowMediaRecorder) return;
-      const route = crowModalityRouteFor('asr');
+      if (_crowMediaRecorder || isStreaming) return;
+      if (!state.localEnabled) {
+        if (typeof logRuntimeDiagnostic === 'function') {
+          logRuntimeDiagnostic('Enable the local runtime in Settings → API Keys first.', 'warning');
+        }
+        openSettings();
+        return;
+      }
+      // Keep credentials and target together across permission, recording, and
+      // decoding awaits, even if the selected runtime changes in Settings.
+      const transport = Object.freeze(crowModalityTransport());
+      const route = crowModalityRouteFor('asr', transport);
       if (!route) {
         if (typeof logRuntimeDiagnostic === 'function') {
           logRuntimeDiagnostic('AUDIO IN: no transcription route on this runtime. Select the Crow Free AI Gateway and run Test & Discover.', 'warning');
@@ -333,31 +422,66 @@
         }
         return;
       }
+      let stream;
+      let released = false;
+      const releaseStream = () => {
+        if (released || !stream) return;
+        released = true;
+        stream.getTracks().forEach(track => track.stop());
+      };
+      const request = crowBeginModalityRequest('audio-in');
+      request.releaseStream = releaseStream;
+      const resetRecording = () => {
+        if (!crowEndModalityRequest(request)) return;
+        _crowMediaRecorder = null;
+        _crowModality = 'text';
+        updateCrowModalityUI();
+      };
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        _crowRecordedChunks = [];
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        if (!crowModalityRequestActive(request)) {
+          releaseStream();
+          return;
+        }
+        const chunks = [];
+        let failed = false;
         const recorder = new MediaRecorder(stream);
+        request.recorder = recorder;
         _crowMediaRecorder = recorder;
         recorder.ondataavailable = (event) => {
-          if (event.data?.size) _crowRecordedChunks.push(event.data);
+          if (!failed && crowModalityRequestActive(request) && event.data?.size) chunks.push(event.data);
+        };
+        recorder.onerror = (event) => {
+          if (!crowModalityRequestActive(request)) return;
+          failed = true;
+          releaseStream();
+          resetRecording();
+          if (typeof logRuntimeDiagnostic === 'function') {
+            logRuntimeDiagnostic(`Microphone error: ${event.error?.message || 'Recording failed.'}`, 'error');
+          }
         };
         recorder.onstop = () => {
-          stream.getTracks().forEach(track => track.stop());
-          const blob = new Blob(_crowRecordedChunks, { type: recorder.mimeType || 'audio/webm' });
+          releaseStream();
+          // A recorder error can dispatch a final data/stop event after the UI
+          // has recovered. Never transcribe that incomplete recording.
+          if (failed || !crowModalityRequestActive(request)) return;
+          const blob = new Blob(chunks, { type: recorder.mimeType || chunks[0]?.type || '' });
           _crowMediaRecorder = null;
-          _crowRecordedChunks = [];
           updateCrowModalityUI();
-          crowTranscribeAndInsert(blob, route);
+          crowTranscribeAndInsert(blob, route, transport, request);
         };
         recorder.start();
         _crowModality = 'audio-in';
         updateCrowModalityUI();
         if (typeof logRuntimeDiagnostic === 'function') {
-          logRuntimeDiagnostic('Recording… click the modality button to stop and transcribe.', 'info');
+          const limit = transport.runtimeId === 'crowfree' && route.startsWith('iflytek-asr:')
+            ? ' Keep this gateway recording to 10 seconds or less.' : '';
+          logRuntimeDiagnostic(`Recording… click the modality button to stop and transcribe.${limit}`, 'info');
         }
       } catch (err) {
-        _crowMediaRecorder = null;
-        updateCrowModalityUI();
+        releaseStream();
+        if (!crowModalityRequestActive(request)) return;
+        resetRecording();
         if (typeof logRuntimeDiagnostic === 'function') {
           logRuntimeDiagnostic(`Microphone error: ${err.message}`, 'error');
         }
@@ -365,10 +489,10 @@
     }
 
     function crowStopRecording() {
-      if (_crowMediaRecorder) _crowMediaRecorder.stop();
+      if (_crowMediaRecorder && _crowMediaRecorder.state !== 'inactive') _crowMediaRecorder.stop();
     }
 
-    // Decode browser audio (webm/opus) to 16 kHz mono signed-16-bit PCM,
+    // Decode the browser's recording format to 16 kHz mono signed-16-bit PCM,
     // then base64 — the exact frame format the transcription route expects.
     async function crowEncodePcm16Base64(blob) {
       const arrayBuffer = await blob.arrayBuffer();
@@ -377,13 +501,15 @@
       const audioCtx = new AudioContextCtor();
       try {
         const decoded = await audioCtx.decodeAudioData(arrayBuffer);
-        const mono = decoded.getChannelData(0);
+        if (!decoded.numberOfChannels || !decoded.length) throw new Error('No audio samples captured.');
+        const channels = Array.from({ length: decoded.numberOfChannels }, (_, index) => decoded.getChannelData(index));
         const ratio = decoded.sampleRate / 16000;
-        const outLength = Math.max(1, Math.round(mono.length / ratio));
+        const outLength = Math.max(1, Math.round(decoded.length / ratio));
         const pcm = new Int16Array(outLength);
         for (let i = 0; i < outLength; i++) {
-          const sample = mono[Math.min(mono.length - 1, Math.round(i * ratio))];
-          pcm[i] = Math.max(-32768, Math.min(32767, Math.round(sample * 32767)));
+          const sourceIndex = Math.min(decoded.length - 1, Math.round(i * ratio));
+          const sample = channels.reduce((sum, channel) => sum + channel[sourceIndex], 0) / channels.length;
+          pcm[i] = Math.max(-32768, Math.min(32767, Math.round(sample * (sample < 0 ? 32768 : 32767))));
         }
         const bytes = new Uint8Array(pcm.buffer);
         let binary = '';
@@ -393,14 +519,15 @@
         }
         return btoa(binary);
       } finally {
-        audioCtx.close();
+        await audioCtx.close();
       }
     }
 
-    async function crowTranscribeAndInsert(blob, route) {
+    async function crowTranscribeAndInsert(blob, route, transport = crowModalityTransport(), request = _crowModalityRequest) {
       if (!blob || !blob.size) {
         if (typeof logRuntimeDiagnostic === 'function') logRuntimeDiagnostic('No audio captured.', 'warning');
         _crowModality = 'text';
+        crowEndModalityRequest(request);
         updateCrowModalityUI();
         return;
       }
@@ -409,13 +536,17 @@
         input.dataset.crowBusy = '1';
         input.placeholder = 'Transcribing…';
       }
-      isStreaming = true;
-      updateSendButton();
       try {
         const audio = await crowEncodePcm16Base64(blob);
+        if (!crowModalityRequestActive(request)) return;
+        const pcmBytes = audio.length / 4 * 3 - (audio.endsWith('==') ? 2 : audio.endsWith('=') ? 1 : 0);
+        if (transport.runtimeId === 'crowfree' && route.startsWith('iflytek-asr:') && pcmBytes > 320000) {
+          throw new Error('This gateway transcription route accepts up to 10 seconds of audio. Record a shorter clip and try again.');
+        }
         if (typeof logRuntimeDiagnostic === 'function') logRuntimeDiagnostic(`Transcribing via ${route}…`, 'info');
-        const data = await crowModalityFetch('/audio/transcriptions', { model: route, audio });
-        const text = String(data?.text || '').trim();
+        const data = await crowModalityFetch('/audio/transcriptions', { model: route, audio }, transport, request);
+        if (!crowModalityRequestActive(request)) return;
+        const text = typeof data?.text === 'string' ? data.text.trim() : '';
         if (!text) throw new Error('The transcription route returned no text.');
         if (input) {
           input.value = (input.value ? input.value.replace(/\s+$/, '') + ' ' : '') + text;
@@ -424,13 +555,14 @@
         }
         if (typeof logRuntimeDiagnostic === 'function') logRuntimeDiagnostic('Transcription complete — review and send.', 'success');
       } catch (err) {
+        if (!crowModalityRequestActive(request)) return;
         if (typeof logRuntimeDiagnostic === 'function') logRuntimeDiagnostic(`Transcription failed: ${err.message}`, 'error');
       } finally {
-        isStreaming = false;
-        updateSendButton();
-        _crowModality = 'text';
-        if (input) delete input.dataset.crowBusy;
-        updateCrowModalityUI();
+        if (crowEndModalityRequest(request)) {
+          _crowModality = 'text';
+          if (input) delete input.dataset.crowBusy;
+          updateCrowModalityUI();
+        }
       }
     }
 
