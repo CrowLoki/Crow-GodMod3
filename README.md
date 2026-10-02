@@ -23,6 +23,8 @@ This repository is an ongoing project.
   [PR #23](https://github.com/CrowLoki/Crow-GodMod3/pull/23).
   Dependency maintenance and modality/sidebar repairs are merged through
   [PR #24](https://github.com/CrowLoki/Crow-GodMod3/pull/24).
+  Real gateway acceptance and the media-only discovery repair are recorded in
+  [PR #25](https://github.com/CrowLoki/Crow-GodMod3/pull/25).
   Further Phase 2 features require an explicit request.
 - **CrowClaw:** keep Crow-GodMod3 independently usable while making it available
   as an optional CrowClaw plugin in a future phase.

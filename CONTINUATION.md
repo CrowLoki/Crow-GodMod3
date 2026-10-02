@@ -8,7 +8,9 @@ below is dated. Historical handoffs remain provenance, not current instructions.
 
 This continuation reconciled the existing work, upgraded the dependency tree,
 and repaired defects in the existing modality and local-runtime UI. That work
-is published and merged through PR #24. It adds no new Phase 2 feature set.
+is published and merged through PR #24, with the real-runtime acceptance
+follow-up delivered through [PR #25](https://github.com/CrowLoki/Crow-GodMod3/pull/25).
+It adds no new Phase 2 feature set.
 Crow-GodMod3 remains independently deployable. No new Vercel deployment has
 completed, and no sibling-project source/configuration files were edited.
 
@@ -25,7 +27,8 @@ LM Studio obstacles are access/policy failures, detailed below.
 | Starting source baseline | `b3bf2efff92718ef0503e28241c8bc4a79d442fa` |
 | Verified merged baseline | `afed312fe6b0aada5137bec4449f98dfcdbbb6c4` from PR #24; the media-only discovery follow-up is recorded below |
 | Remote state at baseline | Live `git ls-remote` returned `afed312fe6b0aada5137bec4449f98dfcdbbb6c4` for `main` and `2585f294183352fb6af805ba266b29780f69c775` for `codex/next-authorized-slice`; recheck current `main` rather than treating this baseline as a permanent HEAD |
-| Latest integration | [PR #24](https://github.com/CrowLoki/Crow-GodMod3/pull/24), merged as `afed312` from head `2585f29` |
+| Baseline integration | [PR #24](https://github.com/CrowLoki/Crow-GodMod3/pull/24), merged as `afed312` from head `2585f29` |
+| Runtime acceptance follow-up | [PR #25](https://github.com/CrowLoki/Crow-GodMod3/pull/25), implementation commit `81753eef00fd0081c3410135b3c14cee40ae6143` plus this delivery reference; check its current merge/CI state when resuming |
 | CI | [PR run 36959434520](https://github.com/CrowLoki/Crow-GodMod3/actions/runs/36959434520) and [main run 36959558554](https://github.com/CrowLoki/Crow-GodMod3/actions/runs/36959558554) passed |
 | Earlier open PR / issue query | None returned before PR #24 was opened; PR #24 has since been merged |
 | Entry state for this documentation refresh | Clean working tree on `main` at `afed312` |
@@ -270,7 +273,7 @@ state before editing:
 Set-Location C:\Users\djdar\Documents\Crow-GodMod3
 git status --short --branch
 git log -5 --oneline --decorate
-git ls-remote --heads origin main codex/next-authorized-slice
+git ls-remote --heads origin main codex/runtime-acceptance-followup
 git stash list
 git worktree list
 ```
