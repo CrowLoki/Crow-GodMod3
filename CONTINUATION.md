@@ -25,13 +25,13 @@ LM Studio obstacles are access/policy failures, detailed below.
 | Repository | `https://github.com/CrowLoki/Crow-GodMod3.git` |
 | Resume branch | `main`; fetch and verify its current HEAD before continuing. The media-only discovery repair was delivered from `codex/runtime-acceptance-followup`. |
 | Starting source baseline | `b3bf2efff92718ef0503e28241c8bc4a79d442fa` |
-| Verified merged baseline | `afed312fe6b0aada5137bec4449f98dfcdbbb6c4` from PR #24; the media-only discovery follow-up is recorded below |
-| Remote state at baseline | Live `git ls-remote` returned `afed312fe6b0aada5137bec4449f98dfcdbbb6c4` for `main` and `2585f294183352fb6af805ba266b29780f69c775` for `codex/next-authorized-slice`; recheck current `main` rather than treating this baseline as a permanent HEAD |
+| Verified product-code baseline | `4c9d7a66e4949b2e2293b36a13acd9c9b98c60cb` from merged PR #25; later acceptance-evidence updates change documentation only |
+| Remote state at baseline | Live `git ls-remote` returned `4c9d7a66e4949b2e2293b36a13acd9c9b98c60cb` for `main`; recheck current `main` rather than treating this baseline as a permanent HEAD |
 | Baseline integration | [PR #24](https://github.com/CrowLoki/Crow-GodMod3/pull/24), merged as `afed312` from head `2585f29` |
-| Runtime acceptance follow-up | [PR #25](https://github.com/CrowLoki/Crow-GodMod3/pull/25), implementation commit `81753eef00fd0081c3410135b3c14cee40ae6143` plus this delivery reference; check its current merge/CI state when resuming |
-| CI | [PR run 36959434520](https://github.com/CrowLoki/Crow-GodMod3/actions/runs/36959434520) and [main run 36959558554](https://github.com/CrowLoki/Crow-GodMod3/actions/runs/36959558554) passed |
-| Earlier open PR / issue query | None returned before PR #24 was opened; PR #24 has since been merged |
-| Entry state for this documentation refresh | Clean working tree on `main` at `afed312` |
+| Runtime acceptance follow-up | [PR #25](https://github.com/CrowLoki/Crow-GodMod3/pull/25), merged as `4c9d7a6` from head `083344d`; implementation commit `81753eef00fd0081c3410135b3c14cee40ae6143` |
+| CI | [PR #25 run 36960731285](https://github.com/CrowLoki/Crow-GodMod3/actions/runs/36960731285) and [main run 36960816916](https://github.com/CrowLoki/Crow-GodMod3/actions/runs/36960816916) passed; PR #24 and its main checks also passed |
+| Earlier open PR / issue query | None returned before PR #24 was opened; PRs #24 and #25 have since been merged |
+| Entry state for the local text acceptance update | Clean working tree on synchronized `main` at `4c9d7a6` |
 | Continuation delivery | Maintenance checkpoint `a10f2fb125c8e47e6f087b758846369875cd6bc2` and the responsive-sidebar repair are included in merged PR #24. The follow-up fixes the media-only discovery defect found by real gateway acceptance and records the remaining deployment/runtime prerequisites. |
 
 The current chat runs in the canonical Documents checkout. The older
@@ -171,8 +171,11 @@ build and runtime binaries were usable without changing that global policy.
 | Optional gateway live discovery | Started for the authorized test from the separate project's `05d517a` source; advertised only `edge-tts:neural-voices`, with `tts` and `voice_catalog` capabilities |
 | Optional gateway live speech | Real Edge TTS request returned HTTP 200, `audio/mpeg`, 27648 bytes, using `en-AU-WilliamNeural`; a separate real browser request then decoded and played all 4.104 seconds, reaching `ended=true`, `readyState=4`, with no media error |
 | Post-fix gateway browser acceptance | Real discovery reports reachable/no chat/speech output advertised; the chat warning remains accurate. A new speech request decoded and played all 2.352 seconds to `ended=true`, `readyState=4`, with no media error |
-| Gateway text / image / vendor chat / ASR | Ollama is unavailable. Donor-gated image, vendor chat, and ASR routes were not invoked because the physical donor prerequisite in the sibling project's `AGENTS.md:6` is absent |
+| Gateway local text backend | Installed Ollama 0.32.15 was temporarily started with existing `qwen2.5:0.5b`; no download. Exact gateway route `ollama:qwen2.5:0.5b` returned HTTP 200 JSON and valid SSE with a final stop and `[DONE]`. The separate streaming probe produced a model refusal to a benign prompt; transport success is not a model-quality guarantee. |
+| Gateway local text browser | Actual Crow-GodMod3 at `127.0.0.1:4318`, local-only mode, and an explicit `ollama:qwen2.5:0.5b` pin displayed: "Yes, this local text connection works. Please provide the text for me to analyze." The composer returned to ready without an error. |
+| Gateway image / vendor chat / ASR | Donor-gated image, vendor chat, and ASR routes were not invoked because the physical donor prerequisite in the sibling project's `AGENTS.md:6` is absent |
 | Temporary gateway cleanup | Original stopped state restored: owned PID 37128 identity verified before stopping, process absent, no listener on 8766, and `/health` refuses connections. Test outputs/media and pre-existing sibling documentation edits preserved. |
+| Temporary local-text services cleanup | Original stopped state restored after browser acceptance: gateway PID 46372, Ollama PID 40604, and its runner PID 26436 identities verified and processes stopped; ports 8766/11434 closed and HTTP probes refused. Selected model blobs retain their recorded sizes; outputs and original sibling edits preserved. |
 | Published page after source delivery | HTTP 200; exact older `ad737d6` HTML, with microphone disabled. No new Vercel deployment or deployment check was observed from the push/merge |
 
 Browser checks use the actual generated public files served on loopback with
@@ -187,6 +190,21 @@ The live browser speech evidence is saved locally in
 `output/gateway-browser-acceptance-20261002.json`. These checks do not verify
 physical speaker output or microphone input. Temporary-process cleanup is
 recorded separately above.
+
+Local text acceptance is saved in
+`output/gateway-text-browser-acceptance-20261002.json`; the gateway checkout
+has backend evidence in `output/crow-godmod3-ollama-text-20261002/`. The installed
+small model was verified before starting temporary loopback services. No models
+were downloaded, no persistent settings changed, and no paid routes were used.
+The temporary process environment disabled Ollama cloud inference and pruning.
+
+The sibling gateway currently copies provider-wide `chat` and `embedding`
+capabilities to every Ollama model row (`src/providers/ollama.py:128` and
+`src/gateway/app.py:209` in that project). Discovery therefore includes embedding
+models as candidates. The verified text model was explicitly pinned; the
+19-model inventory is not 19-model acceptance. Resolve that metadata limitation
+in its owning project before relying on an unrestricted automatic gateway pool.
+No sibling source was edited or embedding model invoked during these tests.
 
 The published body SHA-256 is
 `77f10b15f911724f07949cd2d16654622725193ebab41c6977c9a34b91278259`.
@@ -203,8 +221,8 @@ controls are inert. The upstream snapshot remains unchanged.
 
 Rechecked after the authorized source publication and merge on 2 October 2026:
 
-- PR #24 is merged at `afed312`; the media-only discovery follow-up adds the
-  real browser acceptance findings. Vercel's latest observed deployment remains
+- PR #24 is merged at `afed312` and PR #25 at `4c9d7a6`; both source deliveries
+  and their CI checks passed. Vercel's latest observed deployment remains
   `dpl_2nii59cUuUCB2ADfrWXgSdRSkZGz`, READY/production for the older `ad737d6`
   page, recorded as a Git deployment from 15 August. Historical previews also
   exist. No new deployment or deployment check was observed after push/merge.
@@ -228,8 +246,9 @@ Rechecked after the authorized source publication and merge on 2 October 2026:
 - The optional gateway test is already authorized and was started from
   `05d517a5937876d935d65fc7d82a4e84956fe4c1` in its separate checkout, preserving
   its pre-existing documentation changes. Live discovery and Edge TTS speech
-  succeeded as recorded above. Ollama is unavailable, so local text was not
-  accepted. Image, vendor chat, and ASR were not called: the physical donor
+  succeeded as recorded above. A later temporary start of installed Ollama
+  established backend and actual browser text acceptance using the existing
+  `qwen2.5:0.5b` model. Image, vendor chat, and ASR were not called: the physical donor
   prerequisite in that project's `AGENTS.md:6` is absent. No sibling source or
   configuration was edited. Real browser speech playback passed before and
   after the media-only discovery repair. Process cleanup is recorded above.
@@ -249,10 +268,11 @@ Rechecked after the authorized source publication and merge on 2 October 2026:
    controlled change; do not retry through another mechanism to bypass it. If
    a later permitted test changes settings, restore their original values and
    verify restoration. Backend HTTP 200 alone is not browser acceptance.
-3. **Remaining gateway capabilities:** use current discovery as the boundary.
-   Edge TTS speech passed backend and browser acceptance in this pass. Local
-   text requires available Ollama; donor-gated image, vendor chat, and ASR
-   require the sibling project's physical donor prerequisite. Do not infer
+3. **Remaining gateway capabilities:** local Ollama text and Edge TTS speech
+   passed backend and browser acceptance in this pass. Donor-gated image,
+   vendor chat, and ASR require the sibling project's physical donor prerequisite.
+   The provider-wide Ollama capability metadata also needs correction in its
+   owning project before broad automatic model selection. Do not infer
    current availability from hardcoded routes or prior fixtures. Preserve the
    separate project's ownership and existing no-paid-route scope.
 4. **Further features:** no new Phase 2 feature set or CrowClaw plugin design

@@ -36,10 +36,13 @@ the maintained build passes 103 tests and lint reports 0 errors / 8 warnings.
 Vercel deployment is already authorized but awaits authenticated access through
 its two-factor sign-in step. No new deployment was observed after push/merge.
 
-The optional gateway returned real Edge TTS audio, and browser generation,
-decoding, and playback passed. The media-only discovery follow-up accurately
-reports available speech while keeping chat unavailable. The gateway's original
-stopped state is restored and its test media is preserved. LM Studio browser
+The optional gateway passed real browser text using installed Ollama
+`qwen2.5:0.5b`, plus Edge TTS generation, decoding, and playback. No model download
+or paid route was used. The media-only discovery repair accurately reports
+available speech when no chat runtime is running. Pin a verified gateway text
+model: its provider-wide capability metadata currently also lists embedding
+models as chat candidates. Temporary services are restored after testing and
+test media is preserved. LM Studio browser
 chat remains blocked by unchanged CORS after automatic approval review rejected
 the authorized temporary setting change. See [CONTINUATION.md](CONTINUATION.md)
 for the exact evidence, remaining access requirements, and capability limits.
