@@ -19,16 +19,30 @@ This repository is an ongoing project.
   browser, provider, and device acceptance must be established separately.
 - **Existing Phase 2 foundation:** local-runtime profiles and model pools,
   diagnostics, the optional Crow Free AI Gateway preset, modality switching,
-  and the Crow Signal identity layer are already in the source. The latest
-  integration landed through [PR #23](https://github.com/CrowLoki/Crow-GodMod3/pull/23).
+  and the Crow Signal identity layer are already in the source through
+  [PR #23](https://github.com/CrowLoki/Crow-GodMod3/pull/23).
+  Dependency maintenance and modality/sidebar repairs are merged through
+  [PR #24](https://github.com/CrowLoki/Crow-GodMod3/pull/24).
+  Real gateway acceptance and the media-only discovery repair are recorded in
+  [PR #25](https://github.com/CrowLoki/Crow-GodMod3/pull/25).
   Further Phase 2 features require an explicit request.
 - **CrowClaw:** keep Crow-GodMod3 independently usable while making it available
   as an optional CrowClaw plugin in a future phase.
 
 As checked on **2 October 2026**, the public site's HTML still matches the
-older `ad737d6` source revision. Current `main` includes the later gateway,
-modality, and identity integration. See the continuation record for the exact
-source/deployment distinction and the latest maintenance verification.
+older `ad737d6` source revision. PR #24 merged at `afed312`, including the later
+gateway, modality, identity, dependency, and sidebar work. PR and main CI passed;
+the maintained build passes 103 tests and lint reports 0 errors / 8 warnings.
+Vercel deployment is already authorized but awaits authenticated access through
+its two-factor sign-in step. No new deployment was observed after push/merge.
+
+The optional gateway returned real Edge TTS audio, and browser generation,
+decoding, and playback passed. The media-only discovery follow-up accurately
+reports available speech while keeping chat unavailable. The gateway's original
+stopped state is restored and its test media is preserved. LM Studio browser
+chat remains blocked by unchanged CORS after automatic approval review rejected
+the authorized temporary setting change. See [CONTINUATION.md](CONTINUATION.md)
+for the exact evidence, remaining access requirements, and capability limits.
 
 ## Provenance
 

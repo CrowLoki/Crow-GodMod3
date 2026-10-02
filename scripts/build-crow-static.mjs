@@ -411,6 +411,31 @@ const runtimeLocalProviderConfig = `    // First-class loopback runtime presets.
       return '';
     }
 
+    function getAdvertisedLocalMediaLabels(runtime) {
+      return [['image', 'image output'], ['tts', 'speech output'], ['asr', 'speech input']]
+        .filter(([capability]) => findLocalModelWithCapability(runtime, capability))
+        .map(([, label]) => label);
+    }
+
+    function describeLocalModelDiscovery(runtime, discovery) {
+      const label = LOCAL_RUNTIME_PRESETS[runtime].label;
+      const count = discovery.models.length;
+      if (!count) {
+        const mediaLabels = getAdvertisedLocalMediaLabels(runtime);
+        const mediaSummary = mediaLabels.length
+          ? '; ' + mediaLabels.join(', ') + ' advertised'
+          : '; no supported media routes advertised';
+        return \`\${label}: reachable; no chat model IDs\${mediaSummary}.\`;
+      }
+      const capabilityLabel = discovery.source.startsWith('lmstudio-')
+        ? 'chat-capable model'
+        : 'candidate model';
+      const skippedLabel = discovery.skipped
+        ? \`; \${discovery.skipped} non-chat ID\${discovery.skipped === 1 ? '' : 's'} skipped\`
+        : '';
+      return \`\${label}: \${count} \${capabilityLabel} ID\${count === 1 ? '' : 's'} saved\${skippedLabel}.\`;
+    }
+
     async function discoverLocalChatModels(runtime, baseUrl, headers, fetchImpl = fetch) {
       if (runtime === 'lmstudio') {
         for (const apiVersion of ['v1', 'v0']) {
@@ -421,7 +446,7 @@ const runtimeLocalProviderConfig = `    // First-class loopback runtime presets.
             );
             if (!nativeResponse.ok) continue;
             const nativePayload = await nativeResponse.json();
-            const descriptors = extractLocalModelDescriptors(nativePayload);
+            const descriptors = extractLocalModelDescriptors(nativePayload).filter(getLocalModelDescriptorId);
             recordLocalModelCapabilities(runtime, descriptors);
             if (!descriptors.length) continue;
             const result = filterLocalChatModelDescriptors(descriptors);
@@ -438,7 +463,7 @@ const runtimeLocalProviderConfig = `    // First-class loopback runtime presets.
       const response = await fetchImpl(\`\${baseUrl}/models\`, { headers });
       if (!response.ok) throw new Error(\`HTTP \${response.status}\`);
       const payload = await response.json();
-      const descriptors = extractLocalModelDescriptors(payload);
+      const descriptors = extractLocalModelDescriptors(payload).filter(getLocalModelDescriptorId);
       recordLocalModelCapabilities(runtime, descriptors);
       if (!descriptors.length) throw new Error('Server returned no model IDs');
       return {
@@ -1593,6 +1618,9 @@ replaceRequired(
     }`,
 );
 
+replaceRequired('No model provider. <a onclick="startOpenRouterLogin()"', 'No chat model provider. <a onclick="startOpenRouterLogin()"');
+replaceRequired('configure OpenRouter, Venice, or local models</a> to start.', 'configure OpenRouter, Venice, or local models</a> to start text chat.');
+
 replaceRequired(
   `    function normalizeLocalBaseUrl(raw = state.localBaseUrl) {
       const value = String(raw || '').trim().replace(/\\/+$/, '');
@@ -1689,7 +1717,6 @@ replaceRequired(
         const discovery = await discoverLocalChatModels(runtime, baseUrl, headers);
         if (_localRuntimeProfileGenerations[runtime] !== discoveryGeneration) return;
         const models = discovery.models;
-        if (!models.length) throw new Error('Server returned no model IDs');
         setLocalRuntimeProfile(runtime, {
           ...requestProfile,
           baseUrl,
@@ -1706,17 +1733,14 @@ replaceRequired(
         }
         saveState();
         updateApiWarning();
-        const label = LOCAL_RUNTIME_PRESETS[runtime].label;
+        const discoveryMessage = describeLocalModelDiscovery(runtime, discovery);
         if (status && runtime === state.localRuntime) {
-          const capabilityLabel = discovery.source.startsWith('lmstudio-')
-            ? 'chat-capable model'
-            : 'candidate model';
-          const skippedLabel = discovery.skipped
-            ? \`; \${discovery.skipped} non-chat ID\${discovery.skipped === 1 ? '' : 's'} skipped\`
-            : '';
-          status.textContent = \`\${label}: \${models.length} \${capabilityLabel} ID\${models.length === 1 ? '' : 's'} saved\${skippedLabel}.\`;
+          status.textContent = discoveryMessage;
           status.style.color = 'var(--success)';
         }
+        if (typeof _localRuntimeErrorCounts !== 'undefined') delete _localRuntimeErrorCounts[runtime];
+        if (typeof logRuntimeDiagnostic === 'function') logRuntimeDiagnostic(discoveryMessage, 'success', runtime);
+        if (typeof updateLocalRuntimeStatusBadge === 'function') updateLocalRuntimeStatusBadge();
       } catch (err) {
         if (discoveryGeneration !== null
           && _localRuntimeProfileGenerations[runtime] !== discoveryGeneration) return;
@@ -5434,6 +5458,7 @@ replaceRequired(
   '      const profile = getLocalRuntimeProfile(runtimeId);\n' +
   '      const models = parseLocalModelIds(profile.models);\n' +
   '      const isConfigured = hasLocalProvider(runtimeId);\n' +
+  '      const mediaLabels = state.localEnabled ? getAdvertisedLocalMediaLabels(runtimeId) : [];\n' +
     "      const statusText = badge.querySelector('.status-text');\n" +
   "      const errorCount = typeof _localRuntimeErrorCounts !== 'undefined' ? (_localRuntimeErrorCounts[runtimeId] || 0) : 0;\n" +
   '      if (errorCount > 0) {\n' +
@@ -5442,6 +5467,9 @@ replaceRequired(
   '      } else if (isConfigured) {\n' +
   "        badge.className = 'local-runtime-status configured';\n" +
   "        if (statusText) statusText.textContent = runtimeLabel + ' · ' + models.length + ' model' + (models.length === 1 ? '' : 's') + ' configured';\n" +
+  '      } else if (mediaLabels.length) {\n' +
+  "        badge.className = 'local-runtime-status configured';\n" +
+  "        if (statusText) statusText.textContent = runtimeLabel + ' · ' + mediaLabels.join(', ') + ' advertised';\n" +
   '      } else {\n' +
   "        badge.className = 'local-runtime-status disconnected';\n" +
   "        if (statusText) statusText.textContent = runtimeLabel + (state.localEnabled ? ' · not configured' : ' · disabled');\n" +
@@ -5520,11 +5548,6 @@ replaceRequired(
 replaceRequired(
   '      updateLocalRuntimeHelp(state.localRuntime);\n      refreshModeModelSelect();\n      renderLocalRaceModelPicker();\n      buildTierSelect();\n    }',
   '      updateLocalRuntimeHelp(state.localRuntime);\n      refreshModeModelSelect();\n      renderLocalRaceModelPicker();\n      buildTierSelect();\n      updateApiWarning();\n      updateLocalRuntimeStatusBadge();\n    }',
-);
-
-replaceRequired(
-  "          status.textContent = `${label}: ${models.length} ${capabilityLabel} ID${models.length === 1 ? '' : 's'} saved${skippedLabel}.`;\n          status.style.color = 'var(--success)';\n        }\n      } catch (err) {",
-  "          status.textContent = `${label}: ${models.length} ${capabilityLabel} ID${models.length === 1 ? '' : 's'} saved${skippedLabel}.`;\n          status.style.color = 'var(--success)';\n        }\n        if (typeof _localRuntimeErrorCounts !== 'undefined') delete _localRuntimeErrorCounts[runtime];\n        if (typeof logRuntimeDiagnostic === 'function') logRuntimeDiagnostic(`${label}: ${models.length} ${discovery.source.startsWith('lmstudio-') ? 'chat-capable model' : 'candidate model'} ID${models.length === 1 ? '' : 's'} saved${discovery.skipped ? '; ' + discovery.skipped + ' non-chat ID' + (discovery.skipped === 1 ? '' : 's') + ' skipped' : ''}.`, 'success', runtime);\n        if (typeof updateLocalRuntimeStatusBadge === 'function') updateLocalRuntimeStatusBadge();\n      } catch (err) {",
 );
 
 replaceRequired(

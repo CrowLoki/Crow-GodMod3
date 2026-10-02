@@ -121,6 +121,8 @@
       if (!dropdown) return;
       const { runtimeId } = crowModalityTransport();
       const runtimeLabel = LOCAL_RUNTIME_PRESETS[runtimeId]?.label || 'Local';
+      const inventoryKnown = typeof _localModelCapsByRuntime !== 'undefined'
+        && Object.prototype.hasOwnProperty.call(_localModelCapsByRuntime, runtimeId);
       dropdown.innerHTML = CROW_MODALITIES.map(m => {
         const active = _crowModality === m.id;
         const available = crowModalityAvailable(m);
@@ -131,7 +133,9 @@
             && findLocalModelWithCapability(runtimeId, m.capability);
           note = route
             ? `via ${route} · ${runtimeLabel}${discovered ? '' : ' · configured, not verified'}`
-            : runtimeId === 'crowfree'
+            : inventoryKnown
+              ? `no route advertised by ${runtimeLabel}`
+              : runtimeId === 'crowfree'
               ? 'start the gateway, then Test & Discover'
               : `no route on ${runtimeLabel}`;
         }
