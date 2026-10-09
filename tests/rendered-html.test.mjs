@@ -85,7 +85,7 @@ test("routes OpenRouter chat through the configured free-model allowlist", async
     /const OPENROUTER_DEFAULT_MODEL = "nvidia\/nemotron-3-ultra-550b-a55b:free";/,
   );
 
-  for (const selectId of ["modelSelect", "defaultModelInput"]) {
+  for (const selectId of ["modelSelect"]) {
     const selectMatch = html.match(
       new RegExp(`<select[^>]*id="${selectId}"[^>]*>([\\s\\S]*?)<\\/select>`),
     );
@@ -96,6 +96,10 @@ test("routes OpenRouter chat through the configured free-model allowlist", async
     assert.deepEqual([...values].sort(), expectedModels);
     assert.ok(values.every((value) => value.endsWith(":free")));
   }
+  const general = html.match(/<select[^>]*id="defaultModelInput"[^>]*>([\s\S]*?)<\/select>/);
+  assert.ok(general, 'General must provide a default-model selector');
+  assert.match(general[1], /CrowBot AI/);
+  assert.deepEqual([...general[1].matchAll(/<option value="([^"]+)"/g)].map(match=>JSON.parse(decodeURIComponent(match[1]))), [['crowbot','crowbot-auto']]);
 
   const tierMatch = html.match(
     /const ULTRAPLINIAN_MODELS = \[([\s\S]*?)\n    \];/,
@@ -895,6 +899,7 @@ test("keeps local tier counts truthful for unlimited automatic pools and pinned 
       return localModels;
     },
     getModeModelSelection: () => selection,
+    getModeExecutionSelection: () => selection,
     isModeModelSelectionAvailable: () => selectionAvailable,
   });
   vm.runInContext(
@@ -924,7 +929,9 @@ globalThis.tierCountForTest = _tierCount;`,
     "an unavailable pinned model must not be reported as an automatic race",
   );
 
-  assert.match(html, /OpenRouter Models by Tier/);
+  selection = { provider: "crowbot", model: "crowbot-auto" };
+  assert.equal(context.tierCountForTest("standard"), 5);
+  assert.match(html, /Strategy Candidates by Tier/);
   assert.match(
     html,
     /ULTRAPLINIAN’s selected local pool is added when Automatic is used/,

@@ -4390,32 +4390,8 @@
             <div class="settings-section-title">Model & Persona</div>
             <div class="form-group">
               <label>Default Model</label>
-              <select id="defaultModelInput">
-                <optgroup label="InclusionAI">
-                  <option value="inclusionai/ling-3.0-flash:free">Ling-3.0-flash (free)</option>
-                </optgroup>
-                <optgroup label="Poolside">
-                  <option value="poolside/laguna-s-2.1:free">Laguna S 2.1 (free)</option>
-                  <option value="poolside/laguna-xs-2.1:free">Laguna XS 2.1 (free)</option>
-                </optgroup>
-                <optgroup label="Cohere">
-                  <option value="cohere/north-mini-code:free">North Mini Code (free)</option>
-                </optgroup>
-                <optgroup label="NVIDIA">
-                  <option value="nvidia/nemotron-3-ultra-550b-a55b:free">Nemotron 3 Ultra (free)</option>
-                  <option value="nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free">Nemotron 3 Nano Omni (free)</option>
-                  <option value="nvidia/nemotron-3-super-120b-a12b:free">Nemotron 3 Super (free)</option>
-                  <option value="nvidia/nemotron-3-nano-30b-a3b:free">Nemotron 3 Nano 30B A3B (free)</option>
-                  <option value="nvidia/nemotron-nano-12b-v2-vl:free">Nemotron Nano 12B 2 VL (free)</option>
-                  <option value="nvidia/nemotron-nano-9b-v2:free">Nemotron Nano 9B V2 (free)</option>
-                </optgroup>
-                <optgroup label="Google">
-                  <option value="google/gemma-4-26b-a4b-it:free">Gemma 4 26B A4B (free)</option>
-                  <option value="google/gemma-4-31b-it:free">Gemma 4 31B (free)</option>
-                </optgroup>
-                <optgroup label="OpenAI">
-                  <option value="openai/gpt-oss-20b:free">gpt-oss-20b (free)</option>
-                </optgroup>
+              <select id="defaultModelInput" aria-label="Default model" onchange="setGlobalDefaultModel(this.value)">
+                <option value="%5B%22crowbot%22%2C%22crowbot-auto%22%5D">CrowBot AI</option>
               </select>
             </div>
             <div class="form-group">
@@ -4649,7 +4625,7 @@
               </div>
             </div>
             <div class="form-group">
-              <label>OpenRouter Models by Tier <small style="color: #888;">(click to select · auto-synced from model list)</small></label>
+              <label>Strategy Candidates by Tier <small style="color: #888;">(independent calls using the selected provider)</small></label>
               <div id="tierModelDisplay" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; font-size: 11px; font-family: monospace;">
                 <!-- Dynamically populated by buildTierDisplay() from ULTRAPLINIAN_MODELS -->
               </div>
@@ -5597,6 +5573,7 @@
 
     function createModeTarget(provider, model, runtime = state.localRuntime, source = null) {
       const target = { provider, model };
+      if (source?.candidate) target.candidate = source.candidate;
       if (provider === 'local') {
         target.runtime = LOCAL_RUNTIME_IDS.has(runtime) ? runtime : state.localRuntime;
         attachLocalTransportSnapshot(target, target.runtime, source);
@@ -5805,11 +5782,64 @@
       return 'openrouter';
     }
 
+    function getDefaultModelSelection() {
+      const fallback = {provider:'crowbot',model:'crowbot-auto'};
+      const choice = normalizeModeModelSelection(state.defaultModelSelection, fallback);
+      return choice.provider === 'auto' ? fallback : choice;
+    }
+
+    function initializePublicModelDefault() {
+      if (state.publicModelDefaultVersion === 1) {
+        state.defaultModelSelection = getDefaultModelSelection();
+        return;
+      }
+      state.defaultModelSelection = {provider:'crowbot',model:'crowbot-auto'};
+      state.publicModelDefaultVersion = 1;
+      state.crowbotEnabled = true;
+      state.localOnly = false;
+      state.modeModelSelections = Object.fromEntries([...MODE_MODEL_IDS].map(mode => [mode,{...state.defaultModelSelection}]));
+    }
+
+    function refreshDefaultModelSelect() {
+      const select = document.getElementById('defaultModelInput');
+      if (!select) return;
+      select.replaceChildren();
+      appendModeModelOptions(select,'CrowBot AI','crowbot',['crowbot-auto']);
+      if (typeof getMembershipModels === 'function') appendModeModelOptions(select,'ChatGPT membership','chatgpt',getMembershipModels());
+      if (state.apiKey) appendModeModelOptions(select,'OpenRouter','openrouter',OPENROUTER_FREE_CHAT_MODELS);
+      if (state.veniceApiKey && typeof VENICE_MODELS !== 'undefined') appendModeModelOptions(select,'Venice','venice',VENICE_MODELS);
+      if (state.localEnabled) {
+        for (const runtime of LOCAL_RUNTIME_IDS) appendModeModelOptions(select,LOCAL_RUNTIME_PRESETS[runtime].label,'local',getLocalModels(runtime),runtime);
+      }
+      const selection = getDefaultModelSelection();
+      const value = encodeModeModelSelection(selection);
+      if (![...select.options].some(option => option.value === value)) {
+        const option = document.createElement('option');option.value=value;option.textContent='Unavailable · '+selection.model;select.appendChild(option);
+      }
+      select.value = value;
+    }
+
+    function setGlobalDefaultModel(value) {
+      const selection = normalizeModeModelSelection(decodeModeModelSelection(value),{provider:'crowbot',model:'crowbot-auto'});
+      if (selection.provider === 'auto') return;
+      state.defaultModelSelection = selection;
+      state.publicModelDefaultVersion = 1;
+      if (selection.provider !== 'local') state.localOnly = false;
+      if (selection.provider === 'local') state.localEnabled = true;
+      if (selection.provider === 'openrouter') state.model = selection.model;
+      state.modeModelSelections = Object.fromEntries([...MODE_MODEL_IDS].map(mode=>[mode,{...selection}]));
+      refreshDefaultModelSelect();refreshModeModelSelect();updateApiWarning();
+    }
+
     function defaultModeModelSelections(
       fallbackModel = state.model,
       localModels = getLocalModels(),
       localOnly = state.localOnly,
     ) {
+      if (state.publicModelDefaultVersion === 1) {
+        const choice = getDefaultModelSelection();
+        return Object.fromEntries([...MODE_MODEL_IDS].map(mode=>[mode,{...choice}]));
+      }
       if (state.crowbotEnabled && !state.apiKey && !state.veniceApiKey && !state.localEnabled) {
         return Object.fromEntries([...MODE_MODEL_IDS].map(mode => [mode, {provider:'crowbot',model:'crowbot-auto'}]));
       }
@@ -5960,7 +5990,8 @@
     }
 
     function getModeExecutionSelection(mode = getCurrentMode()) {
-      const selection = getModeModelSelection(mode);
+      let selection = getModeModelSelection(mode);
+      if (selection.provider === 'auto' && state.publicModelDefaultVersion === 1) selection = getDefaultModelSelection();
       const localModels = selection.provider === 'auto' && hasLocalProvider()
         ? Object.freeze([...getLocalAutomaticRaceModels(mode)])
         : Object.freeze([]);
@@ -6172,6 +6203,7 @@
       const autoOption = document.createElement('option');
       autoOption.value = 'auto';
       autoOption.textContent = autoLabels[mode];
+      if (state.publicModelDefaultVersion === 1 && getDefaultModelSelection().provider === 'crowbot') autoOption.textContent = 'Automatic · CrowBot AI for every enabled strategy';
       select.appendChild(autoOption);
       appendModeModelOptions(select, 'CrowBot AI', 'crowbot', ['crowbot-auto']);
       if (typeof getMembershipModels === 'function') appendModeModelOptions(select, 'ChatGPT membership', 'chatgpt', getMembershipModels());
@@ -6209,6 +6241,8 @@
         ? 'Pick the provider and model used by this mode'
         : 'This saved model is unavailable. Reconnect it or choose another model.';
       if (typeof refreshMembershipControls === 'function') refreshMembershipControls();
+      refreshDefaultModelSelect();
+      buildTierSelect();
     }
 
     function setCurrentModeModelSelection(value) {
@@ -6261,6 +6295,8 @@
       localEnabled: false,  // Use an OpenAI-compatible server on loopback
       localOnly: false,  // Never use cloud providers; telemetry is disabled
       crowbotEnabled: true,  // This project's anonymous standalone CrowBot AI
+      defaultModelSelection: null,  // Provider-qualified General default across every strategy
+      publicModelDefaultVersion: 0,  // Legacy OpenRouter-only defaults migrate once to CrowBot AI
       localRuntime: '',  // Missing legacy value is inferred from the saved URL
       localBaseUrl: 'http://localhost:11434/v1',
       localModels: '',  // Comma-separated model IDs available from the local server
@@ -6397,6 +6433,10 @@
         throw new Error(`The selected ${provider} model is unavailable while Local-only mode is enabled.`);
       }
       if (!explicitProvider) {
+        if (state.publicModelDefaultVersion === 1 && !state.localOnly) {
+          const selected = getDefaultModelSelection();
+          return resolveChatTarget(selected.model,selected.provider,selected.runtime || requestedRuntime,executionContext);
+        }
         if (state.localOnly) provider = 'local';
         else if (state.apiKey) provider = 'openrouter';
         else if (localEnabled && localModels.length) provider = 'local';
@@ -6459,9 +6499,10 @@
     }
 
     async function fetchChatCompletion(body, options = {}) {
+      const currentSelection = state.publicModelDefaultVersion === 1 ? getModeExecutionSelection() : null;
       const inheritedTarget = options.modeTarget?.provider && options.modeTarget.provider !== 'auto'
         ? options.modeTarget
-        : null;
+        : currentSelection?.provider && currentSelection.provider !== 'auto' ? currentSelection : null;
       const target = resolveChatTarget(
         inheritedTarget?.model || body.model,
         inheritedTarget?.provider || options.provider || 'auto',
@@ -9112,7 +9153,8 @@ directness, and genuine helpfulness wins. Hedging or refusing guarantees you los
       const hasV = !!state.veniceApiKey && !state.localOnly;
       const or = hasOR ? (TIER_SIZES[tier] || 0) : 0;
       const v = hasV ? (VENICE_TIER_SIZES[tier] || 0) : 0;
-      const ultraSelection = getModeModelSelection('ultraplinian');
+      const ultraSelection = getModeExecutionSelection('ultraplinian');
+      if (ultraSelection.provider === 'crowbot') return TIER_SIZES[tier] || TIER_SIZES.standard;
       if (ultraSelection.provider !== 'auto') {
         return isModeModelSelectionAvailable(ultraSelection) ? 1 : 0;
       }
@@ -9124,6 +9166,11 @@ directness, and genuine helpfulness wins. Hedging or refusing guarantees you los
       const sel = document.getElementById('ultraSpeedTier');
       if (!sel) return;
       const saved = sel.value || 'standard';
+      buildTierDisplay();
+      if (state.publicModelDefaultVersion === 1 && getModeExecutionSelection('ultraplinian').provider === 'crowbot') {
+        sel.innerHTML = ['fast','standard','smart','power','ultra'].map(tier => '<option value="'+tier+'">'+tier.toUpperCase()+' · '+TIER_SIZES[tier]+' CrowBot AI candidates</option>').join('');
+        sel.value = saved;return;
+      }
       sel.innerHTML = [
         `<option value="fast">⌁ FAST (${_tierCount('fast')} models)</option>`,
         `<option value="standard">🎯 STANDARD (${_tierCount('standard')} models)</option>`,
@@ -9137,6 +9184,10 @@ directness, and genuine helpfulness wins. Hedging or refusing guarantees you los
     function buildTierDisplay() {
       const container = document.getElementById('tierModelDisplay');
       if (!container || !ULTRAPLINIAN_MODELS || !ULTRAPLINIAN_MODELS.length) return;
+      if (state.publicModelDefaultVersion === 1 && getModeExecutionSelection('ultraplinian').provider === 'crowbot') {
+        container.innerHTML = ['fast','standard','smart','power','ultra'].map(tier =>
+          '<div style="border:1px solid var(--border);border-radius:6px;padding:10px"><strong>'+tier.toUpperCase()+' · '+TIER_SIZES[tier]+' independent candidates</strong><br>'+getCrowBotRaceEntries(tier).map(getUltraplinianThinkingModelKey).join('<br>')+'</div>').join('');return;
+      }
 
       const tc = TIER_SIZES;
       const tiers = [
@@ -9374,7 +9425,8 @@ directness, and genuine helpfulness wins. Hedging or refusing guarantees you los
           duration: Date.now() - startTime,
           success: true,
           provider,
-          runtime: modeTarget?.runtime
+          runtime: modeTarget?.runtime,
+          candidate: modeTarget?.candidate
         };
       } catch (err) {
         console.error(`[ULTRAPLINIAN] ${model} failed:`, err.message);
@@ -9388,7 +9440,8 @@ directness, and genuine helpfulness wins. Hedging or refusing guarantees you los
           error: err.message,
           success: false,
           provider,
-          runtime: modeTarget?.runtime
+          runtime: modeTarget?.runtime,
+          candidate: modeTarget?.candidate
         };
       }
     }
@@ -13251,7 +13304,14 @@ Analyze and refine. Output ONLY the JSON object:` }
     const ULTRAPLINIAN_CLOUD_RACE_TIMEOUT_MS = 45_000;
     const ULTRAPLINIAN_LOCAL_RACE_TIMEOUT_MS = null;
 
+    function getCrowBotRaceEntries(tier) {
+      return Array.from({ length: TIER_SIZES[tier] || TIER_SIZES.standard }, (_, index) => ({
+        provider: 'crowbot', model: 'crowbot-auto', candidate: index + 1,
+      }));
+    }
+
     function getUltraplinianThinkingModelKey(target) {
+      if (target.provider === 'crowbot') return 'CrowBot AI · candidate ' + (target.candidate || 1);
       return `${target.model} [${target.provider}]`;
     }
 
@@ -13260,6 +13320,7 @@ Analyze and refine. Output ONLY the JSON object:` }
     }
 
     function getUltraplinianRaceTimeoutMs(raceEntries) {
+      if (raceEntries.some(({ provider }) => provider === 'crowbot')) return 120_000;
       return hasLocalUltraplinianRaceEntry(raceEntries)
         ? ULTRAPLINIAN_LOCAL_RACE_TIMEOUT_MS
         : ULTRAPLINIAN_CLOUD_RACE_TIMEOUT_MS;
@@ -13525,7 +13586,9 @@ Analyze and refine. Output ONLY the JSON object:` }
       // pins ULTRAPLINIAN to that exact provider-qualified target.
       const ultraSelection = executionSelection || getModeExecutionSelection('ultraplinian');
       const raceEntries = [];
-      if (ultraSelection.provider !== 'auto') {
+      if (ultraSelection.provider === 'crowbot') {
+        raceEntries.push(...getCrowBotRaceEntries(state.ultraSpeedTier));
+      } else if (ultraSelection.provider !== 'auto') {
         const pinnedTarget = resolveChatTarget(
           ultraSelection.model,
           ultraSelection.provider,
@@ -14882,6 +14945,7 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
         hadPerModeLocalPools,
       );
       state.modeModelSelectionVersion = MODE_MODEL_SELECTION_SCHEMA_VERSION;
+      initializePublicModelDefault();
       state.localApiKey = typeof state.localApiKey === 'string' ? state.localApiKey.slice(0, 500) : '';
       // Validate conversations
       if (!Array.isArray(state.conversations)) { state.conversations = []; }
@@ -19805,7 +19869,7 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
       renderActiveLocalRuntimeProfile();
       document.getElementById('localConnectionStatus').textContent = '';
       updateOAuthUI();
-      document.getElementById('defaultModelInput').value = state.model;
+      refreshDefaultModelSelect();
       document.getElementById('personaSelect').value = state.persona;
       document.getElementById('customSystemPromptEnabled').checked = state.customSystemPromptEnabled;
       document.getElementById('customSystemPromptInput').value = state.customSystemPrompt || '';
@@ -20005,9 +20069,7 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
         _telemetry.buffer.length = 0;
       }
       const defaultModelValue = document.getElementById('defaultModelInput').value;
-      if (OPENROUTER_FREE_CHAT_MODEL_SET.has(defaultModelValue)) {
-        state.model = defaultModelValue;
-      }
+      if (defaultModelValue !== encodeModeModelSelection(getDefaultModelSelection())) setGlobalDefaultModel(defaultModelValue);
       state.persona = document.getElementById('personaSelect').value;
       state.customSystemPromptEnabled = document.getElementById('customSystemPromptEnabled').checked;
       state.customSystemPrompt = document.getElementById('customSystemPromptInput').value;

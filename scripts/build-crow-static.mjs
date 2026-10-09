@@ -748,6 +748,7 @@ const runtimeModeModelConfig = `    // Each mode keeps its own explicit provider
 
     function createModeTarget(provider, model, runtime = state.localRuntime, source = null) {
       const target = { provider, model };
+      if (source?.candidate) target.candidate = source.candidate;
       if (provider === 'local') {
         target.runtime = LOCAL_RUNTIME_IDS.has(runtime) ? runtime : state.localRuntime;
         attachLocalTransportSnapshot(target, target.runtime, source);
@@ -954,11 +955,64 @@ const runtimeModeModelConfig = `    // Each mode keeps its own explicit provider
       return 'openrouter';
     }
 
+    function getDefaultModelSelection() {
+      const fallback = {provider:'crowbot',model:'crowbot-auto'};
+      const choice = normalizeModeModelSelection(state.defaultModelSelection, fallback);
+      return choice.provider === 'auto' ? fallback : choice;
+    }
+
+    function initializePublicModelDefault() {
+      if (state.publicModelDefaultVersion === 1) {
+        state.defaultModelSelection = getDefaultModelSelection();
+        return;
+      }
+      state.defaultModelSelection = {provider:'crowbot',model:'crowbot-auto'};
+      state.publicModelDefaultVersion = 1;
+      state.crowbotEnabled = true;
+      state.localOnly = false;
+      state.modeModelSelections = Object.fromEntries([...MODE_MODEL_IDS].map(mode => [mode,{...state.defaultModelSelection}]));
+    }
+
+    function refreshDefaultModelSelect() {
+      const select = document.getElementById('defaultModelInput');
+      if (!select) return;
+      select.replaceChildren();
+      appendModeModelOptions(select,'CrowBot AI','crowbot',['crowbot-auto']);
+      if (typeof getMembershipModels === 'function') appendModeModelOptions(select,'ChatGPT membership','chatgpt',getMembershipModels());
+      if (state.apiKey) appendModeModelOptions(select,'OpenRouter','openrouter',OPENROUTER_FREE_CHAT_MODELS);
+      if (state.veniceApiKey && typeof VENICE_MODELS !== 'undefined') appendModeModelOptions(select,'Venice','venice',VENICE_MODELS);
+      if (state.localEnabled) {
+        for (const runtime of LOCAL_RUNTIME_IDS) appendModeModelOptions(select,LOCAL_RUNTIME_PRESETS[runtime].label,'local',getLocalModels(runtime),runtime);
+      }
+      const selection = getDefaultModelSelection();
+      const value = encodeModeModelSelection(selection);
+      if (![...select.options].some(option => option.value === value)) {
+        const option = document.createElement('option');option.value=value;option.textContent='Unavailable · '+selection.model;select.appendChild(option);
+      }
+      select.value = value;
+    }
+
+    function setGlobalDefaultModel(value) {
+      const selection = normalizeModeModelSelection(decodeModeModelSelection(value),{provider:'crowbot',model:'crowbot-auto'});
+      if (selection.provider === 'auto') return;
+      state.defaultModelSelection = selection;
+      state.publicModelDefaultVersion = 1;
+      if (selection.provider !== 'local') state.localOnly = false;
+      if (selection.provider === 'local') state.localEnabled = true;
+      if (selection.provider === 'openrouter') state.model = selection.model;
+      state.modeModelSelections = Object.fromEntries([...MODE_MODEL_IDS].map(mode=>[mode,{...selection}]));
+      refreshDefaultModelSelect();refreshModeModelSelect();updateApiWarning();
+    }
+
     function defaultModeModelSelections(
       fallbackModel = state.model,
       localModels = getLocalModels(),
       localOnly = state.localOnly,
     ) {
+      if (state.publicModelDefaultVersion === 1) {
+        const choice = getDefaultModelSelection();
+        return Object.fromEntries([...MODE_MODEL_IDS].map(mode=>[mode,{...choice}]));
+      }
       if (state.crowbotEnabled && !state.apiKey && !state.veniceApiKey && !state.localEnabled) {
         return Object.fromEntries([...MODE_MODEL_IDS].map(mode => [mode, {provider:'crowbot',model:'crowbot-auto'}]));
       }
@@ -1109,7 +1163,8 @@ const runtimeModeModelConfig = `    // Each mode keeps its own explicit provider
     }
 
     function getModeExecutionSelection(mode = getCurrentMode()) {
-      const selection = getModeModelSelection(mode);
+      let selection = getModeModelSelection(mode);
+      if (selection.provider === 'auto' && state.publicModelDefaultVersion === 1) selection = getDefaultModelSelection();
       const localModels = selection.provider === 'auto' && hasLocalProvider()
         ? Object.freeze([...getLocalAutomaticRaceModels(mode)])
         : Object.freeze([]);
@@ -1321,6 +1376,7 @@ const runtimeModeModelConfig = `    // Each mode keeps its own explicit provider
       const autoOption = document.createElement('option');
       autoOption.value = 'auto';
       autoOption.textContent = autoLabels[mode];
+      if (state.publicModelDefaultVersion === 1 && getDefaultModelSelection().provider === 'crowbot') autoOption.textContent = 'Automatic · CrowBot AI for every enabled strategy';
       select.appendChild(autoOption);
       appendModeModelOptions(select, 'CrowBot AI', 'crowbot', ['crowbot-auto']);
       if (typeof getMembershipModels === 'function') appendModeModelOptions(select, 'ChatGPT membership', 'chatgpt', getMembershipModels());
@@ -1358,6 +1414,8 @@ const runtimeModeModelConfig = `    // Each mode keeps its own explicit provider
         ? 'Pick the provider and model used by this mode'
         : 'This saved model is unavailable. Reconnect it or choose another model.';
       if (typeof refreshMembershipControls === 'function') refreshMembershipControls();
+      refreshDefaultModelSelect();
+      buildTierSelect();
     }
 
     function setCurrentModeModelSelection(value) {
@@ -1403,6 +1461,14 @@ replaceRequired(
   '<select class="model-select" id="modelSelect" onchange="setCurrentModeModelSelection(this.value)" aria-label="Model for current mode" title="Pick the provider and model used by this mode" style="display: none;">',
 );
 replaceRequired(
+  '<select id="defaultModelInput">',
+  '<select id="defaultModelInput" aria-label="Default model" onchange="setGlobalDefaultModel(this.value)">',
+);
+replaceRequired(
+  "      document.getElementById('defaultModelInput').value = state.model;",
+  '      refreshDefaultModelSelect();',
+);
+replaceRequired(
   '<div class="mode-option-desc">Query ALL models, AI judge picks best</div>',
   '<div class="mode-option-desc">Race your selected models, or pin one model</div>',
 );
@@ -1419,9 +1485,9 @@ replaceRequired(
   '5 prompt strategies. Each runs across the CLASSIC model pool; toggle strategies on/off.',
 );
 replaceRegex(
-  /(              <select id="defaultModelInput">\n)[\s\S]*?(\n              <\/select>)/,
+  /(              <select id="defaultModelInput"[^>]*>\n)[\s\S]*?(\n              <\/select>)/,
   (_match, opening, closing) =>
-    `${opening}${renderOpenRouterFreeModelOptions("                ")}${closing}`,
+    `${opening}                <option value="${encodeURIComponent(JSON.stringify(['crowbot','crowbot-auto']))}">CrowBot AI</option>${closing}`,
   1,
 );
 
@@ -1572,7 +1638,7 @@ replaceRequired(
               </div>
             </div>
             <div class="form-group">
-              <label>OpenRouter Models by Tier <small style="color: #888;">(click to select · auto-synced from model list)</small></label>`,
+              <label>Strategy Candidates by Tier <small style="color: #888;">(independent calls using the selected provider)</small></label>`,
 );
 replaceRequired(
   "                <small style=\"color: #888; display: block; margin-top: 4px;\">More models = slower but better. Fast tier prioritizes uncensored.</small>",
@@ -1588,6 +1654,8 @@ replaceRequired(
   `      localEnabled: false,  // Use an OpenAI-compatible server on loopback
       localOnly: false,  // Never use cloud providers; telemetry is disabled
       crowbotEnabled: true,  // This project's anonymous standalone CrowBot AI
+      defaultModelSelection: null,  // Provider-qualified General default across every strategy
+      publicModelDefaultVersion: 0,  // Legacy OpenRouter-only defaults migrate once to CrowBot AI
       localRuntime: '',  // Missing legacy value is inferred from the saved URL
       localBaseUrl: 'http://localhost:11434/v1',
       localModels: '',  // Comma-separated model IDs available from the local server
@@ -1927,7 +1995,8 @@ replaceRequired(
 );
 replaceRequired(
   "      const local = hasLocalProvider() ? getLocalModels().length : 0;",
-  `      const ultraSelection = getModeModelSelection('ultraplinian');
+  `      const ultraSelection = getModeExecutionSelection('ultraplinian');
+      if (ultraSelection.provider === 'crowbot') return TIER_SIZES[tier] || TIER_SIZES.standard;
       if (ultraSelection.provider !== 'auto') {
         return isModeModelSelectionAvailable(ultraSelection) ? 1 : 0;
       }
@@ -1960,7 +2029,9 @@ replaceRequired(
       // pins ULTRAPLINIAN to that exact provider-qualified target.
       const ultraSelection = executionSelection || getModeExecutionSelection('ultraplinian');
       const raceEntries = [];
-      if (ultraSelection.provider !== 'auto') {
+      if (ultraSelection.provider === 'crowbot') {
+        raceEntries.push(...getCrowBotRaceEntries(state.ultraSpeedTier));
+      } else if (ultraSelection.provider !== 'auto') {
         const pinnedTarget = resolveChatTarget(
           ultraSelection.model,
           ultraSelection.provider,
@@ -2025,7 +2096,8 @@ replaceRequired(
         };`,
   `          success: true,
           provider,
-          runtime: modeTarget?.runtime
+          runtime: modeTarget?.runtime,
+          candidate: modeTarget?.candidate
         };`,
   1,
 );
@@ -2035,7 +2107,8 @@ replaceRequired(
         };`,
   `          success: false,
           provider,
-          runtime: modeTarget?.runtime
+          runtime: modeTarget?.runtime,
+          candidate: modeTarget?.candidate
         };`,
   1,
 );
@@ -2239,6 +2312,10 @@ replaceRequired(
         throw new Error(\`The selected \${provider} model is unavailable while Local-only mode is enabled.\`);
       }
       if (!explicitProvider) {
+        if (state.publicModelDefaultVersion === 1 && !state.localOnly) {
+          const selected = getDefaultModelSelection();
+          return resolveChatTarget(selected.model,selected.provider,selected.runtime || requestedRuntime,executionContext);
+        }
         if (state.localOnly) provider = 'local';
         else if (state.apiKey) provider = 'openrouter';
         else if (localEnabled && localModels.length) provider = 'local';
@@ -2304,9 +2381,10 @@ replaceRequired(
   `    async function fetchChatCompletion(body, options = {}) {
       const target = resolveChatTarget(body.model, options.provider || 'auto');`,
   `    async function fetchChatCompletion(body, options = {}) {
+      const currentSelection = state.publicModelDefaultVersion === 1 ? getModeExecutionSelection() : null;
       const inheritedTarget = options.modeTarget?.provider && options.modeTarget.provider !== 'auto'
         ? options.modeTarget
-        : null;
+        : currentSelection?.provider && currentSelection.provider !== 'auto' ? currentSelection : null;
       const target = resolveChatTarget(
         inheritedTarget?.model || body.model,
         inheritedTarget?.provider || options.provider || 'auto',
@@ -3297,7 +3375,8 @@ replaceRequired(
         state.modeModelSelectionVersion,
         hadPerModeLocalPools,
       );
-      state.modeModelSelectionVersion = MODE_MODEL_SELECTION_SCHEMA_VERSION;`,
+      state.modeModelSelectionVersion = MODE_MODEL_SELECTION_SCHEMA_VERSION;
+      initializePublicModelDefault();`,
 );
 replaceRequired(
   "      if (m.winnerModel != null) m.winnerModel = String(m.winnerModel).slice(0, 100);",
@@ -3576,7 +3655,14 @@ replaceRequired(
   `    const ULTRAPLINIAN_CLOUD_RACE_TIMEOUT_MS = 45_000;
     const ULTRAPLINIAN_LOCAL_RACE_TIMEOUT_MS = null;
 
+    function getCrowBotRaceEntries(tier) {
+      return Array.from({ length: TIER_SIZES[tier] || TIER_SIZES.standard }, (_, index) => ({
+        provider: 'crowbot', model: 'crowbot-auto', candidate: index + 1,
+      }));
+    }
+
     function getUltraplinianThinkingModelKey(target) {
+      if (target.provider === 'crowbot') return 'CrowBot AI · candidate ' + (target.candidate || 1);
       return \`\${target.model} [\${target.provider}]\`;
     }
 
@@ -3585,6 +3671,7 @@ replaceRequired(
     }
 
     function getUltraplinianRaceTimeoutMs(raceEntries) {
+      if (raceEntries.some(({ provider }) => provider === 'crowbot')) return 120_000;
       return hasLocalUltraplinianRaceEntry(raceEntries)
         ? ULTRAPLINIAN_LOCAL_RACE_TIMEOUT_MS
         : ULTRAPLINIAN_CLOUD_RACE_TIMEOUT_MS;
@@ -4244,9 +4331,7 @@ replaceRequired(
 replaceRequired(
   "      state.model = document.getElementById('defaultModelInput').value;",
   `      const defaultModelValue = document.getElementById('defaultModelInput').value;
-      if (OPENROUTER_FREE_CHAT_MODEL_SET.has(defaultModelValue)) {
-        state.model = defaultModelValue;
-      }`,
+      if (defaultModelValue !== encodeModeModelSelection(getDefaultModelSelection())) setGlobalDefaultModel(defaultModelValue);`,
 );
 
 replaceRequired(
@@ -5833,6 +5918,24 @@ replaceRequired(
       }
       const headers = { 'Content-Type': 'application/json' };
       if (target.apiKey)`,
+);
+replaceRequired(
+  "      const saved = sel.value || 'standard';\n      sel.innerHTML = [",
+  `      const saved = sel.value || 'standard';
+      buildTierDisplay();
+      if (state.publicModelDefaultVersion === 1 && getModeExecutionSelection('ultraplinian').provider === 'crowbot') {
+        sel.innerHTML = ['fast','standard','smart','power','ultra'].map(tier => '<option value="'+tier+'">'+tier.toUpperCase()+' · '+TIER_SIZES[tier]+' CrowBot AI candidates</option>').join('');
+        sel.value = saved;return;
+      }
+      sel.innerHTML = [`,
+);
+replaceRequired(
+  "      if (!container || !ULTRAPLINIAN_MODELS || !ULTRAPLINIAN_MODELS.length) return;",
+  `      if (!container || !ULTRAPLINIAN_MODELS || !ULTRAPLINIAN_MODELS.length) return;
+      if (state.publicModelDefaultVersion === 1 && getModeExecutionSelection('ultraplinian').provider === 'crowbot') {
+        container.innerHTML = ['fast','standard','smart','power','ultra'].map(tier =>
+          '<div style="border:1px solid var(--border);border-radius:6px;padding:10px"><strong>'+tier.toUpperCase()+' · '+TIER_SIZES[tier]+' independent candidates</strong><br>'+getCrowBotRaceEntries(tier).map(getUltraplinianThinkingModelKey).join('<br>')+'</div>').join('');return;
+      }`,
 );
 const membershipScript = await readFile(resolve(projectRoot, 'scripts/crow-membership.js'), 'utf8');
 if (membershipScript.includes('</' + 'script>')) throw new Error('Invalid membership script');
