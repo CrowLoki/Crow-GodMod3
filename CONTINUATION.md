@@ -1,10 +1,57 @@
 # Crow-GodMod3 continuation
 
-Reconciled **2 October 2026 (Australia/Sydney)**. This is the current entry point
+Reconciled **9 October 2026 (Australia/Sydney)**. This is the current entry point
 for this project. Recheck Git and runtime state when resuming; the evidence
 below is dated. Historical handoffs remain provenance, not current instructions.
 
 ## Scope and current checkpoint
+
+### Current increment: independent public CrowBot AI and membership connections
+
+Crow clarified on 9 October that this is a public website: visitors use their
+own keys and memberships. Only standalone CrowBot AI is supplied without an
+individual account. Crow then requested immediate website publication and stop;
+the Windows-app request was withdrawn because it referred to another product.
+
+CrowBot AI is a named model-picker choice backed by this project's own anonymous
+implementation. Selected source modules were incorporated from the verified
+Crow-owned provider revision f12ffe72e6877c055641da9ba965e8f82bbe34ae;
+lib/crowbot/PROVENANCE.json records all 18 source-file hashes. There is no runtime
+dependency on another repository, running app, owner account or provider key.
+The protected upstream G0DM0D3 snapshot remains unchanged.
+
+ChatGPT uses the legitimate OpenAI device-code flow observed in Hermes: explicit
+account authorization, per-account model discovery, selectable reasoning, and
+the Codex OAuth transport. Each visitor/account has separate AES-GCM encrypted
+HttpOnly cookies, and switching selects only a connected account belonging to
+that browser session. No owner membership or API key is a visitor fallback.
+Inference uses the selected account; the native Codex image endpoint supplies
+image generation. OpenRouter/Venice retain each visitor's own existing keys.
+The session-encryption variable is sensitive Vercel configuration, never a
+provider credential or source-controlled secret. Generic token/sampling controls
+unsupported by the subscription route are not sent to it.
+
+Fresh checks: 105 tests passed; lint passed with 0 errors and 11 warnings.
+Real standalone anonymous text returned a completed answer, then actual Chrome
+rendered a real answer through CrowBot AI. Account-session tampering, cross-account
+cookie substitution, foreign origins, and absence of owner fallback have tests.
+OpenAI device-code creation and the application's real sign-in UI worked.
+
+Membership end-to-end acceptance is incomplete: the separate account selected
+in Edge reached OpenAI's add-phone prerequisite. Crow's current number cannot
+complete that check; do not bypass verification or claim the free/monthly usage
+pool was tested. A prior local prototype verified seven Pro catalogue entries
+and a Luna native shell call, but that cross-project prototype was removed and
+does not prove the independent published membership route. The web implementation
+exposes web search and native image generation; full local shell/MCP execution
+is not implemented in the hosted website.
+
+Production delivery is the merged revision of this increment. Read /api/status
+for the current deployed source SHA and membership-configuration status, then
+compare it with current main. The attached delivery PR and this chat's deployment
+result carry live acceptance; the 2 October deployment table below is historical.
+No new phone number, paid route, desktop installation, or sibling source/config
+change occurred. Stop after publication as Crow requested.
 
 This continuation reconciled the existing work, upgraded the dependency tree,
 and repaired defects in the existing modality and local-runtime UI. That work

@@ -39,6 +39,36 @@ the first local model. Users can tick any number of models, including the full
 discovered inventory; Crow-GodMod3 applies no fixed model-count limit. The
 runtime and the user's hardware determine how much work is practical.
 
+## CrowBot AI and ChatGPT membership
+
+Select **CrowBot AI** in the header to use the site's own standalone anonymous
+AI. No membership, API key, sibling project or local provider app is required.
+
+To use your own subscription, choose **Sign in with ChatGPT**. Open the official
+OpenAI verification link, select your account, and enter the displayed device
+code. The website then loads that account's available models. Choose a model in
+the header and its supported reasoning level. Connect another account from
+Settings, then use the account selector to switch; its own permissions and usage
+limits apply. There is no automatic account switching or owner-funded fallback.
+
+OAuth tokens remain encrypted in HttpOnly cookies and never enter JavaScript,
+localStorage, Git or the static page. Explicit **Renew selected connection**
+renews that account. If OpenAI requests phone/security verification, complete
+the legitimate provider step; another login or email does not establish bypass.
+
+Membership chat uses the Codex OAuth Responses transport with web search. Image
+output uses the native Codex images endpoint, matching the mechanism established
+in Hermes. Image access remains subject to that account's actual entitlement.
+Hosted shell/MCP execution is not exposed by this website. Existing local
+runtimes remain separately available below. Generic sampling/token controls
+unsupported by the membership transport are omitted.
+
+Deployment uses the sensitive CROW_GODMOD3_SESSION_SECRET variable to encrypt
+visitor sessions. It is application configuration, not an owner provider key.
+For local development, run node scripts/site-server.mjs and visit
+http://127.0.0.1:8767/. Its local encryption key is ignored output, not public
+content. Public /api/status reports the deployed revision and configuration.
+
 Each runtime preset keeps its own remembered model inventory and its own three
 per-mode pools. Only the currently selected runtime can execute local requests;
 models from the other saved runtimes are not mixed into the race. Switching to

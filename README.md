@@ -12,6 +12,15 @@ CrowClaw visual identity.
 
 This repository is an ongoing project.
 
+**CrowBot AI** is the site's standalone, anonymous AI choice. Visitors can also
+connect their own **ChatGPT membership**, select a connected account, and choose
+its available model and reasoning level. OpenRouter and Venice continue using
+each visitor's own keys. See the
+[connection guide](docs/LOCAL_MODELS.md#crowbot-ai-and-chatgpt-membership).
+No owner membership or provider key supplies visitor membership requests.
+OAuth sessions are encrypted in HttpOnly cookies, independently per account.
+Membership usage counts against the account the visitor selected.
+
 - **Continue here:** [CONTINUATION.md](CONTINUATION.md) records the verified
   source baseline, preserved work, production deployment, checks, and next
   steps. Read it before resuming development.
