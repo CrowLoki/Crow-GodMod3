@@ -1,0 +1,24 @@
+{
+  "source": "https://github.com/TheCrowBot/CrowBot-Free-Models",
+  "commit": "f12ffe72e6877c055641da9ba965e8f82bbe34ae",
+  "files": {
+    "worker/src/upstream/original_text.js": "2867d9366016cd94e35b5070db4084d6b713e3522802028e03d22dccc41268ce",
+    "worker/src/upstream/guest_chat.js": "fada9c558de95e963569b5ca090b592e030a43b48e41af3ce0ff88d6c5dae64e",
+    "worker/src/util.js": "8da587b585022779d923900bb9c633eff1371c7524bd07be0ec99125745b0433",
+    "worker/src/upstream/ws.js": "2a5b9642ee359f9937d7c27c04d14908ca4308fc76ef1d6c0302fffa40cb4bb1",
+    "worker/src/upstream/cancellation.js": "5f0001d518f61488c3345acd8d311283736fcddf96c7b46c8fd82c2ba728528f",
+    "worker/src/upstream/image_tools.js": "06a31414aa59f4a69a69e297358cd27e57f0ab82fce6aa54185c7df976011a0d",
+    "worker/src/upstream/java_signature.js": "0fccd58bb9918a92841c9148b15ba60f201a5d3bf0580ab879698f5f9762ca80",
+    "worker/src/upstream/md5.js": "d670ee1959786954ea2aa5d1eb633a08f714f52d5cc7bde4736b452d644dd25e",
+    "worker/src/upstream/original_account_context.js": "35c5409dfdc5e2c9bf2523938b5244262d3784537daf466e27bcc92a9cd46b34",
+    "worker/src/upstream/media.js": "ddbb070a18b95417df295b10101b4ca094348652ae731e3fc5eeb01d6f57e7bc",
+    "worker/src/upstream/edge_tts.js": "74f6477b5e31ea5684734f8f730655cceb5079dbd29009f3b165058e933ff670",
+    "worker/src/upstream/legacy_asr.js": "e9d737f7fcb3d63985bf15116758dbd3392e6492b04dff7cfbc623a795eba418",
+    "worker/src/upstream/signature.js": "48dccbdeb5a004edf8aea7308a5e9337adbec6a48f81400fbd0a65059308ec85",
+    "worker/src/upstream/legacy_image.js": "2b3db9a2c71b1134437a62d00867e5acd51506b7793d97d8a1d0d96b38221ef3",
+    "worker/src/upstream/legacy_tts.js": "d5b72a3c27c0325c8f90ddf396130dd6f04c06ade1578d1e2b356e25805bd193",
+    "worker/src/upstream/voice_catalog.js": "fa95919203b6e5513d2fa1dfdcadff6e70d9c04b5dda5e46f9be4b785602c7dd",
+    "worker/src/upstream/legacy_vision.js": "7e99e0f7680d285cce363973c0d1c09fa09248f2e98f482ed4136d1ad7e6f326",
+    "worker/src/upstream/original_text_http.js": "8acf9e4cb68e86ac78899e890922621e762abc067544254109d4d936e0eeb036"
+  }
+}

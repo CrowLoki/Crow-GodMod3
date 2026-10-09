@@ -1436,7 +1436,7 @@ globalThis.decodeModeModelSelectionForTest = decodeModeModelSelection;`,
         false,
       ),
     ).parseltongue,
-    { provider: "local", model: "lm-beta" },
+    { provider: "local", model: "lm-beta", runtime: "lmstudio" },
     "A genuinely different legacy pin must survive the one-time migration",
   );
   modeSelectionState.apiKey = "openrouter-present";
@@ -1479,6 +1479,22 @@ globalThis.decodeModeModelSelectionForTest = decodeModeModelSelection;`,
     ),
     { provider: "local", model: "lm-beta", runtime: "lmstudio" },
     "An explicit snapshot must retain its exact provider and model for the whole run",
+  );
+  context.state.modeModelSelections.parseltongue = {
+    provider: "local", model: "model-a", runtime: "ollama",
+  };
+  modeSelectionState.localRuntime = "lmstudio";
+  assert.deepEqual(
+    structuredClone(context.getModeModelRequestForTest("parseltongue")),
+    { provider: "local", model: "model-a", runtime: "ollama" },
+    "Changing the settings profile must not redirect a pinned model to another runtime",
+  );
+  assert.equal(context.getModeExecutionSelectionForTest("parseltongue").runtime, "ollama");
+  const choice = { provider: "chatgpt", model: "gpt-6-luna" };
+  assert.deepEqual(
+    structuredClone(context.decodeModeModelSelectionForTest(context.encodeModeModelSelectionForTest(choice))),
+    choice,
+    "The membership model choice must round-trip its provider connection",
   );
 });
 

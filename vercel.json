@@ -6,6 +6,10 @@
   "outputDirectory": "public",
   "rewrites": [
     {
+      "source": "/api/:path*",
+      "destination": "/api/service?path=:path*"
+    },
+    {
       "source": "/",
       "destination": "/crow-godmod3.html"
     }

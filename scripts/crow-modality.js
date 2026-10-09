@@ -84,6 +84,8 @@
     }
 
     function crowModalityTransport() {
+      const selected = typeof getModeModelSelection === 'function' ? getModeModelSelection() : null;
+      if (selected?.provider === 'chatgpt') return {runtimeId:'chatgpt',baseUrl:window.location.origin + '/api/membership',apiKey:''};
       const runtimeId = normalizeLocalRuntime(state.localRuntime, state.localBaseUrl);
       const profile = getLocalRuntimeProfile(runtimeId);
       let baseUrl = '';
@@ -102,6 +104,7 @@
 
     function crowModalityRouteFor(capability, transport = crowModalityTransport()) {
       const { runtimeId } = transport;
+      if (runtimeId === 'chatgpt') return capability === 'image' ? getModeModelSelection().model : '';
       if (typeof findLocalModelWithCapability === 'function') {
         const discovered = findLocalModelWithCapability(runtimeId, capability);
         if (discovered) return discovered;
@@ -257,7 +260,7 @@
     function crowModalityBeginSend(content) {
       // Mirrors the conversation plumbing at the top of sendMessage().
       if (isStreaming) return null;
-      if (!state.localEnabled) {
+      if (!state.localEnabled && !(typeof getModeModelSelection === 'function' && getModeModelSelection().provider === 'chatgpt')) {
         if (typeof logRuntimeDiagnostic === 'function') {
           logRuntimeDiagnostic('Enable the local runtime in Settings → API Keys first.', 'warning');
         }
@@ -315,6 +318,7 @@
 
     function crowModalityMediaUrl(value, transport) {
       if (typeof value !== 'string' || !value.trim() || /[\s"'<>]/.test(value)) return '';
+      if (transport.runtimeId === 'chatgpt' && /^data:image\/png;base64,[A-Za-z0-9+/]+={0,2}$/.test(value)) return value;
       if (!/^https?:\/\//i.test(value) && !/^\/(?![/\\])/.test(value)) return '';
       try {
         const url = new URL(value, `${transport.baseUrl}/`);
@@ -575,7 +579,7 @@
       if (!msg || typeof msg !== 'object') return '';
       let out = '';
       const img = msg.generatedImage;
-      if (img && /^https?:\/\/[^\s"'<>]+$/.test(img.url || '')) {
+      if (img && (/^https?:\/\/[^\s"'<>]+$/.test(img.url || '') || /^data:image\/png;base64,[A-Za-z0-9+/]+={0,2}$/.test(img.url || ''))) {
         const url = escapeAttr(img.url);
         const caption = escapeAttr(img.prompt || 'generated image');
         out += `<div class="generated-media"><a href="${url}" target="_blank" rel="noopener"><img class="generated-image" src="${url}" loading="lazy" decoding="async" alt="${caption}"></a><div class="generated-media-caption">▣ ${caption} · <a href="${url}" target="_blank" rel="noopener">open full size ↗</a></div></div>`;

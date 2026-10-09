@@ -4948,6 +4948,7 @@
               <input type="password" id="localApiKeyInput" placeholder="Optional bearer token" oninput="invalidateActiveLocalRuntimeDiscovery(true)">
             </div>
             <div class="form-group">
+              <button type="button" class="api-key-btn" onclick="connectChatGPTMembership()">Continue with ChatGPT</button><small id="membershipConnectionStatus" style="display:block;color:var(--text-dim);"></small>
               <label for="localReasoningEffortInput">LM Studio reasoning</label>
               <select id="localReasoningEffortInput" onchange="invalidateActiveLocalRuntimeDiscovery()">
                 <option value="none">Final answers only (recommended)</option>
@@ -5237,6 +5238,7 @@
 
     const _localModelCapsByRuntime = {};
     function recordLocalModelCapabilities(runtime, descriptors) {
+      if (runtime === 'chatgpt' && typeof recordMembershipOptions === 'function') recordMembershipOptions(descriptors);
       const map = {};
       for (const descriptor of Array.isArray(descriptors) ? descriptors : []) {
         const id = getLocalModelDescriptorId(descriptor);
@@ -5308,7 +5310,7 @@
         }
       }
 
-      const response = await fetchImpl(`${baseUrl}/models`, { headers });
+      const response = await fetchImpl(`${baseUrl}/models`, { headers, targetAddressSpace: 'loopback' });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const payload = await response.json();
       const descriptors = extractLocalModelDescriptors(payload).filter(getLocalModelDescriptorId);
@@ -5401,7 +5403,7 @@
     // "auto" preserves the mode's native cloud behavior and adds that mode's
     // independently selected local-model pool. Every pool defaults to one
     // local model but has no fixed model-count ceiling.
-    const MODE_MODEL_PROVIDERS = new Set(['auto', 'openrouter', 'venice', 'local']);
+    const MODE_MODEL_PROVIDERS = new Set(['auto', 'openrouter', 'venice', 'local', 'crowbot', 'chatgpt']);
     const MODE_MODEL_IDS = new Set(['ultraplinian', 'parseltongue', 'pliny']);
     const MODE_MODEL_SELECTION_SCHEMA_VERSION = 2;
     const MODE_LOCAL_POOL_LABELS = Object.freeze({
@@ -5587,6 +5589,8 @@
         apiKey: _localApiKeysByRuntime[runtimeId]
           || (runtimeId === state.localRuntime ? state.localApiKey : '')
           || '',
+        membership: runtimeId === 'chatgpt' && typeof getMembershipChoice === 'function'
+          ? Object.freeze(getMembershipChoice(target.model)) : null,
       }));
       return target;
     }
@@ -5806,6 +5810,9 @@
       localModels = getLocalModels(),
       localOnly = state.localOnly,
     ) {
+      if (state.crowbotEnabled && !state.apiKey && !state.veniceApiKey && !state.localEnabled) {
+        return Object.fromEntries([...MODE_MODEL_IDS].map(mode => [mode, {provider:'crowbot',model:'crowbot-auto'}]));
+      }
       return {
         ultraplinian: { provider: 'auto', model: '' },
         parseltongue: { provider: 'auto', model: '' },
@@ -5878,7 +5885,9 @@
       if (provider === 'openrouter') {
         model = OPENROUTER_LEGACY_MODEL_MIGRATIONS[model] || model;
       }
-      return { provider, model };
+      return provider === 'local'
+        ? { provider, model, runtime: LOCAL_RUNTIME_IDS.has(selection.runtime) ? selection.runtime : state.localRuntime }
+        : { provider, model };
     }
 
     function normalizeModeModelSelections(
@@ -5906,8 +5915,11 @@
 
     function isModeModelSelectionAvailable(selection) {
       if (!selection || selection.provider === 'auto') return true;
+      if (selection.provider === 'crowbot') return state.crowbotEnabled !== false;
+      if (selection.provider === 'chatgpt') return typeof getMembershipModels === 'function' && getMembershipModels().includes(selection.model);
       if (selection.provider === 'local') {
-        return hasLocalProvider() && getLocalModels().includes(selection.model);
+        const runtime = selection.runtime || state.localRuntime;
+        return hasLocalProvider(runtime) && getLocalModels(runtime).includes(selection.model);
       }
       if (selection.provider === 'openrouter') {
         return !state.localOnly
@@ -5929,7 +5941,7 @@
         const request = {
           provider: selection.provider,
           model: selection.model,
-          runtime: selection.provider === 'local' ? state.localRuntime : undefined,
+          runtime: selection.provider === 'local' ? selection.runtime || state.localRuntime : undefined,
         };
         if (selection.provider === 'local') {
           attachLocalTransportSnapshot(request, request.runtime);
@@ -5956,7 +5968,7 @@
         provider: selection.provider,
         model: selection.model,
         localModels,
-        runtime: state.localRuntime,
+        runtime: selection.provider === 'local' ? selection.runtime || state.localRuntime : state.localRuntime,
       };
       if (selection.provider === 'local' || localModels.length) {
         attachLocalTransportSnapshot(executionSelection, executionSelection.runtime);
@@ -6111,28 +6123,32 @@
 
     function encodeModeModelSelection(selection) {
       if (!selection || selection.provider === 'auto') return 'auto';
-      return encodeURIComponent(JSON.stringify([selection.provider, selection.model]));
+      return encodeURIComponent(JSON.stringify(selection.provider === 'local' && selection.runtime
+        ? [selection.provider, selection.model, selection.runtime]
+        : [selection.provider, selection.model]));
     }
 
     function decodeModeModelSelection(value) {
       if (!value || value === 'auto') return { provider: 'auto', model: '' };
       try {
         const parsed = JSON.parse(decodeURIComponent(value));
-        if (!Array.isArray(parsed) || parsed.length !== 2) throw new Error('Invalid model selection');
-        return { provider: parsed[0], model: parsed[1] };
+        if (!Array.isArray(parsed) || ![2, 3].includes(parsed.length)) throw new Error('Invalid model selection');
+        return parsed[0] === 'local' && LOCAL_RUNTIME_IDS.has(parsed[2])
+          ? { provider: parsed[0], model: parsed[1], runtime: parsed[2] }
+          : { provider: parsed[0], model: parsed[1] };
       } catch (_) {
         return { provider: 'auto', model: '' };
       }
     }
 
-    function appendModeModelOptions(select, label, provider, models) {
+    function appendModeModelOptions(select, label, provider, models, runtime) {
       if (!models.length) return;
       const group = document.createElement('optgroup');
       group.label = label;
       for (const model of models) {
         const option = document.createElement('option');
-        option.value = encodeModeModelSelection({ provider, model });
-        option.textContent = `${label} · ${model}`;
+        option.value = encodeModeModelSelection({ provider, model, runtime });
+        option.textContent = provider === 'crowbot' ? 'CrowBot AI' : `${label} · ${model}`;
         group.appendChild(option);
       }
       select.appendChild(group);
@@ -6157,10 +6173,14 @@
       autoOption.value = 'auto';
       autoOption.textContent = autoLabels[mode];
       select.appendChild(autoOption);
+      appendModeModelOptions(select, 'CrowBot AI', 'crowbot', ['crowbot-auto']);
+      if (typeof getMembershipModels === 'function') appendModeModelOptions(select, 'ChatGPT membership', 'chatgpt', getMembershipModels());
 
       if (state.localEnabled) {
-        const runtime = LOCAL_RUNTIME_PRESETS[state.localRuntime]?.label || 'Local';
-        appendModeModelOptions(select, runtime, 'local', getLocalModels());
+        for (const runtime of LOCAL_RUNTIME_IDS) {
+          const label = LOCAL_RUNTIME_PRESETS[runtime].label;
+          appendModeModelOptions(select, label, 'local', getLocalModels(runtime), runtime);
+        }
       }
       if (!state.localOnly && state.apiKey) {
         appendModeModelOptions(select, 'OpenRouter', 'openrouter', OPENROUTER_FREE_CHAT_MODELS);
@@ -6188,6 +6208,7 @@
       select.title = available
         ? 'Pick the provider and model used by this mode'
         : 'This saved model is unavailable. Reconnect it or choose another model.';
+      if (typeof refreshMembershipControls === 'function') refreshMembershipControls();
     }
 
     function setCurrentModeModelSelection(value) {
@@ -6201,6 +6222,7 @@
       state.modeModelSelections[mode] = selection;
       state.modeModelSelectionVersion = MODE_MODEL_SELECTION_SCHEMA_VERSION;
       refreshModeModelSelect();
+      updateApiWarning();
       buildTierSelect();
       saveState();
     }
@@ -6238,6 +6260,7 @@
       veniceApiKey: '',  // Venice API key for uncensored model racing
       localEnabled: false,  // Use an OpenAI-compatible server on loopback
       localOnly: false,  // Never use cloud providers; telemetry is disabled
+      crowbotEnabled: true,  // This project's anonymous standalone CrowBot AI
       localRuntime: '',  // Missing legacy value is inferred from the saved URL
       localBaseUrl: 'http://localhost:11434/v1',
       localModels: '',  // Comma-separated model IDs available from the local server
@@ -6316,8 +6339,13 @@
     }
 
     function hasAnyChatProvider() {
-      if (state.localOnly) return hasLocalProvider();
-      return !!(state.apiKey || state.veniceApiKey || hasLocalProvider());
+      const mode = typeof getCurrentMode === 'function' ? getCurrentMode() : 'ultraplinian';
+      const selection = state.modeModelSelections?.[mode];
+      const localAvailable = selection?.provider === 'local'
+        ? hasLocalProvider(selection.runtime || state.localRuntime)
+        : hasLocalProvider();
+      if (state.localOnly) return localAvailable;
+      return !!(state.crowbotEnabled !== false || state.apiKey || state.veniceApiKey || localAvailable || (typeof getMembershipModels === 'function' && getMembershipModels().length));
     }
 
     function hasAuxiliaryModelProvider(modeTarget = null) {
@@ -6373,7 +6401,14 @@
         else if (state.apiKey) provider = 'openrouter';
         else if (localEnabled && localModels.length) provider = 'local';
         else if (state.veniceApiKey) provider = 'venice';
+        else if (state.crowbotEnabled !== false) provider = 'crowbot';
         else throw new Error('No model provider is configured.');
+      }
+
+      if (provider === 'crowbot') return {provider,model:'crowbot-auto',url:'/api/crowbot/chat/completions',apiKey:''};
+      if (provider === 'chatgpt') {
+        if (typeof getMembershipModels !== 'function' || !getMembershipModels().includes(requestedModel)) throw new Error('Sign in with your ChatGPT membership and choose an available model.');
+        return {provider,model:requestedModel,url:'/api/membership/chat/completions',apiKey:''};
       }
 
       if (provider === 'local') {
@@ -6439,6 +6474,18 @@
       if (target.provider === 'local') {
         delete requestBody.reasoning;
         delete requestBody.reasoning_effort;
+        if (target.runtime === 'chatgpt') {
+          const snapshot = getLocalTransportSnapshot(target, target.runtime);
+          const choice = snapshot?.membership || (typeof getMembershipChoice === 'function' ? getMembershipChoice(target.model) : {});
+          if (choice.effort && choice.effort !== 'default') requestBody.reasoning_effort = choice.effort;
+          requestBody.service_tier = choice.tier || 'default';
+        }
+        if (target.runtime === 'crowbot') {
+          const supported = new Set(['model', 'messages', 'stream', 'temperature', 'max_tokens']);
+          for (const key of Object.keys(requestBody)) {
+            if (!supported.has(key)) delete requestBody[key];
+          }
+        }
         const localProfile = getLocalTransportSnapshot(target, target.runtime)
           || getLocalRuntimeProfile(target.runtime);
         if (
@@ -6450,6 +6497,11 @@
         }
       }
 
+      if (target.provider === 'chatgpt' && typeof getMembershipChoice === 'function') {
+        const choice = getMembershipChoice(target.model);
+        if (choice.effort !== 'default') requestBody.reasoning_effort = choice.effort;
+        requestBody.service_tier = choice.tier;
+      }
       const headers = { 'Content-Type': 'application/json' };
       if (target.apiKey) headers.Authorization = `Bearer ${target.apiKey}`;
       if (target.provider === 'openrouter') {
@@ -6458,6 +6510,7 @@
       }
 
       return fetch(target.url, {
+        ...(target.provider === 'local' ? { targetAddressSpace: 'loopback' } : {}),
         method: 'POST',
         headers,
         body: JSON.stringify(requestBody),
@@ -15204,6 +15257,8 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
     }
 
     function crowModalityTransport() {
+      const selected = typeof getModeModelSelection === 'function' ? getModeModelSelection() : null;
+      if (selected?.provider === 'chatgpt') return {runtimeId:'chatgpt',baseUrl:window.location.origin + '/api/membership',apiKey:''};
       const runtimeId = normalizeLocalRuntime(state.localRuntime, state.localBaseUrl);
       const profile = getLocalRuntimeProfile(runtimeId);
       let baseUrl = '';
@@ -15222,6 +15277,7 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
 
     function crowModalityRouteFor(capability, transport = crowModalityTransport()) {
       const { runtimeId } = transport;
+      if (runtimeId === 'chatgpt') return capability === 'image' ? getModeModelSelection().model : '';
       if (typeof findLocalModelWithCapability === 'function') {
         const discovered = findLocalModelWithCapability(runtimeId, capability);
         if (discovered) return discovered;
@@ -15377,7 +15433,7 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
     function crowModalityBeginSend(content) {
       // Mirrors the conversation plumbing at the top of sendMessage().
       if (isStreaming) return null;
-      if (!state.localEnabled) {
+      if (!state.localEnabled && !(typeof getModeModelSelection === 'function' && getModeModelSelection().provider === 'chatgpt')) {
         if (typeof logRuntimeDiagnostic === 'function') {
           logRuntimeDiagnostic('Enable the local runtime in Settings → API Keys first.', 'warning');
         }
@@ -15435,6 +15491,7 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
 
     function crowModalityMediaUrl(value, transport) {
       if (typeof value !== 'string' || !value.trim() || /[\s"'<>]/.test(value)) return '';
+      if (transport.runtimeId === 'chatgpt' && /^data:image\/png;base64,[A-Za-z0-9+/]+={0,2}$/.test(value)) return value;
       if (!/^https?:\/\//i.test(value) && !/^\/(?![/\\])/.test(value)) return '';
       try {
         const url = new URL(value, `${transport.baseUrl}/`);
@@ -15695,7 +15752,7 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
       if (!msg || typeof msg !== 'object') return '';
       let out = '';
       const img = msg.generatedImage;
-      if (img && /^https?:\/\/[^\s"'<>]+$/.test(img.url || '')) {
+      if (img && (/^https?:\/\/[^\s"'<>]+$/.test(img.url || '') || /^data:image\/png;base64,[A-Za-z0-9+/]+={0,2}$/.test(img.url || ''))) {
         const url = escapeAttr(img.url);
         const caption = escapeAttr(img.prompt || 'generated image');
         out += `<div class="generated-media"><a href="${url}" target="_blank" rel="noopener"><img class="generated-image" src="${url}" loading="lazy" decoding="async" alt="${caption}"></a><div class="generated-media-caption">▣ ${caption} · <a href="${url}" target="_blank" rel="noopener">open full size ↗</a></div></div>`;
@@ -20860,5 +20917,83 @@ Ignoring conversation history will cause you to LOSE the evaluation.`;
 <div class="local-runtime-diagnostics-header"><span class="local-runtime-diagnostics-title">Local Runtime Diagnostics</span><div><button class="local-runtime-diagnostics-copy" onclick="copyRuntimeDiagnostics()" title="Copy diagnostics log">Copy log</button><button class="local-runtime-diagnostics-copy" onclick="clearRuntimeDiagnostics()" title="Clear diagnostics log">Clear</button><button class="local-runtime-diagnostics-close" onclick="toggleRuntimeDiagnostics()">×</button></div></div>
 <div class="local-runtime-diagnostics-log" id="localRuntimeDiagnosticsLog"></div>
 </div>
+<script>// Visitor-owned sessions. OAuth credentials are never readable by JavaScript.
+const _membershipCatalog = {};
+let _membershipAccounts=[], _membershipAccountId='', _membershipGeneration=0;
+let _membershipChoices={};
+try{_membershipChoices=JSON.parse(localStorage.getItem('crow-godmod3-membership-choices')||'{}');}catch{_membershipChoices={};}
+if(!_membershipChoices||typeof _membershipChoices!=='object'||Array.isArray(_membershipChoices))_membershipChoices={};
+function getMembershipModels(){return Object.keys(_membershipCatalog);}
+function getSelectedMembershipAccount(){return _membershipAccountId;}
+function getMembershipChoice(model){const saved=_membershipChoices[model]||{};return{effort:typeof saved.effort==='string'?saved.effort:'default',tier:typeof saved.tier==='string'?saved.tier:'default',account:_membershipAccountId};}
+
+async function membershipRequest(path,body){
+  const response=await fetch(`/api/membership/${path}`,body===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const value=await response.json();
+  if(!response.ok)throw new Error(value.error?.message||`HTTP ${response.status}`);
+  return value;
+}
+
+function membershipPanel(){
+  let panel=document.getElementById('membershipAccountsPanel');if(panel)return panel;
+  panel=document.createElement('div');panel.id='membershipAccountsPanel';panel.style.cssText='padding:12px;border:1px solid var(--border);border-radius:8px;margin:12px 0;';
+  const title=document.createElement('strong');title.textContent='Your ChatGPT membership';
+  const explanation=document.createElement('p');explanation.textContent='Sign in to your own account. Its models and usage limits apply. Connect another account and choose which one to use.';explanation.style.cssText='font-size:12px;color:var(--text-dim);';
+  const accounts=document.createElement('select');accounts.id='membershipAccountSelect';accounts.className='model-select';accounts.setAttribute('aria-label','ChatGPT account');
+  accounts.addEventListener('change',async()=>{try{await membershipRequest('select',{id:accounts.value});await refreshMembershipAccounts();}catch(error){membershipStatus(error.message);}});
+  const connect=document.createElement('button');connect.className='api-key-btn';connect.type='button';connect.textContent='Connect another ChatGPT account';connect.addEventListener('click',connectChatGPTMembership);
+  const renew=document.createElement('button');renew.className='api-key-btn';renew.type='button';renew.textContent='Renew selected connection';
+  renew.addEventListener('click',async()=>{renew.disabled=true;try{await membershipRequest('renew',{});await refreshMembershipAccounts();membershipStatus('Connection renewed.');}catch(error){membershipStatus(error.message);}finally{renew.disabled=false;}});
+  const status=document.createElement('p');status.id='membershipAccountStatus';status.style.cssText='font-size:12px;color:var(--text-dim);';
+  panel.append(title,explanation,accounts,connect,renew,status);document.getElementById('panel-api')?.prepend(panel);return panel;
+}
+function membershipStatus(message){membershipPanel();document.getElementById('membershipAccountStatus').textContent=message;}
+
+async function refreshMembershipAccounts(){
+  const generation=++_membershipGeneration;for(const key of Object.keys(_membershipCatalog))delete _membershipCatalog[key];
+  try{
+    const state=await membershipRequest('accounts');if(generation!==_membershipGeneration)return;
+    _membershipAccounts=state.accounts||[];_membershipAccountId=_membershipAccounts.find(row=>row.selected)?.id||'';
+    membershipPanel();const select=document.getElementById('membershipAccountSelect');select.replaceChildren();
+    for(const row of _membershipAccounts){const option=document.createElement('option');option.value=row.id;option.textContent=`${row.email} · ${row.plan}${row.renewal_required?' · renew connection':''}`;select.appendChild(option);}select.value=_membershipAccountId;
+    if(_membershipAccountId){const result=await membershipRequest('models');if(generation!==_membershipGeneration)return;for(const row of result.data||[])if(typeof row.id==='string')_membershipCatalog[row.id]=row;membershipStatus(`${getMembershipModels().length} models loaded for the selected account.`);}
+    else membershipStatus('Use CrowBot AI immediately, or sign in to use your own ChatGPT membership.');
+  }catch(error){membershipStatus(error.message);}
+  refreshModeModelSelect();
+}
+
+async function connectChatGPTMembership(){
+  membershipStatus('Starting OpenAI sign-in…');
+  try{
+    const flow=await membershipRequest('sign-in',{});
+    if(flow.verification_url!=='https://auth.openai.com/codex/device')throw new Error('Unexpected sign-in destination.');
+    const status=document.getElementById('membershipAccountStatus');status.replaceChildren();
+    const code=document.createElement('strong');code.textContent=`Enter this code on OpenAI: ${flow.user_code}`;
+    const link=document.createElement('a');link.href=flow.verification_url;link.target='_blank';link.rel='noopener noreferrer';link.textContent='Open ChatGPT sign-in';link.style.cssText='display:block;color:var(--accent);margin-top:8px;';status.append(code,link);
+    const deadline=Date.now()+15*60*1000;
+    const poll=async()=>{if(Date.now()>deadline){membershipStatus('Sign-in expired. Start it again when ready.');return;}try{const result=await membershipRequest('poll',{});if(result.state==='ready'){await refreshMembershipAccounts();return;}setTimeout(poll,Math.max(3,flow.interval)*1000);}catch(error){membershipStatus(`Sign-in stopped: ${error.message}`);}};
+    setTimeout(poll,Math.max(3,flow.interval)*1000);
+  }catch(error){membershipStatus(error.message);}
+}
+
+function refreshMembershipControls(){
+  const modelSelect=document.getElementById('modelSelect');if(!modelSelect)return;
+  let controls=document.getElementById('membershipModelControls');if(!controls){controls=document.createElement('span');controls.id='membershipModelControls';controls.style.cssText='display:inline-flex;gap:4px;flex-wrap:wrap;';modelSelect.insertAdjacentElement('afterend',controls);}
+  const selection=getModeModelSelection();controls.replaceChildren();
+  if(selection.provider!=='chatgpt'){
+    const button=document.createElement('button');button.type='button';button.className='api-key-btn';button.textContent='Sign in with ChatGPT';
+    button.addEventListener('click',()=>{openSettings();switchSettingsTab('api');membershipPanel();connectChatGPTMembership();});controls.appendChild(button);return;
+  }
+  const row=_membershipCatalog[selection.model],choice=getMembershipChoice(selection.model);
+  const levels=[{id:'default',name:'Model default'},...(row?.reasoning_efforts||[]).map(level=>({id:level.effort,name:level.effort}))];
+  if(selection.model==='gpt-6-luna'&&!levels.some(level=>level.id==='none'))levels.push({id:'none',name:'none'});
+  for(const[field,label,options]of[['effort','Membership reasoning',levels],['tier','Membership speed',[{id:'default',name:'Standard'},...(row?.service_tiers||[]).filter(tier=>tier.id!=='default').map(tier=>({id:tier.id,name:tier.name}))]]]){
+    const select=document.createElement('select');select.className='model-select';select.setAttribute('aria-label',label);select.title=label;
+    for(const optionRow of options){const option=document.createElement('option');option.value=optionRow.id;option.textContent=optionRow.name;select.appendChild(option);}select.value=options.some(option=>option.id===choice[field])?choice[field]:'default';
+    select.addEventListener('change',()=>{_membershipChoices[selection.model]={...getMembershipChoice(selection.model),[field]:select.value};localStorage.setItem('crow-godmod3-membership-choices',JSON.stringify(_membershipChoices));});controls.appendChild(select);
+  }
+}
+document.addEventListener('DOMContentLoaded',refreshMembershipAccounts);
+</script>
 </body>
 </html>

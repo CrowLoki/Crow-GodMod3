@@ -389,6 +389,7 @@ const runtimeLocalProviderConfig = `    // First-class loopback runtime presets.
 
     const _localModelCapsByRuntime = {};
     function recordLocalModelCapabilities(runtime, descriptors) {
+      if (runtime === 'chatgpt' && typeof recordMembershipOptions === 'function') recordMembershipOptions(descriptors);
       const map = {};
       for (const descriptor of Array.isArray(descriptors) ? descriptors : []) {
         const id = getLocalModelDescriptorId(descriptor);
@@ -460,7 +461,7 @@ const runtimeLocalProviderConfig = `    // First-class loopback runtime presets.
         }
       }
 
-      const response = await fetchImpl(\`\${baseUrl}/models\`, { headers });
+      const response = await fetchImpl(\`\${baseUrl}/models\`, { headers, targetAddressSpace: 'loopback' });
       if (!response.ok) throw new Error(\`HTTP \${response.status}\`);
       const payload = await response.json();
       const descriptors = extractLocalModelDescriptors(payload).filter(getLocalModelDescriptorId);
@@ -553,7 +554,7 @@ const runtimeModeModelConfig = `    // Each mode keeps its own explicit provider
     // "auto" preserves the mode's native cloud behavior and adds that mode's
     // independently selected local-model pool. Every pool defaults to one
     // local model but has no fixed model-count ceiling.
-    const MODE_MODEL_PROVIDERS = new Set(['auto', 'openrouter', 'venice', 'local']);
+    const MODE_MODEL_PROVIDERS = new Set(['auto', 'openrouter', 'venice', 'local', 'crowbot', 'chatgpt']);
     const MODE_MODEL_IDS = new Set(['ultraplinian', 'parseltongue', 'pliny']);
     const MODE_MODEL_SELECTION_SCHEMA_VERSION = 2;
     const MODE_LOCAL_POOL_LABELS = Object.freeze({
@@ -739,6 +740,8 @@ const runtimeModeModelConfig = `    // Each mode keeps its own explicit provider
         apiKey: _localApiKeysByRuntime[runtimeId]
           || (runtimeId === state.localRuntime ? state.localApiKey : '')
           || '',
+        membership: runtimeId === 'chatgpt' && typeof getMembershipChoice === 'function'
+          ? Object.freeze(getMembershipChoice(target.model)) : null,
       }));
       return target;
     }
@@ -956,6 +959,9 @@ const runtimeModeModelConfig = `    // Each mode keeps its own explicit provider
       localModels = getLocalModels(),
       localOnly = state.localOnly,
     ) {
+      if (state.crowbotEnabled && !state.apiKey && !state.veniceApiKey && !state.localEnabled) {
+        return Object.fromEntries([...MODE_MODEL_IDS].map(mode => [mode, {provider:'crowbot',model:'crowbot-auto'}]));
+      }
       return {
         ultraplinian: { provider: 'auto', model: '' },
         parseltongue: { provider: 'auto', model: '' },
@@ -1028,7 +1034,9 @@ const runtimeModeModelConfig = `    // Each mode keeps its own explicit provider
       if (provider === 'openrouter') {
         model = OPENROUTER_LEGACY_MODEL_MIGRATIONS[model] || model;
       }
-      return { provider, model };
+      return provider === 'local'
+        ? { provider, model, runtime: LOCAL_RUNTIME_IDS.has(selection.runtime) ? selection.runtime : state.localRuntime }
+        : { provider, model };
     }
 
     function normalizeModeModelSelections(
@@ -1056,8 +1064,11 @@ const runtimeModeModelConfig = `    // Each mode keeps its own explicit provider
 
     function isModeModelSelectionAvailable(selection) {
       if (!selection || selection.provider === 'auto') return true;
+      if (selection.provider === 'crowbot') return state.crowbotEnabled !== false;
+      if (selection.provider === 'chatgpt') return typeof getMembershipModels === 'function' && getMembershipModels().includes(selection.model);
       if (selection.provider === 'local') {
-        return hasLocalProvider() && getLocalModels().includes(selection.model);
+        const runtime = selection.runtime || state.localRuntime;
+        return hasLocalProvider(runtime) && getLocalModels(runtime).includes(selection.model);
       }
       if (selection.provider === 'openrouter') {
         return !state.localOnly
@@ -1079,7 +1090,7 @@ const runtimeModeModelConfig = `    // Each mode keeps its own explicit provider
         const request = {
           provider: selection.provider,
           model: selection.model,
-          runtime: selection.provider === 'local' ? state.localRuntime : undefined,
+          runtime: selection.provider === 'local' ? selection.runtime || state.localRuntime : undefined,
         };
         if (selection.provider === 'local') {
           attachLocalTransportSnapshot(request, request.runtime);
@@ -1106,7 +1117,7 @@ const runtimeModeModelConfig = `    // Each mode keeps its own explicit provider
         provider: selection.provider,
         model: selection.model,
         localModels,
-        runtime: state.localRuntime,
+        runtime: selection.provider === 'local' ? selection.runtime || state.localRuntime : state.localRuntime,
       };
       if (selection.provider === 'local' || localModels.length) {
         attachLocalTransportSnapshot(executionSelection, executionSelection.runtime);
@@ -1261,28 +1272,32 @@ const runtimeModeModelConfig = `    // Each mode keeps its own explicit provider
 
     function encodeModeModelSelection(selection) {
       if (!selection || selection.provider === 'auto') return 'auto';
-      return encodeURIComponent(JSON.stringify([selection.provider, selection.model]));
+      return encodeURIComponent(JSON.stringify(selection.provider === 'local' && selection.runtime
+        ? [selection.provider, selection.model, selection.runtime]
+        : [selection.provider, selection.model]));
     }
 
     function decodeModeModelSelection(value) {
       if (!value || value === 'auto') return { provider: 'auto', model: '' };
       try {
         const parsed = JSON.parse(decodeURIComponent(value));
-        if (!Array.isArray(parsed) || parsed.length !== 2) throw new Error('Invalid model selection');
-        return { provider: parsed[0], model: parsed[1] };
+        if (!Array.isArray(parsed) || ![2, 3].includes(parsed.length)) throw new Error('Invalid model selection');
+        return parsed[0] === 'local' && LOCAL_RUNTIME_IDS.has(parsed[2])
+          ? { provider: parsed[0], model: parsed[1], runtime: parsed[2] }
+          : { provider: parsed[0], model: parsed[1] };
       } catch (_) {
         return { provider: 'auto', model: '' };
       }
     }
 
-    function appendModeModelOptions(select, label, provider, models) {
+    function appendModeModelOptions(select, label, provider, models, runtime) {
       if (!models.length) return;
       const group = document.createElement('optgroup');
       group.label = label;
       for (const model of models) {
         const option = document.createElement('option');
-        option.value = encodeModeModelSelection({ provider, model });
-        option.textContent = \`\${label} · \${model}\`;
+        option.value = encodeModeModelSelection({ provider, model, runtime });
+        option.textContent = provider === 'crowbot' ? 'CrowBot AI' : \`\${label} · \${model}\`;
         group.appendChild(option);
       }
       select.appendChild(group);
@@ -1307,10 +1322,14 @@ const runtimeModeModelConfig = `    // Each mode keeps its own explicit provider
       autoOption.value = 'auto';
       autoOption.textContent = autoLabels[mode];
       select.appendChild(autoOption);
+      appendModeModelOptions(select, 'CrowBot AI', 'crowbot', ['crowbot-auto']);
+      if (typeof getMembershipModels === 'function') appendModeModelOptions(select, 'ChatGPT membership', 'chatgpt', getMembershipModels());
 
       if (state.localEnabled) {
-        const runtime = LOCAL_RUNTIME_PRESETS[state.localRuntime]?.label || 'Local';
-        appendModeModelOptions(select, runtime, 'local', getLocalModels());
+        for (const runtime of LOCAL_RUNTIME_IDS) {
+          const label = LOCAL_RUNTIME_PRESETS[runtime].label;
+          appendModeModelOptions(select, label, 'local', getLocalModels(runtime), runtime);
+        }
       }
       if (!state.localOnly && state.apiKey) {
         appendModeModelOptions(select, 'OpenRouter', 'openrouter', OPENROUTER_FREE_CHAT_MODELS);
@@ -1338,6 +1357,7 @@ const runtimeModeModelConfig = `    // Each mode keeps its own explicit provider
       select.title = available
         ? 'Pick the provider and model used by this mode'
         : 'This saved model is unavailable. Reconnect it or choose another model.';
+      if (typeof refreshMembershipControls === 'function') refreshMembershipControls();
     }
 
     function setCurrentModeModelSelection(value) {
@@ -1351,6 +1371,7 @@ const runtimeModeModelConfig = `    // Each mode keeps its own explicit provider
       state.modeModelSelections[mode] = selection;
       state.modeModelSelectionVersion = MODE_MODEL_SELECTION_SCHEMA_VERSION;
       refreshModeModelSelect();
+      updateApiWarning();
       buildTierSelect();
       saveState();
     }`;
@@ -1566,6 +1587,7 @@ replaceRequired(
       localApiKey: '',  // Optional token for authenticated local servers`,
   `      localEnabled: false,  // Use an OpenAI-compatible server on loopback
       localOnly: false,  // Never use cloud providers; telemetry is disabled
+      crowbotEnabled: true,  // This project's anonymous standalone CrowBot AI
       localRuntime: '',  // Missing legacy value is inferred from the saved URL
       localBaseUrl: 'http://localhost:11434/v1',
       localModels: '',  // Comma-separated model IDs available from the local server
@@ -2137,6 +2159,18 @@ replaceRequired(
   `      if (target.provider === 'local') {
         delete requestBody.reasoning;
         delete requestBody.reasoning_effort;
+        if (target.runtime === 'chatgpt') {
+          const snapshot = getLocalTransportSnapshot(target, target.runtime);
+          const choice = snapshot?.membership || (typeof getMembershipChoice === 'function' ? getMembershipChoice(target.model) : {});
+          if (choice.effort && choice.effort !== 'default') requestBody.reasoning_effort = choice.effort;
+          requestBody.service_tier = choice.tier || 'default';
+        }
+        if (target.runtime === 'crowbot') {
+          const supported = new Set(['model', 'messages', 'stream', 'temperature', 'max_tokens']);
+          for (const key of Object.keys(requestBody)) {
+            if (!supported.has(key)) delete requestBody[key];
+          }
+        }
         const localProfile = getLocalTransportSnapshot(target, target.runtime)
           || getLocalRuntimeProfile(target.runtime);
         if (
@@ -2209,7 +2243,14 @@ replaceRequired(
         else if (state.apiKey) provider = 'openrouter';
         else if (localEnabled && localModels.length) provider = 'local';
         else if (state.veniceApiKey) provider = 'venice';
+        else if (state.crowbotEnabled !== false) provider = 'crowbot';
         else throw new Error('No model provider is configured.');
+      }
+
+      if (provider === 'crowbot') return {provider,model:'crowbot-auto',url:'/api/crowbot/chat/completions',apiKey:''};
+      if (provider === 'chatgpt') {
+        if (typeof getMembershipModels !== 'function' || !getMembershipModels().includes(requestedModel)) throw new Error('Sign in with your ChatGPT membership and choose an available model.');
+        return {provider,model:requestedModel,url:'/api/membership/chat/completions',apiKey:''};
       }
 
       if (provider === 'local') {
@@ -5763,6 +5804,43 @@ replaceRequired(
   '        <button class="sidebar-close" id="sidebarClose" type="button" onclick="closeMobileSidebar()" aria-label="Close sidebar">×</button>\n',
 );
 
+replaceRequired(
+  '      return fetch(target.url, {',
+  "      return fetch(target.url, {\n        ...(target.provider === 'local' ? { targetAddressSpace: 'loopback' } : {}),",
+);
+replaceRequired(
+  `    function hasAnyChatProvider() {
+      if (state.localOnly) return hasLocalProvider();
+      return !!(state.apiKey || state.veniceApiKey || hasLocalProvider());
+    }`,
+  `    function hasAnyChatProvider() {
+      const mode = typeof getCurrentMode === 'function' ? getCurrentMode() : 'ultraplinian';
+      const selection = state.modeModelSelections?.[mode];
+      const localAvailable = selection?.provider === 'local'
+        ? hasLocalProvider(selection.runtime || state.localRuntime)
+        : hasLocalProvider();
+      if (state.localOnly) return localAvailable;
+      return !!(state.crowbotEnabled !== false || state.apiKey || state.veniceApiKey || localAvailable || (typeof getMembershipModels === 'function' && getMembershipModels().length));
+    }`,
+);
+
+replaceRequired(
+  "      const headers = { 'Content-Type': 'application/json' };\n      if (target.apiKey)",
+  `      if (target.provider === 'chatgpt' && typeof getMembershipChoice === 'function') {
+        const choice = getMembershipChoice(target.model);
+        if (choice.effort !== 'default') requestBody.reasoning_effort = choice.effort;
+        requestBody.service_tier = choice.tier;
+      }
+      const headers = { 'Content-Type': 'application/json' };
+      if (target.apiKey)`,
+);
+const membershipScript = await readFile(resolve(projectRoot, 'scripts/crow-membership.js'), 'utf8');
+if (membershipScript.includes('</' + 'script>')) throw new Error('Invalid membership script');
+replaceRequired('</body>', `<script>${membershipScript}</script>\n</body>`);
+replaceRequired(
+  '<label for="localReasoningEffortInput">LM Studio reasoning</label>',
+  '<button type="button" class="api-key-btn" onclick="connectChatGPTMembership()">Continue with ChatGPT</button><small id="membershipConnectionStatus" style="display:block;color:var(--text-dim);"></small>\n              <label for="localReasoningEffortInput">LM Studio reasoning</label>',
+);
 await mkdir(dirname(outputPath), { recursive: true });
 await writeFile(outputPath, html, "utf8");
 console.log(`Generated ${outputPath} (${html.length.toLocaleString()} bytes).`);
