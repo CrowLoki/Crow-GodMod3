@@ -5934,7 +5934,7 @@ replaceRequired(
   `      if (!container || !ULTRAPLINIAN_MODELS || !ULTRAPLINIAN_MODELS.length) return;
       if (state.publicModelDefaultVersion === 1 && getModeExecutionSelection('ultraplinian').provider === 'crowbot') {
         container.innerHTML = ['fast','standard','smart','power','ultra'].map(tier =>
-          '<div style="border:1px solid var(--border);border-radius:6px;padding:10px"><strong>'+tier.toUpperCase()+' · '+TIER_SIZES[tier]+' independent candidates</strong><br>'+getCrowBotRaceEntries(tier).map(getUltraplinianThinkingModelKey).join('<br>')+'</div>').join('');return;
+          '<button type="button" onclick="document.getElementById(&quot;ultraSpeedTier&quot;).value=&quot;'+tier+'&quot;;document.getElementById(&quot;ultraSpeedTier&quot;).dispatchEvent(new Event(&quot;change&quot;))" style="text-align:left;color:var(--text);background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:10px;cursor:pointer"><strong>'+tier.toUpperCase()+' · '+TIER_SIZES[tier]+' independent candidates</strong><br>'+getCrowBotRaceEntries(tier).map(getUltraplinianThinkingModelKey).join('<br>')+'</button>').join('');return;
       }`,
 );
 const membershipScript = await readFile(resolve(projectRoot, 'scripts/crow-membership.js'), 'utf8');
