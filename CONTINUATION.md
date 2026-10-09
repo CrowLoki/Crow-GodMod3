@@ -6,7 +6,23 @@ below is dated. Historical handoffs remain provenance, not current instructions.
 
 ## Scope and current checkpoint
 
-### Current increment: independent public CrowBot AI and membership connections
+### Current repair: public defaults and repeated strategy candidates
+
+The public default is CrowBot AI in General and all three mode selectors.
+Legacy OpenRouter defaults migrate once while retaining visitor keys and chats;
+other providers require an explicit selection. Auxiliary scoring/refinement calls
+inherit the selected provider. ULTRAPLINIAN runs 3/5/8/11/13 independent CrowBot AI
+candidates for Fast/Standard/Smart/Power/Ultra, preserving separate progress and
+winner identities. CLASSIC prompt combinations and PARSELTONGUE variants retain
+their existing pipelines. Tier displays refresh with the selection.
+
+Validation: 109 tests passed; lint 0 errors, 11 warnings. Actual Chrome ran the
+Standard CrowBot pipeline for a benign rain explanation and rendered its refined
+answer. Request tracing showed only anonymous crowbot-auto requests without
+Authorization headers. Membership acceptance limitations below remain unchanged.
+This repair is authorized for merged-source production delivery.
+
+### Prior increment: independent public CrowBot AI and membership connections
 
 Crow clarified on 9 October that this is a public website: visitors use their
 own keys and memberships. Only standalone CrowBot AI is supplied without an
